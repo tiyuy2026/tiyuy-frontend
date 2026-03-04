@@ -1,0 +1,136 @@
+'use client';
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { PropertyRepository } from '@/infrastructure/repositories/PropertyRepository';
+import { PropertyFilter } from '@/core/domain/entities/PropertyFilter';
+import { CreatePropertyData, UpdatePropertyData } from '@/core/domain/repositories/IPropertyRepository';
+import { toast } from 'sonner';
+
+const propertyRepo = new PropertyRepository();
+
+export function usePropertyBySlug(slug: string) {
+  return useQuery({
+    queryKey: ['property', 'slug', slug],
+    queryFn: () => propertyRepo.getBySlug(slug),
+    enabled: !!slug,
+  });
+}
+
+export function usePropertyById(id: number) {
+  return useQuery({
+    queryKey: ['property', id],
+    queryFn: () => propertyRepo.getById(id),
+    enabled: !!id,
+  });
+}
+
+export function useSearchProperties(filters: PropertyFilter) {
+  return useQuery({
+    queryKey: ['properties', 'search', filters],
+    queryFn: () => propertyRepo.search(filters),
+  });
+}
+
+export function useMyProperties(page = 0, size = 20) {
+  return useQuery({
+    queryKey: ['properties', 'my-properties', page, size],
+    queryFn: () => propertyRepo.getMyProperties(page, size),
+    staleTime: 0, // Siempre considerar los datos como obsoletos
+    refetchOnMount: true, // Siempre refrescar al montar
+    refetchOnWindowFocus: true, // Refrescar cuando la ventana gana foco
+  });
+}
+
+export function useCreateProperty() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (data: CreatePropertyData) => propertyRepo.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['properties', 'my-properties'] });
+      toast.success('Propiedad creada exitosamente');
+    },
+    onError: (error: any) => {
+      const status = error?.response?.status;
+      if (status === 402) {
+        // No mostrar toast para error 402, el componente manejará el modal
+        return;
+      }
+      toast.error(error.response?.data?.message || 'Error al crear propiedad');
+    },
+  });
+}
+
+export function useUpdateProperty() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdatePropertyData }) => 
+      propertyRepo.update(id, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['property', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['properties', 'my-properties'], exact: false });
+      toast.success('Propiedad actualizada');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al actualizar');
+    },
+  });
+}
+
+export function usePublishProperty() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (id: number) => propertyRepo.publish(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['properties', 'my-properties'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['subscription', 'active'] });
+      queryClient.refetchQueries({ queryKey: ['properties', 'my-properties'] });
+      toast.success('¡Propiedad publicada!');
+    },
+    onError: (error: any) => {
+      const status = error?.response?.status;
+      if (status === 402) {
+        // No mostrar toast para error 402, el componente manejará el modal
+        return;
+      }
+      // ✅ Solo mostrar error si realmente hay un error, no si la publicación fue exitosa
+      if (error?.response?.data?.message) {
+        toast.error(error.response.data.message);
+      }
+    },
+  });
+}
+
+export function useDeleteProperty() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (id: number) => propertyRepo.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['properties', 'my-properties'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['properties', 'search'], exact: false });
+      toast.success('Propiedad eliminada');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al eliminar');
+    },
+  });
+}
+
+export function useUploadPhotos() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ propertyId, files }: { propertyId: number; files: File[] }) =>
+      propertyRepo.uploadPhotos(propertyId, files),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['property', variables.propertyId] });
+      toast.success('Fotos subidas correctamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al subir fotos');
+    },
+  });
+}

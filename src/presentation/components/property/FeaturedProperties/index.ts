@@ -1,0 +1,1 @@
+export { FeaturedProperties } from './FeaturedProperties';

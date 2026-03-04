@@ -1,0 +1,3 @@
+echo "User-agent: *
+Allow: /
+Sitemap: https://tiyuy.com/sitemap.xml" > public/robots.txt
