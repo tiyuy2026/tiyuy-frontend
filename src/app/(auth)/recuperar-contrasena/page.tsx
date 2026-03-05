@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { ForgotPasswordForm } from '@/presentation/components/auth/ForgotPasswordForm';
+import { ForgotPasswordForm } from '@/presentation/components/auth/ForgotPasswordForm/ForgotPasswordForm';
 
 export const metadata: Metadata = {
   title: 'Recuperar Contraseña - TIYUY | Bienes Raíces en Perú',

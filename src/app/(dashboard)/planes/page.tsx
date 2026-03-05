@@ -117,7 +117,7 @@ export default function PlansPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+        <div className="bg-gradient-to-r from-blue-600 to-teal-600 text-white">
           <div className="max-w-6xl mx-auto px-4 py-16">
             <div className="text-center">
               <h1 className="text-5xl font-bold mb-6">Planes para Tu Negocio Inmobiliario</h1>

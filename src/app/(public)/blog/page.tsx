@@ -1,7 +1,6 @@
 import { BlogSection } from '@/presentation/components/blog/BlogSection/BlogSection';
 import { BlogPosts } from '@/presentation/components/blog/BlogPosts/BlogPosts';
 import { CompleteServices } from '@/presentation/components/services/CompleteServices/CompleteServices';
-import { Footer } from '@/presentation/components/layout/Footer/Footer';
 
 export default function BlogPage() {
   return (
@@ -9,7 +8,6 @@ export default function BlogPage() {
       <BlogSection />
       <BlogPosts />
       <CompleteServices />
-      <Footer />
     </main>
   );
 }

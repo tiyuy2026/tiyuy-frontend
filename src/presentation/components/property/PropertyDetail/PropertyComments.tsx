@@ -130,8 +130,8 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
       {/* Lista de comentarios */}
       {comments.length > 0 ? (
         <div className="space-y-3">
-          {comments.map((comment) => (
-            <div key={comment.id} className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+          {comments.map((comment, index) => (
+            <div key={comment.id || `comment-${index}-${comment.createdAt}`} className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
               <div className="flex justify-between items-start mb-2">
                 <div>
                   <p className="font-semibold text-gray-900">{comment.author}</p>

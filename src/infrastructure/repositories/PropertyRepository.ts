@@ -56,15 +56,32 @@ export class PropertyRepository implements IPropertyRepository {
     // Buscar directamente por slug sin extraer ID
     console.log('Buscando por slug directamente:', slug);
     const response = await axiosClient.get(ENDPOINTS.PROPERTIES.BY_SLUG(slug));
-    return PropertyMapper.toDomain(response.data.property);
+    
+    const dto = response.data?.property ? response.data.property : response.data;
+    console.log('🔍 DTO fields (slug):', Object.keys(dto));
+    console.log('📝 Description field (slug):', dto.description);
+    console.log('📝 Full DTO (slug):', dto);
+    
+    const mappedProperty = PropertyMapper.toDomain(dto);
+    console.log('🏠 Mapped Property description (slug):', mappedProperty.description);
+    
+    return mappedProperty;
   }
 
 // En PropertyRepository.ts, método getById
 async getById(id: number): Promise<Property> {
   const response = await axiosClient.get(`${ENDPOINTS.PROPERTIES.BASE}/${id}`);
   console.log('🔥 RAW response.data:', JSON.stringify(response.data, null, 2));
+  
   const dto = response.data?.property ? response.data.property : response.data;
-  return PropertyMapper.toDomain(dto);
+  console.log('🔍 DTO fields:', Object.keys(dto));
+  console.log('📝 Description field:', dto.description);
+  console.log('📝 Full DTO:', dto);
+  
+  const mappedProperty = PropertyMapper.toDomain(dto);
+  console.log('🏠 Mapped Property description:', mappedProperty.description);
+  
+  return mappedProperty;
 }
   
 

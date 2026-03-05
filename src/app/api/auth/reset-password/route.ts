@@ -2,21 +2,33 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json();
-    console.log('Forgot password - Email:', email);
+    const { token, password, confirmPassword } = await request.json();
 
-    if (!email) {
+    // Validaciones básicas
+    if (!token) {
       return NextResponse.json(
-        { message: 'El email es requerido' },
+        { message: 'Token de recuperación es requerido' },
         { status: 400 }
       );
     }
 
-    // Validar formato de email
-    const emailRegex = /\S+@\S+\.\S+/;
-    if (!emailRegex.test(email)) {
+    if (!password) {
       return NextResponse.json(
-        { message: 'Email inválido' },
+        { message: 'La contraseña es requerida' },
+        { status: 400 }
+      );
+    }
+
+    if (password.length < 8) {
+      return NextResponse.json(
+        { message: 'La contraseña debe tener al menos 8 caracteres' },
+        { status: 400 }
+      );
+    }
+
+    if (password !== confirmPassword) {
+      return NextResponse.json(
+        { message: 'Las contraseñas no coinciden' },
         { status: 400 }
       );
     }
@@ -25,12 +37,16 @@ export async function POST(request: NextRequest) {
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
     
     try {
-      const response = await fetch(`${backendUrl}/auth/forgot-password`, {
+      const response = await fetch(`${backendUrl}/auth/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ 
+          token, 
+          password,
+          confirmPassword 
+        }),
       });
 
       console.log(`Backend response: ${response.status}`);
@@ -55,13 +71,13 @@ export async function POST(request: NextRequest) {
       if (response.ok) {
         return NextResponse.json(
           { 
-            message: 'Si el email está registrado, recibirás las instrucciones para recuperar tu contraseña' 
+            message: 'Contraseña actualizada exitosamente' 
           },
           { status: 200 }
         );
       } else {
         return NextResponse.json(
-          { message: (data && data.message) || 'Error al procesar la solicitud' },
+          { message: (data && data.message) || 'Error al restablecer la contraseña' },
           { status: response.status }
         );
       }
@@ -74,7 +90,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Error en forgot password:', error);
+    console.error('Error en reset-password:', error);
     return NextResponse.json(
       { message: 'Error del servidor. Inténtalo nuevamente' },
       { status: 500 }
