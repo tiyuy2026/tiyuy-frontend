@@ -35,36 +35,30 @@ export async function POST(request: NextRequest) {
 
       console.log(`Backend response: ${response.status}`);
 
-      // Si la respuesta no es JSON, probablemente el backend no está corriendo
+      // ✅ Si el backend responde 200 sin cuerpo (Void), retornar éxito directo
+      if (response.ok) {
+        return NextResponse.json(
+          { message: 'Si el email está registrado, recibirás las instrucciones para recuperar tu contraseña' },
+          { status: 200 }
+        );
+      }
+
+      // Solo intentar parsear JSON si hay error
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         const text = await response.text();
         console.error('Backend no devuelve JSON:', text.substring(0, 100));
-        
         return NextResponse.json(
-          { message: 'El backend no está disponible' },
-          { status: 503 }
-        );
-      }
-
-      const data = await response.json().catch(err => {
-        console.error('Error parseando JSON:', err);
-        return null;
-      });
-
-      if (response.ok) {
-        return NextResponse.json(
-          { 
-            message: 'Si el email está registrado, recibirás las instrucciones para recuperar tu contraseña' 
-          },
-          { status: 200 }
-        );
-      } else {
-        return NextResponse.json(
-          { message: (data && data.message) || 'Error al procesar la solicitud' },
+          { message: 'Error del servidor' },
           { status: response.status }
         );
       }
+
+      const data = await response.json();
+      return NextResponse.json(
+        { message: data.message || 'Error al procesar la solicitud' },
+        { status: response.status }
+      );
     } catch (fetchError) {
       console.error('Error conectando al backend:', fetchError);
       return NextResponse.json(
