@@ -95,22 +95,9 @@ export const DniInput: React.FC<DniInputProps> = ({
         </div>
       </div>
 
-      {dniValidation && dniValidation.success && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0">
-              <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <h4 className="text-sm font-semibold text-green-900 mb-1">✓ DNI Verificado</h4>
-              <p className="text-sm text-green-800">
-                <span className="font-medium">{dniValidation.fullName}</span>
-              </p>
-              <p className="text-xs text-green-700 mt-1">DNI: {dniValidation.dni}</p>
-            </div>
-          </div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+          <p className="text-sm text-red-800">{error}</p>
         </div>
       )}
     </div>
