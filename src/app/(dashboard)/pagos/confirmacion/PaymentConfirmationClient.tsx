@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { usePaymentDetails } from '@/presentation/hooks/usePayments';
+import { usePaymentById } from '@/presentation/hooks/usePayments';
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
 
 export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) {
   const router = useRouter();
-  const { data: payment, isLoading, error } = usePaymentDetails(paymentId);
+  const { data: payment, isLoading, error } = usePaymentById(parseInt(paymentId));
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
-    if (payment && payment.status === 'SUCCESS') {
+    if (payment && payment.status === 'APPROVED') {
       // Redirigir después de 3 segundos para que el usuario vea el éxito
       const timer = setTimeout(() => {
         setIsRedirecting(true);
@@ -43,7 +43,7 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Error en la Confirmación</h1>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <p className="text-gray-600 mb-6">{error instanceof Error ? error.message : String(error)}</p>
           <button
             onClick={() => router.push('/dashboard/pagos')}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
@@ -95,7 +95,7 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
                     <div className="flex justify-between">
                       <span className="text-green-100">Estado:</span>
                       <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm">
-                        {payment?.status === 'SUCCESS' ? 'Aprobado' : payment?.status}
+                        {payment?.status === 'APPROVED' ? 'Aprobado' : payment?.status}
                       </span>
                     </div>
                     {payment?.description && (
@@ -113,6 +113,7 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
                       </div>
                     </div>
                   )}
+                </div>
               </div>
 
               {/* Details Side */}

@@ -20,9 +20,5 @@ export const metadata: Metadata = {
 };
 
 export default function ProfileSelectorPage() {
-  return (
-    <div className="py-8">
-      <ProfileSelector />
-    </div>
-  );
+  return <ProfileSelector />;
 }
