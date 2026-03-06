@@ -8,6 +8,8 @@ interface RucInputProps {
   onChange: (value: string) => void;
   onValidated?: (data: any) => void;
   required?: boolean;
+  helperText?: string;
+  disabled?: boolean;
 }
 
 export const RucInput: React.FC<RucInputProps> = ({
@@ -15,7 +17,10 @@ export const RucInput: React.FC<RucInputProps> = ({
   onChange,
   onValidated,
   required = false,
+  helperText,
+  disabled = false,
 }) => {
+  // Se cambia isValidatingRuc por isValidating que es lo que devuelve el hook
   const { validateRuc, isValidating, rucValidation } = useKyc();
   const [error, setError] = useState<string>('');
 
@@ -28,7 +33,6 @@ export const RucInput: React.FC<RucInputProps> = ({
     try {
       setError('');
       const result = await validateRuc(value);
-      
       if (result.success) {
         onValidated?.(result);
       } else {
@@ -40,6 +44,7 @@ export const RucInput: React.FC<RucInputProps> = ({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
     const val = e.target.value.replace(/\D/g, '').slice(0, 11);
     onChange(val);
     setError('');
@@ -47,30 +52,46 @@ export const RucInput: React.FC<RucInputProps> = ({
 
   return (
     <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700">
+        RUC {required && <span className="text-red-500">*</span>}
+      </label>
+
       <div className="flex gap-2">
         <div className="flex-1">
           <Input
             type="text"
-            label="RUC"
-            placeholder="20123456789"
+            placeholder="12345678901"
             value={value}
             onChange={handleChange}
             error={error}
             required={required}
             maxLength={11}
+            disabled={disabled}
             leftIcon={
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 7v10a2 2 0 002 2h3V5H5a2 2 0 00-2 2zm11-2v14h3a2 2 0 002-2V7a2 2 0 00-2-2h-3z"
+                />
               </svg>
             }
-            helperText="RUC de tu empresa (11 dígitos)"
+            helperText={
+              helperText ??
+              (disabled
+                ? 'RUC ya validado y verificado'
+                : 'Ingresa el RUC de tu empresa (11 dígitos)')
+            }
           />
         </div>
-        <div className="pt-8">
+
+        <div className="pt-6">
           <Button
             type="button"
             variant="outline"
             onClick={handleValidate}
+            // Actualizado para usar isValidating
             disabled={value.length !== 11 || isValidating}
             isLoading={isValidating}
           >
@@ -79,23 +100,12 @@ export const RucInput: React.FC<RucInputProps> = ({
         </div>
       </div>
 
-      {/* Resultado de validación */}
       {rucValidation && rucValidation.success && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0">
-              <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="flex-1">
-              <h4 className="text-sm font-semibold text-green-900 mb-1">✓ RUC Verificado</h4>
-              <p className="text-sm text-green-800">
-                <span className="font-medium">{rucValidation.companyName}</span>
-              </p>
-              <p className="text-xs text-green-700 mt-1">RUC: {rucValidation.ruc}</p>
-            </div>
-          </div>
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+          <p className="text-sm text-green-800">
+            <span className="font-medium">{rucValidation.companyName}</span>
+          </p>
+          <p className="text-xs text-green-700 mt-1">RUC: {rucValidation.ruc}</p>
         </div>
       )}
     </div>

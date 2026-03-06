@@ -8,9 +8,10 @@ interface DniInputProps {
   onChange: (value: string) => void;
   onValidated?: (data: any) => void;
   required?: boolean;
+  helperText?: string;
   leftIcon?: React.ReactNode;
   placeholder?: string;
-  disabled?: boolean; // Nuevo: para deshabilitar si ya está validado
+  disabled?: boolean;
 }
 
 export const DniInput: React.FC<DniInputProps> = ({
@@ -18,7 +19,8 @@ export const DniInput: React.FC<DniInputProps> = ({
   onChange,
   onValidated,
   required = false,
-  disabled = false, // Nuevo parámetro
+  disabled = false,
+  helperText,
 }) => {
   const { validateDni, isValidating, dniValidation } = useKyc();
   const [error, setError] = useState<string>('');
@@ -28,11 +30,9 @@ export const DniInput: React.FC<DniInputProps> = ({
       setError('El DNI debe tener 8 dígitos');
       return;
     }
-
     try {
       setError('');
       const result = await validateDni(value);
-      
       if (result.success) {
         onValidated?.(result);
       } else {
@@ -44,9 +44,7 @@ export const DniInput: React.FC<DniInputProps> = ({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Si está deshabilitado (ya validado), no permitir cambios
     if (disabled) return;
-    
     const val = e.target.value.replace(/\D/g, '').slice(0, 8);
     onChange(val);
     setError('');
@@ -54,27 +52,37 @@ export const DniInput: React.FC<DniInputProps> = ({
 
   return (
     <div className="space-y-2">
+      {/* Label manual */}
+      <label className="block text-sm font-medium text-gray-700">
+        DNI {required && <span className="text-red-500">*</span>}
+      </label>
+
       <div className="flex gap-2">
         <div className="flex-1">
           <Input
             type="text"
-            label="DNI"
             placeholder="12345678"
             value={value}
             onChange={handleChange}
             error={error}
             required={required}
             maxLength={8}
-            disabled={disabled} // Deshabilitar si ya está validado
+            disabled={disabled}
             leftIcon={
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
               </svg>
             }
-            helperText={disabled ? "DNI ya validado y verificado" : "Ingresa tu DNI de 8 dígitos"}
           />
+          {/* helperText manual */}
+          {helperText && (
+            <p className="mt-1 text-sm text-gray-500">{helperText}</p>
+          )}
+          {disabled && (
+            <p className="mt-1 text-sm text-gray-500">DNI ya validado y verificado</p>
+          )}
         </div>
-        <div className="pt-8">
+        <div className="pt-6">
           <Button
             type="button"
             variant="outline"
@@ -87,7 +95,6 @@ export const DniInput: React.FC<DniInputProps> = ({
         </div>
       </div>
 
-      {/* Resultado de validación */}
       {dniValidation && dniValidation.success && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="flex items-start gap-3">

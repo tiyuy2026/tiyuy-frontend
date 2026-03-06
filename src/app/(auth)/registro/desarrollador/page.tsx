@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { RegisterDeveloperForm } from '@/presentation/components/auth/RegisterForm/RegisterDeveloperForm';
 
 export const metadata: Metadata = {
-  title: 'Registro Desarrollador - TIYUY | Bienes Raíces en Perú',
-  description: 'Regístra tu empresa desarrolladora en TIYUY. Accede a 999 publicaciones y proyectos ilimitados. 30 días de prueba gratuita.',
-  keywords: ['desarrollador inmobiliario tiyuy', 'registro empresa', 'proyectos inmobiliarios perú', 'tiyuy enterprise'],
+  title: 'Publica tu Proyecto Gratis - TIYUY | Desarrolladores Inmobiliarios',
+  description: 'Regístra tu empresa y publica tu primer proyecto inmobiliario gratis. 30 días de prueba + unidades ilimitadas (departamentos, casas, oficinas, lotes).',
+  keywords: ['publicar proyecto gratis tiyuy', 'desarrollador inmobiliario', 'proyecto departamentos', 'inmobiliaria peru', 'tiyuy developer'],
   robots: { index: false, follow: false },
 };
 
@@ -19,10 +19,10 @@ export default function RegisterDeveloperPage() {
           30 días gratis - Trial Enterprise
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Registro de Desarrollador
+          Publica tu Proyecto Inmobiliario
         </h1>
         <p className="text-gray-600">
-          Registra tu empresa y proyectos inmobiliarios
+          Regístra tu empresa y publica tu primer proyecto con unidades ilimitadas
         </p>
       </div>
       <RegisterDeveloperForm />

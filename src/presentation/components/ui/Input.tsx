@@ -5,6 +5,8 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   rightIcon?: React.ReactNode;
   helperText?: string;
   className?: string;
+  label?: string;        // ← agregar
+  error?: string; 
 }
 
 export const Input: React.FC<InputProps> = ({
