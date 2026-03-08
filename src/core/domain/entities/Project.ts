@@ -3,8 +3,9 @@ export interface Project {
   name: string;
   slug: string;
   description: string;
+  status: 'DRAFT' | 'PUBLISHED' | 'COMPLETED';
   phase: 'PRE_SALE' | 'SALE' | 'DELIVERY';
-  type: 'RESIDENTIAL' | 'COMMERCIAL' | 'MIXED';
+  type: 'INDUSTRIAL' | 'COMMERCIAL' | 'MIXED_USE' | 'RESIDENTIAL';
   totalUnits: number;
   availableUnits: number;
   soldUnits: number;

@@ -7,7 +7,7 @@ import ProjectDetail from '@/presentation/components/project/ProjectDetail/Proje
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute/ProtectedRoute'; 
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
@@ -18,7 +18,8 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   try {
-    const project = await projectRepo.getBySlug(params.slug);
+    const { slug } = await params;
+    const project = await projectRepo.getBySlug(slug);
     
     return {
       title: `${project.name} | Proyecto Inmobiliario ${project.district} | TIYUY`,
@@ -50,7 +51,8 @@ export async function generateMetadata(
 }
 
 export default async function ProjectDetailPage({ params }: Props) {
-  const project = await projectRepo.getBySlug(params.slug);
+  const { slug } = await params;
+  const project = await projectRepo.getBySlug(slug);
 
   if (!project) notFound();
 

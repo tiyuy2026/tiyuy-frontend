@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Footer } from '@/presentation/components/layout/Footer/Footer';
 import { FeaturedProperties } from '@/presentation/components/property/FeaturedProperties/FeaturedProperties';
-import { FeaturedProjects } from '@/presentation/components/projects/FeaturedProjects/FeaturedProjects';
+import { FeaturedProjects } from '@/presentation/components/project/FeaturedProjects/FeaturedProjects';
 
 const HERO_IMAGES = [
   '/assets/images/hero/hero-1.jpg',

@@ -178,7 +178,10 @@ export const RegisterDeveloperForm: React.FC = () => {
                         onChange={(val) => setFormData(prev => ({ ...prev, ruc: val }))}
                         onValidated={(data) => {
                             setIsRucValidated(true);
-                            setFormData(prev => ({ ...prev, companyName: data.companyName || '' }));
+                            // Si la API devuelve el nombre, lo usa, pero no bloquea el campo
+                            if (data.companyName) {
+                                setFormData(prev => ({ ...prev, companyName: data.companyName }));
+                            }
                         }}
                         required
                     />
@@ -190,7 +193,6 @@ export const RegisterDeveloperForm: React.FC = () => {
                         value={formData.companyName}
                         onChange={handleChange}
                         placeholder="Ej: Inmobiliaria Los Pinos S.A.C."
-                        readOnly={isRucValidated}
                         className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                     />
                 </div>

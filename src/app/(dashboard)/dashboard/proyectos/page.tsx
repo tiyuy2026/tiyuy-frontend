@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { useProjects } from '@/presentation/hooks/useProjects';
@@ -11,14 +10,85 @@ import { TrialWarningBanner } from '@/presentation/components/guards/TrialGuard/
 
 export default function TodosProyectosPage() {
   const { user } = useAuthStore();
-  const { searchProjects } = useProjects();
+  const { myProjects } = useProjects(); // Cambiado de searchProjects a myProjects
   const [activeTab, setActiveTab] = useState<'ALL' | 'DRAFT' | 'PUBLISHED' | 'COMPLETED'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data: projectsData, isLoading, refetch } = searchProjects({
-    page: 0,
-    size: 20
-  });
+  // Función para publicar proyecto
+  const handlePublish = async (projectId: number) => {
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('tiyuy-auth-token');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${projectId}/publish`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        alert('¡Proyecto publicado exitosamente! 🎉');
+        refetch();
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Error al publicar el proyecto');
+      }
+    } catch (error) {
+      alert('Error al publicar el proyecto');
+    }
+  };
+
+  // Función para destacar proyecto
+  const handleFeature = async (projectId: number) => {
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('tiyuy-auth-token');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${projectId}/feature`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        alert('¡Proyecto destacado exitosamente! 🌟');
+        refetch();
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Error al destacar el proyecto');
+      }
+    } catch (error) {
+      alert('Error al destacar el proyecto');
+    }
+  };
+
+  // Función para eliminar proyecto
+  const handleDelete = async (projectId: number) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('tiyuy-auth-token');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${projectId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        alert('Proyecto eliminado correctamente');
+        refetch();
+      } else {
+        alert('Error al eliminar el proyecto');
+      }
+    } catch (error) {
+      alert('Error al eliminar el proyecto');
+    }
+  };
+
+  const { data: projectsData, isLoading, refetch } = myProjects(0, 20); // Cambiado a myProjects
 
   const projects = projectsData?.content || [];
   const filteredProjects = projects.filter((project: any) => {
@@ -234,11 +304,10 @@ export default function TodosProyectosPage() {
                   {/* Project Image */}
                   <div className="aspect-video bg-gray-100 relative">
                     {project.coverImageUrl ? (
-                      <Image
+                      <img
                         src={project.coverImageUrl}
                         alt={project.name}
-                        fill
-                        className="object-cover"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
@@ -254,6 +323,11 @@ export default function TodosProyectosPage() {
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPhaseColor(project.phase)}`}>
                         {getPhaseText(project.phase)}
                       </span>
+                      {project.isFeatured && (
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                          ⭐ Destacado
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -290,16 +364,38 @@ export default function TodosProyectosPage() {
                     <div className="mt-4 pt-4 border-t border-gray-200 flex gap-2">
                       <Link
                         href={`/proyectos/${project.slug}`}
-                        className="flex-1 text-center px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm"
+                        className="flex-1 text-center px-2 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm"
                       >
                         Ver
                       </Link>
                       <Link
                         href={`/dashboard/proyectos/${project.id}/editar`}
-                        className="flex-1 text-center px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+                        className="flex-1 text-center px-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
                       >
                         Editar
                       </Link>
+                      {project.status === 'DRAFT' && (
+                        <button
+                          onClick={() => handlePublish(project.id)}
+                          className="flex-1 text-center px-2 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
+                        >
+                          🚀 Publicar
+                        </button>
+                      )}
+                      {project.status === 'PUBLISHED' && (
+                        <button
+                          onClick={() => handleFeature(project.id)}
+                          className="flex-1 text-center px-2 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 text-sm font-medium"
+                        >
+                          ⭐ Destacar
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDelete(project.id)}
+                        className="flex-1 text-center px-2 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+                      >
+                        🗑️ Eliminar
+                      </button>
                     </div>
                   </div>
                 </div>

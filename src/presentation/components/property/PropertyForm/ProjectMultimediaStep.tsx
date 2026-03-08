@@ -1,12 +1,67 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import { authStorage } from '@/infrastructure/storage/auth-storage';
 
 interface ProjectMultimediaStepProps {
   formData: any;
   onChange: (field: string, value: any) => void;
   propertyId?: number;
 }
+
+const getVideoDuration = (file: File): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.onloadedmetadata = () => {
+      URL.revokeObjectURL(video.src);
+      resolve(video.duration);
+    };
+    video.onerror = () => reject(new Error('No se pudo leer el video'));
+    video.src = URL.createObjectURL(file);
+  });
+};
+
+const validateFile = async (file: File, type: 'images' | 'blueprints' | 'renders'): Promise<string | null> => {
+  const isVideo = file.type.startsWith('video/');
+  const isImage = file.type.startsWith('image/');
+
+  // Límites de tamaño
+  const maxSize = isVideo ? 100 * 1024 * 1024   // 100MB para video
+                : isImage ? 10 * 1024 * 1024    // 10MB para imágenes
+                :           20 * 1024 * 1024;   // 20MB para PDFs/planos
+
+  if (file.size > maxSize) {
+    const maxMB = maxSize / (1024 * 1024);
+    const fileMB = (file.size / (1024 * 1024)).toFixed(1);
+    return `"${file.name}" pesa ${fileMB}MB. Máximo permitido: ${maxMB}MB`;
+  }
+
+  // Validar duración de video (máx 60 segundos)
+  if (isVideo) {
+    try {
+      const duration = await getVideoDuration(file);
+      if (duration > 60) {
+        return `El video "${file.name}" dura ${Math.round(duration)}s. Máximo: 60 segundos`;
+      }
+    } catch (error) {
+      return `El video "${file.name}" no es válido o está corrupto`;
+    }
+  }
+
+  // Validar formatos permitidos
+  const allowedTypes = {
+    images: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+    blueprints: ['application/pdf', 'image/vnd.dwg', 'application/dxf'],
+    renders: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'video/mp4', 'video/avi']
+  };
+
+  if (!allowedTypes[type].includes(file.type)) {
+    return `El archivo "${file.name}" tiene un formato no permitido para ${type}`;
+  }
+
+  return null; // sin error
+};
 
 export function ProjectMultimediaStep({ formData, onChange, propertyId }: ProjectMultimediaStepProps) {
   const [uploading, setUploading] = useState(false);
@@ -21,40 +76,78 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId }: Projec
       return;
     }
 
+    // ✅ Validar todos los archivos antes de subir
+    for (const file of Array.from(files)) {
+      const error = await validateFile(file, type);
+      if (error) {
+        alert(`⚠️ ${error}`);
+        return; // Detener todo si hay un archivo inválido
+      }
+    }
+
     setUploading(true);
     setUploadProgress(0);
 
     try {
+      // ✅ Mapeo del tipo al valor que espera el backend
+      const mediaTypeMap = {
+        images: 'PHOTO',
+        blueprints: 'BLUEPRINT',
+        renders: 'RENDER',
+      };
+
+      // ✅ Obtener el token JWT
+      const token = authStorage.getToken();
+      
+      // 🔍 Logs para diagnosticar el token
+      console.log('🔑 Token existe:', !!token);
+      console.log('🔑 Token value:', token?.substring(0, 50) + '...'); // primeros 50 chars
+      console.log('🔑 PropertyId:', propertyId);
+      console.log('🔑 Keys en localStorage:', Object.keys(localStorage));
+      Object.keys(localStorage).forEach(k => console.log(k, '→', localStorage.getItem(k)?.substring(0, 30)));
+
       const uploadPromises = Array.from(files).map(async (file, index) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('type', type);
+        const formDataUpload = new FormData();
+        formDataUpload.append('files', file);
+        formDataUpload.append('type', mediaTypeMap[type]);
 
         // Simulación de progreso
         const progressInterval = setInterval(() => {
           setUploadProgress((prev) => Math.min(prev + (100 / files.length), 90));
         }, 200);
 
-        const response = await fetch(`/api/projects/${propertyId}/upload`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${propertyId}/upload`, {
           method: 'POST',
-          body: formData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formDataUpload,
         });
 
         clearInterval(progressInterval);
         setUploadProgress(100);
 
         if (!response.ok) {
-          throw new Error('Error al subir archivo');
+          const errorBody = await response.text();
+          console.error('Backend error:', response.status, errorBody);
+          throw new Error(`Error al subir archivo: ${response.status}`);
         }
 
-        return response.json();
+        const result: Array<{ id: number; url: string; mediaType: string }> = await response.json();
+        console.log('📸 Backend response:', JSON.stringify(result, null, 2));
+        
+        // ✅ El backend devuelve un array, extraer las URLs
+        return result.map(m => m.url);
       });
 
       const results = await Promise.all(uploadPromises);
       
-      // Actualizar formData con los archivos subidos
+      // results es array de arrays de URLs, hay que aplanarlo
+      const allUrls = results.flat();
+      
+      // Actualizar formData con las URLs de los archivos subidos
       const currentFiles = formData[type] || [];
-      onChange(type, [...currentFiles, ...results]);
+      onChange(type, [...currentFiles, ...allUrls]);
 
     } catch (error) {
       console.error('Error uploading files:', error);
@@ -107,7 +200,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId }: Projec
               <div key={index} className="relative group">
                 <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                   <img
-                    src={image.url}
+                    src={image}
                     alt={`Imagen ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
@@ -129,7 +222,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId }: Projec
           ref={fileInputRef}
           type="file"
           multiple
-          accept="image/*"
+          accept="image/jpeg,image/jpg,image/png,image/webp"
           onChange={(e) => e.target.files && handleFileUpload(e.target.files, 'images')}
           className="hidden"
         />
@@ -181,7 +274,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId }: Projec
           ref={blueprintInputRef}
           type="file"
           multiple
-          accept=".pdf,.dwg,.dxf"
+          accept="application/pdf,image/vnd.dwg,application/dxf"
           onChange={(e) => e.target.files && handleFileUpload(e.target.files, 'blueprints')}
           className="hidden"
         />
@@ -205,28 +298,44 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId }: Projec
         {/* Grid de renders existentes */}
         {formData.renders && formData.renders.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-            {formData.renders.map((render: any, index: number) => (
-              <div key={index} className="relative group">
-                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                  <img
-                    src={render.url}
-                    alt={`Render ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-1 rounded">
-                    3D
+            {formData.renders.map((render: any, index: number) => {
+              const isVideo = render.includes('.mp4') || render.includes('.avi') || render.includes('.mov');
+              
+              return (
+                <div key={index} className="relative group">
+                  <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                    {isVideo ? (
+                      <video
+                        src={render}
+                        className="w-full h-full object-cover"
+                        controls
+                        muted
+                        playsInline
+                      >
+                        Tu navegador no soporta el tag de video.
+                      </video>
+                    ) : (
+                      <img
+                        src={render}
+                        alt={`Render ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                    <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-1 rounded">
+                      {isVideo ? '▶️ VIDEO' : '3D'}
+                    </div>
                   </div>
+                  <button
+                    onClick={() => removeFile('renders', index)}
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
-                <button
-                  onClick={() => removeFile('renders', index)}
-                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
@@ -234,7 +343,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId }: Projec
           ref={renderInputRef}
           type="file"
           multiple
-          accept="image/*,.mp4,.avi"
+          accept="image/jpeg,image/jpg,image/png,image/webp,video/mp4,video/avi"
           onChange={(e) => e.target.files && handleFileUpload(e.target.files, 'renders')}
           className="hidden"
         />

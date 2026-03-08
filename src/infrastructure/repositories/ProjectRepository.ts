@@ -29,7 +29,7 @@ export class ProjectRepository implements IProjectRepository {
   /**
    * Obtener proyecto por slug (SEO público)
    */
-  async getBySlug(slug: string): Promise<ProjectFull> {
+  async getBySlug(slug: string): Promise<Project> {
     const response = await apiClient.get(`/projects/slug/${slug}`);
     return response.data;
   }
@@ -97,8 +97,53 @@ export class ProjectRepository implements IProjectRepository {
    * Crear nuevo proyecto (draft)
    */
   async createProject(projectData: Parameters<IProjectRepository['createProject']>[0]): Promise<Project> {
-    const response = await apiClient.post('/projects', projectData);
-    return response.data;
+    try {
+      console.log('🚀 Enviando solicitud de creación de proyecto al backend...');
+      console.log('👤 Usuario actual (rol debería ir en token JWT)');
+      
+      const response = await apiClient.post('/projects', projectData);
+      console.log('✅ Proyecto creado exitosamente:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Error completo del backend:', error.response?.data);
+      console.error('❌ Status:', error.response?.status);
+      console.error('❌ Headers:', error.response?.config?.headers);
+      
+      // Si es error de validación, mostrar detalles específicos
+      if (error.response?.status === 400) {
+        const validationError = error.response?.data;
+        console.error('❌ Detalles de validación:', validationError?.details);
+        
+        // Crear mensaje amigable para el usuario
+        let errorMessage = 'Error en los datos del formulario';
+        
+        if (validationError?.details) {
+          const details = validationError?.details;
+          if (typeof details === 'object') {
+            const errors = Object.values(details).flat();
+            errorMessage = errors.join('. ');
+          }
+        }
+        
+        const validationErrorObj = new Error(errorMessage);
+        (validationErrorObj as any).isValidationError = true;
+        throw validationErrorObj;
+      }
+      
+      // Si es error de suscripción, manejar apropiadamente
+      if (error.response?.status === 402) {
+        const errorMessage = error.response?.data?.message || 'Para crear proyectos necesitas una suscripción ENTERPRISE.';
+        console.error('❌ Error de suscripción del backend:', errorMessage);
+        
+        // El backend devuelve 402, significa que realmente necesita suscripción
+        const subscriptionError = new Error(errorMessage);
+        (subscriptionError as any).isSubscriptionError = true;
+        (subscriptionError as any).requiresEnterprise = true;
+        throw subscriptionError;
+      }
+      
+      throw error;
+    }
   }
 
   /**
@@ -205,5 +250,63 @@ export class ProjectRepository implements IProjectRepository {
    */
   async deleteProjectMedia(projectId: number, mediaId: number): Promise<void> {
     await apiClient.delete(`/projects/${projectId}/media/${mediaId}`);
+  }
+
+  /**
+   * Destacar proyecto
+   */
+  async featureProject(projectId: number): Promise<any> {
+    const response = await apiClient.patch(`/projects/${projectId}/feature`);
+    return response.data;
+  }
+
+  /**
+   * Obtener proyectos destacados
+   */
+  async getFeaturedProjects(district?: string): Promise<{
+    content: Project[];
+    totalElements: number;
+    totalPages: number;
+    page: number;
+    size: number;
+  }> {
+    const params = new URLSearchParams();
+    if (district) params.append('district', district);
+    params.append('size', '5');
+
+    const response = await apiClient.get(`/projects/featured?${params}`);
+    
+    return {
+      content: response.data.content || [],
+      totalElements: response.data.totalElements || 0,
+      totalPages: response.data.totalPages || 0,
+      page: response.data.number || 0,
+      size: response.data.size || 5,
+    };
+  }
+
+  /**
+   * Obtener items destacados (alias para getFeaturedProjects)
+   */
+  async getFeaturedItems(district?: string): Promise<{
+    content: Project[];
+    totalElements: number;
+    totalPages: number;
+    page: number;
+    size: number;
+    last: boolean;
+    numberOfElements: number;
+    first: boolean;
+    empty: boolean;
+  }> {
+    const result = await this.getFeaturedProjects(district);
+    
+    return {
+      ...result,
+      last: result.page >= result.totalPages - 1,
+      numberOfElements: result.content.length,
+      first: result.page === 0,
+      empty: result.content.length === 0,
+    };
   }
 }

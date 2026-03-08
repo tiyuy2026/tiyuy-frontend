@@ -117,6 +117,19 @@ export const useProjects = () => {
     });
   };
 
+  const useUpdateProject = () => {
+    return useMutation({
+      mutationFn: ({ projectId, projectData }: { 
+        projectId: number; 
+        projectData: Parameters<typeof projectRepo.updateProject>[1] 
+      }) => projectRepo.updateProject(projectId, projectData),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.lists() });
+        queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.details() });
+      },
+    });
+  };
+
   // ... resto de mutations IGUALES
 
   return {
@@ -131,6 +144,7 @@ export const useProjects = () => {
     
     // Mutations
     createProject: useCreateProject,
+    updateProject: useUpdateProject,
     // ... resto
   };
 };

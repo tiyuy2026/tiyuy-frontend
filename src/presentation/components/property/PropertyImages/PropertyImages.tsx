@@ -14,6 +14,7 @@ export function PropertyImages({ propertyId, onImagesUploaded }: PropertyImagesP
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuthStore();
+  const propertyRepository = new PropertyRepository();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -32,7 +33,7 @@ export function PropertyImages({ propertyId, onImagesUploaded }: PropertyImagesP
       setError(null);
 
       // Subir todas las imágenes de una vez usando el endpoint batch
-      await PropertyRepository.uploadPhotos(propertyId, files);
+      await propertyRepository.uploadPhotos(propertyId, files);
 
       // Actualizar el contador de propiedades del usuario
       if (user) {

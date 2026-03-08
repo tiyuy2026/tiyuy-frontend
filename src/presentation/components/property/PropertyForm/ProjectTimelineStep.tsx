@@ -51,8 +51,8 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
           </label>
           <input
             type="date"
-            value={formData.constructionStartDate || ''}
-            onChange={(e) => onChange('constructionStartDate', e.target.value)}
+            value={formData.startDate || formData.constructionStartDate || ''}
+            onChange={(e) => onChange('startDate', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
           />
         </div>
@@ -71,6 +71,16 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
         </div>
       </div>
 
+      {/* Información adicional */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h4 className="font-medium text-blue-900 mb-2">Información importante</h4>
+        <ul className="text-sm text-blue-800 space-y-1">
+          <li>• La fecha de entrega estimada es obligatoria</li>
+          <li>• Puedes agregar hitos importantes del proyecto</li>
+          <li>• Estas fechas serán visibles para los compradores</li>
+        </ul>
+      </div>
+
       {/* Timeline existente */}
       {formData.timeline && formData.timeline.length > 0 && (
         <div className="space-y-4">
@@ -79,76 +89,45 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
             {formData.timeline
               .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
               .map((milestone: any) => (
-              <div key={milestone.id} className="border border-gray-200 rounded-lg p-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Fase</label>
-                    <input
-                      type="text"
-                      value={milestone.phase}
-                      onChange={(e) => updateMilestone(milestone.id, 'phase', e.target.value)}
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                      placeholder="Ej: Cimentación"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Fecha</label>
-                    <input
-                      type="date"
-                      value={milestone.date}
-                      onChange={(e) => updateMilestone(milestone.id, 'date', e.target.value)}
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2">
+                <div key={milestone.id} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <label className="block text-xs text-gray-500 mb-1">Descripción</label>
-                      <input
-                        type="text"
-                        value={milestone.description}
-                        onChange={(e) => updateMilestone(milestone.id, 'description', e.target.value)}
-                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                        placeholder="Detalles del hito"
-                      />
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                        <span className="font-medium text-gray-900">{milestone.phase}</span>
+                        <span className="text-sm text-gray-500">{new Date(milestone.date).toLocaleDateString('es-PE')}</span>
+                      </div>
+                      <p className="text-sm text-gray-600">{milestone.description}</p>
                     </div>
                     <button
                       onClick={() => removeMilestone(milestone.id)}
-                      className="text-red-500 hover:text-red-700 mt-4"
+                      className="text-red-500 hover:text-red-700 ml-4"
                     >
                       Eliminar
                     </button>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       )}
 
-      {/* Botón agregar hito */}
-      <button
-        onClick={() => setShowMilestoneForm(true)}
-        className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-purple-500 hover:text-purple-600 transition-colors"
-      >
-        + Agregar Hito del Proyecto
-      </button>
-
-      {/* Formulario nuevo hito */}
+      {/* Formulario para agregar hito */}
       {showMilestoneForm && (
-        <div className="border border-gray-200 rounded-lg p-6 bg-gray-50">
-          <h4 className="font-medium text-gray-900 mb-4">Nuevo Hito del Proyecto</h4>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="border border-gray-200 rounded-lg p-4">
+          <h4 className="font-medium text-gray-900 mb-4">Nuevo Hito</h4>
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Fase *
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Fase o Hito *
               </label>
               <input
                 type="text"
                 value={currentMilestone.phase}
-                onChange={(e) => setCurrentMilestone({...currentMilestone, phase: e.target.value})}
+                onChange={(e) => setCurrentMilestone({ ...currentMilestone, phase: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                placeholder="Ej: Cimentación, Estructura, Acabados"
+                placeholder="Ej: Inicio de cimentación"
+                required
               />
             </div>
 

@@ -3,21 +3,29 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCreateProperty, useUpdateProperty } from '@/presentation/hooks/useProperties';
+import { useProjects } from '@/presentation/hooks/useProjects';
 import { useActiveSubscription } from '@/presentation/hooks/useFinance';
 import { Property } from '@/core/domain/entities/Property';
+import { Project } from '@/core/domain/entities/Project';
 import { BasicInfoStep } from './BasicInfoStep';
 import { LocationStep } from './LocationStep';
 import { CharacteristicsStep } from './CharacteristicsStep';
 import { PhotosStep } from './PhotosStep';
+import { ProjectInfoStep } from './ProjectInfoStep';
+import { ProjectUnitsStep } from './ProjectUnitsStep';
+import { ProjectTimelineStep } from './ProjectTimelineStep';
+import { ProjectMultimediaStep } from './ProjectMultimediaStep';
 import { UpgradePlanModal } from '@/presentation/components/modals/UpgradePlanModal';
 import { useMyProperties } from '@/presentation/hooks/useProperties';
 import { useAuth } from '@/presentation/hooks/useAuth';
+import { authStorage } from '@/infrastructure/storage/auth-storage';
 import { toast } from 'sonner';
 
 interface PropertyFormProps {
-  property?: Property;
+  property?: Property | Project;
   mode: 'create' | 'edit';
   onStepChange?: (step: number) => void;
+  formType?: 'property' | 'project'; // ← NUEVO: para diferenciar tipos
 }
 
 const STEPS = [
@@ -27,6 +35,14 @@ const STEPS = [
   { number: 4, title: 'Fotos', description: 'Imágenes del inmueble' },
 ];
 
+const PROJECT_STEPS = [
+  { number: 1, title: 'Información del Proyecto', description: 'Tipo y fase' },
+  { number: 2, title: 'Ubicación', description: 'Dirección exacta' },
+  { number: 3, title: 'Unidades', description: 'Departamentos disponibles' },
+  { number: 4, title: 'Timeline', description: 'Fechas de entrega' },
+  { number: 5, title: 'Multimedia', description: 'Planos y renders' },
+];
+
 const StepComponents: Record<number, React.ComponentType<any>> = {
   1: BasicInfoStep,
   2: LocationStep,
@@ -34,7 +50,15 @@ const StepComponents: Record<number, React.ComponentType<any>> = {
   4: PhotosStep,
 };
 
-export function PropertyForm({ property, mode, onStepChange }: PropertyFormProps) {
+const ProjectStepComponents: Record<number, React.ComponentType<any>> = {
+  1: ProjectInfoStep,
+  2: LocationStep,
+  3: ProjectUnitsStep,
+  4: ProjectTimelineStep,
+  5: ProjectMultimediaStep,
+};
+
+export function PropertyForm({ property, mode, onStepChange, formType = 'property' }: PropertyFormProps) {
   const router = useRouter();
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
@@ -43,44 +67,74 @@ export function PropertyForm({ property, mode, onStepChange }: PropertyFormProps
 
   const { data: myPropertiesData } = useMyProperties();
   const { data: activeSubscription } = useActiveSubscription();
+  const myProjectsQuery = useProjects().myProjects?.() ?? { data: null };
 
-  const publishedCount =
+  const publishedPropertiesCount =
     myPropertiesData?.properties?.filter((p: any) => p.status === 'PUBLISHED').length || 0;
+
+  const publishedProjectsCount =
+    myProjectsQuery.data?.content?.filter((p: any) => p.status === 'PUBLISHED').length || 0;
 
   const canPublish = useMemo(() => {
     if (activeSubscription) return activeSubscription.remainingPublications > 0;
-    return publishedCount < 1;
-  }, [activeSubscription, publishedCount]);
+    // ✅ Sin suscripción: 1 publicación gratis entre propiedades + proyectos
+    return (publishedPropertiesCount + publishedProjectsCount) < 1;
+  }, [activeSubscription, publishedPropertiesCount, publishedProjectsCount]);
 
   const [formData, setFormData] = useState({
+    // Propiedades existentes
     type: property?.type || 'APARTMENT',
-    transactionType: property?.transactionType || 'SALE',
-    price: property?.price || 0,
-    currency: property?.currency || 'PEN',
-    bedrooms: property?.bedrooms || 1,
-    bathrooms: property?.bathrooms || 1,
-    parking: property?.parkingSpots || 0,
-    totalArea: property?.totalArea || 0,
-    builtArea: property?.builtArea || 0,
-    floor: property?.floor || 1,
-    age: property?.age || 0,
-    maintenanceFee: property?.maintenanceFee || 0,
+    transactionType: (property && 'transactionType' in property) ? property.transactionType : 'SALE',
+    price: (property && 'price' in property) ? property.price : 0,
+    currency: (property && 'currency' in property) ? property.currency : 'PEN',
+    bedrooms: (property && 'bedrooms' in property) ? property.bedrooms : 1,
+    bathrooms: (property && 'bathrooms' in property) ? property.bathrooms : 1,
+    parking: (property && 'parkingSpots' in property) ? property.parkingSpots : 0,
+    totalArea: (property && 'totalArea' in property) ? property.totalArea : 0,
+    builtArea: (property && 'builtArea' in property) ? property.builtArea : 0,
+    floor: (property && 'floor' in property) ? property.floor : 1,
+    age: (property && 'age' in property) ? property.age : 0,
+    maintenanceFee: (property && 'maintenanceFee' in property) ? property.maintenanceFee : 0,
     description: property?.description || '',
-    fullAddress: property?.location?.fullAddress || '',
-    region: property?.location?.region || 'Lima',
-    province: property?.location?.province || 'Lima',
-    district: property?.location?.district || '',
-    urbanization: property?.location?.urbanization || '',
-    street: property?.location?.street || '',
-    streetNumber: property?.location?.streetNumber || '',
-    apartmentNumber: property?.location?.apartmentNumber || '',
-    latitude: property?.location?.latitude || 0,
-    longitude: property?.location?.longitude || 0,
-    showExactAddress: property?.location?.showExactAddress ?? true,
+    fullAddress: (property && 'location' in property) ? property.location?.fullAddress : '',
+    region: (property && 'location' in property) ? property.location?.region : 'Lima',
+    province: (property && 'location' in property) ? property.location?.province : 'Lima',
+    district: (property && 'location' in property) ? property.location?.district : '',
+    urbanization: (property && 'location' in property) ? property.location?.urbanization : '',
+    street: (property && 'location' in property) ? property.location?.street : '',
+    streetNumber: (property && 'location' in property) ? property.location?.streetNumber : '',
+    apartmentNumber: (property && 'location' in property) ? property.location?.apartmentNumber : '',
+    latitude: (property && 'location' in property) ? property.location?.latitude : 0,
+    longitude: (property && 'location' in property) ? property.location?.longitude : 0,
+    showExactAddress: (property && 'location' in property) ? property.location?.showExactAddress : true,
+    
+    // Campos para proyectos (separados de los de propiedades)
+    name: (property && 'name' in property) ? property.name : '',
+    phase: (property && 'phase' in property) ? property.phase : 'PRE_SALE',
+    projectType: (property && 'type' in property) ? property.type : 'RESIDENTIAL',
+    totalUnits: (property && 'totalUnits' in property) ? property.totalUnits : 0,
+    availableUnits: (property && 'availableUnits' in property) ? property.availableUnits : 0,
+    priceFrom: (property && 'priceFrom' in property) ? property.priceFrom : 0,
+    priceTo: (property && 'priceTo' in property) ? property.priceTo : 0,
+    startDate: (property && 'estimatedDelivery' in property) ? property.estimatedDelivery : '',
+    estimatedDelivery: (property && 'estimatedDelivery' in property) ? property.estimatedDelivery : '',
+    areaFrom: 0,
+    areaTo: 0,
+    floors: 0,
+    address: (property && 'district' in property) ? `${property.district}, ${property.province}, ${property.region}` : '',
+    units: (property && 'units' in property) ? property.units : [],
+    timeline: [],
   });
 
   const createMutation = useCreateProperty();
   const updateMutation = useUpdateProperty();
+  const createProjectMutation = useProjects().createProject(); // ← Hook para proyectos
+  const updateProjectMutation = useProjects().updateProject(); // ← Hook para actualizar proyectos
+
+  // Determinar steps y componentes según el tipo
+  const currentSteps = formType === 'project' ? PROJECT_STEPS : STEPS;
+  const currentStepComponents = formType === 'project' ? ProjectStepComponents : StepComponents;
+  const totalSteps = currentSteps.length;
 
   const goToStep = (step: number) => {
     setCurrentStep(step);
@@ -91,7 +145,62 @@ export function PropertyForm({ property, mode, onStepChange }: PropertyFormProps
     setFormData((prev) => ({ ...prev, [field]: value }));
 
   const handleNext = () => {
-    if (mode === 'create' && currentStep === 3 && !createdPropertyId) {
+    if (formType === 'project' && currentStep === 4 && !createdPropertyId) {
+      // Crear proyecto en el paso 4 como DRAFT (no requiere suscripción)
+      const projectData = prepareProjectData(formData);
+      console.log('🚀 Creando proyecto como DRAFT:', projectData);
+      
+      createProjectMutation.mutate(projectData, {
+        onSuccess: (result: any) => { 
+          console.log('✅ Proyecto creado como DRAFT:', result);
+          setCreatedPropertyId(result.id); 
+          goToStep(5); 
+        },
+        onError: (error: any) => {
+          console.error('❌ Error al crear proyecto:', error);
+          
+          // Manejar error de validación específicamente
+          if (error.isValidationError) {
+            toast.error(error.message, {
+              duration: 5000,
+              style: {
+                background: '#ef4444',
+                color: 'white',
+              }
+            });
+            return;
+          }
+          
+          // Manejar error de suscripción específicamente
+          if (error.isSubscriptionError || error.message?.includes('ENTERPRISE') || error.message?.includes('suscripción')) {
+            const errorMessage = 'Para crear proyectos necesitas una suscripción ENTERPRISE.';
+            
+            toast.error(errorMessage, {
+              duration: 5000,
+              action: {
+                label: 'Ver Planes',
+                onClick: () => {
+                  console.log('🔍 Toast: Navegando a /planes...');
+                  console.log('🔍 URL actual:', window.location.href);
+                  router.push('/planes');
+                }
+              }
+            });
+            
+            // Redirigir después de un tiempo
+            setTimeout(() => {
+              console.log('🔍 Timeout: Navegando a /planes...');
+              router.push('/planes');
+            }, 3000);
+          } else {
+            toast.error('Error al crear el proyecto');
+          }
+        },
+      });
+      return;
+    }
+    
+    if (mode === 'create' && formType === 'property' && currentStep === 3 && !createdPropertyId) {
       // Crear propiedad en el paso 3 para poder subir fotos en el paso 4
       const createData = prepareCreateData(formData);
       
@@ -106,7 +215,7 @@ export function PropertyForm({ property, mode, onStepChange }: PropertyFormProps
       });
       return;
     }
-    goToStep(Math.min(currentStep + 1, 4));
+    goToStep(Math.min(currentStep + 1, totalSteps));
   };
 
   // Función para preparar datos según el tipo de propiedad
@@ -163,18 +272,74 @@ export function PropertyForm({ property, mode, onStepChange }: PropertyFormProps
     }
   };
 
+  // Función para preparar datos para proyectos según el backend
+  const prepareProjectData = (data: any) => {
+    return {
+      name: data.name || data.projectName || '',
+      description: data.description || '',
+      phase: data.phase || 'PRE_SALE',
+      type: data.projectType || 'RESIDENTIAL', // Usar projectType para el backend
+      totalUnits: Number(data.totalUnits) || 0,
+      priceFrom: Number(data.priceFrom) || 0,
+      priceTo: Number(data.priceTo) || (Number(data.priceFrom) * 2), // ✅ Obligatorio según backend
+      areaFrom: Number(data.areaFrom) || 60, // ✅ Obligatorio según backend
+      areaTo: Number(data.areaTo) || (Number(data.areaFrom) * 2), // ✅ Obligatorio según backend
+      startDate: data.startDate || data.constructionStartDate || undefined,
+      estimatedDelivery: data.estimatedDelivery || '',
+      floors: data.floors ? Number(data.floors) : undefined,
+      address: data.address || data.fullAddress || '',
+      district: data.district || '',
+      province: data.province || '',
+      region: data.region || '',
+      latitude: data.latitude ? Number(data.latitude) : undefined,
+      longitude: data.longitude ? Number(data.longitude) : undefined,
+    };
+  };
+
   const handlePrev = () => goToStep(Math.max(currentStep - 1, 1));
 
   const handleSubmit = async () => {
-    if (mode === 'create') {
-      // NO validar límite aquí - solo redirigir al historial
-      // El usuario publicará desde el historial si quiere
+    if (mode === 'create' && formType === 'project' && createdPropertyId) {
       
+      // Verificar si puede publicar (gratis o con suscripción)
+      if (canPublish) {
+        // ✅ Tiene derecho a publicar (primer proyecto gratis o suscripción activa)
+        try {
+          const token = authStorage.getToken() || localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token');
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${createdPropertyId}/publish`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+              }
+            }
+          );
+
+          if (response.ok) {
+            toast.success('¡Proyecto publicado exitosamente! 🎉');
+            router.push('/dashboard/proyectos');
+          } else {
+            const error = await response.json();
+            toast.error(error.message || 'Error al publicar el proyecto');
+          }
+        } catch (error) {
+          toast.error('Error al publicar el proyecto');
+        }
+      } else {
+        // ❌ No puede publicar → mostrar modal de upgrade
+        setShowUpgradeModal(true);
+      }
+    } else if (mode === 'create' && formType === 'project' && !createdPropertyId) {
+      // Crear proyecto y redirigir (se creó como DRAFT en handleNext)
+      toast.success('Proyecto guardado como BORRADOR');
+      router.push('/mis-proyectos'); // ✅ Redirigir a mis-proyectos
+    } else if (mode === 'create' && formType !== 'project') {
+      // Para propiedades, redirigir al historial
       if (createdPropertyId) {
-        // Ya existe la propiedad, redirigir al historial
         router.push('/mis-propiedades');
       } else {
-        // Crear propiedad y redirigir al historial
         const createData = prepareCreateData(formData);
         createMutation.mutate(createData, {
           onSuccess: () => router.push('/mis-propiedades'),
@@ -184,31 +349,47 @@ export function PropertyForm({ property, mode, onStepChange }: PropertyFormProps
         });
       }
     } else if (property) {
-      updateMutation.mutate(
-        {
-          id: property.id,
-          data: {
-            userId: user!.id,
-            price: formData.price,
-            description: formData.description,
-            bedrooms: formData.bedrooms,
-            bathrooms: formData.bathrooms,
-            parkingSpots: formData.parking,
-            totalArea: formData.totalArea,
-            maintenanceFee: formData.maintenanceFee,
+      if (formType === 'project') {
+        // Actualizar proyecto existente
+        const projectData = prepareProjectData(formData);
+        updateProjectMutation.mutate(
+          {
+            projectId: property.id,
+            projectData,
           },
-        },
-        {
-          onSuccess: () => router.push('/mis-propiedades'),
-          onError: () => toast.error('Error al guardar la propiedad'),
-        }
-      );
+          {
+            onSuccess: () => router.push('/dashboard/proyectos'),
+            onError: () => toast.error('Error al guardar el proyecto'),
+          }
+        );
+      } else {
+        // Actualizar propiedad existente
+        updateMutation.mutate(
+          {
+            id: property.id,
+            data: {
+              userId: user!.id,
+              price: formData.price,
+              description: formData.description,
+              bedrooms: formData.bedrooms,
+              bathrooms: formData.bathrooms,
+              parkingSpots: formData.parking,
+              totalArea: formData.totalArea,
+              maintenanceFee: formData.maintenanceFee,
+            },
+          },
+          {
+            onSuccess: () => router.push('/mis-propiedades'),
+            onError: () => toast.error('Error al guardar la propiedad'),
+          }
+        );
+      }
     }
   };
 
-  const ActiveComponent = StepComponents[currentStep];
-  const isLoading = createMutation.isPending || updateMutation.isPending;
-  const isLastStep = currentStep === 4;
+  const ActiveComponent = currentStepComponents[currentStep];
+  const isLoading = createMutation.isPending || updateMutation.isPending || createProjectMutation.isPending || updateProjectMutation.isPending;
+  const isLastStep = currentStep === totalSteps;
 
   return (
     <>
@@ -217,12 +398,12 @@ export function PropertyForm({ property, mode, onStepChange }: PropertyFormProps
       {/* ── STEP HEADER ── */}
       <div className="mb-8">
         <p style={{ color: '#00a63e' }} className="text-xs font-bold uppercase tracking-widest mb-1">
-          Paso {currentStep} de {STEPS.length}
+          Paso {currentStep} de {totalSteps}
         </p>
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          {STEPS[currentStep - 1].title}
+          {currentSteps[currentStep - 1].title}
         </h1>
-        <p className="text-sm text-gray-400 mt-0.5">{STEPS[currentStep - 1].description}</p>
+        <p className="text-sm text-gray-400 mt-0.5">{currentSteps[currentStep - 1].description}</p>
       </div>
 
       {/* ── STEP CONTENT (con contenedor robusto) ── */}
@@ -267,7 +448,11 @@ export function PropertyForm({ property, mode, onStepChange }: PropertyFormProps
             </>
           ) : isLastStep ? (
             <>
-              {mode === 'create' ? 'Finalizar' : 'Guardar cambios'}
+              {mode === 'create' ? (
+                formType === 'project' 
+                  ? (canPublish ? '✅ Publicar Proyecto' : '💾 Guardar Borrador')
+                  : 'Finalizar'
+              ) : 'Guardar cambios'}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>

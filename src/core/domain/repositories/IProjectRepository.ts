@@ -19,11 +19,11 @@ export interface IProjectRepository {
   getProjectFull(projectId: number): Promise<ProjectFull>;
 
   /**
-   * Obtener proyecto completo por slug (SEO)
-   * Usado para: SSR/SSG en páginas públicas
+   * Obtener proyecto por slug (SEO)
+   * Usado para: página pública de detalle
    * Ejemplo: /proyectos/edificio-miraflores
    */
-  getBySlug(slug: string): Promise<ProjectFull>;
+  getBySlug(slug: string): Promise<Project>;
 
   /**
    * Búsqueda pública de proyectos con filtros
@@ -68,7 +68,7 @@ export interface IProjectRepository {
     name: string;
     description: string;
     phase: 'PRE_SALE' | 'SALE' | 'DELIVERY';
-    type: 'RESIDENTIAL' | 'COMMERCIAL' | 'MIXED';
+    type: 'INDUSTRIAL' | 'COMMERCIAL' | 'MIXED_USE' | 'RESIDENTIAL';
     totalUnits: number;
     priceFrom: number;
     priceTo?: number;

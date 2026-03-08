@@ -191,8 +191,8 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600">Crear desarrollo</p>
                 </Link>
                 
-                <Link href="/dashboard/planes" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
-                  <div className="text-orange-600 text-2xl mb-2">�</div>
+                <Link href="/planes" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
+                  <div className="text-orange-600 text-2xl mb-2">🌟</div>
                   <h3 className="font-semibold">Planes</h3>
                   <p className="text-sm text-gray-600">999 publicaciones</p>
                 </Link>
