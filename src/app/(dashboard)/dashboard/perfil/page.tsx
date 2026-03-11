@@ -10,11 +10,6 @@ import { PlansTab } from '@/presentation/components/profile/PlansTab';
 import { FavoritesTab } from '@/presentation/components/profile/FavoritesTab';
 import { HistoryTab } from '@/presentation/components/profile/HistoryTab';
 
-export const metadata = {
-  title: 'Mi Perfil | TIYUY',
-  description: 'Gestiona tu perfil, propiedades favoritas y configuración',
-};
-
 type TabType = 'personal' | 'security' | 'plans' | 'favorites' | 'history';
 
 export default function ProfilePage() {
@@ -65,6 +60,10 @@ export default function ProfilePage() {
     }
   };
 
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId as TabType);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -75,7 +74,7 @@ export default function ProfilePage() {
         <ProfileTabs 
           tabs={tabs} 
           activeTab={activeTab} 
-          onTabChange={setActiveTab} 
+          onTabChange={handleTabChange} 
         />
 
         {/* Contenido del Tab Activo */}

@@ -1,10 +1,10 @@
 import { Metadata, ResolvingMetadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProjectRepository } from '@/infrastructure/repositories/ProjectRepository';
+import { ProjectFull } from '@/core/domain/entities/Project';
 import Script from 'next/script';
 import Image from 'next/image';  // ✅ Agregado
-import ProjectDetail from '@/presentation/components/project/ProjectDetail/ProjectDetail';  // ✅ Componente correcto
-import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute/ProtectedRoute'; 
+import ProjectDetail from '@/presentation/components/project/ProjectDetail/ProjectDetail';  // ✅ Componente correcto 
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -52,38 +52,43 @@ export async function generateMetadata(
 
 export default async function ProjectDetailPage({ params }: Props) {
   const { slug } = await params;
-  const project = await projectRepo.getBySlug(slug);
+  
+  try {
+    // ✅ Una sola llamada que ya trae TODO
+    const projectFull = await projectRepo.getBySlug(slug) as ProjectFull;
+    
+    if (!projectFull) notFound();
 
-  if (!project) notFound();
+    // JSON-LD para SEO
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'ApartmentComplex',
+      name: projectFull.name,
+      description: projectFull.description,
+      image: projectFull.coverImageUrl,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: projectFull.district,
+        addressRegion: projectFull.province,
+        addressCountry: 'PE',
+      },
+      numberOfAvailableUnits: projectFull.availableUnits,
+      numberOfRooms: projectFull.totalUnits,
+    };
 
-  // JSON-LD para SEO
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'ApartmentComplex',
-    name: project.name,
-    description: project.description,
-    image: project.coverImageUrl,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: project.district,
-      addressRegion: project.province,
-      addressCountry: 'PE',
-    },
-    numberOfAvailableUnits: project.availableUnits,
-    numberOfRooms: project.totalUnits,
-  };
+    return (
+      <>
+        <Script
+          id="project-jsonld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
 
-  return (
-    <>
-      <Script
-        id="project-jsonld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <ProtectedRoute>  {/* ✅ JSX válido */}
-        <ProjectDetail project={project} />  {/* ✅ Componente dedicado */}
-      </ProtectedRoute>
-    </>
-  );
+        <ProjectDetail project={projectFull} />
+      </>
+    );
+  } catch (error) {
+    console.error('Error cargando proyecto:', error);
+    notFound();
+  }
 }

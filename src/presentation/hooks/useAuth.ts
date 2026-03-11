@@ -110,6 +110,26 @@ export const useAuth = () => {
     }
   };
 
+  const updateProfile = async (userData: Partial<User>) => {
+    try {
+      setLoading(true);
+      clearError();
+
+      const updatedUser: User = await authRepository.updateProfile(userData);
+      
+      // Actualizar el usuario en el store y localStorage
+      setAuth(token!, updatedUser);
+      authStorage.setUser(updatedUser);
+
+      return updatedUser;
+    } catch (err: any) {
+      setError(err.message || 'Error al actualizar perfil');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     authStorage.clear();
     logoutStore();
@@ -133,6 +153,7 @@ export const useAuth = () => {
     error: storeError,
     login,
     register,
+    updateProfile,
     logout,
     checkAuth,
     clearError,

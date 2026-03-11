@@ -3,6 +3,7 @@ export const ENDPOINTS = {
     LOGIN: '/auth/login',
     REGISTER: '/auth/register',
     ME: '/auth/me',
+    UPDATE_PROFILE: '/auth/update-profile',
   },
   
   KYC: {  // ← Cambiado de KYC_ENDPOINTS a KYC (nested)

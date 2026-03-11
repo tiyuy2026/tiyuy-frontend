@@ -4,16 +4,9 @@ import { useState } from 'react';
 import { User } from '@/core/domain/entities';
 import { Button } from '@/presentation/components/ui';
 import { Eye, MessageCircle, Calendar, Filter, Download, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-
-interface HistoryItem {
-  id: string;
-  type: 'view' | 'contact' | 'message' | 'search';
-  title: string;
-  propertyTitle?: string;
-  date: string;
-  details: string;
-  status: 'active' | 'completed' | 'pending';
-}
+import { useUserActivities, useActivityStats, useExportActivities } from '@/presentation/hooks/useActivity';
+import { ActivityFilters } from '@/core/domain/entities/Activity';
+import { toast } from 'sonner';
 
 interface HistoryTabProps {
   user: User;
@@ -22,60 +15,17 @@ interface HistoryTabProps {
 export const HistoryTab: React.FC<HistoryTabProps> = ({ user }) => {
   const [filterType, setFilterType] = useState<'all' | 'views' | 'contacts' | 'messages' | 'searches'>('all');
   const [dateRange, setDateRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Datos de ejemplo - TODO: Conectar con backend real
-  const [history, setHistory] = useState<HistoryItem[]>([
-    {
-      id: '1',
-      type: 'view',
-      title: 'Visita a propiedad',
-      propertyTitle: 'Departamento en Miraflores',
-      date: '2024-01-20T14:30:00Z',
-      details: 'Usuario vio tu propiedad por 5 minutos',
-      status: 'active'
-    },
-    {
-      id: '2',
-      type: 'contact',
-      title: 'Solicitud de contacto',
-      propertyTitle: 'Casa en San Borja',
-      date: '2024-01-19T10:15:00Z',
-      details: 'Juan Pérez solicitó información sobre esta propiedad',
-      status: 'pending'
-    },
-    {
-      id: '3',
-      type: 'message',
-      title: 'Mensaje recibido',
-      propertyTitle: 'Studio en San Isidro',
-      date: '2024-01-18T16:45:00Z',
-      details: 'María García envió un mensaje sobre disponibilidad',
-      status: 'completed'
-    },
-    {
-      id: '4',
-      type: 'view',
-      title: 'Visita a propiedad',
-      propertyTitle: 'Departamento en Surco',
-      date: '2024-01-17T09:20:00Z',
-      details: 'Usuario vio tu propiedad por 3 minutos',
-      status: 'active'
-    },
-    {
-      id: '5',
-      type: 'search',
-      title: 'Búsqueda guardada',
-      date: '2024-01-16T13:00:00Z',
-      details: 'Búsqueda: "Departamentos 3 dormitorios en Miraflores"',
-      status: 'completed'
-    }
-  ]);
+  // Build filters object
+  const filters: ActivityFilters = {
+    type: filterType === 'all' ? undefined : filterType.slice(0, -1) as ActivityFilters['type'],
+    dateRange,
+  };
 
-  const filteredHistory = history.filter(item => {
-    if (filterType === 'all') return true;
-    return item.type === filterType.slice(0, -1); // Remove 's' from plural
-  });
+  // Dynamic data from backend
+  const { data: history = [], isLoading, error } = useUserActivities(filters);
+  const { data: stats } = useActivityStats(filters);
+  const exportMutation = useExportActivities();
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -144,30 +94,18 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ user }) => {
   };
 
   const handleExportHistory = async () => {
-    setIsLoading(true);
-    
-    try {
-      // TODO: Implementar exportación a CSV/PDF
-      console.log('Exportando historial...');
-      
-      // Simulación
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      alert('Historial exportado correctamente');
-    } catch (error) {
-      console.error('Error exportando historial:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    exportMutation.mutate(filters);
   };
 
-  // Estadísticas
-  const stats = {
-    totalViews: history.filter(item => item.type === 'view').length,
-    totalContacts: history.filter(item => item.type === 'contact').length,
-    totalMessages: history.filter(item => item.type === 'message').length,
-    pendingActions: history.filter(item => item.status === 'pending').length
+  // Default stats if not loaded yet
+  const defaultStats = {
+    totalViews: 0,
+    totalContacts: 0,
+    totalMessages: 0,
+    pendingActions: 0
   };
+
+  const currentStats = stats || defaultStats;
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -184,7 +122,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ user }) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-blue-900">Visitas</p>
-              <p className="text-2xl font-bold text-blue-900">{stats.totalViews}</p>
+              <p className="text-2xl font-bold text-blue-900">{currentStats.totalViews}</p>
             </div>
             <Eye className="w-8 h-8 text-blue-500" />
           </div>
@@ -194,7 +132,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ user }) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-green-900">Contactos</p>
-              <p className="text-2xl font-bold text-green-900">{stats.totalContacts}</p>
+              <p className="text-2xl font-bold text-green-900">{currentStats.totalContacts}</p>
             </div>
             <MessageCircle className="w-8 h-8 text-green-500" />
           </div>
@@ -204,7 +142,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ user }) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-purple-900">Mensajes</p>
-              <p className="text-2xl font-bold text-purple-900">{stats.totalMessages}</p>
+              <p className="text-2xl font-bold text-purple-900">{currentStats.totalMessages}</p>
             </div>
             <MessageCircle className="w-8 h-8 text-purple-500" />
           </div>
@@ -214,7 +152,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ user }) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-orange-900">Pendientes</p>
-              <p className="text-2xl font-bold text-orange-900">{stats.pendingActions}</p>
+              <p className="text-2xl font-bold text-orange-900">{currentStats.pendingActions}</p>
             </div>
             <Calendar className="w-8 h-8 text-orange-500" />
           </div>
@@ -251,7 +189,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ user }) => {
         <Button
           variant="outline"
           onClick={handleExportHistory}
-          isLoading={isLoading}
+          isLoading={exportMutation.isPending}
         >
           <Download className="w-4 h-4 mr-2" />
           Exportar
@@ -260,7 +198,22 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ user }) => {
 
       {/* Lista de Historial */}
       <div className="space-y-4">
-        {filteredHistory.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+            <p className="text-gray-600">Cargando historial...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <Calendar className="w-16 h-16 text-red-300 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-red-900 mb-2">
+              Error al cargar el historial
+            </h3>
+            <p className="text-gray-600">
+              No se pudo cargar la actividad. Por favor, intenta nuevamente.
+            </p>
+          </div>
+        ) : history.length === 0 ? (
           <div className="text-center py-12">
             <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -271,7 +224,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ user }) => {
             </p>
           </div>
         ) : (
-          filteredHistory.map((item) => {
+          history.map((item: any) => {
             const { date, time } = formatDate(item.date);
             
             return (

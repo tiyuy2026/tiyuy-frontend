@@ -13,7 +13,14 @@ export interface User {
   phoneVerified: boolean;
   publishedPropertiesCount: number;
   createdAt: Date;
+  // Campos del perfil extendido
+  address?: string;
+  city?: string;
+  country?: string;
+  bio?: string;
 }
+
+// No necesitamos UserProfile separado, ya está incluido en User
 
 export interface UserCredentials {
   email: string;

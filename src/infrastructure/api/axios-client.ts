@@ -7,6 +7,15 @@ export const axiosClient = axios.create({
   timeout: 60000, // 60 segundos para Render cold start
 });
 
+// Public client for endpoints that don't require authentication
+export const publicApiClient = axios.create({
+  baseURL: API_URL,
+  timeout: 60000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 // Retry interceptor para Render cold start
 axiosClient.interceptors.response.use(
   (response) => response,
@@ -15,6 +24,19 @@ axiosClient.interceptors.response.use(
       error.config.__retry = true;
       console.log('🔄 Reintentando request (Render cold start)...');
       return axiosClient.request(error.config);
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Retry interceptor for public client
+publicApiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.code === 'ECONNABORTED' && error.config && !error.config.__retry) {
+      error.config.__retry = true;
+      console.log('🔄 Reintentando request (Render cold start)...');
+      return publicApiClient.request(error.config);
     }
     return Promise.reject(error);
   }
@@ -40,9 +62,21 @@ axiosClient.interceptors.request.use(
     }
 
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('tiyuy-auth-token');
+      // Check all possible token keys
+      const tokenKeys = ['tiyuy-auth-token', 'token', 'auth-token'];
+      console.log('🔍 localStorage keys:', Object.keys(localStorage));
+      
+      const token = localStorage.getItem('tiyuy-auth-token') || 
+                   localStorage.getItem('token') || 
+                   localStorage.getItem('auth-token');
+      
+      console.log('🔑 Token check:', token ? 'EXISTS' : 'MISSING');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+        console.log('✅ Token added to headers');
+      } else {
+        console.log('❌ No token found in localStorage');
+        console.log('🔍 Available localStorage items:', Object.keys(localStorage));
       }
     }
     return config;

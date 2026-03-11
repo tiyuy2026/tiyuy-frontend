@@ -11,11 +11,42 @@ export interface Project {
   soldUnits: number;
   priceFrom: number;
   priceTo?: number;
+  currency: 'PEN' | 'USD';
+  // Ubicación completa
   district: string;
   province: string;
   region: string;
+  urbanization?: string;
+  address?: string;
+  fullAddress?: string;
+  street?: string;
+  streetNumber?: string;
+  number?: string; 
+  latitude?: number;
+  longitude?: number;
+  areaFrom?: number;
+  areaTo?: number;
+  floors?: number;
   coverImageUrl?: string;
+  constructionStart?: string; 
+  startDate?: string; 
   estimatedDelivery: string;
+  timeline?: Array<{
+    id: number;
+    phase: string;
+    date: string;
+    description: string;
+  }>;
+  amenities?: string[];
+  certifications?: string[];
+  milestones?: Array<{
+    title: string;
+    date: string;
+    completed: boolean;
+  }>;
+  images?: string[];
+  blueprints?: string[];
+  renders?: string[];
   isFeatured: boolean;
   isVerified: boolean;
   viewsCount: number;
@@ -25,14 +56,17 @@ export interface Project {
 export interface ProjectUnit {
   id: number;
   unitNumber: string;
-  type: 'APARTMENT' | 'OFFICE' | 'PENTHOUSE';
+  type: 'APARTMENT' | 'DUPLEX' | 'PENTHOUSE' | 'OFFICE' | 'STORE' | 'WAREHOUSE';
   floor: number;
   area: number;
   bedrooms?: number;
   bathrooms?: number;
   parkingSpots: number;
   price: number;
-  status: 'AVAILABLE' | 'RESERVED' | 'SOLD';
+  status: 'AVAILABLE' | 'RESERVED' | 'SOLD' | 'BLOCKED';
+  view?: string;
+  image?: string;        // Imagen de la unidad
+  blueprintImage?: string; // Plano de la unidad
 }
 
 export interface ProjectFull extends Project {
@@ -45,4 +79,7 @@ export interface ProjectFull extends Project {
   };
   units: ProjectUnit[];
   amenities: string[];
+  images?: string[];
+  blueprints?: string[];
+  renders?: string[];
 }

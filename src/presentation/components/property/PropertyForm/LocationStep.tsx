@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { LocationSearch } from '@/presentation/components/forms/LocationSearch/LocationSearch';
 import { useGooglePlaces } from '@/presentation/hooks/useGooglePlaces';
 
@@ -19,37 +19,42 @@ interface LocationStepProps {
 
 export function LocationStep({ formData, onChange }: LocationStepProps) {
   const [locationInput, setLocationInput] = useState(
-    formData.district ? `${formData.district}, ${formData.province}` : ''
+    formData.district && formData.province 
+      ? `${formData.district}, ${formData.province}` 
+      : ''
   );
-  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(
-    formData.latitude && formData.longitude
-      ? { lat: Number(formData.latitude), lng: Number(formData.longitude) }
-      : null
-  );
-  const mapRef = useRef<HTMLDivElement>(null);
+  const [mapCenter, setMapCenter] = useState<{lat: number, lng: number} | null>(null);
   const [mapReady, setMapReady] = useState(false);
+  
+  // ✅ Refs para mapa y marcador
+  const mapInstanceRef = useRef<any>(null);
+  const markerRef = useRef<any>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
 
   const { getPlaceDetails, loading, error } = useGooglePlaces();
 
-  // Función para actualizar la dirección completa
-  const updateFullAddress = () => {
-    const parts = [
+  const inputClass =
+    'w-full px-4 py-3 rounded-lg border border-gray-200 text-sm text-gray-900 bg-gray-50 outline-none';
+
+  // Función para actualizar con logging
+  const handleChangeWithLog = (field: string, value: any) => {
+    console.log(`📝 LocationStep - Actualizando ${field}:`, value);
+    onChange(field, value);
+  };
+
+  // ✅ fullAddress como valor derivado con useMemo (EVITA BUCLE INFINITO)
+  const fullAddress = useMemo(() => {
+    return [
       formData.street,
       formData.streetNumber,
       formData.urbanization,
       formData.district,
       formData.province,
       formData.region
-    ].filter(Boolean);
-    
-    const fullAddress = parts.join(', ');
-    onChange('fullAddress', fullAddress);
-    
-    // Si tenemos calle y número, geocodificar para obtener coordenadas exactas
-    if (formData.street && formData.streetNumber && formData.district) {
-      geocodeAddress(fullAddress);
-    }
-  };
+    ].filter(Boolean).join(', ');
+  }, [formData.street, formData.streetNumber, formData.urbanization, formData.district, formData.province, formData.region]);
+
+  // ✅ Fix 3: Eliminar la función updateFullAddress duplicada (la lógica está en el useEffect)
 
   // Función para geocodificar dirección y actualizar mapa
   const geocodeAddress = async (address: string) => {
@@ -70,75 +75,112 @@ export function LocationStep({ formData, onChange }: LocationStepProps) {
     });
   };
 
-  // Actualizar dirección cuando cambian los datos del distrito o dirección
-  useEffect(() => {
-    if (formData.district || formData.province) {
-      updateFullAddress();
-    }
-  }, [formData.district, formData.province, formData.street, formData.streetNumber, formData.urbanization]);
+  // ✅ Fix 1: Debounce en updateFullAddress para evitar geocodificar con cada tecla
+useEffect(() => {
+  if (!formData.district && !formData.province) return;
 
-  useEffect(() => {
-    if (!mapCenter || !mapRef.current) return;
+  // ✅ Actualizar fullAddress inmediatamente (sin mapa)
+  const parts = [
+    formData.street,
+    formData.streetNumber,
+    formData.urbanization,
+    formData.district,
+    formData.province,
+    formData.region,
+  ].filter(Boolean);
 
-    const initializeMap = () => {
-      if (!mapRef.current) return;
+  const newFullAddress = parts.join(', ');
+  if (newFullAddress !== formData.fullAddress) {
+    onChange('fullAddress', newFullAddress);
+    onChange('address', newFullAddress);
+  }
 
-      const mapInstance = new window.google.maps.Map(mapRef.current, {
-        center: mapCenter,
-        zoom: 16,
-        zoomControl: true,
-        streetViewControl: false,
-        mapTypeControl: false,
-        fullscreenControl: false,
-        styles: [
-          {
-            featureType: 'poi',
-            elementType: 'labels',
-            stylers: [{ visibility: 'off' }],
-          },
-        ],
-      });
+  // ✅ Geocodificar con debounce de 1s (solo mueve el mapa después de parar de escribir)
+  if (formData.street && formData.streetNumber && formData.district) {
+    const timer = setTimeout(() => {
+      geocodeAddress(newFullAddress);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }
+}, [
+  formData.district,
+  formData.province,
+  formData.street,
+  formData.streetNumber,
+  formData.urbanization,
+  formData.region,
+]);
 
-      const marker = new window.google.maps.Marker({
-        position: mapCenter,
-        map: mapInstance,
-        draggable: true,
-        title: formData.district || 'Ubicación seleccionada',
-      });
+  // ✅ Fix 2: Separar la inicialización del mapa del movimiento del centro
+// Efecto 1: Inicializar el mapa UNA SOLA VEZ
+useEffect(() => {
+  if (!mapCenter || !mapRef.current) return;
+  if (mapInstanceRef.current) return; // ✅ Ya inicializado, no recrear
 
-      marker.addListener('dragend', (e: any) => {
-        const lat = e.latLng.lat();
-        const lng = e.latLng.lng();
-        onChange('latitude', lat);
-        onChange('longitude', lng);
-        setMapCenter({ lat, lng });
-      });
+  const initializeMap = () => {
+    if (!mapRef.current) return;
 
-      setMapReady(true);
-    };
+    mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
+      center: mapCenter,
+      zoom: 16,
+      zoomControl: true,
+      streetViewControl: false,
+      mapTypeControl: false,
+      fullscreenControl: false,
+      styles: [
+        { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+      ],
+    });
 
-    if (window.google?.maps) {
-      initializeMap();
-      return;
-    }
+    markerRef.current = new window.google.maps.Marker({
+      position: mapCenter,
+      map: mapInstanceRef.current,
+      draggable: true,
+      title: formData.district || 'Ubicación seleccionada',
+    });
 
-    if (document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]')) {
-      const interval = setInterval(() => {
-        if (window.google?.maps) {
-          clearInterval(interval);
-          initializeMap();
-        }
-      }, 100);
-      return () => clearInterval(interval);
-    }
+    markerRef.current.addListener('dragend', (e: any) => {
+      const lat = e.latLng.lat();
+      const lng = e.latLng.lng();
+      onChange('latitude', lat);
+      onChange('longitude', lng);
+      setMapCenter({ lat, lng });
+    });
 
-    window.initMap = initializeMap;
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}&libraries=places&callback=initMap`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-  }, [mapCenter]);
+    setMapReady(true);
+  };
+
+  if (window.google?.maps) {
+    initializeMap();
+    return;
+  }
+
+  if (document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]')) {
+    const interval = setInterval(() => {
+      if (window.google?.maps) {
+        clearInterval(interval);
+        initializeMap();
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }
+
+  window.initMap = initializeMap;
+  const script = document.createElement('script');
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}&libraries=places&callback=initMap`;
+  script.async = true;
+  script.defer = true;
+  document.head.appendChild(script);
+}, [mapCenter !== null]); // ✅ Solo cuando pasa de null a tener valor
+
+// Efecto 2: Solo MOVER el mapa cuando cambia el centro (sin reinicializar)
+useEffect(() => {
+  if (!mapCenter || !mapInstanceRef.current || !markerRef.current) return;
+
+  // ✅ Pan suave al nuevo centro sin recrear el mapa
+  mapInstanceRef.current.panTo(mapCenter);
+  markerRef.current.setPosition(mapCenter);
+}, [mapCenter]);
 
   const handleLocationSelect = async (location: {
     placeId: string;
@@ -157,9 +199,6 @@ export function LocationStep({ formData, onChange }: LocationStepProps) {
       onChange('district', locationData.district || location.mainText);
       onChange('province', locationData.province || location.secondaryText);
       onChange('region', locationData.region || 'Perú');
-      onChange('latitude', lat);
-      onChange('longitude', lng);
-      onChange('fullAddress', locationData.place.description);
 
       // Forzar el mapa con coords válidas
       if (!isNaN(lat) && !isNaN(lng)) {
@@ -167,9 +206,6 @@ export function LocationStep({ formData, onChange }: LocationStepProps) {
       }
     }
   };
-
-  const inputClass =
-    'w-full px-4 py-3 rounded-lg border border-gray-200 text-sm text-gray-900 bg-gray-50 outline-none';
 
   // El mapa se muestra solo si tenemos coordenadas
   const showMap = mapCenter !== null && !isNaN(mapCenter.lat) && !isNaN(mapCenter.lng);

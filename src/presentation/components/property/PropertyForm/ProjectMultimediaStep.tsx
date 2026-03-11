@@ -7,6 +7,9 @@ interface ProjectMultimediaStepProps {
   formData: any;
   onChange: (field: string, value: any) => void;
   propertyId?: number;
+  // 🔍 FIX: Agregar archivos de unidades para subir en paso 5
+  unitBlueprintFiles?: {[key: number]: File};
+  groupBlueprintFiles?: {[key: number]: File};
 }
 
 const getVideoDuration = (file: File): Promise<number> => {
@@ -63,12 +66,88 @@ const validateFile = async (file: File, type: 'images' | 'blueprints' | 'renders
   return null; // sin error
 };
 
-export function ProjectMultimediaStep({ formData, onChange, propertyId }: ProjectMultimediaStepProps) {
+export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlueprintFiles, groupBlueprintFiles }: ProjectMultimediaStepProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const blueprintInputRef = useRef<HTMLInputElement>(null);
   const renderInputRef = useRef<HTMLInputElement>(null);
+
+  // 🔍 FIX: Función para subir planos de unidades (del paso 3)
+  const uploadUnitBlueprints = async () => {
+    if (!propertyId) return;
+
+    const token = authStorage.getToken() || localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token');
+    if (!token) return;
+
+    console.log('📤 Subiendo planos de unidades desde paso 3...');
+    
+    // 🔍 FIX: Guardar las URLs subidas para actualizar las unidades
+    const uploadedBlueprints: {[key: number]: string} = {};
+    
+    // Subir planos de unidades individuales
+    if (unitBlueprintFiles) {
+      for (const [unitId, file] of Object.entries(unitBlueprintFiles)) {
+        if (file) {
+          const formDataUpload = new FormData();
+          formDataUpload.append('files', file);
+          formDataUpload.append('type', 'blueprints');
+
+          try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${propertyId}/upload`, {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${token}` },
+              body: formDataUpload,
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              const uploadedUrl = result[0];
+              console.log(`✅ Plano de unidad ${unitId} subido:`, uploadedUrl);
+              
+              // 🔍 FIX: Guardar la URL para actualizar la unidad
+              uploadedBlueprints[parseInt(unitId)] = uploadedUrl;
+            }
+          } catch (error) {
+            console.error(`❌ Error subiendo plano de unidad ${unitId}:`, error);
+          }
+        }
+      }
+    }
+
+    // Subir planos de grupos
+    if (groupBlueprintFiles) {
+      for (const [groupId, file] of Object.entries(groupBlueprintFiles)) {
+        if (file) {
+          const formDataUpload = new FormData();
+          formDataUpload.append('files', file);
+          formDataUpload.append('type', 'blueprints');
+
+          try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${propertyId}/upload`, {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${token}` },
+              body: formDataUpload,
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              const uploadedUrl = result[0];
+              console.log(`✅ Plano de grupo ${groupId} subido:`, uploadedUrl);
+              
+              // 🔍 FIX: Guardar la URL para actualizar el grupo
+              uploadedBlueprints[parseInt(groupId)] = uploadedUrl;
+            }
+          } catch (error) {
+            console.error(`❌ Error subiendo plano de grupo ${groupId}:`, error);
+          }
+        }
+      }
+    }
+
+    // 🔍 FIX: Devolver las URLs subidas para que se usen en el guardado final
+    return uploadedBlueprints;
+  };
 
   const handleFileUpload = async (files: FileList, type: 'images' | 'blueprints' | 'renders') => {
     if (!propertyId) {
@@ -164,7 +243,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId }: Projec
   };
 
   return (
-    <div className="space-y-6">
+    <div data-multimedia-step className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Multimedia del Proyecto</h3>
         <p className="text-sm text-gray-600 mb-6">

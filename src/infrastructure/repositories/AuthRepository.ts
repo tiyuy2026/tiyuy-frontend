@@ -84,6 +84,15 @@ export class AuthRepository implements IAuthRepository {
     }
   }
 
+  async updateProfile(userData: Partial<User>): Promise<User> {
+    try {
+      const response = await axiosClient.put<User>(AUTH_ENDPOINTS.UPDATE_PROFILE, userData);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error al actualizar perfil');
+    }
+  }
+
   async getCurrentUser(token: string): Promise<User> {
     try {
       const response = await axiosClient.get<User>(AUTH_ENDPOINTS.ME, {

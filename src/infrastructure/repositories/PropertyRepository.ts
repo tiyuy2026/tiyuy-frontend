@@ -28,7 +28,7 @@ export class PropertyRepository implements IPropertyRepository {
       },
     });
 
-    console.log('📥 Respuesta del backend:', {
+    console.log(' Respuesta del backend:', {
       totalElements: response.data.totalElements,
       first: response.data.first,
       content: response.data.content?.length || 0

@@ -1,23 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import { User } from '@/core/domain/entities';
+import { User } from '@/core/domain/entities/User';
 import { Button, Input } from '@/presentation/components/ui';
-import { Save, MapPin, Phone, Hash } from 'lucide-react';
+import { Save, MapPin, Phone, Hash, User as UserIcon } from 'lucide-react';
+import { useAuth } from '@/presentation/hooks/useAuth';
 
 interface PersonalInfoTabProps {
   user: User;
 }
 
 export const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ user }) => {
+  const { updateProfile } = useAuth();
+  
   const [formData, setFormData] = useState({
-    firstName: user.firstName,
-    lastName: user.lastName,
     phone: user.phone,
-    address: '',
-    city: 'Lima',
-    country: 'Perú',
-    bio: '',
+    address: user.address || '',
+    city: user.city || 'Lima',
+    country: user.country || 'Perú',
+    bio: user.bio || '',
   });
   
   const [isLoading, setIsLoading] = useState(false);
@@ -34,11 +35,10 @@ export const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ user }) => {
     setSuccessMessage('');
 
     try {
-      // TODO: Conectar con backend para actualizar perfil
       console.log('Actualizando perfil:', formData);
       
-      // Simulación de actualización
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Conectar con backend para actualizar perfil
+      await updateProfile(formData);
       
       setSuccessMessage('Información actualizada correctamente');
       setTimeout(() => setSuccessMessage(''), 3000);
@@ -82,31 +82,27 @@ export const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ user }) => {
               label="Email"
               value={user.email}
               disabled
-              leftIcon={<User className="w-5 h-5 text-gray-400" />}
+              leftIcon={<UserIcon className="w-5 h-5 text-gray-400" />}
               helperText="El email no se puede modificar por seguridad"
             />
           </div>
         </div>
 
-        {/* Campos editables */}
+        {/* Campos no editables pero visibles */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
-            name="firstName"
             label="Nombres"
-            value={formData.firstName}
-            onChange={handleChange}
+            value={user.firstName}
             disabled
-            leftIcon={<User className="w-5 h-5 text-gray-400" />}
+            leftIcon={<UserIcon className="w-5 h-5 text-gray-400" />}
             helperText="Los nombres no se pueden modificar por seguridad"
           />
           
           <Input
-            name="lastName"
             label="Apellidos"
-            value={formData.lastName}
-            onChange={handleChange}
+            value={user.lastName}
             disabled
-            leftIcon={<User className="w-5 h-5 text-gray-400" />}
+            leftIcon={<UserIcon className="w-5 h-5 text-gray-400" />}
             helperText="Los apellidos no se pueden modificar por seguridad"
           />
         </div>
@@ -123,6 +119,17 @@ export const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ user }) => {
           />
           
           <Input
+            name="country"
+            label="País"
+            value={formData.country}
+            onChange={handleChange}
+            leftIcon={<MapPin className="w-5 h-5 text-gray-400" />}
+            placeholder="Perú"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Input
             name="city"
             label="Ciudad"
             value={formData.city}
@@ -130,6 +137,8 @@ export const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ user }) => {
             leftIcon={<MapPin className="w-5 h-5 text-gray-400" />}
             placeholder="Lima"
           />
+          
+          <div></div> {/* Espacio vacío para balancear el grid */}
         </div>
 
         <div>

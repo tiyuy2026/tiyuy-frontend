@@ -109,10 +109,23 @@ export const useProjects = () => {
   // 🚀 MUTATIONS (resto igual...)
   const useCreateProject = () => {
     return useMutation({
-      mutationFn: (projectData: Parameters<typeof projectRepo.createProject>[0]) => 
-        projectRepo.createProject(projectData),
-      onSuccess: () => {
+      mutationFn: (projectData: Parameters<typeof projectRepo.createProject>[0]) => {
+        console.log('🚀 useCreateProject - Datos que se enviarán:', projectData);
+        console.log('🚀 useCreateProject - Llamando a projectRepo.createProject...');
+        
+        return projectRepo.createProject(projectData);
+      },
+      onSuccess: (result) => {
+        console.log('✅ useCreateProject - Proyecto creado exitosamente:', result);
         queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.lists() });
+      },
+      onError: (error) => {
+        console.error('❌ useCreateProject - Error al crear proyecto:', error);
+        console.error('❌ Error details:', {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
       },
     });
   };

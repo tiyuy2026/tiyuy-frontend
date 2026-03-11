@@ -13,6 +13,12 @@ export function ProjectInfoStep({ formData, onChange }: ProjectInfoStepProps) {
   const selectedCurrency = formData.currency || 'PEN';
   const currencySymbol = CURRENCIES[selectedCurrency as keyof typeof CURRENCIES]?.symbol || 'S/';
 
+  // Función para actualizar con logging
+  const handleChangeWithLog = (field: string, value: any) => {
+    console.log(`📝 ProjectInfoStep - Actualizando ${field}:`, value);
+    onChange(field, value);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -20,6 +26,91 @@ export function ProjectInfoStep({ formData, onChange }: ProjectInfoStepProps) {
         <p className="text-sm text-gray-600 mb-6">
           Describe tu proyecto inmobiliario y especifica la fase actual
         </p>
+      </div>
+
+      {/* Tipo de Propiedad y Fase */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Tipo de Propiedad *
+          </label>
+          <select
+            value={formData.projectType || 'RESIDENTIAL'}
+            onChange={(e) => handleChangeWithLog('projectType', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+            required
+          >
+            {Object.entries(PROJECT_TYPES_LABELS).map(([key, label]) => (
+              <option key={key} value={key}>{label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Fase Actual *
+          </label>
+          <select
+            value={formData.phase || 'PRE_SALE'}
+            onChange={(e) => handleChangeWithLog('phase', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+            required
+          >
+            {Object.entries(PROJECT_PHASES_LABELS).map(([key, label]) => (
+              <option key={key} value={key}>{label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Moneda y Rango de Precios */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Moneda
+          </label>
+          <select
+            value={formData.currency || 'PEN'}
+            onChange={(e) => handleChangeWithLog('currency', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+          >
+            {Object.entries(CURRENCIES).map(([key, value]) => (
+              <option key={key} value={key}>
+                {value.symbol} ({key})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Precio Desde
+          </label>
+          <input
+            type="number"
+            value={formData.priceFrom || 0}
+            onChange={(e) => handleChangeWithLog('priceFrom', parseFloat(e.target.value) || 0)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+            placeholder="0"
+            min="0"
+            step="0.01"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Precio Hasta
+          </label>
+          <input
+            type="number"
+            value={formData.priceTo || 0}
+            onChange={(e) => handleChangeWithLog('priceTo', parseFloat(e.target.value) || 0)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+            placeholder="0"
+            min="0"
+            step="0.01"
+          />
+        </div>
       </div>
 
       {/* Alerta de suscripción inteligente */}
@@ -56,7 +147,7 @@ export function ProjectInfoStep({ formData, onChange }: ProjectInfoStepProps) {
         <input
           type="text"
           value={formData.name || formData.projectName || ''}
-          onChange={(e) => onChange('name', e.target.value)}
+          onChange={(e) => handleChangeWithLog('name', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
           placeholder="Ej: Residencial Las Flores"
           required
@@ -70,144 +161,11 @@ export function ProjectInfoStep({ formData, onChange }: ProjectInfoStepProps) {
         </label>
         <textarea
           value={formData.description || ''}
-          onChange={(e) => onChange('description', e.target.value)}
-          rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-          placeholder="Describe las características principales de tu proyecto..."
-          required
-        />
-      </div>
-
-      {/* Tipo de Proyecto */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Tipo de Proyecto *
-        </label>
-        <select
-          value={formData.projectType || 'RESIDENTIAL'}
-          onChange={(e) => onChange('projectType', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-          required
-        >
-          {Object.entries(PROJECT_TYPES_LABELS).map(([key, label]) => (
-            <option key={key} value={key}>{label}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Fase del Proyecto */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Fase Actual *
-        </label>
-        <select
-          value={formData.phase || 'PRE_SALE'}
-          onChange={(e) => onChange('phase', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-          required
-        >
-          {Object.entries(PROJECT_PHASES_LABELS).map(([key, label]) => (
-            <option key={key} value={key}>{label}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Unidades */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Total de Unidades *
-          </label>
-          <input
-            type="number"
-            value={formData.totalUnits || ''}
-            onChange={(e) => onChange('totalUnits', parseInt(e.target.value) || 0)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-            placeholder="100"
-            min="1"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Unidades Disponibles *
-          </label>
-          <input
-            type="number"
-            value={formData.availableUnits || ''}
-            onChange={(e) => onChange('availableUnits', parseInt(e.target.value) || 0)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-            placeholder="80"
-            min="0"
-            required
-          />
-        </div>
-      </div>
-
-      {/* Moneda */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Moneda de los Precios *
-        </label>
-        <select
-          value={selectedCurrency}
-          onChange={(e) => onChange('currency', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-          required
-        >
-          {Object.entries(CURRENCIES).map(([key, currency]) => (
-            <option key={key} value={currency.code}>
-              {currency.symbol} {currency.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Precios */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Precio Desde ({currencySymbol}) *
-          </label>
-          <input
-            type="number"
-            value={formData.priceFrom || ''}
-            onChange={(e) => onChange('priceFrom', parseFloat(e.target.value) || 0)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-            placeholder="150000"
-            min="0"
-            step="0.01"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Precio Hasta ({currencySymbol})
-          </label>
-          <input
-            type="number"
-            value={formData.priceTo || ''}
-            onChange={(e) => onChange('priceTo', parseFloat(e.target.value) || undefined)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-            placeholder="500000"
-            min="0"
-          />
-        </div>
-      </div>
-
-      {/* Descripción */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Descripción del Proyecto *
-        </label>
-        <textarea
-          value={formData.description || ''}
-          onChange={(e) => onChange('description', e.target.value)}
+          onChange={(e) => handleChangeWithLog('description', e.target.value)}
           rows={4}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
           placeholder="Describe tu proyecto, características principales, amenities, ubicación privilegiada..."
+          required
         />
         <p className="text-xs text-gray-500 mt-1">
           Mínimo 50 caracteres para mejor SEO
@@ -232,9 +190,9 @@ export function ProjectInfoStep({ formData, onChange }: ProjectInfoStepProps) {
                 onChange={(e) => {
                   const current = formData.amenities || [];
                   if (e.target.checked) {
-                    onChange('amenities', [...current, amenity]);
+                    handleChangeWithLog('amenities', [...current, amenity]);
                   } else {
-                    onChange('amenities', current.filter((a: string) => a !== amenity));
+                    handleChangeWithLog('amenities', current.filter((a: string) => a !== amenity));
                   }
                 }}
                 className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"

@@ -210,17 +210,25 @@ export default function HomePage() {
                 </div>
               </Link>
 
-              <div className="bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-shadow">
-                <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-5">
-                  <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
+              <Link href="/proyectos" className="block group">
+                <div className="bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-all border-2 border-transparent group-hover:border-purple-200 group-hover:scale-105">
+                  <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-5 group-hover:bg-purple-200 transition-colors">
+                    <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">Proyectos Inmobiliarios</h3>
+                  <p className="text-gray-600 text-base leading-relaxed mb-4">
+                    Descubre los mejores proyectos de vivienda y inversión de las principales inmobiliarias.
+                  </p>
+                  <div className="flex items-center gap-2 text-purple-600 font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span>Ver proyectos</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Proyectos Inmobiliarios</h3>
-                <p className="text-gray-600 text-base leading-relaxed">
-                  Descubre los mejores proyectos de vivienda y inversión de las principales inmobiliarias.
-                </p>
-              </div>
+              </Link>
 
               <Link href="/conoce-tiyuy" className="block group">
                 <div className="bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-all border-2 border-transparent group-hover:border-blue-200 group-hover:scale-105">

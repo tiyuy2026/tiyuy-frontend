@@ -11,6 +11,12 @@ export function CharacteristicsStep({ formData, onChange }: CharacteristicsStepP
   const inputClass =
     'w-full px-4 py-3 rounded-lg border border-gray-200 text-sm text-gray-900 bg-gray-50 outline-none';
 
+  // Función para actualizar con logging
+  const handleChangeWithLog = (field: string, value: any) => {
+    console.log(`📝 CharacteristicsStep - Actualizando ${field}:`, value);
+    onChange(field, value);
+  };
+
   // Contadores para dormitorios, baños y estacionamientos
   const Counter = ({ 
     label, 
@@ -202,16 +208,50 @@ export function CharacteristicsStep({ formData, onChange }: CharacteristicsStepP
               <div className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <NumberInput
-                    label="Área total"
-                    value={formData.totalArea || ''}
-                    onChange={(value) => onChange('totalArea', value)}
+                    label="Total de Unidades *"
+                    value={formData.totalUnits || ''}
+                    onChange={(value) => handleChangeWithLog('totalUnits', value)}
+                    placeholder="0"
+                    suffix="unidades"
+                  />
+                  <NumberInput
+                    label="Área Desde *"
+                    value={formData.areaFrom || ''}
+                    onChange={(value) => handleChangeWithLog('areaFrom', value)}
+                    placeholder="0"
+                    suffix="m²"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <NumberInput
+                    label="Área Hasta *"
+                    value={formData.areaTo || ''}
+                    onChange={(value) => handleChangeWithLog('areaTo', value)}
                     placeholder="0"
                     suffix="m²"
                   />
                   <NumberInput
+                    label="Área total"
+                    value={formData.totalArea || ''}
+                    onChange={(value) => handleChangeWithLog('totalArea', value)}
+                    placeholder="0"
+                    suffix="m²"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <NumberInput
                     label="Frente"
                     value={formData.frontage || ''}
-                    onChange={(value) => onChange('frontage', value)}
+                    onChange={(value) => handleChangeWithLog('frontage', value)}
+                    placeholder="0"
+                    suffix="ml"
+                  />
+                  <NumberInput
+                    label="Fondo"
+                    value={formData.depth || ''}
+                    onChange={(value) => handleChangeWithLog('depth', value)}
                     placeholder="0"
                     suffix="ml"
                   />
@@ -219,18 +259,18 @@ export function CharacteristicsStep({ formData, onChange }: CharacteristicsStepP
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <NumberInput
-                    label="Fondo"
-                    value={formData.depth || ''}
-                    onChange={(value) => onChange('depth', value)}
+                    label="Perímetro"
+                    value={formData.perimeter || ''}
+                    onChange={(value) => handleChangeWithLog('perimeter', value)}
                     placeholder="0"
                     suffix="ml"
                   />
                   <NumberInput
-                    label="Perímetro"
-                    value={formData.perimeter || ''}
-                    onChange={(value) => onChange('perimeter', value)}
+                    label="Número de Pisos"
+                    value={formData.floors || ''}
+                    onChange={(value) => handleChangeWithLog('floors', value)}
                     placeholder="0"
-                    suffix="ml"
+                    suffix="pisos"
                   />
                 </div>
 
