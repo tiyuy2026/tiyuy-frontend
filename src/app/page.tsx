@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Footer } from '@/presentation/components/layout/Footer/Footer';
 import { FeaturedProperties } from '@/presentation/components/property/FeaturedProperties/FeaturedProperties';
 import { FeaturedProjects } from '@/presentation/components/project/FeaturedProjects/FeaturedProjects';
+import { LocationSearch } from '@/presentation/components/forms/LocationSearch/LocationSearch';
 
 const HERO_IMAGES = [
   '/assets/images/hero/hero-1.jpg',
@@ -17,6 +18,14 @@ const HERO_IMAGES = [
 export default function HomePage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'alquiler' | 'venta' | 'proyectos'>('venta');
+  const [selectedPropertyType, setSelectedPropertyType] = useState('departamentos');
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const [selectedBedrooms, setSelectedBedrooms] = useState('');
+  const [selectedBathrooms, setSelectedBathrooms] = useState('');
+  const [selectedMinArea, setSelectedMinArea] = useState('');
+  const [selectedMaxArea, setSelectedMaxArea] = useState('');
+  const [selectedFloor, setSelectedFloor] = useState('');
+  const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -50,14 +59,59 @@ export default function HomePage() {
     setActiveTab(tab);
     localStorage.setItem('selectedTab', tab);
     sessionStorage.setItem('lastActiveTab', tab);
+  };
+
+  const handleLocationSelect = (location: any) => {
+    setSelectedLocation(location.mainText);
+  };
+
+  const handleSearch = () => {
+    const baseUrl = activeTab === 'alquiler' ? '/alquiler' : activeTab === 'venta' ? '/venta' : '/proyectos';
+    const location = selectedLocation || 'lima';
+    let url = `${baseUrl}/${selectedPropertyType}/${location}`;
     
-    // Navegar a la página correspondiente
-    if (tab === 'alquiler') {
-      window.location.href = '/alquiler/departamentos/lima';
-    } else if (tab === 'venta') {
-      window.location.href = '/venta/departamentos/lima';
-    } else {
-      window.location.href = '/proyectos';
+    // Agregar parámetros según el tipo de propiedad
+    const params = new URLSearchParams();
+    
+    if ((selectedPropertyType === 'departamentos' || selectedPropertyType === 'casas') && selectedBedrooms) {
+      params.append('bedrooms', selectedBedrooms);
+    }
+    
+    if (selectedPropertyType === 'habitaciones' && selectedBathrooms) {
+      params.append('bathrooms', selectedBathrooms);
+    }
+    
+    // Para oficinas, terrenos/lotes (igual) y locales - solo área mínima
+    if ((selectedPropertyType === 'oficinas' || selectedPropertyType === 'terrenos' || selectedPropertyType === 'lotes' || selectedPropertyType === 'locales') && selectedMinArea) {
+      params.append('minArea', selectedMinArea);
+    }
+    
+    if (params.toString()) {
+      url += `?${params.toString()}`;
+    }
+    
+    router.push(url);
+  };
+
+  const getPropertyTypes = () => {
+    switch (activeTab) {
+      case 'proyectos':
+        return [
+          { value: 'departamentos', label: 'Departamentos' },
+          { value: 'casas', label: 'Casas' },
+          { value: 'oficinas', label: 'Oficinas' },
+          { value: 'locales', label: 'Locales Comerciales' },
+          { value: 'lotes', label: 'Lotes' },
+        ];
+      default:
+        return [
+          { value: 'departamentos', label: 'Departamentos' },
+          { value: 'casas', label: 'Casas' },
+          { value: 'habitaciones', label: 'Habitaciones' },
+          { value: 'terrenos', label: 'Terrenos' },
+          { value: 'oficinas', label: 'Oficinas' },
+          { value: 'locales', label: 'Local Comercial' }
+        ];
     }
   };
 
@@ -87,41 +141,128 @@ export default function HomePage() {
                   Encuentra tu hogar
                 </h1>
 
-                <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
-                  <div className="flex border-b border-gray-200">
-                    <button className="flex-1 py-4 text-base font-semibold text-gray-900 bg-white border-b-2 border-gray-900">
-                      Alquilar
-                    </button>
-                    <button className="flex-1 py-4 text-base font-medium text-gray-600 hover:text-gray-900">
-                      Comprar
-                    </button>
-                    <button className="flex-1 py-4 text-base font-medium text-gray-600 hover:text-gray-900">
-                      Proyectos
-                    </button>
+                <div className="bg-white rounded-2xl shadow-2xl overflow-visible">
+                  <div className="border-b border-gray-200">
+                    <div className="flex">
+                      <button 
+                        onClick={() => handleTabClick('alquiler')}
+                        className={`flex-1 py-4 text-base font-semibold transition-colors ${
+                          activeTab === 'alquiler' 
+                            ? 'text-gray-900 bg-white border-b-2 border-gray-900' 
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        Alquilar
+                      </button>
+                      <button 
+                        onClick={() => handleTabClick('venta')}
+                        className={`flex-1 py-4 text-base font-semibold transition-colors ${
+                          activeTab === 'venta' 
+                            ? 'text-gray-900 bg-white border-b-2 border-gray-900' 
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        Comprar
+                      </button>
+                      <button 
+                        onClick={() => handleTabClick('proyectos')}
+                        className={`flex-1 py-4 text-base font-semibold transition-colors ${
+                          activeTab === 'proyectos' 
+                            ? 'text-gray-900 bg-white border-b-2 border-gray-900' 
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        Proyectos
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="p-6">
-                    <div className="flex gap-3">
-                      <select className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-[210px]">
-                        <option>Departamento</option>
-                        <option>Casa</option>
-                        <option>Terreno</option>
-                        <option>Oficina</option>
-                        <option>Local Comercial</option>
+                  <div className="p-6 overflow-visible">
+                    <div className="flex flex-col lg:flex-row gap-3 relative">
+                      <select 
+                        value={selectedPropertyType}
+                        onChange={(e) => setSelectedPropertyType(e.target.value)}
+                        className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[180px]"
+                      >
+                        {getPropertyTypes().map(type => (
+                          <option key={type.value} value={type.value}>
+                            {type.label}
+                          </option>
+                        ))}
                       </select>
 
-                      <input
-                        type="text"
-                        placeholder="Ingresa ubicaciones o características (ej: piscina)"
-                        className="flex-1 px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base"
-                      />
+                      {/* Filtros específicos según tipo de propiedad */}
+                      {(selectedPropertyType === 'departamentos' || selectedPropertyType === 'casas') ? (
+                        <select 
+                          value={selectedBedrooms}
+                          onChange={(e) => setSelectedBedrooms(e.target.value)}
+                          className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[140px]"
+                        >
+                          <option value="">Habitaciones</option>
+                          <option value="1">1 habitación</option>
+                          <option value="2">2 habitaciones</option>
+                          <option value="3">3 habitaciones</option>
+                          <option value="4">4 habitaciones</option>
+                          <option value="5">5+ habitaciones</option>
+                        </select>
+                      ) : selectedPropertyType === 'habitaciones' ? (
+                        <select 
+                          value={selectedBathrooms}
+                          onChange={(e) => setSelectedBathrooms(e.target.value)}
+                          className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[140px]"
+                        >
+                          <option value="">Baños</option>
+                          <option value="propio">Propio</option>
+                          <option value="compartido">Compartido</option>
+                        </select>
+                      ) : selectedPropertyType === 'oficinas' ? (
+                        <input
+                          type="number"
+                          placeholder="Área mínima (m²)"
+                          value={selectedMinArea}
+                          onChange={(e) => setSelectedMinArea(e.target.value)}
+                          className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[140px]"
+                        />
+                      ) : selectedPropertyType === 'terrenos' ? (
+                        <input
+                          type="number"
+                          placeholder="Área mínima (m²)"
+                          value={selectedMinArea}
+                          onChange={(e) => setSelectedMinArea(e.target.value)}
+                          className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[140px]"
+                        />
+                      ) : selectedPropertyType === 'locales' ? (
+                        <input
+                          type="number"
+                          placeholder="Área mínima (m²)"
+                          value={selectedMinArea}
+                          onChange={(e) => setSelectedMinArea(e.target.value)}
+                          className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[140px]"
+                        />
+                      ) : selectedPropertyType === 'lotes' ? (
+                        <input
+                          type="number"
+                          placeholder="Área mínima (m²)"
+                          value={selectedMinArea}
+                          onChange={(e) => setSelectedMinArea(e.target.value)}
+                          className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[140px]"
+                        />
+                      ) : null}
 
-                      <Link
-                        href="/venta/departamentos/lima"
-                        className="bg-teal-600 text-white px-10 py-3.5 rounded-lg font-bold text-base hover:bg-teal-700 transition-colors whitespace-nowrap"
+                      <div className="flex-1 relative">
+                        <LocationSearch
+                          onLocationSelect={handleLocationSelect}
+                          placeholder="Ingresa ubicaciones o características (ej: piscina)"
+                          className="w-full"
+                        />
+                      </div>
+
+                      <button
+                        onClick={handleSearch}
+                        className="bg-teal-600 text-white px-10 py-3.5 rounded-lg font-bold text-base hover:bg-teal-700 transition-colors whitespace-nowrap w-full lg:w-auto"
                       >
                         Buscar
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>

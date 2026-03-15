@@ -82,7 +82,7 @@ export default function DashboardPage() {
               <h2 className="text-xl font-bold mb-4">Bienvenido a tu Dashboard</h2>
               <p className="text-gray-600 mb-6">Busca tu hogar ideal y gestiona tus propiedades favoritas</p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Link href="/dashboard/mis-propiedades" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
                   <div className="text-blue-600 text-2xl mb-2">🏠</div>
                   <h3 className="font-semibold">Mis Propiedades</h3>
@@ -93,12 +93,6 @@ export default function DashboardPage() {
                   <div className="text-green-600 text-2xl mb-2">❤️</div>
                   <h3 className="font-semibold">Favoritos</h3>
                   <p className="text-sm text-gray-600">Propiedades guardadas</p>
-                </Link>
-                
-                <Link href="/dashboard/billetera" className="bg-purple-50 p-4 rounded-lg hover:bg-purple-100 transition-colors">
-                  <div className="text-purple-600 text-2xl mb-2">💳</div>
-                  <h3 className="font-semibold">Billetera</h3>
-                  <p className="text-sm text-gray-600">Pagos y métodos</p>
                 </Link>
                 
                 <Link href="/dashboard/perfil" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
@@ -172,15 +166,15 @@ export default function DashboardPage() {
               <h2 className="text-xl font-bold mb-4">Dashboard de Desarrollador Inmobiliario</h2>
               <p className="text-gray-600 mb-6">Gestiona tus proyectos y desarrollos inmobiliarios</p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <Link href="/dashboard/mis-propiedades" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
-                  <div className="text-blue-600 text-2xl mb-2">�</div>
+                  <div className="text-blue-600 text-2xl mb-2">🏠</div>
                   <h3 className="font-semibold">Mis Propiedades</h3>
                   <p className="text-sm text-gray-600">Gestiona publicaciones</p>
                 </Link>
                 
                 <Link href="/dashboard/proyectos" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
-                  <div className="text-green-600 text-2xl mb-2">�️</div>
+                  <div className="text-green-600 text-2xl mb-2">🏗️</div>
                   <h3 className="font-semibold">Mis Proyectos</h3>
                   <p className="text-sm text-gray-600">Desarrollos activos</p>
                 </Link>
@@ -191,8 +185,14 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600">Crear desarrollo</p>
                 </Link>
                 
-                <Link href="/planes" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
-                  <div className="text-orange-600 text-2xl mb-2">🌟</div>
+                <Link href="/dashboard/billetera" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
+                  <div className="text-orange-600 text-2xl mb-2">💳</div>
+                  <h3 className="font-semibold">Billetera</h3>
+                  <p className="text-sm text-gray-600">Créditos y pagos</p>
+                </Link>
+                
+                <Link href="/planes" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors">
+                  <div className="text-red-600 text-2xl mb-2">🌟</div>
                   <h3 className="font-semibold">Planes</h3>
                   <p className="text-sm text-gray-600">999 publicaciones</p>
                 </Link>

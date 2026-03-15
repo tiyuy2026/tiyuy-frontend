@@ -24,4 +24,5 @@ export interface FavoritePropertyCard {
   isAvailable: boolean;
   propertyStatus: string;
   savedAt: string;
+  viewsCount?: number;
 }

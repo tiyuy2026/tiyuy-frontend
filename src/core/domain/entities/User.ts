@@ -18,6 +18,7 @@ export interface User {
   city?: string;
   country?: string;
   bio?: string;
+  avatar?: string;
 }
 
 // No necesitamos UserProfile separado, ya está incluido en User

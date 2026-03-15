@@ -922,7 +922,10 @@ export function Header() {
                 </div>
               )}
 
-              <button className="flex items-center gap-2 text-black hover:text-gray-800">
+              <Link 
+                href="/dashboard/mis-contactos"
+                className="flex items-center gap-2 text-black hover:text-gray-800"
+              >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
@@ -934,7 +937,7 @@ export function Header() {
                 <span className="text-base font-normal hidden xl:inline">
                   Mis contactos
                 </span>
-              </button>
+              </Link>
 
               {/* BOTÓN INGRESAR / PERFIL */}
               {!isAuthenticated ? (
