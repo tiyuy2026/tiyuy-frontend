@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { formatDistanceToNow } from '@/utils/formatters';
-import { useCommentStatusPost, useStatusComments } from '@/presentation/hooks/useContacts';
+import { useCommentStatusPost, useStatusComments, useLikeStatusPost, useUnlikeStatusPost, useShareStatusPost, useLikeComment, useUnlikeComment, useGetActiveStatusPosts } from '@/presentation/hooks/useContacts';
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from '@/presentation/store/toastStore';
 
 interface StatusDetailPanelProps {
   status: any;
@@ -13,61 +14,111 @@ interface StatusDetailPanelProps {
 
 export default function StatusDetailPanel({ status, user, onClose }: StatusDetailPanelProps) {
   const [commentText, setCommentText] = useState('');
+  const [likeCount, setLikeCount] = useState(0);
+  const [shareCount, setShareCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
-  // Los contadores se sincronizan con el estado actual
-  const [likeCount, setLikeCount] = useState(status.likes || 0);
-  const [shareCount, setShareCount] = useState(status.shares || 0);
+  const [localComments, setLocalComments] = useState<any[]>([]);
+  const [replyingTo, setReplyingTo] = useState<any>(null);
+  
+  // Ref para evitar bucle infinito Y persistir isInitialized
+  const localCommentsRef = useRef(localComments);
+  const isInitializedRef = useRef(false);
+  localCommentsRef.current = localComments;
   
   const queryClient = useQueryClient();
-  const commentMutation = useCommentStatusPost();
   
-  // Cargar comentarios desde el backend
-  const { data: commentsData, isLoading: commentsLoading } = useStatusComments(status.id);
+  // Hooks para interacciones con el estado
+  const likeMutation = useLikeStatusPost();
+  const unlikeMutation = useUnlikeStatusPost();
+  const shareMutation = useShareStatusPost();
   
-  // Los comentarios se cargan desde el backend
-  const [localComments, setLocalComments] = useState(commentsData || []);
+  // Hooks para interacciones con comentarios
+  const likeCommentMutation = useLikeComment();
+  const unlikeCommentMutation = useUnlikeComment();
+  
+  //  FIX 1: PASAR status.id al hook
+  const commentMutation = useCommentStatusPost(status.id);
+  
+  //  FIX 2: Usar comentarios del backend (NO local)
+  const { data: rawComments = [], isLoading, error } = useStatusComments(status.id);
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
-  };
+  // Obtener datos actualizados del estado para sincronizar contadores
+  const { data: statusPostsData } = useGetActiveStatusPosts();
 
-  const handleComment = () => {
-    if (commentText.trim()) {
-      // Enviar comentario al backend primero
-      commentMutation.mutate(
-        { postId: status.id, content: commentText },
-        {
-          onSuccess: (response) => {
-            console.log('Comentario guardado exitosamente');
-            // Limpiar el input
-            setCommentText('');
-            // Recargar los comentarios desde el backend para asegurar sincronización
-            queryClient.invalidateQueries({ 
-              queryKey: ['status-comments', status.id] 
-            });
-            // También recargar el estado completo para asegurar que se guarden likes y shares
-            queryClient.invalidateQueries({ 
-              queryKey: ['status', status.id] 
-            });
-          },
-          onError: (error) => {
-            console.warn('Error al enviar comentario al backend:', error);
-            // Si hay error, mostrar mensaje al usuario
+  // Encontrar el estado actualizado en la lista
+  const updatedStatus = statusPostsData?.pages?.flat()?.find(s => s.id === status.id) || status;
+
+  // ✅ DEBUG en consola (limitado para evitar payload errors)
+  console.log('StatusDetailPanel comments:', { 
+    statusId: status.id, 
+    length: rawComments?.length || 0,
+    error 
+  });
+
+  // ✅ Usar rawComments directamente sin useMemo para evitar bucles
+  const comments = rawComments || [];
+
+  // 🔄 Sincronización inteligente - preservar likes locales al invalidar cache
+  useEffect(() => {
+    if (comments && comments.length > 0) {
+      if (localCommentsRef.current.length === 0) {
+        // Primera carga - inicializar todo
+        setLocalComments(comments);
+      } else {
+        // Sincronizar preservando likes locales
+        const mergedComments = comments.map((comment: any) => {
+          const localComment = localCommentsRef.current.find(c => c.id === comment.id);
+          
+          // Si existe localmente y tiene diferente estado de like, preservar el estado local
+          if (localComment && localComment.hasUserLiked !== comment.hasUserLiked) {
+            return {
+              ...comment,
+              hasUserLiked: localComment.hasUserLiked,
+              likeCount: localComment.likeCount
+            };
           }
-        }
-      );
+          
+          return comment;
+        });
+        
+        setLocalComments(mergedComments);
+      }
     }
+  }, [comments]);
+
+  // console.log('Render comments:', comments.length, comments[0]); // ← Comentado para evitar payload errors
+  
+  const handleComment = () => {
+    if (!commentText.trim()) return;
+    
+    commentMutation.mutate({ 
+      content: commentText,
+      ...(replyingTo && { replyToCommentId: replyingTo.id })
+    }, {
+      onSuccess: () => {
+        setCommentText(''); // ← Limpiar input
+        setReplyingTo(null); // ← Limpiar respuesta
+        toast.success('✅ Comentario enviado');
+        // Refrescar los comentarios para mostrar el nuevo
+        queryClient.invalidateQueries({ queryKey: ['status-comments', status.id] });
+      },
+      onError: (error) => {
+        console.error('Error:', error);
+        toast.error('❌ Error al enviar comentario');
+      }
+    });
   };
 
   // Efecto para sincronizar contadores con el estado actual
   useEffect(() => {
-    if (status) {
-      setLikeCount(status.likes || 0);
-      setShareCount(status.shares || 0);
+    if (updatedStatus) {
+      setLikeCount(updatedStatus.likeCount || 0);
+      setShareCount(updatedStatus.shareCount || 0);
       // Verificar si el usuario actual ya dio like
-      if (status.userLiked) {
+      if (updatedStatus.hasUserLiked) {
         setIsLiked(true);
+      } else {
+        setIsLiked(false);
       }
     } else {
       // Si el estado se elimina o expira, limpiar todo
@@ -76,7 +127,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
       setIsLiked(false);
       setLocalComments([]);
     }
-  }, [status]);
+  }, [updatedStatus]);
 
   // Efecto para ocultar estado después de 48 horas
   useEffect(() => {
@@ -98,8 +149,55 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
   const [showShareModal, setShowShareModal] = useState(false);
 
   const handleShare = () => {
+    shareMutation.mutate(status.id);
     setShowShareModal(true);
     setShareCount((prev: number) => prev + 1); // Incrementar contador de compartidos
+  };
+
+  const handleLike = () => {
+    if (isLiked) {
+      unlikeMutation.mutate(status.id);
+    } else {
+      likeMutation.mutate(status.id);
+    }
+    setIsLiked(!isLiked);
+    setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
+  };
+
+  const handleLikeComment = (commentId: number, isCommentLiked: boolean) => {
+    // 🔄 Feedback visual inmediato
+    setLocalComments(prev => prev.map(comment => {
+      if (comment.id === commentId) {
+        return {
+          ...comment,
+          hasUserLiked: !isCommentLiked,
+          likeCount: isCommentLiked 
+            ? Math.max((comment.likeCount || 0) - 1, 0)
+            : (comment.likeCount || 0) + 1
+        };
+      }
+      return comment;
+    }));
+    
+    // Llamar a la mutación
+    if (isCommentLiked) {
+      unlikeCommentMutation.mutate(commentId);
+    } else {
+      likeCommentMutation.mutate(commentId);
+    }
+  };
+
+  const handleReply = (comment: any) => {
+    setReplyingTo(comment);
+    // Focus en el input de comentario
+    setTimeout(() => {
+      const input = document.getElementById('comment-input');
+      input?.focus();
+    }, 100);
+  };
+
+  const handleCancelReply = () => {
+    setReplyingTo(null);
   };
 
   const shareUrl = `${window.location.origin}/dashboard/mis-contactos/status/${status.id}`;
@@ -197,11 +295,152 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
 
       {/* Sección de comentarios */}
       <div className="flex-1 overflow-y-auto p-4">
-        <h4 className="font-semibold text-gray-900 mb-4">Comentarios ({localComments.length})</h4>
+        <h4 className="font-semibold text-gray-900 mb-4">Comentarios ({updatedStatus.commentCount || 0})</h4>
         
         {/* Lista de comentarios */}
         <div className="space-y-4">
-          {localComments && localComments.length > 0 ? (
+          {isLoading ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 text-sm">Cargando comentarios...</p>
+            </div>
+          ) : localComments && Array.isArray(localComments) && localComments.length > 0 ? (
+            // Mostrar comentarios locales (con estado de likes actualizado)
+            localComments.map((comment: any, index: number) => (
+              <div key={comment.id || index} className="space-y-3">
+                {/* Comentario principal */}
+                <div className="flex gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 shadow-sm">
+                    {comment.userName?.charAt(0).toUpperCase() || comment.user?.name?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  <div className="flex-1">
+                    <div className="bg-gray-50 rounded-2xl p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-gray-900 text-sm">
+                            {comment.userName || comment.user?.name || 'Usuario'}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {comment.timeAgo || formatDistanceToNow(new Date(comment.createdAt), { 
+                              addSuffix: true
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-gray-800 text-sm leading-relaxed">{comment.content}</p>
+                    </div>
+                    
+                    {/* Botones de interacción */}
+                    <div className="flex items-center gap-4 mt-2 ml-2">
+                      <button 
+                        onClick={() => handleLikeComment(comment.id, comment.hasUserLiked)}
+                        className={`text-xs flex items-center gap-1 transition-colors ${
+                          comment.hasUserLiked ? 'text-blue-600' : 'text-gray-500 hover:text-blue-600'
+                        }`}
+                      >
+                        <svg className="w-4 h-4" fill={comment.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                        </svg>
+                        <span className="font-medium">{comment.likeCount || 0}</span>
+                      </button>
+                      <button 
+                        onClick={() => handleReply(comment)}
+                        className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                      >
+                        Responder
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Respuestas anidadas (placeholder por ahora) */}
+                {comment.replies && comment.replies.length > 0 && (
+                  <div className="ml-12 space-y-2">
+                    {comment.replies.map((reply: any, replyIndex: number) => (
+                      <div key={reply.id || replyIndex} className="flex gap-2">
+                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                          {reply.userName?.charAt(0).toUpperCase() || reply.user?.name?.charAt(0).toUpperCase() || 'U'}
+                        </div>
+                        <div className="flex-1">
+                          <div className="bg-gray-100 rounded-xl p-3">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-medium text-gray-900 text-xs">
+                                {reply.userName || reply.user?.name || 'Usuario'}
+                              </span>
+                              <span className="text-xs text-gray-400">
+                                {reply.timeAgo || formatDistanceToNow(new Date(reply.createdAt), { 
+                                  addSuffix: true
+                                })}
+                              </span>
+                            </div>
+                            <p className="text-gray-700 text-xs">{reply.content}</p>
+                            
+                            {/* Botón de like para respuestas */}
+                            <div className="flex items-center gap-3 mt-2">
+                              <button 
+                                onClick={() => handleLikeComment(reply.id, reply.hasUserLiked)}
+                                className={`text-xs flex items-center gap-1 transition-colors ${
+                                  reply.hasUserLiked ? 'text-blue-600' : 'text-gray-400 hover:text-blue-600'
+                                }`}
+                              >
+                                <svg className="w-3 h-3" fill={reply.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                                </svg>
+                                <span className="font-medium">{reply.likeCount || 0}</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))
+          ) : status.recentComments && status.recentComments.length > 0 ? (
+            // Fallback a comentarios recientes del status
+            status.recentComments.map((comment: any, index: number) => (
+              <div key={comment.id} className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600 flex-shrink-0">
+                  {comment.userName?.charAt(0).toUpperCase() || 'U'}
+                </div>
+                <div className="flex-1">
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium text-sm text-gray-900">
+                        {comment.userName || 'Usuario'}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {comment.timeAgo || formatDistanceToNow(new Date(comment.createdAt), { 
+                          addSuffix: true
+                        })}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-800">{comment.content}</p>
+                  </div>
+                  <div className="flex items-center gap-4 mt-2 ml-3">
+                    <button 
+                      onClick={() => handleLikeComment(comment.id, comment.hasUserLiked)}
+                      className={`text-xs flex items-center gap-1 ${
+                        comment.hasUserLiked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
+                      }`}
+                    >
+                      <svg className="w-3 h-3" fill={comment.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                      {comment.likeCount > 0 && comment.likeCount}
+                    </button>
+                    <button 
+                      onClick={() => handleReply(comment)}
+                      className="text-xs text-gray-500 hover:text-gray-700"
+                    >
+                      Responder
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : localComments && localComments.length > 0 ? (
+            // Fallback a comentarios locales
             localComments.map((comment: any, index: number) => (
               <div key={index} className="flex gap-3">
                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600 flex-shrink-0">
@@ -222,10 +461,21 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                     <p className="text-sm text-gray-800">{comment.content}</p>
                   </div>
                   <div className="flex items-center gap-4 mt-2 ml-3">
-                    <button className="text-xs text-gray-500 hover:text-gray-700">
-                      Me gusta
+                    <button 
+                      onClick={() => handleLikeComment(comment.id, comment.hasUserLiked)}
+                      className={`text-xs flex items-center gap-1 ${
+                        comment.hasUserLiked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
+                      }`}
+                    >
+                      <svg className="w-3 h-3" fill={comment.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                      {comment.likeCount > 0 && comment.likeCount}
                     </button>
-                    <button className="text-xs text-gray-500 hover:text-gray-700">
+                    <button 
+                      onClick={() => handleReply(comment)}
+                      className="text-xs text-gray-500 hover:text-gray-700"
+                    >
                       Responder
                     </button>
                   </div>
@@ -243,26 +493,64 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
 
       {/* Input para nuevo comentario */}
       <div className="border-t border-gray-100 p-4">
+        {/* Mostrar respuesta seleccionada */}
+        {replyingTo && (
+          <div className="mb-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span className="text-blue-700 font-semibold text-sm">Respondiendo a</span>
+                  <span className="text-blue-600 font-medium text-sm">
+                    {replyingTo.userName || replyingTo.user?.name || 'Usuario'}
+                  </span>
+                </div>
+                <div className="bg-white rounded p-2 border border-blue-200">
+                  <p className="text-gray-700 text-xs italic">
+                    "{replyingTo.content?.substring(0, 80)}{replyingTo.content?.length > 80 ? '...' : ''}"
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={handleCancelReply}
+                className="ml-3 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded hover:bg-gray-200"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+        
         <div className="flex gap-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 shadow-sm">
             {user?.name?.charAt(0).toUpperCase() || 'U'}
           </div>
-          <div className="flex-1 flex gap-2">
-            <input
-              type="text"
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              placeholder="Escribe un comentario..."
-              className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              onKeyPress={(e) => e.key === "Enter" && handleComment()}
-            />
-            <button
-              onClick={handleComment}
-              className="px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
-              disabled={!commentText.trim()}
-            >
-              Enviar
-            </button>
+          <div className="flex-1">
+            <div className="relative">
+              <input
+                id="comment-input"
+                type="text"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder={replyingTo ? `Escribe una respuesta a ${replyingTo.userName || replyingTo.user?.name || 'Usuario'}...` : "Escribe un comentario..."}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                onKeyPress={(e) => e.key === "Enter" && handleComment()}
+              />
+              {commentText && (
+                <button
+                  onClick={handleComment}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

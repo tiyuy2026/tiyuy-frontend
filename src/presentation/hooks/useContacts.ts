@@ -346,27 +346,175 @@ export function useCreateStatusPost() {
 }
 
 export function useShareStatusPost() {
+  const queryClient = useQueryClient();
+  
   return useMutation({
-    mutationFn: (postId: number) => apiCall(`/contacts/extended/status/${postId}/share`),
+    mutationFn: (postId: number) => apiCall(`/contacts/extended/status/${postId}/share`, {
+      method: 'POST',
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['status-posts'] });
+    },
+    onError: (error) => {
+      console.error('Error detallado useShareStatusPost:', error);
+      toast.error('Error al compartir estado');
+    },
   });
 }
 
-export function useCommentStatusPost() {
+export function useLikeStatusPost() {
+  const queryClient = useQueryClient();
+  
   return useMutation({
-    mutationFn: ({ postId, content }: { postId: number; content: string }) =>
-      apiCall(`/contacts/extended/status/${postId}/comments`, {
+    mutationFn: (postId: number) => apiCall(`/contacts/extended/status/${postId}/like`, {
+      method: 'POST',
+    }),
+    onSuccess: (data, postId) => {
+      // 🔄 Actualizar el estado del post en la cache
+      queryClient.setQueryData(['status-posts'], (old: any) => {
+        if (!old?.pages) return old;
+        
+        return {
+          ...old,
+          pages: old.pages.map((page: any) =>
+            page.map((post: any) => {
+              if (post.id === postId) {
+                return {
+                  ...post,
+                  hasUserLiked: data.isCurrentlyActive,
+                  likeCount: data.isCurrentlyActive 
+                    ? (post.likeCount || 0) + 1 
+                    : Math.max((post.likeCount || 0) - 1, 0)
+                };
+              }
+              return post;
+            })
+          )
+        };
+      });
+      
+      // Invalidar para asegurar sincronización
+      queryClient.invalidateQueries({ queryKey: ['status-posts'] });
+      
+      toast.success(data.isCurrentlyActive ? '¡Like al comentario!' : 'Like eliminado');
+    },
+    onError: (error) => {
+      console.error('Error detallado useLikeStatusPost:', error);
+      toast.error('Error al dar me gusta');
+    },
+  });
+}
+
+export function useUnlikeStatusPost() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (postId: number) => apiCall(`/contacts/extended/status/${postId}/like`, {
+      method: 'POST',
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['status-posts'] });
+    },
+    onError: (error) => {
+      console.error('Error detallado useUnlikeStatusPost:', error);
+      toast.error('Error al quitar me gusta');
+    },
+  });
+}
+
+export function useCommentStatusPost(statusPostId: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ content, replyToCommentId }: { content: string; replyToCommentId?: number }) =>
+      apiCall(`/contacts/extended/status/${statusPostId}/comments`, {
         method: 'POST',
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ 
+          content,
+          ...(replyToCommentId && { replyToCommentId })
+        }),
       }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['status-comments', statusPostId] });
+      queryClient.invalidateQueries({ queryKey: ['status-posts'] }); // ← Lista estados
+      toast.success('Comentario publicado');
+    },
+    onError: () => toast.error('Error al publicar comentario'),
   });
 }
 
 export function useStatusComments(statusId: number) {
   return useQuery({
     queryKey: ['status-comments', statusId],
-    queryFn: () => apiCall(`/contacts/extended/status/${statusId}/comments`),
+    queryFn: async () => {
+      console.log('🔍 GET /status/', statusId, '/comments/with-replies'); // ← DEBUG
+      const data = await apiCall(`/contacts/extended/status/${statusId}/comments/with-replies`);
+      
+      // ✅ FIX: Backend devuelve {content: [...]} → Normalizar
+      console.log('📥 Raw data:', data); // ← VER ESTO
+      
+      let comments = Array.isArray(data) ? data : (data?.content ?? data?.data ?? []);
+      console.log('📋 Normalized comments:', comments.length, comments); // ← VER ESTO
+      
+      return comments;
+    },
     enabled: !!statusId,
-    staleTime: 1000 * 60, // 1 minuto
+    staleTime: 1000 * 30, // 30s
+  });
+}
+      export function useLikeComment() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (commentId: number) => apiCall(`/contacts/extended/status/comments/${commentId}/like`, {
+      method: 'POST',
+    }),
+    onSuccess: (data, commentId) => {
+      // 🔄 Actualizar el estado del comentario en la cache
+      queryClient.setQueryData(['status-comments'], (old: any) => {
+        if (!Array.isArray(old)) return old;
+        
+        return old.map((comment: any) => {
+          if (comment.id === commentId) {
+            return {
+              ...comment,
+              hasUserLiked: data.isCurrentlyActive,
+              likeCount: data.isCurrentlyActive 
+                ? (comment.likeCount || 0) + 1 
+                : Math.max((comment.likeCount || 0) - 1, 0)
+            };
+          }
+          return comment;
+        });
+      });
+      
+      // ✅ Invalidar cache DESPUÉS de actualizar para persistencia
+      queryClient.invalidateQueries({ queryKey: ['status-comments'] });
+      
+      toast.success(data.isCurrentlyActive ? '¡Like al comentario!' : 'Like eliminado');
+    },
+    onError: (error) => {
+      console.error('Error detallado useLikeComment:', error);
+      toast.error('Error al dar like al comentario');
+    },
+  });
+}
+
+export function useUnlikeComment() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (commentId: number) => apiCall(`/contacts/extended/status/comments/${commentId}/like`, {
+      method: 'POST',
+    }),
+    onSuccess: (_, variables) => {
+      // ✅ Invalidar cache para persistencia
+      queryClient.invalidateQueries({ queryKey: ['status-comments'] });
+    },
+    onError: (error) => {
+      console.error('Error detallado useUnlikeComment:', error);
+      toast.error('Error al quitar me gusta al comentario');
+    },
   });
 }
 
