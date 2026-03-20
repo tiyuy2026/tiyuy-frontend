@@ -47,6 +47,8 @@ export const apiClient = axiosClient;
 // Request interceptor: Agrega JWT automáticamente
 axiosClient.interceptors.request.use(
   (config) => {
+    console.log('🔍 AXIOS REQUEST - Method:', config.method?.toUpperCase(), 'URL:', config.url);
+    
     if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
       if (config.headers) {
         delete (config.headers as any)['Content-Type'];

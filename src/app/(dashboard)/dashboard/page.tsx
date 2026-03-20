@@ -90,7 +90,7 @@ export default function DashboardPage() {
                 </Link>
                 
                 <Link href="/dashboard/favoritos" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
-                  <div className="text-green-600 text-2xl mb-2">❤️</div>
+                  <div className="text-green-600 text-2xl mb-2">Favoritos</div>
                   <h3 className="font-semibold">Favoritos</h3>
                   <p className="text-sm text-gray-600">Propiedades guardadas</p>
                 </Link>
@@ -105,7 +105,7 @@ export default function DashboardPage() {
                   <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                     {getPlanBadge()}
                   </div>
-                  <div className="text-red-600 text-2xl mb-2">⭐</div>
+                  <div className="text-red-600 text-2xl mb-2">Planes</div>
                   <h3 className="font-semibold">{getPlanButtonText()}</h3>
                   <p className="text-sm text-gray-600">Gestiona tu plan</p>
                 </Link>
@@ -129,19 +129,19 @@ export default function DashboardPage() {
                 </Link>
                 
                 <Link href="/dashboard/mensajes" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
-                  <div className="text-green-600 text-2xl mb-2">💬</div>
+                  <div className="text-green-600 text-2xl mb-2">Mensajes</div>
                   <h3 className="font-semibold">Mensajes</h3>
                   <p className="text-sm text-gray-600">Leads de clientes</p>
                 </Link>
                 
                 <Link href="/dashboard/clientes" className="bg-purple-50 p-4 rounded-lg hover:bg-purple-100 transition-colors">
-                  <div className="text-purple-600 text-2xl mb-2">👥</div>
+                  <div className="text-purple-600 text-2xl mb-2">Clientes</div>
                   <h3 className="font-semibold">Clientes</h3>
                   <p className="text-sm text-gray-600">Gestión de cartera</p>
                 </Link>
                 
                 <Link href="/dashboard/billetera" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
-                  <div className="text-orange-600 text-2xl mb-2">💳</div>
+                  <div className="text-orange-600 text-2xl mb-2">Billetera</div>
                   <h3 className="font-semibold">Billetera</h3>
                   <p className="text-sm text-gray-600">Pagos y métodos</p>
                 </Link>
@@ -150,7 +150,7 @@ export default function DashboardPage() {
                   <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                     {getPlanBadge()}
                   </div>
-                  <div className="text-red-600 text-2xl mb-2">⭐</div>
+                  <div className="text-red-600 text-2xl mb-2">Planes</div>
                   <h3 className="font-semibold">{getPlanButtonText()}</h3>
                   <p className="text-sm text-gray-600">Gestiona tu plan</p>
                 </Link>
@@ -186,13 +186,13 @@ export default function DashboardPage() {
                 </Link>
                 
                 <Link href="/dashboard/billetera" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
-                  <div className="text-orange-600 text-2xl mb-2">💳</div>
+                  <div className="text-orange-600 text-2xl mb-2">Billetera</div>
                   <h3 className="font-semibold">Billetera</h3>
                   <p className="text-sm text-gray-600">Créditos y pagos</p>
                 </Link>
                 
                 <Link href="/planes" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors">
-                  <div className="text-red-600 text-2xl mb-2">🌟</div>
+                  <div className="text-red-600 text-2xl mb-2">Planes</div>
                   <h3 className="font-semibold">Planes</h3>
                   <p className="text-sm text-gray-600">999 publicaciones</p>
                 </Link>
@@ -200,7 +200,7 @@ export default function DashboardPage() {
               
               <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="text-yellow-600 text-xl">⭐</div>
+                  <div className="text-yellow-600 text-xl">Planes</div>
                   <h3 className="font-semibold text-yellow-800">Plan Desarrollador</h3>
                 </div>
                 <p className="text-yellow-700 text-sm">
@@ -226,13 +226,13 @@ export default function DashboardPage() {
                 </Link>
                 
                 <Link href="/dashboard/mensajes" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
-                  <div className="text-green-600 text-2xl mb-2">💬</div>
+                  <div className="text-green-600 text-2xl mb-2">Mensajes</div>
                   <h3 className="font-semibold">Mensajes</h3>
                   <p className="text-sm text-gray-600">Leads de clientes</p>
                 </Link>
                 
                 <Link href="/dashboard/clientes" className="bg-purple-50 p-4 rounded-lg hover:bg-purple-100 transition-colors">
-                  <div className="text-purple-600 text-2xl mb-2">👥</div>
+                  <div className="text-purple-600 text-2xl mb-2">Clientes</div>
                   <h3 className="font-semibold">Clientes</h3>
                   <p className="text-sm text-gray-600">Gestión de cartera</p>
                 </Link>
@@ -247,7 +247,7 @@ export default function DashboardPage() {
                   <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                     {getPlanBadge()}
                   </div>
-                  <div className="text-red-600 text-2xl mb-2">⭐</div>
+                  <div className="text-red-600 text-2xl mb-2">Planes</div>
                   <h3 className="font-semibold">{getPlanButtonText()}</h3>
                   <p className="text-sm text-gray-600">Gestiona tu plan</p>
                 </Link>

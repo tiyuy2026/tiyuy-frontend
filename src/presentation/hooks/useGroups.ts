@@ -4,7 +4,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { GroupUseCases } from '../../core/domain/use-cases/GroupUseCases';
 import { GroupRepositoryImpl } from '../../infrastructure/repositories/GroupRepositoryImpl';
-import { CreateGroupPostData, CreateGroupCommentData } from '../../core/domain/repositories/GroupRepository';
+import { CreateGroupPostData, CreateGroupCommentData, CreateGroupData } from '../../core/domain/repositories/GroupRepository';
 import { Group } from '../../core/domain/entities/Group';
 import { GroupPost, GroupComment, GroupLike, GroupShare } from '../../core/domain/entities/GroupPost';
 
@@ -27,15 +27,27 @@ export function useGroups(userId?: number) {
     staleTime: 5 * 60 * 1000, // 5 minutos
   });
 
+  // Mutación para crear grupo
+  const createGroupMutation = useMutation({
+    mutationFn: (data: CreateGroupData) => groupUseCases.createGroup(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['groups'] });
+      console.log(' Grupo creado exitosamente');
+    },
+    onError: (error) => {
+      console.error('Error al crear grupo:', error);
+    }
+  });
+
   // Mutación para unirse a grupo
   const joinGroupMutation = useMutation({
     mutationFn: (groupId: number) => groupUseCases.joinGroup(groupId, userId || 0),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
-      console.log('✅ Te has unido al grupo exitosamente');
+      console.log(' Te has unido al grupo exitosamente');
     },
     onError: (error) => {
-      console.error('❌ Error al unirse al grupo:', error);
+      console.error(' Error al unirse al grupo:', error);
     }
   });
 
@@ -44,10 +56,10 @@ export function useGroups(userId?: number) {
     mutationFn: (groupId: number) => groupUseCases.leaveGroup(groupId, userId || 0),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
-      console.log('✅ Has abandonado el grupo exitosamente');
+      console.log(' Has abandonado el grupo exitosamente');
     },
     onError: (error) => {
-      console.error('❌ Error al abandonar el grupo:', error);
+      console.error(' Error al abandonar el grupo:', error);
     }
   });
 
@@ -56,8 +68,10 @@ export function useGroups(userId?: number) {
     groupsLoading,
     groupsError,
     refetchGroups,
+    createGroup: createGroupMutation.mutate,
     joinGroup: joinGroupMutation.mutate,
     leaveGroup: leaveGroupMutation.mutate,
+    isCreatingGroup: createGroupMutation.isPending,
     isJoining: joinGroupMutation.isPending,
     isLeaving: leaveGroupMutation.isPending
   };
@@ -76,19 +90,19 @@ export function useGroupPosts(groupId: number) {
   } = useQuery({
     queryKey: ['group-posts', groupId],
     queryFn: () => groupUseCases.getGroupPosts(groupId),
-    staleTime: 2 * 60 * 1000, // 2 minutos
+    staleTime: 30 * 1000, // 30 segundos para que se actualice más rápido
   });
 
   // Mutación para crear publicación
   const createPostMutation = useMutation({
-    mutationFn: (data: CreateGroupPostData) => 
-      groupUseCases.createGroupPost(groupId, data),
+    mutationFn: (data: CreateGroupPostData & { userId: number }) => 
+      groupUseCases.createGroupPost(groupId, data, data.userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-posts', groupId] });
-      console.log('✅ Publicación creada exitosamente');
+      console.log(' Publicación creada exitosamente');
     },
     onError: (error) => {
-      console.error('❌ Error al crear publicación:', error);
+      console.error(' Error al crear publicación:', error);
     }
   });
 
@@ -98,10 +112,10 @@ export function useGroupPosts(groupId: number) {
       groupUseCases.deleteGroupPost(postId, 0), // userId se obtendrá del contexto
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-posts', groupId] });
-      console.log('✅ Publicación eliminada exitosamente');
+      console.log(' Publicación eliminada exitosamente');
     },
     onError: (error) => {
-      console.error('❌ Error al eliminar publicación:', error);
+      console.error(' Error al eliminar publicación:', error);
     }
   });
 
@@ -138,14 +152,14 @@ export function useGroupComments(postId: number) {
   // Mutación para crear comentario
   const createCommentMutation = useMutation({
     mutationFn: (data: CreateGroupCommentData) => 
-      groupUseCases.createGroupComment(postId, data),
+      groupUseCases.createGroupComment(postId, data, 0),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-comments', postId] });
       queryClient.invalidateQueries({ queryKey: ['group-posts'] }); // Para actualizar contador
-      console.log('✅ Comentario creado exitosamente');
+      console.log(' Comentario creado exitosamente');
     },
     onError: (error) => {
-      console.error('❌ Error al crear comentario:', error);
+      console.error(' Error al crear comentario:', error);
     }
   });
 
@@ -156,10 +170,10 @@ export function useGroupComments(postId: number) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-comments', postId] });
       queryClient.invalidateQueries({ queryKey: ['group-posts'] }); // Para actualizar contador
-      console.log('✅ Comentario eliminado exitosamente');
+      console.log(' Comentario eliminado exitosamente');
     },
     onError: (error) => {
-      console.error('❌ Error al eliminar comentario:', error);
+      console.error(' Error al eliminar comentario:', error);
     }
   });
 
@@ -187,7 +201,7 @@ export function useGroupInteractions() {
     mutationFn: (postId: number) => groupUseCases.toggleGroupPostLike(postId, 0),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-posts'] });
-      console.log('✅ Like a publicación actualizado');
+      console.log(' Like a publicación actualizado');
     },
     onError: (error) => {
       console.error('❌ Error al dar like a publicación:', error);
@@ -200,10 +214,10 @@ export function useGroupInteractions() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-comments'] });
       queryClient.invalidateQueries({ queryKey: ['group-posts'] });
-      console.log('✅ Like a comentario actualizado');
+      console.log(' Like a comentario actualizado');
     },
     onError: (error) => {
-      console.error('❌ Error al dar like a comentario:', error);
+      console.error('Error al dar like a comentario:', error);
     }
   });
 
@@ -213,10 +227,10 @@ export function useGroupInteractions() {
       groupUseCases.shareGroupPost(postId, 0, message),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-posts'] });
-      console.log('✅ Publicación compartida exitosamente');
+      console.log('Publicación compartida exitosamente');
     },
     onError: (error) => {
-      console.error('❌ Error al compartir publicación:', error);
+      console.error('Error al compartir publicación:', error);
     }
   });
 
@@ -241,10 +255,10 @@ export function useGroupImages() {
       groupUseCases.uploadGroupPostImages(postId, files),
     onSuccess: (imageUrls) => {
       queryClient.invalidateQueries({ queryKey: ['group-posts'] });
-      console.log('✅ Imágenes subidas exitosamente:', imageUrls);
+      console.log(' Imágenes subidas exitosamente:', imageUrls);
     },
     onError: (error) => {
-      console.error('❌ Error al subir imágenes:', error);
+      console.error(' Error al subir imágenes:', error);
     }
   });
 
@@ -253,10 +267,10 @@ export function useGroupImages() {
     mutationFn: (imageUrl: string) => groupUseCases.deleteGroupPostImage(imageUrl),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-posts'] });
-      console.log('✅ Imagen eliminada exitosamente');
+      console.log(' Imagen eliminada exitosamente');
     },
     onError: (error) => {
-      console.error('❌ Error al eliminar imagen:', error);
+      console.error(' Error al eliminar imagen:', error);
     }
   });
 

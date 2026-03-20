@@ -63,7 +63,7 @@ export default function FavoritesPage() {
 
         {!loading && !error && favorites.length === 0 && (
           <div className="text-center py-16 bg-white rounded-lg shadow">
-            <div className="text-6xl mb-4">❤️</div>
+            <div className="text-6xl mb-4">Favoritos</div>
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
               No tienes favoritos aún
             </h3>

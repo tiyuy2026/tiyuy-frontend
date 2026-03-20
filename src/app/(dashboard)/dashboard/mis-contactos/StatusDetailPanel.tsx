@@ -13,32 +13,50 @@ interface StatusDetailPanelProps {
 }
 
 export default function StatusDetailPanel({ status, user, onClose }: StatusDetailPanelProps) {
+
+  // ✅ Nombre real del usuario autenticado - usar firstName + lastName (campos válidos)
+  console.log('🔍 StatusDetailPanel - user:', user); // ← DEBUG
+  const currentUserName = user?.firstName && user?.lastName
+    ? `${user.firstName} ${user.lastName}`
+    : user?.firstName
+    || user?.lastName
+    || `Usuario ${user?.id || ''}`;
+  const currentUserInitial = currentUserName.charAt(0).toUpperCase();
+  console.log('🔍 StatusDetailPanel - currentUserName:', currentUserName); // ← DEBUG
+
+  // ✅ Función helper para detectar si un comentario es del usuario actual
+  const isCurrentUserComment = (comment: any) => {
+    return comment.userId === user?.id
+      || comment.user?.id === user?.id;
+  };
+
+
   const [commentText, setCommentText] = useState('');
   const [likeCount, setLikeCount] = useState(0);
   const [shareCount, setShareCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [localComments, setLocalComments] = useState<any[]>([]);
   const [replyingTo, setReplyingTo] = useState<any>(null);
-  
+
   // Ref para evitar bucle infinito Y persistir isInitialized
   const localCommentsRef = useRef(localComments);
   const isInitializedRef = useRef(false);
   localCommentsRef.current = localComments;
-  
+
   const queryClient = useQueryClient();
-  
+
   // Hooks para interacciones con el estado
   const likeMutation = useLikeStatusPost();
   const unlikeMutation = useUnlikeStatusPost();
   const shareMutation = useShareStatusPost();
-  
+
   // Hooks para interacciones con comentarios
   const likeCommentMutation = useLikeComment();
   const unlikeCommentMutation = useUnlikeComment();
-  
+
   //  FIX 1: PASAR status.id al hook
   const commentMutation = useCommentStatusPost(status.id);
-  
+
   //  FIX 2: Usar comentarios del backend (NO local)
   const { data: rawComments = [], isLoading, error } = useStatusComments(status.id);
 
@@ -48,17 +66,17 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
   // Encontrar el estado actualizado en la lista
   const updatedStatus = statusPostsData?.pages?.flat()?.find(s => s.id === status.id) || status;
 
-  // ✅ DEBUG en consola (limitado para evitar payload errors)
-  console.log('StatusDetailPanel comments:', { 
-    statusId: status.id, 
+  //  DEBUG en consola (limitado para evitar payload errors)
+  console.log('StatusDetailPanel comments:', {
+    statusId: status.id,
     length: rawComments?.length || 0,
-    error 
+    error
   });
 
-  // ✅ Usar rawComments directamente sin useMemo para evitar bucles
+  //  Usar rawComments directamente sin useMemo para evitar bucles
   const comments = rawComments || [];
 
-  // 🔄 Sincronización inteligente - preservar likes locales al invalidar cache
+  //  Sincronización inteligente - preservar likes locales al invalidar cache
   useEffect(() => {
     if (comments && comments.length > 0) {
       if (localCommentsRef.current.length === 0) {
@@ -68,7 +86,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
         // Sincronizar preservando likes locales
         const mergedComments = comments.map((comment: any) => {
           const localComment = localCommentsRef.current.find(c => c.id === comment.id);
-          
+
           // Si existe localmente y tiene diferente estado de like, preservar el estado local
           if (localComment && localComment.hasUserLiked !== comment.hasUserLiked) {
             return {
@@ -77,21 +95,21 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
               likeCount: localComment.likeCount
             };
           }
-          
+
           return comment;
         });
-        
+
         setLocalComments(mergedComments);
       }
     }
   }, [comments]);
 
   // console.log('Render comments:', comments.length, comments[0]); // ← Comentado para evitar payload errors
-  
+
   const handleComment = () => {
     if (!commentText.trim()) return;
-    
-    commentMutation.mutate({ 
+
+    commentMutation.mutate({
       content: commentText,
       ...(replyingTo && { replyToCommentId: replyingTo.id })
     }, {
@@ -135,7 +153,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
       const now = new Date();
       const createdAt = new Date(status.createdAt);
       const hoursSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
-      
+
       // Si han pasado más de 48 horas, ocultar el estado
       if (hoursSinceCreation > 48) {
         // No guardar más información de este estado
@@ -171,14 +189,14 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
         return {
           ...comment,
           hasUserLiked: !isCommentLiked,
-          likeCount: isCommentLiked 
+          likeCount: isCommentLiked
             ? Math.max((comment.likeCount || 0) - 1, 0)
             : (comment.likeCount || 0) + 1
         };
       }
       return comment;
     }));
-    
+
     // Llamar a la mutación
     if (isCommentLiked) {
       unlikeCommentMutation.mutate(commentId);
@@ -211,14 +229,20 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-white font-semibold">
-              {status.user?.name?.charAt(0).toUpperCase() || 'U'}
+              {status.user?.id === user?.id || status.userId === user?.id
+                ? currentUserInitial
+                : (status.userName || status.user?.name || 'U').charAt(0).toUpperCase()
+              }
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">
-                {status.user?.name || 'Usuario'}
+                {status.user?.id === user?.id || status.userId === user?.id
+                  ? currentUserName
+                  : status.userName || status.user?.name || 'Usuario'
+                }
               </h3>
               <p className="text-xs text-gray-500">
-                {formatDistanceToNow(new Date(status.createdAt), { 
+                {formatDistanceToNow(new Date(status.createdAt), {
                   addSuffix: true
                 })}
               </p>
@@ -239,7 +263,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
         {/* Contenido del estado */}
         <div className="mb-4">
           <p className="text-gray-800 whitespace-pre-wrap">{status.content}</p>
-          
+
           {/* Tags si existen */}
           {status.tags && status.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-3">
@@ -259,9 +283,8 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
         <div className="flex items-center gap-6">
           <button
             onClick={handleLike}
-            className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-              isLiked ? 'text-red-600' : 'text-gray-600 hover:text-red-600'
-            }`}
+            className={`flex items-center gap-2 text-sm font-medium transition-colors ${isLiked ? 'text-red-600' : 'text-gray-600 hover:text-red-600'
+              }`}
           >
             <svg className="w-5 h-5" fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -296,7 +319,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
       {/* Sección de comentarios */}
       <div className="flex-1 overflow-y-auto p-4">
         <h4 className="font-semibold text-gray-900 mb-4">Comentarios ({updatedStatus.commentCount || 0})</h4>
-        
+
         {/* Lista de comentarios */}
         <div className="space-y-4">
           {isLoading ? (
@@ -310,17 +333,23 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                 {/* Comentario principal */}
                 <div className="flex gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 shadow-sm">
-                    {comment.userName?.charAt(0).toUpperCase() || comment.user?.name?.charAt(0).toUpperCase() || 'U'}
+                    {isCurrentUserComment(comment)
+                      ? currentUserInitial
+                      : comment.userName?.charAt(0).toUpperCase() || comment.user?.name?.charAt(0).toUpperCase() || 'U'
+                    }
                   </div>
                   <div className="flex-1">
                     <div className="bg-gray-50 rounded-2xl p-4 shadow-sm">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-gray-900 text-sm">
-                            {comment.userName || comment.user?.name || 'Usuario'}
+                            {isCurrentUserComment(comment)
+                              ? currentUserName
+                              : comment.userName || comment.user?.name || 'Usuario'
+                            }
                           </span>
                           <span className="text-xs text-gray-500">
-                            {comment.timeAgo || formatDistanceToNow(new Date(comment.createdAt), { 
+                            {comment.timeAgo || formatDistanceToNow(new Date(comment.createdAt), {
                               addSuffix: true
                             })}
                           </span>
@@ -328,21 +357,20 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                       </div>
                       <p className="text-gray-800 text-sm leading-relaxed">{comment.content}</p>
                     </div>
-                    
+
                     {/* Botones de interacción */}
                     <div className="flex items-center gap-4 mt-2 ml-2">
-                      <button 
+                      <button
                         onClick={() => handleLikeComment(comment.id, comment.hasUserLiked)}
-                        className={`text-xs flex items-center gap-1 transition-colors ${
-                          comment.hasUserLiked ? 'text-blue-600' : 'text-gray-500 hover:text-blue-600'
-                        }`}
+                        className={`text-xs flex items-center gap-1 transition-colors ${comment.hasUserLiked ? 'text-blue-600' : 'text-gray-500 hover:text-blue-600'
+                          }`}
                       >
                         <svg className="w-4 h-4" fill={comment.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
                         </svg>
                         <span className="font-medium">{comment.likeCount || 0}</span>
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleReply(comment)}
                         className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
                       >
@@ -351,36 +379,41 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Respuestas anidadas (placeholder por ahora) */}
                 {comment.replies && comment.replies.length > 0 && (
                   <div className="ml-12 space-y-2">
                     {comment.replies.map((reply: any, replyIndex: number) => (
                       <div key={reply.id || replyIndex} className="flex gap-2">
                         <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
-                          {reply.userName?.charAt(0).toUpperCase() || reply.user?.name?.charAt(0).toUpperCase() || 'U'}
+                          {isCurrentUserComment(reply)
+                            ? currentUserInitial
+                            : reply.userName?.charAt(0).toUpperCase() || reply.user?.name?.charAt(0).toUpperCase() || 'U'
+                          }
                         </div>
                         <div className="flex-1">
                           <div className="bg-gray-100 rounded-xl p-3">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="font-medium text-gray-900 text-xs">
-                                {reply.userName || reply.user?.name || 'Usuario'}
+                                {isCurrentUserComment(reply)
+                                  ? currentUserName
+                                  : reply.userName || reply.user?.name || 'Usuario'
+                                }
                               </span>
                               <span className="text-xs text-gray-400">
-                                {reply.timeAgo || formatDistanceToNow(new Date(reply.createdAt), { 
+                                {reply.timeAgo || formatDistanceToNow(new Date(reply.createdAt), {
                                   addSuffix: true
                                 })}
                               </span>
                             </div>
                             <p className="text-gray-700 text-xs">{reply.content}</p>
-                            
+
                             {/* Botón de like para respuestas */}
                             <div className="flex items-center gap-3 mt-2">
-                              <button 
+                              <button
                                 onClick={() => handleLikeComment(reply.id, reply.hasUserLiked)}
-                                className={`text-xs flex items-center gap-1 transition-colors ${
-                                  reply.hasUserLiked ? 'text-blue-600' : 'text-gray-400 hover:text-blue-600'
-                                }`}
+                                className={`text-xs flex items-center gap-1 transition-colors ${reply.hasUserLiked ? 'text-blue-600' : 'text-gray-400 hover:text-blue-600'
+                                  }`}
                               >
                                 <svg className="w-3 h-3" fill={reply.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
@@ -401,16 +434,22 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
             status.recentComments.map((comment: any, index: number) => (
               <div key={comment.id} className="flex gap-3">
                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600 flex-shrink-0">
-                  {comment.userName?.charAt(0).toUpperCase() || 'U'}
+                  {isCurrentUserComment(comment)
+                    ? currentUserInitial
+                    : comment.userName?.charAt(0).toUpperCase() || 'U'
+                  }
                 </div>
                 <div className="flex-1">
                   <div className="bg-gray-50 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-medium text-sm text-gray-900">
-                        {comment.userName || 'Usuario'}
+                        {isCurrentUserComment(comment)
+                          ? currentUserName
+                          : comment.userName || 'Usuario'
+                        }
                       </span>
                       <span className="text-xs text-gray-500">
-                        {comment.timeAgo || formatDistanceToNow(new Date(comment.createdAt), { 
+                        {comment.timeAgo || formatDistanceToNow(new Date(comment.createdAt), {
                           addSuffix: true
                         })}
                       </span>
@@ -418,18 +457,17 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                     <p className="text-sm text-gray-800">{comment.content}</p>
                   </div>
                   <div className="flex items-center gap-4 mt-2 ml-3">
-                    <button 
+                    <button
                       onClick={() => handleLikeComment(comment.id, comment.hasUserLiked)}
-                      className={`text-xs flex items-center gap-1 ${
-                        comment.hasUserLiked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
-                      }`}
+                      className={`text-xs flex items-center gap-1 ${comment.hasUserLiked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
+                        }`}
                     >
                       <svg className="w-3 h-3" fill={comment.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                       </svg>
                       {comment.likeCount > 0 && comment.likeCount}
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleReply(comment)}
                       className="text-xs text-gray-500 hover:text-gray-700"
                     >
@@ -453,7 +491,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                         {comment.user?.name || 'Usuario'}
                       </span>
                       <span className="text-xs text-gray-500">
-                        {formatDistanceToNow(new Date(comment.createdAt), { 
+                        {formatDistanceToNow(new Date(comment.createdAt), {
                           addSuffix: true
                         })}
                       </span>
@@ -461,18 +499,17 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                     <p className="text-sm text-gray-800">{comment.content}</p>
                   </div>
                   <div className="flex items-center gap-4 mt-2 ml-3">
-                    <button 
+                    <button
                       onClick={() => handleLikeComment(comment.id, comment.hasUserLiked)}
-                      className={`text-xs flex items-center gap-1 ${
-                        comment.hasUserLiked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
-                      }`}
+                      className={`text-xs flex items-center gap-1 ${comment.hasUserLiked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
+                        }`}
                     >
                       <svg className="w-3 h-3" fill={comment.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                       </svg>
                       {comment.likeCount > 0 && comment.likeCount}
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleReply(comment)}
                       className="text-xs text-gray-500 hover:text-gray-700"
                     >
@@ -513,7 +550,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                   </p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={handleCancelReply}
                 className="ml-3 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded hover:bg-gray-200"
               >
@@ -524,10 +561,10 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
             </div>
           </div>
         )}
-        
+
         <div className="flex gap-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 shadow-sm">
-            {user?.name?.charAt(0).toUpperCase() || 'U'}
+            {currentUserInitial}
           </div>
           <div className="flex-1">
             <div className="relative">
@@ -536,7 +573,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                 type="text"
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                placeholder={replyingTo ? `Escribe una respuesta a ${replyingTo.userName || replyingTo.user?.name || 'Usuario'}...` : "Escribe un comentario..."}
+                placeholder={replyingTo ? `Escribe una respuesta a ${replyingTo.userName || replyingTo.user?.name || 'Usuario'}...` : `Escribe un comentario como ${currentUserName}...`}
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 onKeyPress={(e) => e.key === "Enter" && handleComment()}
               />
@@ -568,11 +605,11 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                 <button onClick={() => setShowShareModal(false)} className="text-white/70 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-xl leading-none">✕</button>
               </div>
             </div>
-            
+
             <div className="p-5">
               <div className="grid grid-cols-3 gap-3"> {/* 3 columnas: Copiar, WhatsApp, Facebook */}
                 {/* Copiar Link */}
-                <button 
+                <button
                   onClick={() => {
                     navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
                     setShowShareModal(false);
@@ -581,7 +618,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                 >
                   <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
                     <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-                      <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                      <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
                     </svg>
                   </div>
                   <span className="text-xs text-gray-700 font-medium">Copiar</span>
@@ -592,23 +629,23 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                   className="flex flex-col items-center gap-2 p-3 bg-green-50 rounded-xl hover:bg-green-100 transition-colors">
                   <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
                     <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.488"/>
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.488" />
                     </svg>
                   </div>
                   <span className="text-xs text-green-700 font-medium">WhatsApp</span>
                 </a>
 
                 {/* Facebook */}
-                <a 
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`} 
-                  target="_blank" 
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`}
+                  target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setShowShareModal(false)}
                   className="flex flex-col items-center gap-2 p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors border-2 border-blue-200"
                 >
                   <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                     <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                     </svg>
                   </div>
                   <span className="text-xs text-blue-700 font-bold">Facebook</span>

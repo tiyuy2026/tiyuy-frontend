@@ -2,7 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import StatusDetailPanel from './StatusDetailPanel';
+import { GrupoPostsPanel } from './grupos/components/GrupoPostsPanel';
 import { formatCompactNumber } from '@/utils/formatters';
+import CreateGroupView from './grupos/components/CreateGroupView';
+import DiscoverGroupsView from './grupos/components/DiscoverGroupsView';
 import { 
   useReceivedContacts,
   useSentContacts,
@@ -77,7 +80,6 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
   return response.json();
 }
 
-// ─── TYPES ────────────────────────────────────────────────────────────────────
 type MainTab = 'chats' | 'estados' | 'canales' | 'grupos';
 type ChatFilter = 'all' | 'unread' | 'favorites';
 
@@ -88,7 +90,7 @@ type NavItem = {
   badge?: number;
 };
 
-// ─── HELPERS ──────────────────────────────────────────────────────────────────
+// ──── HELPERS ────────────────────────────────────────────────────────────────
 function timeAgo(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date;
   const diff = Math.floor((Date.now() - d.getTime()) / 1000);
@@ -137,7 +139,7 @@ const ROLE_BADGE: Record<string, string> = {
   ADMIN: 'bg-slate-100 text-slate-700',
 };
 
-// ─── AVATAR ───────────────────────────────────────────────────────────────────
+// ──── AVATAR ────────────────────────────────────────────────────────────────
 function Avatar({
   name, role, size = 'md', src,
 }: {
@@ -153,7 +155,7 @@ function Avatar({
   );
 }
 
-// ─── ICONOS SVG ELEGANTES ─────────────────────────────────────────────────────
+// ──── ICONOS SVG ELEGANTES ────────────────────────────────────────────────────────
 const IC = {
   Chat: (p: { a?: boolean }) => (
     <svg viewBox="0 0 24 24" className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`}>
@@ -172,7 +174,7 @@ const IC = {
   ),
   Groups: (p: { a?: boolean }) => (
     <svg viewBox="0 0 24 24" className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`}>
-      <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+      <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
     </svg>
   ),
   Search: () => (
@@ -202,12 +204,12 @@ const IC = {
   ),
   Lock: () => (
     <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-red-400">
-      <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+      <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
     </svg>
   ),
   Emoji: () => (
     <svg viewBox="0 0 24 24" className="w-5 h-5 fill-gray-400">
-      <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+      <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-1-4l6-4-6-4v8z"/>
     </svg>
   ),
   Attach: () => (
@@ -217,7 +219,7 @@ const IC = {
   ),
   Mic: () => (
     <svg viewBox="0 0 24 24" className="w-5 h-5 fill-gray-400">
-      <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+      <path d="M12 14c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
     </svg>
   ),
   ArrowBack: () => (
@@ -227,7 +229,7 @@ const IC = {
   ),
 };
 
-// ─── FONDO TIPO WHATSAPP ──────────────────────────────────────────────────────
+// ──── FONDO TIPO WHATSAPP ────────────────────────────────────────────────────────
 function ChatBackground({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex-1 overflow-y-auto relative" style={{
@@ -239,9 +241,9 @@ function ChatBackground({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ─── SHARE MODAL ──────────────────────────────────────────────────────────────
+// ──── SHARE MODAL ────────────────────────────────────────────────────────────────
 function ShareModal({ title, link, onClose }: { title: string; link: string; onClose: () => void }) {
-  const encoded = encodeURIComponent(`${title} - Únete en Tiyuy: ${link}`);
+  const encoded = encodeURIComponent(`${title} - únete en Tiyuy: ${link}`);
   const [copied, setCopied] = useState(false);
 
   const copy = () => {
@@ -251,12 +253,12 @@ function ShareModal({ title, link, onClose }: { title: string; link: string; onC
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
         <div className="bg-gradient-to-r from-blue-600 to-teal-500 p-5">
           <div className="flex items-center justify-between">
             <h3 className="text-white font-semibold text-base">Compartir</h3>
-            <button onClick={onClose} className="text-white/70 hover:text-white w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-lg leading-none">✕</button>
+            <button onClick={onClose} className="text-white/70 hover:text-white w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-lg leading-none">×</button>
           </div>
           <p className="text-white/70 text-xs mt-1 truncate">{title}</p>
         </div>
@@ -276,7 +278,14 @@ function ShareModal({ title, link, onClose }: { title: string; link: string; onC
               </div>
               <span className="text-xs text-green-700 font-medium">WhatsApp</span>
             </a>
-                        <a href={`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encoded}`} target="_blank" rel="noopener noreferrer"
+            <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`} target="_blank" rel="noopener noreferrer"
+              className="flex flex-col items-center gap-2 p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors">
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              </div>
+              <span className="text-xs text-blue-700 font-medium">Facebook</span>
+            </a>
+            <a href={`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encoded}`} target="_blank" rel="noopener noreferrer"
               className="flex flex-col items-center gap-2 p-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition-colors">
               <div className="w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center">
                 <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
@@ -290,7 +299,7 @@ function ShareModal({ title, link, onClose }: { title: string; link: string; onC
   );
 }
 
-// ─── MODAL NUEVO ESTADO ───────────────────────────────────────────────────────
+// ──── MODAL NUEVO ESTADO ──────────────────────────────────────────────────────────
 function NewStatusModal({ onClose, userRole }: { onClose: () => void; userRole?: string }) {
   const createStatus = useCreateStatusPost();
 
@@ -345,18 +354,85 @@ function NewStatusModal({ onClose, userRole }: { onClose: () => void; userRole?:
   );
 }
 
-// ─── MODAL CREAR GRUPO ────────────────────────────────────────────────────────
+// ──── MODAL CREAR GRUPO ──────────────────────────────────────────────────────────
 function NewGroupModal({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isRestricted, setIsRestricted] = useState(false);
   const createGroup = useCreateGroup();
+  const { data: groups } = useGetGroups(0, 50);
+  
+  // Verificar si el usuario ya tiene un grupo
+  const userGroups = groups?.filter((g: any) => g.isMember && g.isOwner) ?? [];
+  const hasGroup = userGroups.length > 0;
 
   const handleSubmit = async () => {
     if (!name.trim()) return;
-    await createGroup.mutateAsync({ name, description, isRestrictedByEmail: isRestricted });
-    onClose();
+    
+    try {
+      await createGroup.mutateAsync({ name, description, isRestrictedByEmail: isRestricted });
+      onClose();
+    } catch (error: any) {
+      // Manejar error específico de límite de grupos
+      if (error?.code === 'GROUP_LIMIT_EXCEEDED') {
+        // Mensaje más claro y persistente
+        const message = `⚠️ LIMITE DE GRUPOS ALCANZADO\n\nYa tienes un grupo creado y no puedes crear mas.\n\nTu grupo actual: "${userGroups[0]?.name || 'Tu grupo'}"\n\nSolo puedes tener UN (1) grupo activo en Tiyuy.\n\nVe a la seccion "Mis Grupos" para gestionarlo.`;
+        
+        alert(message);
+        onClose();
+        
+        // Opcional: Mostrar notificación toast adicional
+        setTimeout(() => {
+          alert('💡 Recuerda: Puedes encontrar tu grupo en la seccion "Tus Grupos" del menu izquierdo');
+        }, 1000);
+        
+      } else {
+        // Otros errores
+        const errorMessage = error?.message || 'Error al crear el grupo';
+        alert(` Error: ${errorMessage}`);
+      }
+    }
   };
+
+  // Si ya tiene un grupo, mostrar mensaje diferente
+  if (hasGroup) {
+    return (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-teal-500 p-5">
+            <div className="text-center">
+              <h2 className="text-white font-bold text-lg"> LIMITE ALCANZADO</h2>
+            </div>
+          </div>
+          <div className="p-6 text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl"></span>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+              NO PUEDES CREAR MAS GRUPOS
+            </h3>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+              <p className="text-red-800 text-sm font-medium">
+                Ya alcanzaste el LIMITE de 1 grupo activo
+              </p>
+            </div>
+            <p className="text-gray-600 text-sm mb-4">
+              Tu grupo actual: <strong>"{userGroups[0]?.name}"</strong>
+            </p>
+            <p className="text-gray-500 text-xs mb-6">
+              En Tiyuy cada usuario puede tener UNICAMENTE UN (1) grupo activo.
+            </p>
+            <button
+              onClick={onClose}
+              className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
+            >
+              ENTENDIDO - NO CREAR GRUPO
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -367,7 +443,7 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
               <h2 className="text-white font-bold text-lg">Crear Grupo</h2>
               <p className="text-white/70 text-xs mt-0.5">Solo puedes crear 1 grupo en Tiyuy</p>
             </div>
-            <button onClick={onClose} className="text-white/70 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-xl leading-none">✕</button>
+            <button onClick={onClose} className="text-white/70 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-xl leading-none">×</button>
           </div>
         </div>
         <div className="p-5 space-y-4">
@@ -394,7 +470,7 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
             </button>
           </div>
           <div className="flex items-center gap-2 bg-blue-50 rounded-xl p-3 border border-blue-100">
-            <span className="text-blue-500">ℹ️</span>
+            <span className="text-blue-500"></span>
             <p className="text-xs text-blue-700">Podrás compartir el link del grupo en WhatsApp, Telegram y otras redes para atraer miembros</p>
           </div>
           <div className="flex gap-3 pt-1">
@@ -413,7 +489,7 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-// ─── MODAL CREAR CANAL ────────────────────────────────────────────────────────
+// ──── MODAL CREAR CANAL ──────────────────────────────────────────────────────────
 function NewChannelModal({ onClose, userRole }: { onClose: () => void; userRole?: string }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -435,7 +511,7 @@ function NewChannelModal({ onClose, userRole }: { onClose: () => void; userRole?
               <h2 className="text-white font-bold text-lg">Crear Canal</h2>
               <p className="text-white/70 text-xs mt-0.5">Comparte información con muchos seguidores</p>
             </div>
-            <button onClick={onClose} className="text-white/70 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-xl leading-none">✕</button>
+            <button onClick={onClose} className="text-white/70 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-xl leading-none">×</button>
           </div>
         </div>
         <div className="p-5 space-y-4">
@@ -464,7 +540,7 @@ function NewChannelModal({ onClose, userRole }: { onClose: () => void; userRole?
             </select>
           </div>
           <div className="flex items-center gap-2 bg-amber-50 rounded-xl p-3 border border-amber-100">
-            <span className="text-amber-500">ℹ️</span>
+            <span className="text-amber-500"></span>
             <p className="text-xs text-amber-700">Los canales son ideales para anuncios, noticias y comunicación unidireccional</p>
           </div>
           <div className="flex gap-3 pt-1">
@@ -483,7 +559,7 @@ function NewChannelModal({ onClose, userRole }: { onClose: () => void; userRole?
   );
 }
 
-// ─── COMPONENTE RESULTADOS DE BÚSQUEDA ───────────────────────────────────────────────
+// ──── COMPONENTE RESULTADOS DE BÚSQUEDA ────────────────────────────────────────
 function SearchResultItem({ result, onCreateChat }: { result: any; onCreateChat: (params: any) => void }) {
   const handleAction = (action: string) => {
     switch (result.type) {
@@ -500,7 +576,7 @@ function SearchResultItem({ result, onCreateChat }: { result: any; onCreateChat:
           onCreateChat({
             targetUserId: property.owner.id,
             propertyId: property.id,
-            initialMessage: `📋 Me gustaría más información sobre: ${property.title}`,
+            initialMessage: `👋 Me gustaría más información sobre: ${property.title}`,
             interactionType: 'info_request'
           });
         } else if (action === 'contact') {
@@ -541,7 +617,7 @@ function SearchResultItem({ result, onCreateChat }: { result: any; onCreateChat:
                 ❤️ Like
               </button>
               <button onClick={() => handleAction('info')} className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs hover:bg-blue-200">
-                📋 Info
+                ℹ️ Info
               </button>
               <button onClick={() => handleAction('contact')} className="px-3 py-1 bg-green-100 text-green-600 rounded-full text-xs hover:bg-green-200">
                 💬 Contactar
@@ -577,7 +653,7 @@ function SearchResultItem({ result, onCreateChat }: { result: any; onCreateChat:
   return null;
 }
 
-// ─── PANEL CHATS ──────────────────────────────────────────────────────────────
+// ──── PANEL CHATS ────────────────────────────────────────────────────────────────
 function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; selectedChatId: number | null; setSelectedChatId: (id: number | null) => void }) {
   const [filter, setFilter] = useState<ChatFilter>('all');
   const [newMessage, setNewMessage] = useState('');
@@ -903,7 +979,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
               <IC.Chat />
             </div>
-            <p className="text-gray-600 text-sm font-medium">No tienes conversaciones aún</p>
+            <p className="text-gray-600 text-sm font-medium">No tienes conversaciones aúnc</p>
             <p className="text-gray-400 text-xs mt-1">Usa el buscador para encontrar propiedades, usuarios o estados</p>
           </div>
         ) : (
@@ -935,7 +1011,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
                     </span>
                   )}
                   {chat.isFavorite && !chat.unreadCount && (
-                    <span className="text-yellow-400 text-xs ml-2">★</span>
+                    <span className="text-yellow-400 text-xs ml-2">⭐</span>
                   )}
                 </div>
               </div>
@@ -947,7 +1023,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
   );
 }
 
-// ─── PANEL ESTADOS ────────────────────────────────────────────────────────────
+// ──── PANEL ESTADOS ────────────────────────────────────────────────────────────────
 function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: { 
   user: any; 
   onNewStatus: () => void;
@@ -1032,7 +1108,9 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
       {/* Sección recientes */}
       {!isLoading && allPosts.length > 0 && (
         <div className="px-4 py-2">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Recientes</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+            Recientes
+          </p>
         </div>
       )}
 
@@ -1087,7 +1165,7 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                         <span className={`text-[10px] font-medium ${isUrgent ? 'text-red-400' : 'text-gray-400'}`}>
-                          {isUrgent ? '⚠ ' : ''}{timeLeft(new Date(post.expiresAt))}
+                          {isUrgent ? '⚠️ ' : ''}{timeLeft(new Date(post.expiresAt))}
                         </span>
                       </div>
                     </div>
@@ -1128,7 +1206,7 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
   );
 }
 
-// ─── PANEL CANALES ────────────────────────────────────────────────────────────
+// ──── PANEL CANALES ────────────────────────────────────────────────────────────────
 function CanalesPanel({ user }: { user: any }) {
   const [shareTarget, setShareTarget] = useState<{ title: string; link: string } | null>(null);
   const [showNewChannel, setShowNewChannel] = useState(false);
@@ -1157,13 +1235,13 @@ function CanalesPanel({ user }: { user: any }) {
   };
 
   const cityEmojis: Record<string, string> = {
-    Lima: '🏙', Arequipa: '🌋', Trujillo: '🏺', Piura: '☀️', Chiclayo: '🌿', Cusco: '🏔',
+    Lima: '🏙️', Arequipa: '🌋', Trujillo: '🏺', Piura: '☀️', Chiclayo: '🌿', Cusco: '🏔️',
   };
 
   return (
     <div className="flex flex-col h-full bg-white">
       <div className="px-4 py-3 border-b border-gray-100">
-        <h2 className="font-semibold text-gray-800">Canales Tiyuy</h2>
+        <h2 className="text-lg font-bold text-gray-900">Canales Tiyuy</h2>
         <p className="text-xs text-gray-400 mt-0.5">Canales oficiales por ciudad</p>
       </div>
 
@@ -1173,15 +1251,15 @@ function CanalesPanel({ user }: { user: any }) {
             <div className="w-8 h-8 rounded-full border-4 border-teal-500 border-t-transparent animate-spin" />
           </div>
         ) : !displayChannels?.length ? (
-          <div className="text-center py-16 px-6">
+          <div className="text-center py-16">
             <p className="text-gray-500 text-sm">No hay canales disponibles</p>
           </div>
         ) : (
           displayChannels.map((channel: any) => (
             <div key={channel.id}
               className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition-colors">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
-                {cityEmojis[channel.city] ?? '🏘'}
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
+                {cityEmojis[channel.city] ?? '🏘️'}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
@@ -1237,133 +1315,367 @@ function CanalesPanel({ user }: { user: any }) {
     </div>
   );
 }
-// ─── PANEL LISTA DE GRUPOS (para panel izquierdo) ────────────────────────────────
-function GruposListPanel({ user }: { user: any }) {
-  const { data: groups, isLoading, refetch } = useGetGroups(0, 50);
-  const joinGroup = useJoinGroup();
-  const leaveGroup = useLeaveGroup();
-  const [district, setDistrict] = useState('');
-  const { searchPredictions, loading: placesLoading } = useGooglePlaces();
-  const [searchTerm, setSearchTerm] = useState('');
 
-  // Forzar refresco al montar el componente para obtener datos frescos
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
+// ──── PANEL LISTA DE GRUPOS (columna izquierda — solo navegación) ─────────────
+function GruposListPanel({ 
+  user, 
+  onGroupSelect, 
+  activeSection,
+  onSectionChange,
+}: { 
+  user: any; 
+  onGroupSelect: (group: any) => void;
+  activeSection: 'mis-grupos' | 'descubrir' | 'crear';
+  onSectionChange: (s: 'mis-grupos' | 'descubrir' | 'crear') => void;
+}) {
+  const { data: groups, isLoading } = useGetGroups(0, 50);
+  const misGrupos = groups?.filter((g: any) => g.isMember) ?? [];
+  console.log('👥 Mis grupos (member) in GruposListPanel:', misGrupos);
+  
+  // Verificar si el usuario ya es dueño de un grupo
+  const userOwnedGroups = groups?.filter((g: any) => g.isMember && g.isOwner) ?? [];
+  const hasGroup = userOwnedGroups.length > 0;
 
-  const userGroups = groups?.filter((g: any) => g.isMember) || [];
-  const availableGroups = groups?.filter((g: any) => !g.isMember) || [];
-
-  const getGroupEmoji = (groupName: string) => {
-    if (groupName.includes('Alquiler')) return '🏠';
-    if (groupName.includes('Venta')) return '💰';
-    if (groupName.includes('Terrenos') || groupName.includes('Lotes')) return '🏗️';
-    if (groupName.includes('Inversiones')) return '📈';
-    if (groupName.includes('Chiclayo')) return '🏖️';
-    if (groupName.includes('Arequipa')) return '🏔️';
-    if (groupName.includes('Lima')) return '🌆';
-    return '🏘️'; // Default
+  const getGroupEmoji = (name: string) => {
+    if (name.includes('Alquiler')) return '🏠';
+    if (name.includes('Venta')) return '💰';
+    if (name.includes('Terreno') || name.includes('Lote')) return '🌍';
+    if (name.includes('Inversion')) return '📈';
+    if (name.includes('Lima')) return '🏙️';
+    return '🏘️';
   };
 
-  
   return (
-    <div className="flex flex-col h-full">
-      {/* Encabezado y búsqueda */}
-      <div className="px-4 py-3 border-b border-gray-100">
-        <h2 className="text-xl font-bold text-gray-800 mb-3">Grupos Inmobiliarios</h2>
-        <div className="relative">
-          <LocationAutocomplete
-            value={district}
-            onChange={setDistrict}
-            onPlaceSelected={(place) => {
-              // Extraer distrito del lugar seleccionado
-              const districtComponent = place.address_components?.find((comp: any) => 
-                comp.types.includes('sublocality') || comp.types.includes('administrative_area_level_3')
-              );
-              const districtName = districtComponent?.long_name || place.formatted_address || '';
-              setDistrict(districtName);
-              setSearchTerm(districtName);
-            }}
-            placeholder="Buscar por distrito o ciudad..."
-            className="pl-10"
+    <div className="flex flex-col h-full bg-white">
+      {/* Header estilo Facebook */}
+      <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-xl font-bold text-gray-900">Grupos</h1>
+        </div>
+        <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2">
+          <IC.Search />
+          <input 
+            placeholder="Buscar grupos" 
+            className="bg-transparent text-sm text-gray-700 placeholder-gray-400 flex-1 focus:outline-none" 
           />
-          <svg className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
         </div>
       </div>
 
-      {/* Lista de grupos */}
-      <div className="flex-1 overflow-y-auto">
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <div className="w-8 h-8 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {/* Grupos disponibles para unirse */}
-            {availableGroups
-              .filter((group: any) => 
-                group.name.toLowerCase().includes(searchTerm.toLowerCase())
-              )
-              .map((group: any) => (
-                <div key={group.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm">
-                    {getGroupEmoji(group.name)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-semibold text-gray-900 truncate">{group.name}</h4>
-                    <p className="text-xs text-gray-600">{formatCompactNumber(group.memberCount)} miembros</p>
-                  </div>
-                  <button
-                    onClick={() => joinGroup.mutate(group.id)}
-                    disabled={joinGroup.isPending}
-                    className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs hover:bg-blue-200 font-medium disabled:opacity-50"
-                  >
-                    Unirse
-                  </button>
-                </div>
-              ))}
-            
-            {/* Grupos a los que ya pertenece */}
-            {userGroups
-              .filter((group: any) => 
-                group.name.toLowerCase().includes(searchTerm.toLowerCase())
-              )
-              .map((group: any) => (
-                <div key={group.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors bg-blue-50">
-                  <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-sm">
-                    {getGroupEmoji(group.name)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-semibold text-gray-900 truncate">{group.name}</h4>
-                    <p className="text-xs text-gray-600">{formatCompactNumber(group.memberCount)} miembros • Miembro</p>
-                  </div>
-                  <button
-                    onClick={() => leaveGroup.mutate(group.id)}
-                    disabled={leaveGroup.isPending}
-                    className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs hover:bg-gray-200 font-medium disabled:opacity-50"
-                  >
-                    Salir
-                  </button>
-                </div>
-              ))}
-          </div>
+      {/* Nav items */}
+      <div className="px-3 py-2 space-y-1">
+        <button
+          onClick={() => onSectionChange('descubrir')}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            activeSection === 'descubrir' ? 'bg-blue-100 text-blue-700' : 'text-gray-800 hover:bg-gray-100'
+          }`}
+        >
+          <span className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
+            activeSection === 'descubrir' ? 'bg-blue-600' : 'bg-gray-200'
+          }`}>
+            <svg viewBox="0 0 24 24" className={`w-5 h-5 ${activeSection === 'descubrir' ? 'fill-white' : 'fill-gray-600'}`}>
+              <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+          </span>
+          Descubrir
+        </button>
+
+        <button
+          onClick={() => onSectionChange('mis-grupos')}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+            activeSection === 'mis-grupos' ? 'bg-blue-100 text-blue-700' : 'text-gray-800 hover:bg-gray-100'
+          }`}
+        >
+          <span className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
+            activeSection === 'mis-grupos' ? 'bg-blue-600' : 'bg-gray-200'
+          }`}>
+            <IC.Groups a={activeSection === 'mis-grupos'} />
+          </span>
+          Tus grupos
+        </button>
+      </div>
+
+      {/* Botón crear */}
+      <div className="px-3 pb-3">
+        <button
+          onClick={() => onSectionChange('crear')}
+          className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-colors relative ${
+            hasGroup 
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+              : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+          }`}
+        >
+          {hasGroup && (
+            <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          )}
+          <span className="text-lg font-bold leading-none">
+            {hasGroup ? '🚫' : '+'}
+          </span>
+          {hasGroup ? 'Límite alcanzado' : 'Crear nuevo grupo'}
+        </button>
+        {hasGroup && (
+          <p className="text-xs text-gray-400 text-center mt-1">
+            Ya tienes 1 grupo activo
+          </p>
         )}
       </div>
+
+      <div className="border-t border-gray-100" />
+
+      {/* Mini lista de mis grupos al fondo */}
+      {misGrupos.length > 0 && (
+        <div className="flex-1 overflow-y-auto px-4 pt-3">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+            Grupos a los que te uniste
+          </p>
+          <div className="space-y-1">
+            {misGrupos.slice(0, 8).map((group: any) => (
+              <button
+                key={group.id}
+                onClick={() => {
+                  // TEMPORAL DEBUG - BORRAR DESPUÉS
+                  console.log('🔍 Grupo seleccionado en GruposListPanel:', group.id, group.groupId);
+                  console.log('🔍 Grupo object completo:', group);
+                  
+                  onGroupSelect(group);
+                  onSectionChange('mis-grupos');
+                }}
+                className="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded-xl transition-colors text-left"
+              >
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-teal-500 flex items-center justify-center text-lg flex-shrink-0">
+                  {getGroupEmoji(group.name)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate">{group.name}</p>
+                  <p className="text-xs text-gray-400">{group.memberCount} miembros</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-// ─── MAIN PAGE COMPONENT ────────────────────────────────────────────────────────
+// ──── VISTA DERECHA: MIS GRUPOS (grid estilo Facebook) ─────────────────────
+function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect: (g: any) => void }) {
+  const { data: groups, isLoading } = useGetGroups(0, 50);
+  const leaveGroup = useLeaveGroup();
+  const [shareTarget, setShareTarget] = useState<{ title: string; link: string } | null>(null);
+  const misGrupos = groups?.filter((g: any) => g.isMember) ?? [];
+  console.log('👥 Mis grupos (member) in GruposListPanel:', misGrupos);
+
+  const getGroupEmoji = (name: string) => {
+    if (name.includes('Alquiler')) return '🏠';
+    if (name.includes('Venta')) return '💰';
+    if (name.includes('Terreno') || name.includes('Lote')) return '🌍';
+    if (name.includes('Inversion')) return '📈';
+    if (name.includes('Lima')) return '🏙️';
+    return '🏘️';
+  };
+
+  return (
+    <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+      {/* Header estilo Facebook */}
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-xl font-bold text-gray-900">
+          Todos los grupos a los que te uniste ({misGrupos.length})
+        </h2>
+        <button className="text-sm text-blue-600 font-medium hover:underline">
+          Ordenar
+        </button>
+      </div>
+
+      {isLoading && (
+        <div className="flex justify-center py-16">
+          <div className="w-8 h-8 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
+        </div>
+      )}
+
+      {!isLoading && misGrupos.length === 0 && (
+        <div className="text-center py-20">
+          <div className="text-6xl mb-4">👥</div>
+          <p className="text-gray-700 font-semibold text-lg">No eres miembro de ningún grupo aún</p>
+          <p className="text-gray-400 text-sm mt-1">Ve a "Descubrir" para unirte a grupos</p>
+        </div>
+      )}
+
+      {/* Grid de tarjetas estilo Facebook */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {misGrupos.map((group: any) => (
+          <div
+            key={group.id}
+            className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all cursor-pointer"
+          >
+            {/* Banner del grupo */}
+            <div
+              className="h-28 bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-5xl"
+              onClick={() => {
+                // TEMPORAL DEBUG - BORRAR DESPUÉS
+                console.log('🔍 Grupo seleccionado en GruposMisGruposView (banner):', group.id, group.groupId);
+                console.log('🔍 Grupo object completo:', group);
+                
+                onGroupSelect(group);
+              }}
+            >
+              {getGroupEmoji(group.name)}
+            </div>
+
+            {/* Info */}
+            <div className="p-3" onClick={() => {
+              // TEMPORAL DEBUG - BORRAR DESPUÉS
+              console.log('🔍 Grupo seleccionado en GruposMisGruposView (info):', group.id, group.groupId);
+              
+              onGroupSelect(group);
+            }}>
+              <h3 className="font-bold text-gray-900 text-sm line-clamp-2 leading-snug mb-1">
+                {group.name}
+              </h3>
+              <p className="text-xs text-gray-500">
+                {group.memberCount || 0} miembros • {group.postCount || 0} publicaciones
+              </p>
+            </div>
+
+            {/* Acciones */}
+            <div className="px-3 pb-3 flex items-center gap-2">
+              <button
+                onClick={() => {
+                  // TEMPORAL DEBUG - BORRAR DESPUÉS
+                  console.log('🔍 Grupo seleccionado en GruposMisGruposView (botón):', group.id, group.groupId);
+                  
+                  onGroupSelect(group);
+                }}
+                className="flex-1 py-1.5 bg-blue-50 text-blue-600 text-xs font-semibold rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                Ver grupo
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShareTarget({
+                    title: group.name,
+                    link: `${window.location.origin}/grupos/${group.id}` 
+                  });
+                }}
+                className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                <span className="text-gray-500 text-xs">···</span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {shareTarget && (
+        <ShareModal
+          title={shareTarget.title}
+          link={shareTarget.link}
+          onClose={() => setShareTarget(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ──── PANEL DETALLES DE GRUPO ────────────────────────────────────────────────────────
+function GrupoDetailPanel({ group, user, onBack }: { group: any; user: any; onBack: () => void }) {
+  const leaveGroup = useLeaveGroup();
+
+  const handleLeaveGroup = () => {
+    if (confirm(`¿Estás seguro de que quieres salir del grupo "${group.name}"?`)) {
+      leaveGroup.mutate(group.id);
+      onBack(); // Volver a la lista de grupos
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-white">
+      {/* Header del grupo estilo Tiyuy */}
+      <div className="bg-gradient-to-r from-blue-600 to-teal-500 p-4 text-white">
+        <div className="flex items-center justify-between">
+          <button 
+            onClick={onBack}
+            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h1 className="text-xl font-bold">{group.name}</h1>
+          <button
+            onClick={handleLeaveGroup}
+            disabled={leaveGroup.isPending}
+            className="px-3 py-1 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
+          >
+            {leaveGroup.isPending ? (
+              <>
+                <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" />
+                Saliendo...
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Salir
+              </>
+            )}
+          </button>
+        </div>
+        <div className="flex items-center gap-4 mt-3">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+            </svg>
+            <span className="text-sm">{group.memberCount || 0} miembros</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+            </svg>
+            <span className="text-sm">{group.postCount || 0} publicaciones</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Área de publicaciones dinámica */}
+      <div className="flex-1 overflow-hidden">
+        <GrupoPostsPanel 
+          groupId={group.id ?? group.groupId ?? 0}
+          groupName={group.name}
+          currentUserId={user?.id || 0}
+          currentUser={user}  
+          onCreatePost={() => {
+            // TEMPORAL DEBUG - BORRAR DESPUÉS
+            console.log('🔍 GrupoPostsPanel groupId:', group.id, group.groupId);
+            console.log('🔍 group object completo:', group);
+            
+            // Función para crear post - puede ser implementada después
+            console.log('Crear post en grupo:', group.id);
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+// ──── MAIN PAGE COMPONENT ────────────────────────────────────────────────────────────────
 export default function MisContactosPage() {
   const [activeTab, setActiveTab] = useState<MainTab>('chats');
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [selectedStatusId, setSelectedStatusId] = useState<number | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+  const [gruposSection, setGruposSection] = useState<'mis-grupos' | 'descubrir' | 'crear'>('mis-grupos');
+  const [activeRightView, setActiveRightView] = useState<'default' | 'create-group' | 'discover'>('default' as const);
   const [showNewStatus, setShowNewStatus] = useState(false);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user, token, isAuthenticated } = useAuthStore();
+
+  // Monitorear cambios en selectedGroup para depuración
+  useEffect(() => {
+    console.log('selectedGroup cambió:', selectedGroup);
+  }, [selectedGroup]);
   
   // Get chats data to find selected chat
   const { data: chats } = useGetChats('all');
@@ -1371,7 +1683,6 @@ export default function MisContactosPage() {
   const sendMessage = useSendMessage();
   const markAsRead = useMarkChatAsRead();
   const toggleFavorite = useToggleFavoriteChat();
-  const selectedChat = chats?.find((c: any) => c.id === selectedChatId);
 
   // Verificar autenticación
   useEffect(() => {
@@ -1385,7 +1696,7 @@ export default function MisContactosPage() {
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
-  }, [messages, newMessage]);
+  }, [messages]);
 
   // Mark chat as read when selected
   useEffect(() => {
@@ -1421,7 +1732,7 @@ export default function MisContactosPage() {
         </div>
       )}
 
-      {/* ── Sidebar iconos estilo WhatsApp ── */}
+      {/* ──── Sidebar iconos estilo WhatsApp ──── */}
       <div className="w-[76px] bg-white flex flex-col items-center py-3 gap-1 flex-shrink-0 flex">
         {/* Logo Tiyuy */}
         <div className="w-10 h-10 mb-6 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center shadow-lg">
@@ -1452,9 +1763,9 @@ export default function MisContactosPage() {
         </div>
       </div>
 
-      {/* ── Contenedor principal para chats y conversación ── */}
+      {/* ──── Contenedor principal para chats y conversación ──── */}
       <div className="flex-1 flex overflow-hidden">
-        {/* ── Panel lista izquierdo ── */}
+        {/* ──── Panel lista izquierdo ──── */}
         <div className="flex-initial w-[350px] flex flex-col bg-white border-r border-[#e9edef] overflow-hidden">
         {/* Header del panel con gradiente Tiyuy */}
         <div className="bg-gradient-to-r from-blue-700 to-teal-600 px-4 py-3 flex-shrink-0">
@@ -1483,14 +1794,26 @@ export default function MisContactosPage() {
           {activeTab === 'chats'   && <ChatsPanel user={user} selectedChatId={selectedChatId} setSelectedChatId={setSelectedChatId} />}
           {activeTab === 'estados' && <EstadosPanel user={user} onNewStatus={() => setShowNewStatus(true)} onStatusSelect={setSelectedStatusId} selectedStatusId={selectedStatusId} />}
           {activeTab === 'canales' && <CanalesPanel user={user} />}
-          {activeTab === 'grupos'  && <GruposListPanel user={user} />}
+          {activeTab === 'grupos' && (
+            <GruposListPanel
+              user={user}
+              onGroupSelect={(group) => {
+                setSelectedGroup(group);
+              }}
+              activeSection={gruposSection}
+              onSectionChange={(s) => {
+                setGruposSection(s);
+                setSelectedGroup(null); // limpiar grupo al cambiar sección
+              }}
+            />
+          )}
         </div>
       </div>
 
-      {/* ── Panel derecho — contenido dinámico según selección ── */}
+      {/* ──── Panel derecho ──── contenido dinámico segun selección ──── */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Si hay un chat seleccionado, mostrar conversación ocupando todo el espacio */}
-        {activeTab === 'chats' && selectedChatId && selectedChat ? (
+        {activeTab === 'chats' && selectedChatId && chats?.find((c: any) => c.id === selectedChatId) ? (
           <div className="flex flex-col h-full">
             {/* Header conversación */}
             <div className="flex items-center gap-3 px-4 py-3 bg-[#075e54] border-b border-[#054d44]">
@@ -1499,12 +1822,21 @@ export default function MisContactosPage() {
                 <IC.ArrowBack />
               </button>
               <div className="flex-1 min-w-0">
-                <p className="text-white font-semibold text-sm truncate">{selectedChat.participantName}</p>
-                <p className="text-white/60 text-xs truncate">{selectedChat.participantEmail}</p>
+                <p className="text-white font-semibold text-sm">{(() => {
+                  const chat = chats?.find((c: { id: number; participantName: string }) => c.id === selectedChatId);
+                  return chat?.participantName;
+                })()}</p>
+                <p className="text-white/60 text-xs">{(() => {
+                  const chat = chats?.find((c: { id: number; participantEmail: string }) => c.id === selectedChatId);
+                  return chat?.participantEmail;
+                })()}</p>
               </div>
               <button onClick={() => toggleFavorite.mutate(selectedChatId)}
-                className={`text-sm ${selectedChat.isFavorite ? 'text-yellow-400' : 'text-white/40 hover:text-white/70'} transition-colors`}>
-                ★
+                className={`text-sm ${(() => {
+                  const chat = chats?.find((c: { id: number; isFavorite: boolean }) => c.id === selectedChatId);
+                  return chat?.isFavorite ? 'text-yellow-400' : 'text-white/40 hover:text-white/70';
+                })()} transition-colors`}>
+                ⭐
               </button>
             </div>
 
@@ -1539,8 +1871,8 @@ export default function MisContactosPage() {
                 ))
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-gray-500 text-sm">No hay mensajes aún</p>
-                  <p className="text-gray-400 text-xs mt-1">Envía el primer mensaje</p>
+                  <p className="text-gray-500 text-sm">No hay mensajes aÃºn</p>
+                  <p className="text-gray-400 text-xs mt-1">EnvÃ­a el primer mensaje</p>
                 </div>
               )}
               <div ref={messagesEndRef} />
@@ -1554,7 +1886,7 @@ export default function MisContactosPage() {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder="Escribe un mensaje..."
+                  placeholder={`Escribe un mensaje como ${user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.firstName || user?.lastName || `Usuario ${user?.id || ''}`}...`}
                   className="flex-1 px-4 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button
@@ -1582,8 +1914,32 @@ export default function MisContactosPage() {
             user={user}
             onClose={() => setSelectedStatusId(null)}
           />
+        ) : activeTab === 'grupos' ? (
+          // ── PANEL DERECHO DE GRUPOS — cambia según sección o grupo seleccionado ──
+          selectedGroup ? (
+            <GrupoDetailPanel
+              group={selectedGroup}
+              user={user}
+              onBack={() => setSelectedGroup(null)}
+            />
+          ) : gruposSection === 'crear' ? (
+            <div className="flex-1 overflow-y-auto bg-gray-50">
+              <NewGroupModal onClose={() => setGruposSection('mis-grupos')} />
+            </div>
+          ) : gruposSection === 'descubrir' ? (
+            <DiscoverGroupsView
+              user={user}
+              onGroupSelect={(group: any) => setSelectedGroup(group)}
+            />
+          ) : (
+            // mis-grupos — grid estilo Facebook
+            <GruposMisGruposView
+              user={user}
+              onGroupSelect={(group: any) => setSelectedGroup(group)}
+            />
+          )
         ) : (
-          /* Si no hay chat seleccionado, mostrar contenido estático */
+          /* Si no hay chat seleccionado, mostrar contenido estÃ¡tico */
           <div className="flex-1 flex items-center justify-center"
             style={{
               backgroundColor: '#e5ddd5',
@@ -1591,7 +1947,7 @@ export default function MisContactosPage() {
               backgroundSize: '24px 24px',
             }}>
             
-            {/* Contenido que cambia según el tab seleccionado */}
+            {/* Contenido que cambia segÃºn el tab seleccionado */}
             {activeTab === 'chats' && (
               <div className="text-center px-6">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center mb-6 shadow-2xl">
@@ -1603,14 +1959,14 @@ export default function MisContactosPage() {
                 </p>
                 <div className="text-center px-4">
                   <p className="text-gray-500 text-xs mb-2">
-                    Busca y agrega contactos por teléfono (solo Perú)
+                    Busca y agrega contactos por telÃ©fono (solo PerÃº)
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-gray-400 text-xs">
                   <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current">
                     <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
                   </svg>
-                  Tus mensajes están cifrados de extremo a extremo
+                  Tus mensajes estÃ¡n cifrados de extremo a extremo
                 </div>
               </div>
             )}
@@ -1622,7 +1978,7 @@ export default function MisContactosPage() {
                 </div>
                 <h2 className="text-gray-800 text-2xl font-light mb-2">Canales</h2>
                 <p className="text-gray-600 text-sm text-center max-w-xs leading-relaxed mb-6">
-                  Suscríbete a canales de noticias inmobiliarias
+                  SuscrÃ­bete a canales de noticias inmobiliarias
                 </p>
                 <div className="text-center px-4">
                   <p className="text-gray-500 text-xs mb-2">
@@ -1638,35 +1994,31 @@ export default function MisContactosPage() {
               </div>
             )}
 
-            {activeTab === 'grupos' && (
+            {activeTab === 'estados' && (
               <div className="text-center px-6">
-                {groupsLoading ? (
-                  <div className="flex justify-center py-12">
-                    <div className="w-8 h-8 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
-                  </div>
-                ) : groups?.filter((g: any) => g.isMember).length === 0 ? (
-                  <>
-                    <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-6">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                      </svg>
-                    </div>
-                    <h2 className="text-gray-800 text-xl font-medium mb-2">No te has unido a ningún grupo</h2>
-                    <p className="text-gray-600 text-sm text-center max-w-xs leading-relaxed mb-6">
-                      Únete a algunos grupos para comenzar
-                    </p>
-                    <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                      Descubrir grupos
-                    </button>
-                  </>
-                ) : (
-                  <GruposListPanel user={user} />
-                )}
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center mb-6 shadow-2xl">
+                  <span className="text-white font-bold text-3xl">E</span>
+                </div>
+                <h2 className="text-gray-800 text-2xl font-light mb-2">Estados</h2>
+                <p className="text-gray-600 text-sm text-center max-w-xs leading-relaxed mb-6">
+                  Comparte tu estado con otros profesionales
+                </p>
+                <div className="text-center px-4">
+                  <p className="text-gray-500 text-xs mb-2">
+                    Publica propiedades y novedades
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-gray-400 text-xs">
+                  <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41 1.41L10 14.17V7h2v7.17l3.59-3.59L18 17l-5-5z"/>
+                  </svg>
+                  Actualiza tu estado diariamente
+                </div>
               </div>
             )}
           </div>
         )}
-      </div>
+        </div>
       </div>
 
       {/* Modals */}

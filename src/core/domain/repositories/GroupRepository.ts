@@ -9,6 +9,7 @@ export interface GroupRepository {
   // Grupos
   getGroups(userId?: number): Promise<Group[]>;
   getGroupById(id: number): Promise<Group>;
+  createGroup(data: CreateGroupData): Promise<Group>;
   joinGroup(groupId: number, userId: number): Promise<void>;
   leaveGroup(groupId: number, userId: number): Promise<void>;
   
@@ -19,8 +20,8 @@ export interface GroupRepository {
   deleteGroupPost(postId: number, userId: number): Promise<void>;
   
   // Comentarios
-  getGroupComments(postId: number, page?: number, size?: number): Promise<{ content: GroupComment[]; totalElements: number; totalPages: number }>;
-  createGroupComment(postId: number, data: CreateGroupCommentData): Promise<GroupComment>;
+  getGroupComments(groupId: number, postId: number, page?: number, size?: number): Promise<{ content: GroupComment[]; totalElements: number; totalPages: number }>;
+  createGroupComment(groupId: number, postId: number, data: CreateGroupCommentData): Promise<GroupComment>;
   deleteGroupComment(commentId: number, userId: number): Promise<void>;
   
   // Interacciones
@@ -42,6 +43,7 @@ export interface CreateGroupPostData {
   borderStyle?: 'none' | 'solid' | 'dashed' | 'rounded';
   postStyle?: 'default' | 'modern' | 'classic' | 'minimal';
   imageUrls?: string[];
+  userId: number; // ✅ userId requerido por el backend
 }
 
 export interface UpdateGroupPostData extends Partial<CreateGroupPostData> {}
@@ -49,4 +51,11 @@ export interface UpdateGroupPostData extends Partial<CreateGroupPostData> {}
 export interface CreateGroupCommentData {
   content: string;
   replyToCommentId?: number;
+}
+
+export interface CreateGroupData {
+  name: string;
+  description?: string;
+  avatar?: string;
+  isRestrictedByEmail?: boolean;
 }

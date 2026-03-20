@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tansta
 import { ContactRepository } from '@/infrastructure/repositories/ContactRepository';
 import { SendContactData } from '@/core/domain/entities/Contact';
 import { toast } from '@/presentation/store/toastStore';
+import { axiosClient } from '@/infrastructure/api/axios-client';
 
 const contactRepo = new ContactRepository();
 
@@ -55,25 +56,30 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
     ...options,
   });
   
-  console.log(`API Response: ${response.status} ${response.statusText}`);
+  console.log(`API Response: ${response?.status} ${response?.statusText}`);
   
-  if (!response.ok) {
+  if (!response || !response.ok) {
     let errorText = 'Unknown error';
+    let status = response?.status || 'NETWORK_ERROR';
+    let statusText = response?.statusText || 'Network Error';
+    
     try {
-      errorText = await response.text();
+      if (response) {
+        errorText = await response.text();
+      }
     } catch (error) {
       console.warn('Could not read error response:', error);
-      errorText = `HTTP ${response.status}: ${response.statusText}`;
+      errorText = `HTTP ${status}: ${statusText}`;
     }
     
     console.error('API Error Details:', {
-      status: response.status,
-      statusText: response.statusText,
+      status: status,
+      statusText: statusText,
       url: url,
       errorText: errorText,
-      ok: response.ok,
-      type: response.type,
-      headers: Object.fromEntries(response.headers.entries())
+      ok: response?.ok || false,
+      type: response?.type || 'unknown',
+      headers: response ? Object.fromEntries(response.headers.entries()) : {}
     });
     
     // Si es 401, limpiar tokens y redirigir
@@ -566,10 +572,13 @@ export function useGetGroups(page = 0, size = 10) {
     queryKey: ['groups', page, size],
     queryFn: async () => {
       const data = await apiCall(`/contacts/extended/groups?page=${page}&size=${size}`);
+      console.log('📋 Groups API response:', data);
       // Normalizar siempre a array
-      return Array.isArray(data) ? data : (data?.content ?? []);
+      const groups = Array.isArray(data) ? data : (data?.content ?? []);
+      console.log('🔍 Normalized groups:', groups);
+      return groups;
     },
-    staleTime: 1000 * 60,
+    staleTime: 30 * 1000, // 30 segundos para que se actualice más rápido
     retry: (failureCount, error: any) => {
       if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
         return false;
@@ -600,15 +609,33 @@ export function useCreateGroup() {
 }
 
 export function useJoinGroup() {
+  console.log('🔧 useJoinGroup: Hook initialized');
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (groupId: number) => {
-      console.log('Joining group:', groupId);
-      return apiCall(`/contacts/extended/groups/${groupId}/join`, { method: 'POST' });
+    mutationFn: async (groupId: number) => {
+      console.log('🚀 useJoinGroup: Starting join process for group:', groupId);
+      
+      const endpoint = `/contacts/extended/groups/${groupId}/join`;
+      const baseURL = axiosClient.defaults.baseURL;
+      const fullURL = baseURL + endpoint;
+      
+      console.log('📍 useJoinGroup: baseURL:', baseURL);
+      console.log('📍 useJoinGroup: endpoint:', endpoint);
+      console.log('📍 useJoinGroup: FULL URL:', fullURL);
+      
+      const response = await axiosClient.post(endpoint);
+      console.log('✅ useJoinGroup: Backend response received:', response.data);
+      return response.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
+    onSuccess: (_, groupId) => {
+      console.log('✅ Successfully joined group:', groupId);
+      // Forzar recarga completa de grupos para actualizar membresía
+      queryClient.refetchQueries({ queryKey: ['groups'] }).then(() => {
+        console.log('🔄 Groups refetched after joining');
+      });
+      // También invalidar posts del grupo para que se actualice la membresía
+      queryClient.refetchQueries({ queryKey: ['group-posts', groupId] });
       toast.success('Te has unido al grupo');
     },
     onError: (error: any) => {
@@ -626,9 +653,13 @@ export function useLeaveGroup() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (groupId: number) => {
-      console.log('Leaving group:', groupId);
-      return apiCall(`/contacts/extended/groups/${groupId}/leave`, { method: 'POST' });
+    mutationFn: async (groupId: number) => {
+      console.log('🚀 useLeaveGroup: Starting leave process for group:', groupId);
+      console.log('📍 useLeaveGroup: Endpoint:', `/contacts/extended/groups/${groupId}/leave`);
+      
+      const response = await axiosClient.post(`/contacts/extended/groups/${groupId}/leave`);
+      console.log('✅ useLeaveGroup: Backend response received:', response.data);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });

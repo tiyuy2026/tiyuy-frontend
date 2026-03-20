@@ -38,8 +38,8 @@ export default function ProfilePage() {
   const tabs = [
     { id: 'personal', label: 'Información Personal', icon: '👤' },
     { id: 'security', label: 'Seguridad', icon: '🔒' },
-    { id: 'plans', label: 'Mi Plan', icon: '⭐' },
-    { id: 'favorites', label: 'Favoritos', icon: '❤️' },
+    { id: 'plans', label: 'Mi Plan', icon: 'Planes' },
+    { id: 'favorites', label: 'Favoritos', icon: 'Favoritos' },
     { id: 'history', label: 'Historial', icon: '📊' },
   ];
 

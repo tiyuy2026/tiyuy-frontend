@@ -1,7 +1,7 @@
 // 🏗️ IMPLEMENTACIÓN DE REPOSITORIO DE GRUPOS - Arquitectura Hexagonal
 // Este archivo pertenece al módulo de GRUPOS (Infraestructura - Implementación concreta)
 
-import { GroupRepository, CreateGroupPostData, CreateGroupCommentData } from '../../core/domain/repositories/GroupRepository';
+import { GroupRepository, CreateGroupPostData, CreateGroupCommentData, CreateGroupData } from '../../core/domain/repositories/GroupRepository';
 import { Group } from '../../core/domain/entities/Group';
 import { GroupPost, GroupComment, GroupLike, GroupShare } from '../../core/domain/entities/GroupPost';
 import { axiosClient } from '../api/axios-client';
@@ -13,11 +13,16 @@ export class GroupRepositoryImpl implements GroupRepository {
   // Grupos
   async getGroups(userId?: number): Promise<Group[]> {
     const response = await axiosClient.get(GROUP_ENDPOINTS.BASE);
-    return response.data.map(this.mapToGroup);
+    return response.data.map((item: any) => this.mapToGroup(item)); // ← arrow function
   }
 
   async getGroupById(id: number): Promise<Group> {
     const response = await axiosClient.get(`${GROUP_ENDPOINTS.BASE}/${id}`);
+    return this.mapToGroup(response.data);
+  }
+
+  async createGroup(data: CreateGroupData): Promise<Group> {
+    const response = await axiosClient.post(GROUP_ENDPOINTS.CREATE, data);
     return this.mapToGroup(response.data);
   }
 
@@ -26,23 +31,33 @@ export class GroupRepositoryImpl implements GroupRepository {
   }
 
   async leaveGroup(groupId: number, userId: number): Promise<void> {
+    console.log('🔍 LEAVE GROUP - Method: DELETE, URL:', GROUP_ENDPOINTS.LEAVE(groupId));
     await axiosClient.delete(GROUP_ENDPOINTS.LEAVE(groupId));
   }
   
   // Publicaciones
-  async getGroupPosts(groupId: number, page: number = 0, size: number = 20): Promise<{ content: GroupPost[]; totalElements: number; totalPages: number }> {
-    const response = await axiosClient.get(GROUP_ENDPOINTS.POSTS(groupId), {
-      params: { page, size }
-    });
+  async getGroupPosts(groupId: number, page = 0, size = 20): Promise<{ content: GroupPost[], totalElements: number, totalPages: number }> {
+    const response = await axiosClient.get(`${GROUP_ENDPOINTS.POSTS(groupId)}?page=${page}&size=${size}`);
     return {
-      content: response.data.content.map(this.mapToGroupPost),
+      content: response.data.content.map((item: any) => this.mapToGroupPost(item)), // ← arrow function
       totalElements: response.data.totalElements,
       totalPages: response.data.totalPages
     };
   }
 
   async createGroupPost(groupId: number, data: CreateGroupPostData): Promise<GroupPost> {
-    const response = await axiosClient.post(GROUP_ENDPOINTS.POSTS(groupId), data);
+    const endpoint = GROUP_ENDPOINTS.POSTS(groupId);
+    const baseURL = axiosClient.defaults.baseURL;
+    const fullURL = baseURL + endpoint;
+    
+    console.log('🚀 GroupRepositoryImpl.createGroupPost:');
+    console.log('📍 baseURL:', baseURL);
+    console.log('📍 endpoint:', endpoint);
+    console.log('📍 FULL URL:', fullURL);
+    console.log('📍 Data:', data);
+    
+    const response = await axiosClient.post(endpoint, data);
+    console.log('✅ Post created successfully:', response.data);
     return this.mapToGroupPost(response.data);
   }
 
@@ -56,19 +71,17 @@ export class GroupRepositoryImpl implements GroupRepository {
   }
   
   // Comentarios
-  async getGroupComments(postId: number, page: number = 0, size: number = 20): Promise<{ content: GroupComment[]; totalElements: number; totalPages: number }> {
-    const response = await axiosClient.get(GROUP_ENDPOINTS.COMMENTS(0, postId), {
-      params: { page, size }
-    });
+  async getGroupComments(groupId: number, postId: number, page = 0, size = 20): Promise<{ content: GroupComment[], totalElements: number, totalPages: number }> {
+    const response = await axiosClient.get(`${GROUP_ENDPOINTS.POSTS(groupId)}/${postId}/comments?page=${page}&size=${size}`);
     return {
-      content: response.data.content.map(this.mapToGroupComment),
+      content: response.data.content.map((item: any) => this.mapToGroupComment(item)), // ← arrow function
       totalElements: response.data.totalElements,
       totalPages: response.data.totalPages
     };
   }
 
-  async createGroupComment(postId: number, data: CreateGroupCommentData): Promise<GroupComment> {
-    const response = await axiosClient.post(GROUP_ENDPOINTS.COMMENTS(0, postId), data);
+  async createGroupComment(groupId: number, postId: number, data: CreateGroupCommentData): Promise<GroupComment> {
+    const response = await axiosClient.post(GROUP_ENDPOINTS.COMMENTS(groupId, postId), data);
     return this.mapToGroupComment(response.data);
   }
 
@@ -155,7 +168,8 @@ export class GroupRepositoryImpl implements GroupRepository {
       updatedAt: new Date(data.updatedAt),
       expiresAt: new Date(data.expiresAt),
       timeAgo: data.timeAgo,
-      recentComments: (data.recentComments || []).map(this.mapToGroupComment)
+      // ✅ Arrow function para no perder el contexto
+      recentComments: (data.recentComments || []).map((c: any) => this.mapToGroupComment(c))
     };
   }
 
@@ -169,7 +183,7 @@ export class GroupRepositoryImpl implements GroupRepository {
       content: data.content,
       replyToCommentId: data.replyToCommentId,
       replyToUserName: data.replyToUserName,
-      replies: (data.replies || []).map(this.mapToGroupComment),
+      replies: (data.replies || []).map((r: any) => this.mapToGroupComment(r)),
       createdAt: new Date(data.createdAt),
       updatedAt: new Date(data.updatedAt),
       isOwn: data.isOwn,

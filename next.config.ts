@@ -20,6 +20,9 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days
   },
   turbopack: {},
+  experimental: {
+    forceSwcTransforms: true,
+  },
 };
 
 export default nextConfig;

@@ -59,14 +59,14 @@ export default function AnalyticsPage() {
             value={globalSummary.totalContacts.toLocaleString()}
             change={periodComparison.contactsGrowth * 100}
             trend={periodComparison.contactsGrowth > 0 ? 'UP' : 'DOWN'}
-            icon="💬"
+            icon="Contactos"
           />
           <StatsCard
             title="Favoritos"
             value={globalSummary.totalFavorites.toLocaleString()}
             change={0}
             trend="STABLE"
-            icon="❤️"
+            icon="Favoritos"
           />
           <StatsCard
             title="Propiedades"
