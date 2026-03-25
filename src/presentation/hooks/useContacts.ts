@@ -816,3 +816,242 @@ export function useCancelRsvpChannelEvent(channelId: number) {
     },
   });
 }
+
+// ==================== CHANNEL POSTS IMAGES ====================
+
+export function useUploadChannelPostImages() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ postId, files }: { postId: number; files: File[] }) => {
+      const formData = new FormData();
+      files.forEach(file => formData.append('files', file));
+      
+      const response = await fetch(`${API_BASE_URL}/contacts/extended/channels/posts/${postId}/upload-images`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token')}`,
+        },
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Error uploading images');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channel-posts'] });
+      toast.success('Imágenes subidas exitosamente');
+    },
+    onError: () => {
+      toast.error('Error al subir imágenes');
+    },
+  });
+}
+
+// ==================== CHANNEL COMMENTS ====================
+
+export function useChannelComments(postId: number) {
+  return useQuery({
+    queryKey: ['channel-comments', postId],
+    queryFn: async () => {
+      const data = await apiCall(`/contacts/extended/channels/posts/${postId}/comments`);
+      const comments = Array.isArray(data) ? data : (data?.content ?? []);
+      console.log('📋 Comentarios recibidos:', comments);
+      return comments;
+    },
+    staleTime: 30 * 1000,
+    enabled: !!postId,
+  });
+}
+
+export function useCreateChannelComment() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ postId, content, replyToCommentId }: { postId: number; content: string; replyToCommentId?: number }) => {
+      const body: any = { content };
+      if (replyToCommentId) {
+        body.replyToCommentId = replyToCommentId;
+      }
+      return await apiCall(`/contacts/extended/channels/posts/${postId}/comments`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+      });
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['channel-comments', variables.postId] });
+      queryClient.invalidateQueries({ queryKey: ['channel-posts'] });
+      toast.success('Comentario agregado');
+    },
+    onError: () => {
+      toast.error('Error al agregar comentario');
+    },
+  });
+}
+
+export function useLikeChannelComment() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (commentId: number) => {
+      return await apiCall(`/contacts/extended/channels/comments/${commentId}/like`, { method: 'POST' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channel-comments'] });
+    },
+  });
+}
+
+export function useDeleteChannelPost() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (postId: number) => {
+      return await apiCall(`/contacts/extended/channels/posts/${postId}`, { method: 'DELETE' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channel-posts'] });
+      toast.success('Post eliminado');
+    },
+    onError: () => {
+      toast.error('Error al eliminar post');
+    },
+  });
+}
+
+// ==================== CHANNEL COLLABORATORS & DELEGATION ====================
+
+export interface ChannelCollaborator {
+  id: number;
+  userId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  dni?: string;
+  avatar?: string;
+  role?: string;
+  grantedAt: string;
+  grantedBy?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+  };
+}
+
+export interface ChannelStatistics {
+  subscriberCount: number;
+  collaboratorCount: number;
+  totalPosts: number;
+  postsLast30Days: number;
+  postsLast7Days: number;
+  totalComments: number;
+  commentsLast30Days: number;
+  commentsLast7Days: number;
+  activeUsersLast7Days: number;
+  dailyActivity: Array<{
+    date: string;
+    posts: number;
+    comments: number;
+    interactions: number;
+  }>;
+}
+
+// Buscar usuarios para delegación de acceso (por DNI, Email o Nombre)
+export function useSearchUsersForDelegation() {
+  return useMutation({
+    mutationFn: async (query: string) => {
+      const data = await apiCall(`/contacts/extended/channels/users/search?query=${encodeURIComponent(query)}`);
+      return data as Array<{
+        id: number;
+        email: string;
+        firstName: string;
+        lastName: string;
+        dni?: string;
+        avatar?: string;
+        role?: string;
+      }>;
+    },
+  });
+}
+
+// Obtener colaboradores del canal (publishers)
+export function useChannelCollaborators(channelId: number) {
+  return useQuery({
+    queryKey: ['channel-collaborators', channelId],
+    queryFn: async () => {
+      const data = await apiCall(`/contacts/extended/channels/${channelId}/publishers`);
+      return (Array.isArray(data) ? data : []) as ChannelCollaborator[];
+    },
+    staleTime: 30 * 1000,
+    enabled: !!channelId,
+  });
+}
+
+// Asignar permiso de publicación a un usuario
+export function useGrantPublishingPermission() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ channelId, userId }: { channelId: number; userId: number }) => {
+      return await apiCall(`/contacts/extended/channels/${channelId}/publishers/${userId}/grant`, {
+        method: 'POST',
+      });
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['channel-collaborators', variables.channelId] });
+      toast.success('Permiso de publicación otorgado exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || 'Error al otorgar permiso');
+    },
+  });
+}
+
+// Revocar permiso de publicación
+export function useRevokePublishingPermission() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ channelId, userId }: { channelId: number; userId: number }) => {
+      return await apiCall(`/contacts/extended/channels/${channelId}/publishers/${userId}/revoke`, {
+        method: 'POST',
+      });
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['channel-collaborators', variables.channelId] });
+      toast.success('Permiso de publicación revocado');
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || 'Error al revocar permiso');
+    },
+  });
+}
+
+// Verificar si el usuario actual puede publicar
+export function useCanUserPublish(channelId: number) {
+  return useQuery({
+    queryKey: ['can-publish', channelId],
+    queryFn: async () => {
+      const data = await apiCall(`/contacts/extended/channels/${channelId}/can-publish`);
+      return data?.canPublish as boolean;
+    },
+    staleTime: 60 * 1000,
+    enabled: !!channelId,
+  });
+}
+
+// Obtener estadísticas del canal
+export function useChannelStatistics(channelId: number) {
+  return useQuery({
+    queryKey: ['channel-statistics', channelId],
+    queryFn: async () => {
+      const data = await apiCall(`/contacts/extended/channels/${channelId}/statistics`);
+      return data as ChannelStatistics;
+    },
+    staleTime: 60 * 1000,
+    enabled: !!channelId,
+  });
+}

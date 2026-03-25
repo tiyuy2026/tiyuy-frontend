@@ -2012,9 +2012,9 @@ export default function MisContactosPage() {
         {activeTab === 'canales' && (
           selectedChannel ? (
             // Vista detallada del canal seleccionado
-            <div className="flex-1 flex flex-col bg-white">
+            <div className="flex-1 flex flex-col bg-white overflow-hidden">
               {/* Header del canal */}
-              <div className="flex items-center gap-3 px-4 py-3 bg-[#075e54] border-b border-[#054d44]">
+              <div className="flex-none flex items-center gap-3 px-4 py-3 bg-[#075e54] border-b border-[#054d44]">
                 <button onClick={() => setSelectedChannel(null)}
                   className="text-white/70 hover:text-white transition-colors">
                   <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
@@ -2030,16 +2030,20 @@ export default function MisContactosPage() {
                 </button>
               </div>
 
-              {/* Contenido del canal */}
-              <div className="flex-1 overflow-y-auto">
-                <ChannelPostsPanel 
-                  channelId={selectedChannel.id}
-                  channelName={selectedChannel.name}
-                  currentUserId={user?.id || 0}
-                  currentUser={user}
-                  onCreatePost={() => console.log('Crear post...')}
-                  onCreateEvent={() => console.log('Crear evento...')}
-                />
+              {/* Contenido + Sidebar en flex-row */}
+              <div className="flex-1 flex flex-row overflow-hidden">
+                {/* Contenido principal scrolleable */}
+                <div className="flex-1 overflow-y-auto">
+                  <ChannelPostsPanel 
+                    channelId={selectedChannel.id}
+                    channelName={selectedChannel.name}
+                    currentUserId={user?.id || 0}
+                    currentUser={user}
+                    isChannelAdmin={selectedChannel.adminId === user?.id || selectedChannel.isAdmin}
+                    onCreatePost={() => console.log('Crear post...')}
+                    onCreateEvent={() => console.log('Crear evento...')}
+                  />
+                </div>
               </div>
             </div>
           ) : (
