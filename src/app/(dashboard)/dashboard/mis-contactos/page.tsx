@@ -3,6 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 import StatusDetailPanel from './StatusDetailPanel';
 import { GrupoPostsPanel } from './grupos/components/GrupoPostsPanel';
+import CanalesListPanel from './canales/components/CanalesListPanel';
+import { ChannelPostsPanel } from './canales/components/ChannelPostsPanel';
+import MisCanalesCreadosView from './canales/components/MisCanalesCreadosView';
+import MisCanalesSuscritosView from './canales/components/MisCanalesSuscritosView';
+import MisEventosView from './canales/components/MisEventosView';
+import DiscoverChannelsView from './canales/components/DiscoverChannelsView';
+import CreateChannelView from './canales/components/CreateChannelView';
 import { formatCompactNumber } from '@/utils/formatters';
 import CreateGroupView from './grupos/components/CreateGroupView';
 import DiscoverGroupsView from './grupos/components/DiscoverGroupsView';
@@ -1665,6 +1672,8 @@ export default function MisContactosPage() {
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [selectedStatusId, setSelectedStatusId] = useState<number | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<any>(null);
+  const [selectedChannel, setSelectedChannel] = useState<any>(null);
+  const [channelsSection, setChannelsSection] = useState<'mis-canales-creados' | 'mis-canales-suscritos' | 'mis-eventos' | 'descubrir-canales' | 'crear-canal'>('mis-canales-creados');
   const [gruposSection, setGruposSection] = useState<'mis-grupos' | 'descubrir' | 'crear'>('mis-grupos');
   const [activeRightView, setActiveRightView] = useState<'default' | 'create-group' | 'discover'>('default' as const);
   const [showNewStatus, setShowNewStatus] = useState(false);
@@ -1793,7 +1802,7 @@ export default function MisContactosPage() {
         <div className="flex-1 overflow-hidden bg-white">
           {activeTab === 'chats'   && <ChatsPanel user={user} selectedChatId={selectedChatId} setSelectedChatId={setSelectedChatId} />}
           {activeTab === 'estados' && <EstadosPanel user={user} onNewStatus={() => setShowNewStatus(true)} onStatusSelect={setSelectedStatusId} selectedStatusId={selectedStatusId} />}
-          {activeTab === 'canales' && <CanalesPanel user={user} />}
+          {activeTab === 'canales' && <CanalesListPanel user={user} onChannelSelect={setSelectedChannel} activeSection={channelsSection} onSectionChange={setChannelsSection} />}
           {activeTab === 'grupos' && (
             <GruposListPanel
               user={user}
@@ -1811,8 +1820,9 @@ export default function MisContactosPage() {
       </div>
 
       {/* ──── Panel derecho ──── contenido dinámico segun selección ──── */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Si hay un chat seleccionado, mostrar conversación ocupando todo el espacio */}
+      {activeTab !== 'canales' && (
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Si hay un chat seleccionado, mostrar conversación ocupando todo el espacio */}
         {activeTab === 'chats' && selectedChatId && chats?.find((c: any) => c.id === selectedChatId) ? (
           <div className="flex flex-col h-full">
             {/* Header conversación */}
@@ -1939,7 +1949,7 @@ export default function MisContactosPage() {
             />
           )
         ) : (
-          /* Si no hay chat seleccionado, mostrar contenido estÃ¡tico */
+          /* Si no hay chat seleccionado, mostrar contenido estático */
           <div className="flex-1 flex items-center justify-center"
             style={{
               backgroundColor: '#e5ddd5',
@@ -1971,29 +1981,6 @@ export default function MisContactosPage() {
               </div>
             )}
 
-            {activeTab === 'canales' && (
-              <div className="text-center px-6">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center mb-6 shadow-2xl">
-                  <span className="text-white font-bold text-3xl">C</span>
-                </div>
-                <h2 className="text-gray-800 text-2xl font-light mb-2">Canales</h2>
-                <p className="text-gray-600 text-sm text-center max-w-xs leading-relaxed mb-6">
-                  SuscrÃ­bete a canales de noticias inmobiliarias
-                </p>
-                <div className="text-center px-4">
-                  <p className="text-gray-500 text-xs mb-2">
-                    Recibe actualizaciones de propiedades y noticias
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 text-gray-400 text-xs">
-                  <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41 1.41L10 14.17V7h2v7.17l3.59-3.59L18 17l-5-5z"/>
-                  </svg>
-                  Nuevos canales cada semana
-                </div>
-              </div>
-            )}
-
             {activeTab === 'estados' && (
               <div className="text-center px-6">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center mb-6 shadow-2xl">
@@ -2019,6 +2006,78 @@ export default function MisContactosPage() {
           </div>
         )}
         </div>
+      )}
+
+        {/* Contenido de canales */}
+        {activeTab === 'canales' && (
+          selectedChannel ? (
+            // Vista detallada del canal seleccionado
+            <div className="flex-1 flex flex-col bg-white">
+              {/* Header del canal */}
+              <div className="flex items-center gap-3 px-4 py-3 bg-[#075e54] border-b border-[#054d44]">
+                <button onClick={() => setSelectedChannel(null)}
+                  className="text-white/70 hover:text-white transition-colors">
+                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                  </svg>
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-semibold text-sm">{selectedChannel.name}</p>
+                  <p className="text-white/60 text-xs">{selectedChannel.subscribers || 0} suscriptores</p>
+                </div>
+                <button className="text-white/70 hover:text-white transition-colors text-sm">
+                  ⋯
+                </button>
+              </div>
+
+              {/* Contenido del canal */}
+              <div className="flex-1 overflow-y-auto">
+                <ChannelPostsPanel 
+                  channelId={selectedChannel.id}
+                  channelName={selectedChannel.name}
+                  currentUserId={user?.id || 0}
+                  currentUser={user}
+                  onCreatePost={() => console.log('Crear post...')}
+                  onCreateEvent={() => console.log('Crear evento...')}
+                />
+              </div>
+            </div>
+          ) : (
+            // Vista por defecto - contenido según sección seleccionada
+            <div className="flex-1 overflow-y-auto bg-gray-50">
+              {channelsSection === 'mis-canales-creados' && (
+                <MisCanalesCreadosView
+                  user={user}
+                  onChannelSelect={setSelectedChannel}
+                />
+              )}
+              {channelsSection === 'mis-canales-suscritos' && (
+                <MisCanalesSuscritosView
+                  user={user}
+                  onChannelSelect={setSelectedChannel}
+                />
+              )}
+              {channelsSection === 'mis-eventos' && (
+                <MisEventosView
+                  user={user}
+                  onEventSelect={(event: any, channel: any) => setSelectedChannel(channel)}
+                />
+              )}
+              {channelsSection === 'descubrir-canales' && (
+                <DiscoverChannelsView
+                  user={user}
+                  onChannelSelect={setSelectedChannel}
+                />
+              )}
+              {channelsSection === 'crear-canal' && (
+                <CreateChannelView
+                  user={user}
+                  onBack={() => setChannelsSection('mis-canales-creados')}
+                />
+              )}
+            </div>
+          )
+        )}
       </div>
 
       {/* Modals */}

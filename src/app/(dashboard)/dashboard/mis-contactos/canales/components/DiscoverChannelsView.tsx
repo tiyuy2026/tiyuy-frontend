@@ -1,47 +1,39 @@
 'use client';
 
 import { useState } from 'react';
-import { useGetGroups, useJoinGroup } from '@/presentation/hooks/useContacts';
+import { useGetChannels, useSubscribeToChannel } from '@/presentation/hooks/useContacts';
 import { formatCompactNumber } from '@/utils/formatters';
-import { Users, FileText } from 'lucide-react';
+import { Users, FileText, Bell, BellOff } from 'lucide-react';
 
-console.log('🔍 DiscoverGroupsView: useJoinGroup imported:', useJoinGroup);
-
-export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any; onGroupSelect: (group: any) => void }) {
+export default function DiscoverChannelsView({ user, onChannelSelect }: { user: any; onChannelSelect: (channel: any) => void }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const { data: groups, isLoading } = useGetGroups(0, 50);
-  const joinGroup = useJoinGroup();
+  const { data: channels, isLoading } = useGetChannels(user?.id);
+  const subscribeToChannel = useSubscribeToChannel();
   
-  // Filtrar grupos donde el usuario NO es miembro
-  console.log('📋 All groups from API:', groups);
-  const availableGroups = groups?.filter((g: any) => !g.isMember) ?? [];
-  console.log('🔓 Available groups (not member):', availableGroups);
-  const filteredGroups = availableGroups.filter((group: any) =>
-    group.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filtrar canales donde el usuario NO esta suscrito
+  const availableChannels = channels?.filter((c: any) => !c.isSubscribed) ?? [];
+  const filteredChannels = availableChannels.filter((channel: any) =>
+    channel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    channel.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    channel.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    channel.city.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getGroupEmoji = (name: string) => {
-    if (name.includes('Alquiler')) return '';
-    if (name.includes('Venta')) return '';
-    if (name.includes('Terreno') || name.includes('Lote')) return '';
-    if (name.includes('Inversion')) return '';
-    if (name.includes('Lima')) return '';
-    return '';
+  const getChannelEmoji = (city: string) => {
+    const cityEmojis: Record<string, string> = {
+      'Lima': '🏙️',
+      'Arequipa': '🌋',
+      'Trujillo': '🏺',
+      'Piura': '☀️',
+      'Chiclayo': '🌿',
+      'Cusco': '🏔️',
+    };
+    return cityEmojis[city] || '🏘️';
   };
 
-  const handleJoinGroup = (groupId: number, e: React.MouseEvent) => {
+  const handleSubscribeChannel = (channelId: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log(' DiscoverGroupsView: handleJoinGroup called for group:', groupId);
-    console.log(' DiscoverGroupsView: joinGroup object:', joinGroup);
-    console.log('DiscoverGroupsView: joinGroup.mutate exists:', typeof joinGroup.mutate);
-    console.log(' DiscoverGroupsView: joinGroup.isPending:', joinGroup.isPending);
-    
-    if (joinGroup.mutate) {
-      console.log(' DiscoverGroupsView: Calling joinGroup.mutate...');
-      joinGroup.mutate(groupId);
-    } else {
-      console.error(' DiscoverGroupsView: ERROR - joinGroup.mutate is not a function!');
-    }
+    subscribeToChannel.mutate(channelId);
   };
 
   return (
@@ -49,13 +41,13 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Descubrir Grupos</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Descubrir Canales</h2>
           <div className="text-sm text-gray-500">
-            {filteredGroups.length} grupos disponibles
+            {filteredChannels.length} canales disponibles
           </div>
         </div>
 
-        {/* Barra de búsqueda */}
+        {/* Barra de busqueda */}
         <div className="mb-6">
           <div className="relative max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -67,7 +59,7 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar grupos..."
+              placeholder="Buscar canales por nombre, descripción, categoría o ciudad..."
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -80,69 +72,78 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
           </div>
         )}
 
-        {/* No groups available */}
-        {!isLoading && filteredGroups.length === 0 && (
+        {/* No channels available */}
+        {!isLoading && filteredChannels.length === 0 && (
           <div className="text-center py-16">
             <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-6">
-              <span className="text-3xl"></span>
+              <span className="text-3xl">📢</span>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {searchTerm ? 'No se encontraron grupos' : 'No hay grupos disponibles'}
+              {searchTerm ? 'No se encontraron canales' : 'No hay canales disponibles'}
             </h3>
             <p className="text-gray-600 text-sm text-center max-w-md leading-relaxed">
               {searchTerm 
-                ? 'Intenta con otros términos de búsqueda'
-                : 'No hay grupos disponibles para unirte en este momento'
+                ? 'Intenta con otros terminos de busqueda'
+                : 'No hay canales disponibles para suscribirse en este momento'
               }
             </p>
           </div>
         )}
 
-        {/* Grid de grupos disponibles */}
-        {!isLoading && filteredGroups.length > 0 && (
+        {/* Grid de canales disponibles */}
+        {!isLoading && filteredChannels.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredGroups.map((group: any) => (
+            {filteredChannels.map((channel: any) => (
               <div
-                key={group.id}
+                key={channel.id}
                 className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
-                onClick={() => onGroupSelect(group)}
+                onClick={() => onChannelSelect(channel)}
               >
-                {/* Banner del grupo */}
+                {/* Banner del canal */}
                 <div className="h-24 bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-4xl">
-                  {getGroupEmoji(group.name)}
+                  {getChannelEmoji(channel.city)}
                 </div>
 
                 {/* Contenido */}
                 <div className="p-4">
                   <h3 className="font-bold text-gray-900 text-sm mb-2 line-clamp-2">
-                    {group.name}
+                    {channel.name}
                   </h3>
                   <p className="text-xs text-gray-600 line-clamp-2 mb-3">
-                    {group.description || 'Sin descripción disponible'}
+                    {channel.description || 'Sin descripcion disponible'}
                   </p>
                   
                   {/* Facebook-style stats */}
                   <div className="flex items-center justify-between text-xs text-gray-500 mb-3 pb-2 border-b border-gray-100">
                     <div className="flex items-center gap-1">
                       <Users className="w-3 h-3" />
-                      <span>{formatCompactNumber(group.memberCount)} members</span>
+                      <span>{formatCompactNumber(channel.subscriberCount)} suscriptores</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <FileText className="w-3 h-3" />
-                      <span>{group.postCount || 0} posts</span>
+                      <span>{channel.postsPerDay || 0} posts/dia</span>
                     </div>
                   </div>
 
-                  {/* Botón de unirse */}
+                  {/* Tipo de canal */}
+                  <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
+                    <span className={`px-2 py-1 rounded-full ${
+                      channel.isPublic 
+                        ? 'bg-green-100 text-green-700' 
+                        : 'bg-orange-100 text-orange-700'
+                    }`}>
+                      {channel.isPublic ? '🌐 Público' : '🔒 Privado'}
+                    </span>
+                    <span>{channel.city}</span>
+                  </div>
+
+                  {/* Boton de suscribirse */}
                   <button
-                    onClick={(e) => {
-                      console.log(' BUTTON CLICKED! Group ID:', group.id);
-                      handleJoinGroup(group.id, e);
-                    }}
-                    disabled={joinGroup.isPending}
+                    onClick={(e) => handleSubscribeChannel(channel.id, e)}
+                    disabled={subscribeToChannel.isPending}
                     className="w-full py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {joinGroup.isPending ? 'Uniéndose...' : 'Unirse al grupo'}
+                    {subscribeToChannel.isPending ? 'Suscribiendose...' : 'Suscribirse'}
                   </button>
                 </div>
               </div>

@@ -1,5 +1,5 @@
-// 🏗️ IMPLEMENTACIÓN DE REPOSITORIO DE GRUPOS - Arquitectura Hexagonal
-// Este archivo pertenece al módulo de GRUPOS (Infraestructura - Implementación concreta)
+// GROUP REPOSITORY IMPLEMENTATION - Hexagonal Architecture
+// This file belongs to GROUPS module (Infrastructure - Concrete implementation)
 
 import { GroupRepository, CreateGroupPostData, CreateGroupCommentData, CreateGroupData } from '../../core/domain/repositories/GroupRepository';
 import { Group } from '../../core/domain/entities/Group';
@@ -7,10 +7,10 @@ import { GroupPost, GroupComment, GroupLike, GroupShare } from '../../core/domai
 import { axiosClient } from '../api/axios-client';
 import { GROUP_ENDPOINTS } from '../api/groupEndpoints';
 
-// Implementación concreta del repositorio (Infraestructura)
+// Concrete repository implementation (Infrastructure)
 export class GroupRepositoryImpl implements GroupRepository {
   
-  // Grupos
+  // Groups
   async getGroups(userId?: number): Promise<Group[]> {
     const response = await axiosClient.get(GROUP_ENDPOINTS.BASE);
     return response.data.map((item: any) => this.mapToGroup(item)); // ← arrow function
@@ -101,11 +101,45 @@ export class GroupRepositoryImpl implements GroupRepository {
   }
 
   async shareGroupPost(postId: number, userId: number, message?: string): Promise<GroupShare> {
-    const response = await axiosClient.post(GROUP_ENDPOINTS.SHARE_POST(postId), { shareMessage: message });
-    return this.mapToGroupShare(response.data);
+    const endpoint = GROUP_ENDPOINTS.SHARE_POST(postId);
+    console.log('🔍 Share request details:');
+    console.log('  - postId:', postId);
+    console.log('  - userId:', userId);
+    console.log('  - message:', message);
+    console.log('  - endpoint:', endpoint);
+    console.log('  - full URL:', `${axiosClient.defaults.baseURL}${endpoint}`);
+    
+    try {
+      // Send share request - backend now allows multiple shares
+      console.log('📡 Sending share request...');
+      const response = await axiosClient.post(endpoint, message || '', {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('✅ Share response:', response.data);
+      return this.mapToGroupShare(response.data);
+    } catch (error: any) {
+      console.error('❌ Share error details:');
+      console.error('  - message:', error.message);
+      console.error('  - status:', error.response?.status);
+      console.error('  - statusText:', error.response?.statusText);
+      console.error('  - data:', error.response?.data);
+      
+      // Try alternative format if first attempt fails
+      console.log('🔄 Trying alternative format with object...');
+      try {
+        const altResponse = await axiosClient.post(endpoint, { shareMessage: message });
+        console.log('✅ Alternative share response:', altResponse.data);
+        return this.mapToGroupShare(altResponse.data);
+      } catch (altError: any) {
+        console.error('❌ Alternative format also failed:', altError.message);
+        throw error;
+      }
+    }
   }
   
-  // Imágenes
+  // Images
   async uploadGroupPostImages(postId: number, files: File[]): Promise<string[]> {
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
@@ -124,7 +158,7 @@ export class GroupRepositoryImpl implements GroupRepository {
     });
   }
 
-  // Mappers (conversión de API a entidades del dominio)
+  // Mappers (API to domain entities conversion)
   private mapToGroup(data: any): Group {
     return {
       id: data.id,
@@ -168,7 +202,7 @@ export class GroupRepositoryImpl implements GroupRepository {
       updatedAt: new Date(data.updatedAt),
       expiresAt: new Date(data.expiresAt),
       timeAgo: data.timeAgo,
-      // ✅ Arrow function para no perder el contexto
+      // Arrow function to avoid losing context
       recentComments: (data.recentComments || []).map((c: any) => this.mapToGroupComment(c))
     };
   }

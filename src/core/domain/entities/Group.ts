@@ -1,5 +1,5 @@
-// 🏗️ ENTIDADES DE GRUPOS - Arquitectura Hexagonal
-// Este archivo pertenece al módulo de GRUPOS
+// GROUP ENTITIES - Hexagonal Architecture
+// This file belongs to GROUPS module
 
 export type GroupStatus = 'ACTIVE' | 'INACTIVE' | 'ARCHIVED';
 export type GroupRole = 'ADMIN' | 'MODERATOR' | 'MEMBER';

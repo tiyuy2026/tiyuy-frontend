@@ -15,14 +15,6 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 async function apiCall(endpoint: string, options: RequestInit = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
   
-  console.log('🔍 API Call Details:', {
-    endpoint: endpoint,
-    fullUrl: url,
-    method: options.method || 'GET',
-    baseUrl: API_BASE_URL
-  });
-  
-  // Obtener token del authStore si está disponible
   let token = null;
   if (typeof window !== 'undefined') {
     try {
@@ -30,22 +22,17 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
       const authStore = useAuthStore.getState();
       token = authStore.token;
       
-      // Fallback a localStorage si no hay token en store
       if (!token) {
         token = localStorage.getItem('tiyuy-auth-token') || 
                localStorage.getItem('token') || 
                localStorage.getItem('auth-token');
       }
     } catch {
-      // Fallback si hay error con el store
       token = localStorage.getItem('tiyuy-auth-token') || 
              localStorage.getItem('token') || 
              localStorage.getItem('auth-token');
     }
   }
-  
-  console.log(`API Call: ${options.method || 'GET'} ${url}`);
-  console.log('Token available:', !!token);
   
   const response = await fetch(url, {
     headers: {
@@ -55,8 +42,6 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
     },
     ...options,
   });
-  
-  console.log(`API Response: ${response?.status} ${response?.statusText}`);
   
   if (!response || !response.ok) {
     let errorText = 'Unknown error';
@@ -68,21 +53,9 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
         errorText = await response.text();
       }
     } catch (error) {
-      console.warn('Could not read error response:', error);
       errorText = `HTTP ${status}: ${statusText}`;
     }
     
-    console.error('API Error Details:', {
-      status: status,
-      statusText: statusText,
-      url: url,
-      errorText: errorText,
-      ok: response?.ok || false,
-      type: response?.type || 'unknown',
-      headers: response ? Object.fromEntries(response.headers.entries()) : {}
-    });
-    
-    // Si es 401, limpiar tokens y redirigir
     if (response?.status === 401) {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('tiyuy-auth-token');
@@ -96,7 +69,6 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
       }
     }
     
-    // Manejar errores de moderación específicos
     if (response.status === 403 && errorText.includes('USER_SUSPENDED')) {
       let errorData;
       try {
@@ -205,9 +177,6 @@ export function useSendMessage() {
       mediaUrl?: string;
       replyToMessageId?: string;
     }) => {
-      console.log('🚀 Sending message:', { chatId, content, type, timestamp: Date.now() });
-      
-      // Obtener token directamente aquí para asegurar que existe
       let token = null;
       if (typeof window !== 'undefined') {
         try {
@@ -218,8 +187,6 @@ export function useSendMessage() {
           token = localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token');
         }
       }
-      
-      console.log('🔑 Token en sendMessage:', !!token);
       
       const url = `/contacts/extended/chats/${chatId}/messages?t=${Date.now()}`;
       return apiCall(url, {
@@ -232,23 +199,22 @@ export function useSendMessage() {
       });
     },
     onMutate: async ({ chatId, content, type }) => {
-      // Optimistic update - agregar mensaje inmediatamente
       await queryClient.cancelQueries({ queryKey: ['chat-messages', chatId] });
       
       const previousMessages = queryClient.getQueryData(['chat-messages', chatId]);
       
       const optimisticMessage = {
-        id: Date.now(), // ID temporal
+        id: Date.now(),
         content,
         type,
-        senderId: 1, // ID del usuario actual (debería venir del authStore)
+        senderId: 1,
         createdAt: new Date().toISOString(),
         isCurrentlyActive: true,
         isDeleted: false,
         isExpired: false,
         sender: {
           id: 1,
-          firstName: 'Tú',
+          firstName: 'Tu',
           lastName: '',
           email: '',
         }
@@ -262,20 +228,16 @@ export function useSendMessage() {
       return { previousMessages };
     },
     onError: (error: any, variables, context) => {
-      console.error('❌ Error sending message:', error);
-      
-      // Revertir optimistic update
       if (context?.previousMessages) {
         queryClient.setQueryData(['chat-messages', variables.chatId], context.previousMessages);
       }
       
       if (error.message.includes('⚠️ ADVERTENCIA')) {
         toast.error(error.message);
-      } else if (error.message.includes('suspendido') || error.message.includes('suspensión')) {
+      } else if (error.message.includes('suspendido') || error.message.includes('suspension')) {
         toast.error(error.message);
       } else if (error.message.includes('403')) {
-        toast.error('❌ Token inválido. Por favor, inicia sesión nuevamente.');
-        // Redirigir al login después de un error 403
+        toast.error('Token invalido. Por favor, inicia sesion nuevamente.');
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
         }
@@ -284,8 +246,7 @@ export function useSendMessage() {
       }
     },
     onSuccess: () => {
-      toast.success('✅ Mensaje enviado');
-      // Invalidar queries para obtener datos actualizados del servidor
+      toast.success('Mensaje enviado');
       queryClient.invalidateQueries({ queryKey: ['chat-messages'] });
       queryClient.invalidateQueries({ queryKey: ['chats'] });
     },
@@ -376,7 +337,7 @@ export function useLikeStatusPost() {
       method: 'POST',
     }),
     onSuccess: (data, postId) => {
-      // 🔄 Actualizar el estado del post en la cache
+      //  Actualizar el estado del post en la cache
       queryClient.setQueryData(['status-posts'], (old: any) => {
         if (!old?.pages) return old;
         
@@ -453,19 +414,13 @@ export function useStatusComments(statusId: number) {
   return useQuery({
     queryKey: ['status-comments', statusId],
     queryFn: async () => {
-      console.log('🔍 GET /status/', statusId, '/comments/with-replies'); // ← DEBUG
       const data = await apiCall(`/contacts/extended/status/${statusId}/comments/with-replies`);
       
-      // ✅ FIX: Backend devuelve {content: [...]} → Normalizar
-      console.log('📥 Raw data:', data); // ← VER ESTO
-      
       let comments = Array.isArray(data) ? data : (data?.content ?? data?.data ?? []);
-      console.log('📋 Normalized comments:', comments.length, comments); // ← VER ESTO
-      
       return comments;
     },
     enabled: !!statusId,
-    staleTime: 1000 * 30, // 30s
+    staleTime: 1000 * 30,
   });
 }
       export function useLikeComment() {
@@ -476,7 +431,6 @@ export function useStatusComments(statusId: number) {
       method: 'POST',
     }),
     onSuccess: (data, commentId) => {
-      // 🔄 Actualizar el estado del comentario en la cache
       queryClient.setQueryData(['status-comments'], (old: any) => {
         if (!Array.isArray(old)) return old;
         
@@ -494,13 +448,11 @@ export function useStatusComments(statusId: number) {
         });
       });
       
-      // ✅ Invalidar cache DESPUÉS de actualizar para persistencia
       queryClient.invalidateQueries({ queryKey: ['status-comments'] });
       
-      toast.success(data.isCurrentlyActive ? '¡Like al comentario!' : 'Like eliminado');
+      toast.success(data.isCurrentlyActive ? 'Like al comentario!' : 'Like eliminado');
     },
     onError: (error) => {
-      console.error('Error detallado useLikeComment:', error);
       toast.error('Error al dar like al comentario');
     },
   });
@@ -514,11 +466,9 @@ export function useUnlikeComment() {
       method: 'POST',
     }),
     onSuccess: (_, variables) => {
-      // ✅ Invalidar cache para persistencia
       queryClient.invalidateQueries({ queryKey: ['status-comments'] });
     },
     onError: (error) => {
-      console.error('Error detallado useUnlikeComment:', error);
       toast.error('Error al quitar me gusta al comentario');
     },
   });
@@ -529,8 +479,8 @@ export function useGetChannels(userId?: number, page = 0, size = 10) {
   return useQuery({
     queryKey: ['channels', userId, page, size],
     queryFn: async () => {
-      const data = await apiCall(`/contacts/extended/channels?page=${page}&size=${size}`);
-      // Normalizar siempre a array
+      const data = await apiCall(`/contacts/extended/channels?page=${page}&size=${size}&sort=subscriberCount,desc`);
+      // Backend devuelve Page<ChannelResponse> → usar .content
       return Array.isArray(data) ? data : (data?.content ?? []);
     },
     staleTime: 1000 * 60,
@@ -558,7 +508,7 @@ export function useUnsubscribeFromChannel() {
   
   return useMutation({
     mutationFn: (channelId: number) =>
-      apiCall(`/contacts/extended/channels/${channelId}/unsubscribe`, { method: 'POST' }),
+      apiCall(`/contacts/extended/channels/${channelId}/subscribe`, { method: 'DELETE' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['channels'] });
       toast.success('Suscripción cancelada');
@@ -572,13 +522,10 @@ export function useGetGroups(page = 0, size = 10) {
     queryKey: ['groups', page, size],
     queryFn: async () => {
       const data = await apiCall(`/contacts/extended/groups?page=${page}&size=${size}`);
-      console.log('📋 Groups API response:', data);
-      // Normalizar siempre a array
       const groups = Array.isArray(data) ? data : (data?.content ?? []);
-      console.log('🔍 Normalized groups:', groups);
       return groups;
     },
-    staleTime: 30 * 1000, // 30 segundos para que se actualice más rápido
+    staleTime: 30 * 1000,
     retry: (failureCount, error: any) => {
       if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
         return false;
@@ -609,41 +556,115 @@ export function useCreateGroup() {
 }
 
 export function useJoinGroup() {
-  console.log('🔧 useJoinGroup: Hook initialized');
   const queryClient = useQueryClient();
   
   return useMutation({
     mutationFn: async (groupId: number) => {
-      console.log('🚀 useJoinGroup: Starting join process for group:', groupId);
-      
-      const endpoint = `/contacts/extended/groups/${groupId}/join`;
-      const baseURL = axiosClient.defaults.baseURL;
-      const fullURL = baseURL + endpoint;
-      
-      console.log('📍 useJoinGroup: baseURL:', baseURL);
-      console.log('📍 useJoinGroup: endpoint:', endpoint);
-      console.log('📍 useJoinGroup: FULL URL:', fullURL);
-      
-      const response = await axiosClient.post(endpoint);
-      console.log('✅ useJoinGroup: Backend response received:', response.data);
+      const response = await axiosClient.post(`/contacts/extended/groups/${groupId}/join`);
       return response.data;
     },
     onSuccess: (_, groupId) => {
-      console.log('✅ Successfully joined group:', groupId);
-      // Forzar recarga completa de grupos para actualizar membresía
-      queryClient.refetchQueries({ queryKey: ['groups'] }).then(() => {
-        console.log('🔄 Groups refetched after joining');
-      });
-      // También invalidar posts del grupo para que se actualice la membresía
+      queryClient.refetchQueries({ queryKey: ['groups'] });
       queryClient.refetchQueries({ queryKey: ['group-posts', groupId] });
       toast.success('Te has unido al grupo');
     },
     onError: (error: any) => {
-      console.error('Error joining group:', error);
       if (error.message.includes('Failed to fetch')) {
-        toast.error('No se puede conectar al servidor. Verifica que el backend esté corriendo.');
+        toast.error('No se puede conectar al servidor. Verifica que el backend este corriendo.');
       } else {
         toast.error(error.message || 'Error al unirse al grupo');
+      }
+    },
+  });
+}
+
+// Channel Posts and Interactions
+export function useChannelPosts(channelId: number) {
+  return useQuery({
+    queryKey: ['channel-posts', channelId],
+    queryFn: async () => {
+      const data = await apiCall(`/contacts/extended/channels/${channelId}/posts?page=0&size=20`);
+      return Array.isArray(data) ? data : (data?.content ?? []);
+    },
+    staleTime: 30 * 1000,
+    enabled: !!channelId,
+  });
+}
+
+export function useChannelInteractions(channelId: number, currentUserId?: number) {
+  const queryClient = useQueryClient();
+  
+  const likePost = useMutation({
+    mutationFn: (postId: number) =>
+      apiCall(`/contacts/extended/channels/${channelId}/posts/${postId}/like`, { method: 'POST' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channel-posts'] });
+    },
+    onError: () => {
+      toast.error('Error al dar like');
+    },
+  });
+
+  const sharePost = useMutation({
+    mutationFn: ({ postId, message }: { postId: number; message?: string }) =>
+      apiCall(`/contacts/extended/channels/${channelId}/posts/${postId}/share`, {
+        method: 'POST',
+        body: JSON.stringify({ shareMessage: message }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channel-posts'] });
+      toast.success('Post compartido');
+    },
+    onError: () => {
+      toast.error('Error al compartir post');
+    },
+  });
+
+  return {
+    likePost: likePost.mutate,
+    sharePost: sharePost.mutate,
+    isLikingPost: likePost.isPending,
+    isSharingPost: sharePost.isPending,
+  };
+}
+
+export function useCreateChannelPost() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ channelId, postData }: { channelId: number; postData: any }) => {
+      return await apiCall(`/contacts/extended/channels/${channelId}/posts`, {
+        method: 'POST',
+        body: JSON.stringify(postData),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channel-posts'] });
+      toast.success('Post creado exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Error al crear post');
+    },
+  });
+}
+
+export function useCreateChannel() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: { name: string; city: string; description: string; avatar?: string }) =>
+      apiCall('/contacts/extended/channels', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channels'] });
+    },
+    onError: (error: any) => {
+      if (error.message.includes('403')) {
+        toast.error('No tienes permiso para crear canales');
+      } else {
+        toast.error(error.message || 'Error al crear canal');
       }
     },
   });
@@ -654,11 +675,7 @@ export function useLeaveGroup() {
   
   return useMutation({
     mutationFn: async (groupId: number) => {
-      console.log('🚀 useLeaveGroup: Starting leave process for group:', groupId);
-      console.log('📍 useLeaveGroup: Endpoint:', `/contacts/extended/groups/${groupId}/leave`);
-      
       const response = await axiosClient.post(`/contacts/extended/groups/${groupId}/leave`);
-      console.log('✅ useLeaveGroup: Backend response received:', response.data);
       return response.data;
     },
     onSuccess: () => {
@@ -666,12 +683,136 @@ export function useLeaveGroup() {
       toast.success('Has abandonado el grupo');
     },
     onError: (error: any) => {
-      console.error('Error leaving group:', error);
       if (error.message.includes('Failed to fetch')) {
-        toast.error('No se puede conectar al servidor. Verifica que el backend esté corriendo.');
+        toast.error('No se puede conectar al servidor. Verifica que el backend este corriendo.');
       } else {
         toast.error(error.message || 'Error al abandonar el grupo');
       }
+    },
+  });
+}
+
+// ==================== CHANNEL EVENTS ====================
+
+export function useChannelEvents(channelId: number) {
+  return useQuery({
+    queryKey: ['channelEvents', channelId],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/events`);
+      return response.data;
+    },
+    enabled: !!channelId,
+  });
+}
+
+export function useChannelUpcomingEvents(channelId: number) {
+  return useQuery({
+    queryKey: ['channelUpcomingEvents', channelId],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/events/upcoming`);
+      return response.data;
+    },
+    enabled: !!channelId,
+  });
+}
+
+export function useCreateChannelEvent() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: any) => {
+      const response = await axiosClient.post(`/contacts/extended/channels/${data.channelId}/events`, data);
+      return response.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['channelEvents', variables.channelId] });
+      queryClient.invalidateQueries({ queryKey: ['channelUpcomingEvents', variables.channelId] });
+      toast.success('Evento creado exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Error al crear evento');
+    },
+  });
+}
+
+export function useRespondToEvent() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ eventId, responseStatus }: { eventId: number; responseStatus: string }) => {
+      const response = await axiosClient.post(`/contacts/extended/channels/events/${eventId}/respond`, { responseStatus });
+      return response.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['channelEvents'] });
+      queryClient.invalidateQueries({ queryKey: ['channelUpcomingEvents'] });
+      toast.success('Respuesta registrada exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Error al responder al evento');
+    },
+  });
+}
+
+export function useDeleteChannelEvent() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ channelId, eventId }: { channelId: number; eventId: number }) => {
+      await axiosClient.delete(`/contacts/extended/channels/${channelId}/events/${eventId}`);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['channelEvents', variables.channelId] });
+      queryClient.invalidateQueries({ queryKey: ['channelUpcomingEvents', variables.channelId] });
+      toast.success('Evento eliminado exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Error al eliminar evento');
+    },
+  });
+}
+
+// ==================== CHANNEL SUBSCRIBERS ====================
+
+export function useChannelSubscribers(channelId: number) {
+  return useQuery({
+    queryKey: ['channelSubscribers', channelId],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/subscribers?size=5`);
+      return response.data;
+    },
+    enabled: !!channelId,
+  });
+}
+
+export function useGetChannelEventAttendees(channelId: number, eventId: number) {
+  return useQuery({
+    queryKey: ['channel-event-attendees', channelId, eventId],
+    queryFn: () => apiCall(`/contacts/extended/channels/${channelId}/events/${eventId}/attendees`),
+    enabled: !!channelId && !!eventId,
+  });
+}
+
+export function useRsvpChannelEvent(channelId: number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (eventId: number) =>
+      apiCall(`/contacts/extended/channels/${channelId}/events/${eventId}/rsvp`, { method: 'POST' }),
+    onSuccess: (_, eventId) => {
+      qc.invalidateQueries({ queryKey: ['channel-events', channelId] });
+      qc.invalidateQueries({ queryKey: ['channel-event-attendees', channelId, eventId] });
+    },
+  });
+}
+
+export function useCancelRsvpChannelEvent(channelId: number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (eventId: number) =>
+      apiCall(`/contacts/extended/channels/${channelId}/events/${eventId}/rsvp`, { method: 'DELETE' }),
+    onSuccess: (_, eventId) => {
+      qc.invalidateQueries({ queryKey: ['channel-events', channelId] });
+      qc.invalidateQueries({ queryKey: ['channel-event-attendees', channelId, eventId] });
     },
   });
 }

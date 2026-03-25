@@ -1,15 +1,15 @@
-// 🏗️ CASOS DE USO DE GRUPOS - Arquitectura Hexagonal
-// Este archivo pertenece al módulo de GRUPOS (Lógica de negocio pura)
+// GROUP USE CASES - Hexagonal Architecture
+// This file belongs to GROUPS module (Pure business logic)
 
 import { Group } from '../entities/Group';
 import { GroupPost, GroupComment, GroupLike, GroupShare } from '../entities/GroupPost';
 import { GroupRepository, CreateGroupPostData, CreateGroupCommentData, CreateGroupData } from '../repositories/GroupRepository';
 
-// Casos de uso del dominio (lógica de negocio pura)
+// Domain use cases (pure business logic)
 export class GroupUseCases {
   constructor(private groupRepository: GroupRepository) {}
 
-  // Casos de uso para grupos
+  // Group use cases
   async getUserGroups(userId: number): Promise<Group[]> {
     return this.groupRepository.getGroups(userId);
   }
@@ -19,17 +19,17 @@ export class GroupUseCases {
   }
 
   async createGroup(data: CreateGroupData): Promise<Group> {
-    // Validaciones de negocio
+    // Business validations
     if (!data.name || data.name.trim().length === 0) {
-      throw new Error('El nombre del grupo es obligatorio');
+      throw new Error('Group name is required');
     }
 
     if (data.name.length > 100) {
-      throw new Error('El nombre no puede exceder los 100 caracteres');
+      throw new Error('Name cannot exceed 100 characters');
     }
 
     if (data.description && data.description.length > 500) {
-      throw new Error('La descripción no puede exceder los 500 caracteres');
+      throw new Error('Description cannot exceed 500 characters');
     }
 
     return this.groupRepository.createGroup(data);
@@ -43,22 +43,22 @@ export class GroupUseCases {
     await this.groupRepository.leaveGroup(groupId, userId);
   }
 
-  // Casos de uso para publicaciones
+  // Post use cases
   async getGroupPosts(groupId: number, page: number = 0, size: number = 20): Promise<{ content: GroupPost[]; totalElements: number; totalPages: number }> {
     return this.groupRepository.getGroupPosts(groupId, page, size);
   }
 
   async createGroupPost(groupId: number, data: CreateGroupPostData, userId: number): Promise<GroupPost> {
-    // Validaciones de negocio
+    // Business validations
     if (!data.content || data.content.trim().length === 0) {
-      throw new Error('El contenido es obligatorio');
+      throw new Error('Content is required');
     }
 
     if (data.imageUrls && data.imageUrls.length > 3) {
-      throw new Error('Máximo 3 imágenes permitidas');
+      throw new Error('Maximum 3 images allowed');
     }
 
-    // Asegurar que userId esté incluido en los datos
+    // Ensure userId is included in data
     const postData = {
       ...data,
       userId
@@ -72,30 +72,30 @@ export class GroupUseCases {
     const existingPost = posts.content.find(p => p.id === postId);
     
     if (!existingPost) {
-      throw new Error('Publicación no encontrada');
+      throw new Error('Post not found');
     }
 
     if (!existingPost.isOwn) {
-      throw new Error('No puedes editar esta publicación');
+      throw new Error('You cannot edit this post');
     }
 
     return this.groupRepository.updateGroupPost(postId, data);
   }
 
   async deleteGroupPost(postId: number, userId: number): Promise<void> {
-    // Nota: En una implementación real, necesitaríamos un endpoint para obtener una publicación específica
-    // Por ahora, asumimos que el usuario tiene permiso si el backend lo valida
+    // Note: In a real implementation, we would need an endpoint to get a specific post
+    // For now, we assume user has permission if backend validates it
     await this.groupRepository.deleteGroupPost(postId, userId);
   }
 
-  // Casos de uso para comentarios
+  // Comment use cases
   async getGroupComments(groupId: number, postId: number, page: number = 0, size: number = 20): Promise<{ content: GroupComment[]; totalElements: number; totalPages: number }> {
     return this.groupRepository.getGroupComments(groupId, postId, page, size);
   }
 
   async createGroupComment(groupId: number, postId: number, data: CreateGroupCommentData, userId: number): Promise<GroupComment> {
     if (!data.content || data.content.trim().length === 0) {
-      throw new Error('El contenido del comentario es obligatorio');
+      throw new Error('Comment content is required');
     }
 
     return this.groupRepository.createGroupComment(groupId, postId, data);
@@ -105,7 +105,7 @@ export class GroupUseCases {
     await this.groupRepository.deleteGroupComment(commentId, userId);
   }
 
-  // Casos de uso para interacciones
+  // Interaction use cases
   async toggleGroupPostLike(postId: number, userId: number): Promise<GroupLike> {
     return this.groupRepository.toggleGroupPostLike(postId, userId);
   }

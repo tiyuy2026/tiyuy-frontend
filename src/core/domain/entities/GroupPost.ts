@@ -1,5 +1,5 @@
-// 🏗️ ENTIDADES DE GRUPOS - Arquitectura Hexagonal
-// Este archivo pertenece al módulo de GRUPOS (Publicaciones, Comentarios, Interacciones)
+// GROUP ENTITIES - Hexagonal Architecture
+// This file belongs to GROUPS module (Posts, Comments, Interactions)
 
 export type PostStyle = 'default' | 'modern' | 'classic' | 'minimal';
 export type FontStyle = 'normal' | 'bold' | 'italic';

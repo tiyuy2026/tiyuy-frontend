@@ -19,10 +19,6 @@ const nextConfig: NextConfig = {
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days
   },
-  turbopack: {},
-  experimental: {
-    forceSwcTransforms: true,
-  },
 };
 
 export default nextConfig;
