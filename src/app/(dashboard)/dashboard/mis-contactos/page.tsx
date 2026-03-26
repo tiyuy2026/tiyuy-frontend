@@ -2023,7 +2023,7 @@ export default function MisContactosPage() {
                 </button>
                 <div className="flex-1 min-w-0">
                   <p className="text-white font-semibold text-sm">{selectedChannel.name}</p>
-                  <p className="text-white/60 text-xs">{selectedChannel.subscribers || 0} suscriptores</p>
+                  <p className="text-white/60 text-xs">{selectedChannel.subscriberCount?.toLocaleString('es-PE') || 0} suscriptores</p>
                 </div>
                 <button className="text-white/70 hover:text-white transition-colors text-sm">
                   ⋯

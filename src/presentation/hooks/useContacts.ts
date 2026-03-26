@@ -853,11 +853,11 @@ export function useUploadChannelPostImages() {
 
 // ==================== CHANNEL COMMENTS ====================
 
-export function useChannelComments(postId: number) {
+export function useChannelComments(channelId: number, postId: number) {
   return useQuery({
-    queryKey: ['channel-comments', postId],
+    queryKey: ['channel-comments', channelId, postId],
     queryFn: async () => {
-      const data = await apiCall(`/contacts/extended/channels/posts/${postId}/comments`);
+      const data = await apiCall(`/contacts/extended/channels/${channelId}/posts/${postId}/comments`);
       const comments = Array.isArray(data) ? data : (data?.content ?? []);
       console.log('📋 Comentarios recibidos:', comments);
       return comments;
@@ -871,18 +871,18 @@ export function useCreateChannelComment() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ postId, content, replyToCommentId }: { postId: number; content: string; replyToCommentId?: number }) => {
+    mutationFn: async ({ channelId, postId, content, replyToCommentId }: { channelId: number; postId: number; content: string; replyToCommentId?: number }) => {
       const body: any = { content };
       if (replyToCommentId) {
         body.replyToCommentId = replyToCommentId;
       }
-      return await apiCall(`/contacts/extended/channels/posts/${postId}/comments`, {
+      return await apiCall(`/contacts/extended/channels/${channelId}/posts/${postId}/comments`, {
         method: 'POST',
         body: JSON.stringify(body),
       });
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['channel-comments', variables.postId] });
+      queryClient.invalidateQueries({ queryKey: ['channel-comments', variables.channelId, variables.postId] });
       queryClient.invalidateQueries({ queryKey: ['channel-posts'] });
       toast.success('Comentario agregado');
     },
@@ -909,8 +909,8 @@ export function useDeleteChannelPost() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (postId: number) => {
-      return await apiCall(`/contacts/extended/channels/posts/${postId}`, { method: 'DELETE' });
+    mutationFn: async ({ channelId, postId }: { channelId: number; postId: number }) => {
+      return await apiCall(`/contacts/extended/channels/${channelId}/posts/${postId}`, { method: 'DELETE' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['channel-posts'] });
@@ -931,7 +931,7 @@ export interface ChannelCollaborator {
   lastName: string;
   email: string;
   dni?: string;
-  avatar?: string;
+  userAvatar?: string;
   role?: string;
   grantedAt: string;
   grantedBy?: {
@@ -959,11 +959,12 @@ export interface ChannelStatistics {
   }>;
 }
 
-// Buscar usuarios para delegación de acceso (por DNI, Email o Nombre)
+// Buscar usuarios para delegación de acceso (por nombre, email, DNI - como en chat)
 export function useSearchUsersForDelegation() {
   return useMutation({
     mutationFn: async (query: string) => {
-      const data = await apiCall(`/contacts/extended/channels/users/search?query=${encodeURIComponent(query)}`);
+      // Usar el endpoint de búsqueda general como en el chat
+      const data = await apiCall(`/contacts/extended/search/users?keyword=${encodeURIComponent(query)}`);
       return data as Array<{
         id: number;
         email: string;

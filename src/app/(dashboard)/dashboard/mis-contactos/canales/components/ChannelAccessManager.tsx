@@ -10,7 +10,13 @@ import {
   Crown, 
   Users,
   Loader2,
-  X
+  X,
+  User,
+  Mail,
+  CreditCard,
+  Calendar,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { toast } from '@/presentation/store/toastStore';
 import {
@@ -18,6 +24,7 @@ import {
   useSearchUsersForDelegation,
   useGrantPublishingPermission,
   useRevokePublishingPermission,
+  useCanUserPublish,
   type ChannelCollaborator,
 } from '@/presentation/hooks/useContacts';
 
@@ -66,11 +73,12 @@ export function ChannelAccessManager({
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [expandedCollaborator, setExpandedCollaborator] = useState<number | null>(null);
 
   // Handle search
   const handleSearch = useCallback(async () => {
-    if (!searchQuery.trim() || searchQuery.length < 3) {
-      toast.error('Ingresa al menos 3 caracteres para buscar');
+    if (!searchQuery.trim() || searchQuery.length < 2) {
+      toast.error('Ingresa al menos 2 caracteres para buscar');
       return;
     }
 
@@ -79,9 +87,19 @@ export function ChannelAccessManager({
 
     try {
       const results = await searchMutation.mutateAsync(searchQuery.trim());
+      // Transformar resultados al formato esperado
+      const transformedResults = results.map((user: any) => ({
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName || user.name?.split(' ')[0] || '',
+        lastName: user.lastName || user.name?.split(' ').slice(1).join(' ') || '',
+        dni: user.dni,
+        avatar: user.avatar,
+        role: user.role,
+      }));
       // Filter out users who are already collaborators
       const existingIds = new Set(collaborators?.map(c => c.userId) || []);
-      const filteredResults = results.filter(r => !existingIds.has(r.id) && r.id !== adminUser?.id);
+      const filteredResults = transformedResults.filter(r => !existingIds.has(r.id) && r.id !== adminUser?.id);
       setSearchResults(filteredResults);
     } catch (error) {
       toast.error('Error al buscar usuarios');
@@ -122,6 +140,16 @@ export function ChannelAccessManager({
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-blue-600" />
             <h3 className="font-semibold text-gray-900">Gestión de Acceso</h3>
+            {/* Statistics Button - Only for admin and publishers */}
+            {canViewStatistics && (
+              <button
+                onClick={() => setShowStatisticsModal(true)}
+                className="px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200"
+              >
+                <BarChart3 className="w-4 h-4" />
+                Estadísticas
+              </button>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -176,12 +204,12 @@ export function ChannelAccessManager({
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
-                if (e.target.value.length < 3) {
+                if (e.target.value.length < 2) {
                   setShowSearchResults(false);
                 }
               }}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              placeholder="Buscar por DNI, Email o Nombre..."
+              placeholder="Buscar por nombre, email, teléfono..."
               className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -190,7 +218,7 @@ export function ChannelAccessManager({
             )}
           </div>
           <p className="text-xs text-gray-400 mt-2">
-            Presiona Enter para buscar. Mínimo 3 caracteres.
+            Presiona Enter para buscar. Mínimo 2 caracteres.
           </p>
 
           {/* Search Results */}
@@ -261,13 +289,18 @@ export function ChannelAccessManager({
         ) : collaborators && collaborators.length > 0 ? (
           <div className="space-y-2">
             {collaborators.map((collaborator) => (
-              <CollaboratorCard
-                key={collaborator.id}
-                collaborator={collaborator}
-                canManage={canManagePermissions}
-                onRevoke={() => handleRevokePermission(collaborator.userId)}
-                isRevoking={revokePermission.isPending}
-              />
+              <div key={collaborator.id}>
+                <CollaboratorCard
+                  collaborator={collaborator}
+                  canManage={canManagePermissions}
+                  onRevoke={() => handleRevokePermission(collaborator.userId)}
+                  isRevoking={revokePermission.isPending}
+                  isExpanded={expandedCollaborator === collaborator.id}
+                  onToggle={() => setExpandedCollaborator(
+                    expandedCollaborator === collaborator.id ? null : collaborator.id
+                  )}
+                />
+              </div>
             ))}
           </div>
         ) : (
@@ -306,49 +339,112 @@ interface CollaboratorCardProps {
   canManage: boolean;
   onRevoke: () => void;
   isRevoking: boolean;
+  isExpanded: boolean;
+  onToggle: () => void;
 }
 
-function CollaboratorCard({ collaborator, canManage, onRevoke, isRevoking }: CollaboratorCardProps) {
+function CollaboratorCard({ collaborator, canManage, onRevoke, isRevoking, isExpanded, onToggle }: CollaboratorCardProps) {
   return (
-    <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
-      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-semibold">
-        {collaborator.avatar ? (
-          <img 
-            src={collaborator.avatar} 
-            alt="" 
-            className="w-full h-full rounded-full object-cover" 
-          />
-        ) : (
-          collaborator.firstName?.charAt(0).toUpperCase() || 'U'
-        )}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-gray-900 text-sm truncate">
-          {collaborator.firstName} {collaborator.lastName}
-        </p>
-        <p className="text-xs text-gray-500 truncate">{collaborator.email}</p>
-        {collaborator.dni && (
-          <p className="text-xs text-gray-400">DNI: {collaborator.dni}</p>
-        )}
-        {collaborator.grantedBy && (
-          <p className="text-xs text-gray-400 mt-1">
-            Autorizado por: {collaborator.grantedBy.firstName} {collaborator.grantedBy.lastName}
-          </p>
-        )}
-      </div>
-      {canManage && (
-        <button
-          onClick={onRevoke}
-          disabled={isRevoking}
-          className="p-2 text-red-500 hover:bg-red-50 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          title="Quitar permiso de publicación"
-        >
-          {isRevoking ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+    <div className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors overflow-hidden">
+      {/* Card Header - Clickable */}
+      <div 
+        onClick={onToggle}
+        className="flex items-center gap-3 p-3 cursor-pointer"
+      >
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
+          {collaborator.userAvatar ? (
+            <img 
+              src={collaborator.userAvatar} 
+              alt="" 
+              className="w-full h-full rounded-full object-cover" 
+            />
           ) : (
-            <UserX className="w-4 h-4" />
+            collaborator.firstName?.charAt(0).toUpperCase() || 'U'
           )}
-        </button>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-medium text-gray-900 text-sm truncate">
+            {collaborator.firstName} {collaborator.lastName}
+          </p>
+          <p className="text-xs text-gray-500 truncate">{collaborator.email}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {canManage && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onRevoke();
+              }}
+              disabled={isRevoking}
+              className="p-2 text-red-500 hover:bg-red-50 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+              title="Quitar permiso de publicación"
+            >
+              {isRevoking ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <UserX className="w-4 h-4" />
+              )}
+            </button>
+          )}
+          {isExpanded ? (
+            <ChevronUp className="w-4 h-4 text-gray-400" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-gray-400" />
+          )}
+        </div>
+      </div>
+
+      {/* Expanded Details */}
+      {isExpanded && (
+        <div className="px-3 pb-3 border-t border-gray-100 bg-gray-50/50">
+          <div className="pt-3 space-y-3">
+            {/* User Info */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <User className="w-4 h-4 text-blue-500" />
+                <span className="text-gray-600">Nombre:</span>
+                <span className="font-medium text-gray-900">{collaborator.firstName} {collaborator.lastName}</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm">
+                <Mail className="w-4 h-4 text-blue-500" />
+                <span className="text-gray-600">Email:</span>
+                <span className="font-medium text-gray-900">{collaborator.email}</span>
+              </div>
+              
+              {collaborator.dni && (
+                <div className="flex items-center gap-2 text-sm">
+                  <CreditCard className="w-4 h-4 text-blue-500" />
+                  <span className="text-gray-600">DNI:</span>
+                  <span className="font-medium text-gray-900">{collaborator.dni}</span>
+                </div>
+              )}
+              
+              <div className="flex items-center gap-2 text-sm">
+                <Calendar className="w-4 h-4 text-blue-500" />
+                <span className="text-gray-600">Acceso otorgado:</span>
+                <span className="font-medium text-gray-900">
+                  {new Date(collaborator.grantedAt).toLocaleDateString('es-ES')}
+                </span>
+              </div>
+            </div>
+
+            {/* Granted By */}
+            {collaborator.grantedBy && (
+              <div className="pt-2 border-t border-gray-200">
+                <p className="text-xs text-gray-500 mb-2">Autorizado por:</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white text-xs font-semibold">
+                    {collaborator.grantedBy.firstName?.charAt(0).toUpperCase() || 'A'}
+                  </div>
+                  <span className="text-sm text-gray-700">
+                    {collaborator.grantedBy.firstName} {collaborator.grantedBy.lastName}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

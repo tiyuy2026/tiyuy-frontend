@@ -238,7 +238,7 @@ export function ChannelPostsPanel({
   const handleDeletePost = async (postId: number) => {
     if (!confirm('¿Estás seguro de que quieres eliminar este post?')) return;
     try {
-      await deletePostMutation.mutateAsync(postId);
+      await deletePostMutation.mutateAsync({ channelId, postId });
       setShowPostMenu(prev => ({ ...prev, [postId]: false }));
     } catch (error) {
       console.error('Error deleting post:', error);
@@ -278,6 +278,7 @@ export function ChannelPostsPanel({
 
     try {
       await createCommentMutation.mutateAsync({ 
+        channelId,
         postId, 
         content: content.trim()
       });
@@ -921,10 +922,12 @@ export function ChannelPostsPanel({
                       {/* Comments List */}
                       {(showComments[post.id] || false) && (
                         <PostComments 
+                          channelId={channelId}
                           postId={post.id} 
                           currentUserId={currentUserId}
                           currentUserName={currentUserName}
                           currentUserInitial={currentUserInitial}
+                          createCommentMutation={createCommentMutation}
                         />
                       )}
                     </div>
@@ -1113,13 +1116,15 @@ export function ChannelPostsPanel({
 }
 
 // Sub-component for comments with replies
-function PostComments({ postId, currentUserId, currentUserName, currentUserInitial }: { 
+function PostComments({ channelId, postId, currentUserId, currentUserName, currentUserInitial, createCommentMutation }: { 
+  channelId: number;
   postId: number; 
   currentUserId: number; 
   currentUserName: string;
   currentUserInitial: string;
+  createCommentMutation: any;
 }) {
-  const { data: comments, isLoading } = useChannelComments(postId);
+  const { data: comments, isLoading } = useChannelComments(channelId, postId);
   const likeCommentMutation = useLikeChannelComment();
   const queryClient = useQueryClient();
   
@@ -1167,19 +1172,118 @@ function PostComments({ postId, currentUserId, currentUserName, currentUserIniti
     setReplyInputs(prev => ({ ...prev, [commentId]: '' }));
   };
 
+  // Render nested replies recursively
+  const renderNestedReplies = (nestedReplies: any[]) => {
+    console.log('🔍 renderNestedReplies llamado con:', nestedReplies);
+    if (!nestedReplies || nestedReplies.length === 0) {
+      console.log('⚠️ No hay respuestas anidadas para renderizar');
+      return null;
+    }
+    return nestedReplies.map((nestedReply: any) => (
+      <div key={nestedReply.id} className="flex gap-2">
+        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center text-white text-[10px] font-semibold flex-shrink-0">
+          {nestedReply.userFirstName?.charAt(0).toUpperCase() || 'U'}
+        </div>
+        <div className="flex-1">
+          <div className="bg-gray-100 rounded-lg px-2 py-1.5 border border-gray-200">
+            <span className="font-semibold text-xs text-gray-900">
+              {nestedReply.userFirstName} {nestedReply.userLastName}
+            </span>
+            <p className="text-sm text-gray-800 mt-0.5">{nestedReply.content}</p>
+            <span className="text-xs text-gray-400">{formatTimeAgo(nestedReply.createdAt)}</span>
+          </div>
+          
+          {/* Like and Reply buttons */}
+          <div className="flex gap-3 px-2 py-0.5">
+            <button
+              onClick={() => handleCommentLike(nestedReply.id, nestedReply.hasUserLiked)}
+              className={`text-[10px] flex items-center gap-1 transition-colors ${
+                nestedReply.hasUserLiked
+                  ? 'text-blue-500 hover:text-blue-600 font-medium' 
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <span>👍</span>
+              Me gusta
+            </button>
+            
+            <button
+              onClick={() => handleReplyToComment(nestedReply.id)}
+              className="text-[10px] text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              Responder
+            </button>
+          </div>
+          
+          {/* Reply input */}
+          {replyingTo === nestedReply.id && (
+            <div className="mt-1.5 px-2">
+              <div className="bg-gray-50 rounded-lg p-1.5 border border-gray-200">
+                <div className="flex items-center gap-1 mb-1 text-[10px] text-gray-600">
+                  <span>Respondiendo a {nestedReply.userFirstName}</span>
+                  <button
+                    onClick={() => setReplyingTo(null)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="flex gap-1.5">
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-white text-[10px] font-semibold flex-shrink-0">
+                    {currentUserInitial}
+                  </div>
+                  <input
+                    type="text"
+                    value={replyInputs[nestedReply.id] || ''}
+                    onChange={(e) => setReplyInputs(prev => ({ ...prev, [nestedReply.id]: e.target.value }))}
+                    onKeyPress={(e) => e.key === 'Enter' && handleReplySubmit(nestedReply.id)}
+                    placeholder="Escribe una respuesta..."
+                    className="flex-1 px-2 py-1 bg-white border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    autoFocus
+                  />
+                  <button
+                    onClick={() => handleReplySubmit(nestedReply.id)}
+                    disabled={!replyInputs[nestedReply.id]?.trim()}
+                    className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Enviar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* More nested replies */}
+          {nestedReply.replies && nestedReply.replies.length > 0 && (
+            <div className="mt-1.5 space-y-1 pl-3 border-l-2 border-gray-200">
+              {renderNestedReplies(nestedReply.replies)}
+            </div>
+          )}
+        </div>
+      </div>
+    ));
+  };
+
   const handleReplySubmit = async (commentId: number) => {
     const reply = replyInputs[commentId];
     if (!reply?.trim()) return;
     
+    console.log('🚀 handleReplySubmit - commentId:', commentId, 'content:', reply.trim(), 'channelId:', channelId, 'postId:', postId);
+    
     try {
-      // TODO: Implement reply API when available
-      console.log('Reply to comment:', commentId, 'content:', reply);
+      console.log('📤 Enviando a createCommentMutation...');
+      const result = await createCommentMutation.mutateAsync({ 
+        channelId,
+        postId, 
+        content: reply.trim(),
+        replyToCommentId: commentId
+      });
+      console.log('✅ Respuesta enviada exitosamente:', result);
       
       setReplyInputs(prev => ({ ...prev, [commentId]: '' }));
       setReplyingTo(null);
-      queryClient.invalidateQueries({ queryKey: ['channel-comments', postId] });
     } catch (error) {
-      console.error('Error sending reply:', error);
+      console.error('❌ Error sending reply:', error);
     }
   };
 
@@ -1190,6 +1294,15 @@ function PostComments({ postId, currentUserId, currentUserName, currentUserIniti
   if (!comments || comments.length === 0) {
     return <div className="text-center py-4 text-gray-500 text-sm">No hay comentarios aún</div>;
   }
+
+  console.log('📊 Comments data structure:', comments.map((c: any) => ({ 
+    id: c.id, 
+    content: c.content?.substring(0, 20), 
+    replyToCommentId: c.replyToCommentId,
+    repliesCount: c.replies?.length,
+    replies: c.replies?.map((r: any) => ({ id: r.id, content: r.content?.substring(0, 15), replyToCommentId: r.replyToCommentId, repliesCount: r.replies?.length }))
+  })));
+  console.log('📋 FULL comments data:', JSON.stringify(comments, null, 2));
 
   return (
     <div className="space-y-2 mt-2">
@@ -1271,18 +1384,87 @@ function PostComments({ postId, currentUserId, currentUserName, currentUserIniti
               
               {/* Replies */}
               {comment.replies && comment.replies.length > 0 && (
-                <div className="mt-2 space-y-1">
+                <div className="mt-2 space-y-2">
                   {comment.replies.map((reply: any) => (
                     <div key={reply.id} className="flex gap-2 pl-4">
                       <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
                         {reply.userFirstName?.charAt(0).toUpperCase() || 'U'}
                       </div>
-                      <div className="flex-1 bg-gray-50 rounded-lg px-2 py-1 border border-gray-100">
-                        <span className="font-semibold text-xs text-gray-900">
-                          {reply.userFirstName} {reply.userLastName}
-                        </span>
-                        <p className="text-xs text-gray-800 mt-0.5">{reply.content}</p>
-                        <span className="text-xs text-gray-400">{formatTimeAgo(reply.createdAt)}</span>
+                      <div className="flex-1">
+                        <div className="bg-gray-50 rounded-lg px-3 py-2 border border-gray-200">
+                          <span className="font-semibold text-xs text-gray-900">
+                            {reply.userFirstName} {reply.userLastName}
+                          </span>
+                          <p className="text-sm text-gray-800 mt-0.5">{reply.content}</p>
+                          <span className="text-xs text-gray-400">{formatTimeAgo(reply.createdAt)}</span>
+                        </div>
+                        
+                        {/* Like and Reply buttons for nested replies */}
+                        <div className="flex gap-4 px-3 py-1 mt-1">
+                          <button
+                            onClick={() => handleCommentLike(reply.id, reply.hasUserLiked)}
+                            className={`text-xs flex items-center gap-1 transition-colors ${
+                              reply.hasUserLiked
+                                ? 'text-blue-500 hover:text-blue-600 font-medium' 
+                                : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                          >
+                            <span>👍</span>
+                            Me gusta
+                          </button>
+                          
+                          <button
+                            onClick={() => handleReplyToComment(reply.id)}
+                            className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                          >
+                            Responder
+                          </button>
+                        </div>
+                        
+                        {/* Reply input for nested replies */}
+                        {replyingTo === reply.id && (
+                          <div className="mt-2 px-3">
+                            <div className="bg-gray-100 rounded-lg p-2 border border-gray-200">
+                              <div className="flex items-center gap-2 mb-2 text-xs text-gray-600">
+                                <span>Respondiendo a {reply.userFirstName}</span>
+                                <button
+                                  onClick={() => setReplyingTo(null)}
+                                  className="text-gray-400 hover:text-gray-600"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                              <div className="flex gap-2">
+                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+                                  {currentUserInitial}
+                                </div>
+                                <input
+                                  type="text"
+                                  value={replyInputs[reply.id] || ''}
+                                  onChange={(e) => setReplyInputs(prev => ({ ...prev, [reply.id]: e.target.value }))}
+                                  onKeyPress={(e) => e.key === 'Enter' && handleReplySubmit(reply.id)}
+                                  placeholder="Escribe una respuesta..."
+                                  className="flex-1 px-2 py-1 bg-white border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                  autoFocus
+                                />
+                                <button
+                                  onClick={() => handleReplySubmit(reply.id)}
+                                  disabled={!replyInputs[reply.id]?.trim()}
+                                  className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  Enviar
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Nested replies (recursive) */}
+                        {reply.replies && reply.replies.length > 0 && (
+                          <div className="mt-2 space-y-2 pl-4 border-l-2 border-gray-200">
+                            {renderNestedReplies(reply.replies)}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
