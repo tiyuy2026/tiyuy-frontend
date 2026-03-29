@@ -497,8 +497,13 @@ export function useSubscribeToChannel() {
       queryClient.invalidateQueries({ queryKey: ['channels'] });
       toast.success('Suscrito al canal');
     },
-    onError: () => {
-      toast.error('Error al suscribirse');
+    onError: (error: any) => {
+      // Don't show error if already subscribed - component handles retry
+      if (!error.message?.includes('already subscribed') && 
+          !error.message?.includes('ya estás suscrito') &&
+          !error.message?.includes('ya eres miembro')) {
+        toast.error('Error al suscribirse');
+      }
     },
   });
 }
@@ -694,11 +699,11 @@ export function useLeaveGroup() {
 
 // ==================== CHANNEL EVENTS ====================
 
-export function useChannelEvents(channelId: number) {
+export function useChannelEvents(channelId: number, page = 0, size = 9) {
   return useQuery({
-    queryKey: ['channelEvents', channelId],
+    queryKey: ['channelEvents', channelId, page, size],
     queryFn: async () => {
-      const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/events`);
+      const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/events?page=${page}&size=${size}`);
       return response.data;
     },
     enabled: !!channelId,
@@ -713,6 +718,17 @@ export function useChannelUpcomingEvents(channelId: number) {
       return response.data;
     },
     enabled: !!channelId,
+  });
+}
+
+export function useGetChannelEvent(channelId: number, eventId: number) {
+  return useQuery({
+    queryKey: ['channel-event', channelId, eventId],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/events/${eventId}`);
+      return response.data;
+    },
+    enabled: !!channelId && !!eventId,
   });
 }
 
@@ -735,17 +751,27 @@ export function useCreateChannelEvent() {
   });
 }
 
-export function useRespondToEvent() {
+export function useRespondToEvent(channelId: number) {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ eventId, responseStatus }: { eventId: number; responseStatus: string }) => {
-      const response = await axiosClient.post(`/contacts/extended/channels/events/${eventId}/respond`, { responseStatus });
+    mutationFn: async ({ eventId, responseStatus, responseMessage, numberOfGuests }: { 
+      eventId: number; 
+      responseStatus: string;
+      responseMessage?: string;
+      numberOfGuests?: number;
+    }) => {
+      const response = await axiosClient.post(
+        `/contacts/extended/channels/${channelId}/events/${eventId}/respond`, 
+        { responseStatus, responseMessage, numberOfGuests }
+      );
       return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['channelEvents'] });
-      queryClient.invalidateQueries({ queryKey: ['channelUpcomingEvents'] });
+      queryClient.invalidateQueries({ queryKey: ['channelEvents', channelId] });
+      queryClient.invalidateQueries({ queryKey: ['channelUpcomingEvents', channelId] });
+      queryClient.invalidateQueries({ queryKey: ['channel-event-attendees', channelId, variables.eventId] });
+      queryClient.invalidateQueries({ queryKey: ['channel-event', channelId, variables.eventId] });
       toast.success('Respuesta registrada exitosamente');
     },
     onError: (error: any) => {
@@ -793,14 +819,33 @@ export function useGetChannelEventAttendees(channelId: number, eventId: number) 
   });
 }
 
+export function useGetChannelEventResponses(channelId: number, eventId: number) {
+  return useQuery({
+    queryKey: ['channel-event-responses', channelId, eventId],
+    queryFn: () => apiCall(`/contacts/extended/channels/${channelId}/events/${eventId}/responses`),
+    enabled: !!channelId && !!eventId,
+  });
+}
+
 export function useRsvpChannelEvent(channelId: number) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (eventId: number) =>
-      apiCall(`/contacts/extended/channels/${channelId}/events/${eventId}/rsvp`, { method: 'POST' }),
+      apiCall(`/contacts/extended/channels/${channelId}/events/${eventId}/respond`, { 
+        method: 'POST',
+        body: JSON.stringify({ responseStatus: 'ATTENDING' })
+      }),
     onSuccess: (_, eventId) => {
-      qc.invalidateQueries({ queryKey: ['channel-events', channelId] });
+      qc.invalidateQueries({ queryKey: ['channelEvents', channelId] });
       qc.invalidateQueries({ queryKey: ['channel-event-attendees', channelId, eventId] });
+      qc.invalidateQueries({ queryKey: ['channel-event', channelId, eventId] });
+      toast.success('Asistencia confirmada');
+    },
+    onError: (error: any) => {
+      // Don't show toast for subscription errors - handled by component
+      if (!error.message?.includes('must be subscribed') && !error.message?.includes('403')) {
+        toast.error(error.message || 'Error al confirmar asistencia');
+      }
     },
   });
 }
@@ -809,15 +854,126 @@ export function useCancelRsvpChannelEvent(channelId: number) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (eventId: number) =>
-      apiCall(`/contacts/extended/channels/${channelId}/events/${eventId}/rsvp`, { method: 'DELETE' }),
+      apiCall(`/contacts/extended/channels/${channelId}/events/${eventId}/responses`, { 
+        method: 'DELETE'
+      }),
     onSuccess: (_, eventId) => {
-      qc.invalidateQueries({ queryKey: ['channel-events', channelId] });
+      qc.invalidateQueries({ queryKey: ['channelEvents', channelId] });
       qc.invalidateQueries({ queryKey: ['channel-event-attendees', channelId, eventId] });
+      qc.invalidateQueries({ queryKey: ['channel-event', channelId, eventId] });
+      toast.success('Asistencia cancelada');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Error al cancelar asistencia');
+    },
+  });
+}
+
+export function useInterestedChannelEvent(channelId: number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (eventId: number) =>
+      apiCall(`/contacts/extended/channels/${channelId}/events/${eventId}/respond`, { 
+        method: 'POST',
+        body: JSON.stringify({ responseStatus: 'INTERESTED' })
+      }),
+    onSuccess: (_, eventId) => {
+      qc.invalidateQueries({ queryKey: ['channelEvents', channelId] });
+      qc.invalidateQueries({ queryKey: ['channel-event-attendees', channelId, eventId] });
+      qc.invalidateQueries({ queryKey: ['channel-event', channelId, eventId] });
+      toast.success('Interés registrado');
+    },
+    onError: (error: any) => {
+      // Don't show toast for subscription errors - handled by component
+      if (!error.message?.includes('must be subscribed') && !error.message?.includes('403')) {
+        toast.error(error.message || 'Error al registrar interés');
+      }
+    },
+  });
+}
+
+// ==================== CHANNEL EVENT IMAGES ====================
+
+export function useUploadChannelEventImages() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ channelId, eventId, files }: { channelId: number; eventId: number; files: File[] }) => {
+      const formData = new FormData();
+      files.forEach(file => formData.append('files', file));
+      
+      const response = await fetch(`${API_BASE_URL}/contacts/extended/channels/${channelId}/events/${eventId}/upload-images`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token')}`,
+        },
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Error uploading images');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (_, variables) => {
+      // Invalidate all paginated queries for this channel
+      queryClient.invalidateQueries({ 
+        queryKey: ['channelEvents', variables.channelId],
+        exact: false  // This will match all query keys that start with this prefix
+      });
+      queryClient.invalidateQueries({ queryKey: ['channelUpcomingEvents', variables.channelId] });
+      queryClient.invalidateQueries({ queryKey: ['channel-event', variables.channelId, variables.eventId] });
+    },
+    onError: () => {
+      toast.error('Error al subir imagenes');
     },
   });
 }
 
 // ==================== CHANNEL POSTS IMAGES ====================
+
+export function useUploadChannelDocuments() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ channelId, postId, files }: { channelId: number; postId: number; files: File[] }) => {
+      const formData = new FormData();
+      files.forEach(file => formData.append('files', file));
+      
+      const response = await fetch(`${API_BASE_URL}/contacts/extended/channels/${channelId}/posts/${postId}/documents`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token')}`,
+        },
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Error uploading documents');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channel-posts'] });
+    },
+    onError: () => {
+      toast.error('Error al subir documentos');
+    },
+  });
+}
+
+export function useGetChannelPostDocuments(channelId: number, postId: number) {
+  return useQuery({
+    queryKey: ['channel-post-documents', channelId, postId],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/posts/${postId}/documents`);
+      return response.data;
+    },
+    enabled: !!channelId && !!postId,
+  });
+}
 
 export function useUploadChannelPostImages() {
   const queryClient = useQueryClient();

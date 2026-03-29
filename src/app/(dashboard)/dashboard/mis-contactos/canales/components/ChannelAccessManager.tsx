@@ -16,7 +16,8 @@ import {
   CreditCard,
   Calendar,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  BarChart3
 } from 'lucide-react';
 import { toast } from '@/presentation/store/toastStore';
 import {
@@ -64,9 +65,13 @@ export function ChannelAccessManager({
 
   // Queries
   const { data: collaborators, isLoading: collaboratorsLoading } = useChannelCollaborators(channelId);
+  const { data: canPublish } = useCanUserPublish(channelId);
   const searchMutation = useSearchUsersForDelegation();
   const grantPermission = useGrantPublishingPermission();
   const revokePermission = useRevokePublishingPermission();
+
+  // Check if user can view statistics (admin or publisher)
+  const canViewStatistics = isChannelAdmin || canPublish;
 
   // State
   const [searchQuery, setSearchQuery] = useState('');
@@ -74,6 +79,7 @@ export function ChannelAccessManager({
   const [isSearching, setIsSearching] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [expandedCollaborator, setExpandedCollaborator] = useState<number | null>(null);
+  const [showStatisticsModal, setShowStatisticsModal] = useState(false);
 
   // Handle search
   const handleSearch = useCallback(async () => {

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Search, Home, User, Bell, Plus, MapPin, Calendar, Users, Star, Share2, ChevronDown, Pin, MoreHorizontal } from 'lucide-react';
 import { useChannelEvents, useChannelUpcomingEvents, useCreateChannelEvent, useChannelSubscribers } from '@/presentation/hooks/useContacts';
 import ChannelEventCard from './ChannelEventCard';
+import EventDetailView from './EventDetailView';
 
 interface ChannelEventsPanelProps {
   channelId: number;
@@ -26,6 +27,7 @@ export default function ChannelEventsPanel({
   const [activeFilter, setActiveFilter] = useState<'all' | 'upcoming' | 'following' | 'featured'>('upcoming');
   const [showUserEventsDropdown, setShowUserEventsDropdown] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   // Queries
   const { data: events, isLoading: eventsLoading } = useChannelEvents(channelId);
@@ -194,11 +196,21 @@ export default function ChannelEventsPanel({
 
       {/* CONTENIDO PRINCIPAL */}
       <div className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto">
-          {/* Header */}
-          <div className="bg-white border-b border-gray-200 p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Descubrir eventos</h2>
-            
+        {selectedEvent ? (
+          <EventDetailView
+            event={selectedEvent}
+            channelId={channelId}
+            currentUserId={currentUserId}
+            isOwner={isOwner}
+            onBack={() => setSelectedEvent(null)}
+          />
+        ) : (
+          <div className="h-full overflow-y-auto">
+            {/* Header */}
+            <div className="bg-white border-b border-gray-200 p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Descubrir eventos</h2>
+            </div>
+
             {/* Filtros */}
             <div className="flex items-center gap-3 flex-wrap">
               <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-200">
@@ -227,13 +239,12 @@ export default function ChannelEventsPanel({
                 </button>
               ))}
             </div>
-          </div>
 
           {/* Events Grid */}
           <div className="p-6">
             {(eventsLoading || upcomingLoading) ? (
               // Loading skeleton
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {Array.from({ length: 12 }).map((_, i) => (
                   <div key={i} className="bg-white rounded-xl border border-gray-200 overflow-hidden animate-pulse">
                     <div className="h-32 bg-gray-200"></div>
@@ -261,20 +272,22 @@ export default function ChannelEventsPanel({
                 </p>
               </div>
             ) : (
-              // Events grid
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
+              // Events grid - 3 cards per row filling entire width
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredEvents.map((event: any) => (
                   <ChannelEventCard
                     key={event.id}
                     event={event}
                     currentUserId={currentUserId}
                     isOwner={isOwner}
+                    onView={() => setSelectedEvent(event)}
                   />
                 ))}
               </div>
-            )}
+                       )}
           </div>
         </div>
+        )}
       </div>
     </div>
   );

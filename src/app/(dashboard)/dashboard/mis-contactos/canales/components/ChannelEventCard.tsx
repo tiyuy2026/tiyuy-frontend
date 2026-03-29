@@ -44,9 +44,9 @@ export default function ChannelEventCard({
     >
       {/* Cover Image */}
       <div className="relative h-32 bg-gradient-to-br from-gray-100 to-gray-200">
-        {event.coverImageUrl ? (
+        {(event.coverImageUrl || (event.imageUrls && event.imageUrls.length > 0)) ? (
           <img 
-            src={event.coverImageUrl} 
+            src={event.coverImageUrl || event.imageUrls[0]} 
             alt={event.title}
             className="w-full h-full object-cover"
           />

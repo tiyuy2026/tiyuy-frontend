@@ -130,7 +130,7 @@ export function ChannelStatisticsModal({
                       </span>
                     </div>
                     <div className="flex gap-2 h-24 items-end">
-                      {statistics.dailyActivity.slice(-7).map((day, idx) => (
+                      {statistics.dailyActivity.map((day, idx) => (
                         <div key={idx} className="flex-1 flex flex-col items-center gap-1">
                           <div 
                             className="w-full bg-blue-500 rounded-t-lg transition-all hover:bg-blue-600"
@@ -157,7 +157,7 @@ export function ChannelStatisticsModal({
                       </span>
                     </div>
                     <div className="flex gap-2 h-24 items-end">
-                      {statistics.dailyActivity.slice(-7).map((day, idx) => (
+                      {statistics.dailyActivity.map((day, idx) => (
                         <div key={idx} className="flex-1 flex flex-col items-center gap-1">
                           <div 
                             className="w-full bg-teal-500 rounded-t-lg transition-all hover:bg-teal-600"
@@ -217,9 +217,9 @@ export function ChannelStatisticsModal({
                       className="px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors"
                     >
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-semibold">
-                        {collaborator.avatar ? (
+                        {collaborator.userAvatar ? (
                           <img
-                            src={collaborator.avatar}
+                            src={collaborator.userAvatar}
                             alt=""
                             className="w-full h-full rounded-full object-cover"
                           />

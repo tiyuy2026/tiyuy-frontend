@@ -1,18 +1,19 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { 
   useChannelPosts, 
   useChannelInteractions, 
   useCreateChannelPost,
   useUploadChannelPostImages,
+  useUploadChannelDocuments,
+  useDeleteChannelPost, 
+  useCanUserPublish,
   useCreateChannelComment,
-  useDeleteChannelPost,
   useChannelComments,
   useLikeChannelComment
 } from '@/presentation/hooks/useContacts';
-import { Plus, MessageSquare, Heart, Share2, Image, X, Send, MoreVertical, Edit, Trash2, Calendar, Shield, BarChart3 } from 'lucide-react';
+import { Plus, MessageSquare, Heart, Share2, Image, X, Send, MoreVertical, Edit, Trash2, Calendar, Shield, BarChart3, FileText, Paperclip } from 'lucide-react';
 import ChannelEventsPanel from './ChannelEventsPanel';
 import CreateEventModal from './CreateEventModal';
 import { ChannelAccessManager } from './ChannelAccessManager';
@@ -54,15 +55,18 @@ export function ChannelPostsPanel({
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newPost, setNewPost] = useState('');
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [selectedDocuments, setSelectedDocuments] = useState<File[]>([]);
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
   const [textColor, setTextColor] = useState('#000000');
   const [fontStyle, setFontStyle] = useState<'normal' | 'bold' | 'italic'>('normal');
   const [borderStyle, setBorderStyle] = useState<'none' | 'solid' | 'dashed' | 'rounded'>('none');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const documentInputRef = useRef<HTMLInputElement>(null);
   
   const postsQuery = useChannelPosts(channelId);
   const createPostMutation = useCreateChannelPost();
   const uploadImagesMutation = useUploadChannelPostImages();
+  const uploadDocumentsMutation = useUploadChannelDocuments();
   const deletePostMutation = useDeleteChannelPost();
   
   const { 
@@ -92,10 +96,12 @@ export function ChannelPostsPanel({
   const [showAccessManager, setShowAccessManager] = useState(false);
   const [showStatisticsModal, setShowStatisticsModal] = useState(false);
 
-  const canCreateContent = currentUser?.role === 'AGENT' || currentUser?.role === 'INMOBILIARIA';
+  // Check if user can view statistics (admin or publisher)
+  const { data: canPublish } = useCanUserPublish(channelId);
+  const canViewStatistics = isChannelAdmin || canPublish;
 
   const handleCreatePost = async () => {
-    if (!newPost.trim() && selectedImages.length === 0) return;
+    if (!newPost.trim() && selectedImages.length === 0 && selectedDocuments.length === 0) return;
 
     const postData = {
       content: newPost.trim(),
@@ -119,10 +125,20 @@ export function ChannelPostsPanel({
           console.error('Error uploading images:', uploadError);
         }
       }
+
+      // Upload documents if any
+      if (selectedDocuments.length > 0 && createdPost?.id) {
+        try {
+          await uploadDocumentsMutation.mutateAsync({ channelId, postId: createdPost.id, files: selectedDocuments });
+        } catch (uploadError) {
+          console.error('Error uploading documents:', uploadError);
+        }
+      }
       
       // Reset form
       setNewPost('');
       setSelectedImages([]);
+      setSelectedDocuments([]);
       setBackgroundColor('#ffffff');
       setTextColor('#000000');
       setFontStyle('normal');
@@ -229,6 +245,41 @@ export function ChannelPostsPanel({
       const filesToAdd = files.slice(0, remainingSlots);
       setSelectedImages([...selectedImages, ...filesToAdd]);
     }
+  };
+
+  const handleDocumentSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      // Validate file types (PDF, Word, Excel)
+      const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+      const validFiles = files.filter(file => {
+        if (!validTypes.includes(file.type)) {
+          alert(`${file.name} no es un documento valido (solo PDF, Word, Excel)`);
+          return false;
+        }
+        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+          alert(`${file.name} excede el limite de 10MB`);
+          return false;
+        }
+        return true;
+      });
+      
+      const remainingSlots = 3 - selectedDocuments.length;
+      const filesToAdd = validFiles.slice(0, remainingSlots);
+      setSelectedDocuments([...selectedDocuments, ...filesToAdd]);
+    }
+  };
+
+  const removeDocument = (index: number) => {
+    setSelectedDocuments(selectedDocuments.filter((_, i) => i !== index));
+  };
+
+  const getDocumentIcon = (fileName: string) => {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    if (ext === 'pdf') return 'PDF';
+    if (ext === 'doc' || ext === 'docx') return 'DOC';
+    if (ext === 'xls' || ext === 'xlsx') return 'XLS';
+    return 'FILE';
   };
 
   const removeImage = (index: number) => {
@@ -393,14 +444,16 @@ export function ChannelPostsPanel({
                 Acceso
               </button>
             )}
-            {/* Statistics Button */}
-            <button
-              onClick={() => setShowStatisticsModal(true)}
-              className="px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200"
-            >
-              <BarChart3 className="w-4 h-4" />
-              Estadísticas
-            </button>
+            {/* Statistics Button - Only for admin and publishers */}
+            {canViewStatistics && (
+              <button
+                onClick={() => setShowStatisticsModal(true)}
+                className="px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200"
+              >
+                <BarChart3 className="w-4 h-4" />
+                Estadísticas
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -409,7 +462,7 @@ export function ChannelPostsPanel({
       {activeTab === 'posts' ? (
         <div className="flex-1 overflow-y-auto">
           {/* Create Post Area - Estilo Facebook/Grupos */}
-          {canCreateContent && (
+          {canPublish && (
             <>
               {!hasPosts && showWelcome ? (
                 // Initial state: "write first post" and "skip" buttons
@@ -587,7 +640,7 @@ export function ChannelPostsPanel({
 
                       {/* Images */}
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <input
                             ref={fileInputRef}
                             type="file"
@@ -603,6 +656,24 @@ export function ChannelPostsPanel({
                           >
                             <Image className="w-4 h-4" />
                             <span>Agregar imagen ({selectedImages.length}/3)</span>
+                          </button>
+
+                          {/* Documents */}
+                          <input
+                            ref={documentInputRef}
+                            type="file"
+                            multiple
+                            accept=".pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            onChange={handleDocumentSelect}
+                            className="hidden"
+                          />
+                          <button
+                            onClick={() => documentInputRef.current?.click()}
+                            disabled={selectedDocuments.length >= 3}
+                            className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                          >
+                            <Paperclip className="w-4 h-4" />
+                            <span>Adjuntar documento ({selectedDocuments.length}/3)</span>
                           </button>
                         </div>
 
@@ -625,6 +696,27 @@ export function ChannelPostsPanel({
                             ))}
                           </div>
                         )}
+
+                        {/* Selected Documents Preview */}
+                        {selectedDocuments.length > 0 && (
+                          <div className="flex gap-2 flex-wrap">
+                            {selectedDocuments.map((doc, index) => (
+                              <div key={index} className="relative flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+                                <FileText className="w-5 h-5 text-blue-600" />
+                                <div className="flex flex-col">
+                                  <span className="text-xs font-medium text-gray-700 max-w-[120px] truncate">{doc.name}</span>
+                                  <span className="text-[10px] text-gray-500">{getDocumentIcon(doc.name)} • {(doc.size / 1024).toFixed(0)} KB</span>
+                                </div>
+                                <button
+                                  onClick={() => removeDocument(index)}
+                                  className="ml-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -635,6 +727,7 @@ export function ChannelPostsPanel({
                           setShowCreateForm(false);
                           setNewPost('');
                           setSelectedImages([]);
+                          setSelectedDocuments([]);
                           setBackgroundColor('#ffffff');
                           setTextColor('#000000');
                           setFontStyle('normal');
@@ -646,7 +739,7 @@ export function ChannelPostsPanel({
                       </button>
                       <button
                         onClick={handleCreatePost}
-                        disabled={(!newPost.trim() && selectedImages.length === 0) || createPostMutation.isPending}
+                        disabled={(!newPost.trim() && selectedImages.length === 0 && selectedDocuments.length === 0) || createPostMutation.isPending}
                         className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                       >
                         {createPostMutation.isPending ? (
@@ -809,6 +902,28 @@ export function ChannelPostsPanel({
                             </div>
                           ))}
                         </div>
+                      </div>
+                    )}
+
+                    {/* Post Documents */}
+                    {post.documents && post.documents.length > 0 && (
+                      <div className="mb-3 space-y-2">
+                        {post.documents.map((doc: any, idx: number) => (
+                          <a
+                            key={idx}
+                            href={doc.documentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                          >
+                            <FileText className="w-8 h-8 text-blue-600 flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">{doc.fileName}</p>
+                              <p className="text-xs text-gray-500">{doc.documentType} • {doc.formattedFileSize}</p>
+                            </div>
+                            <span className="text-xs text-blue-600 font-medium">Descargar</span>
+                          </a>
+                        ))}
                       </div>
                     )}
 
@@ -1073,22 +1188,29 @@ export function ChannelPostsPanel({
         )
       ))}
 
-      {/* Access Management Sidebar - Using Portal to render outside scrollable container */}
-      {showAccessManager && createPortal(
-        <ChannelAccessManager
-          channelId={channelId}
-          channelName={channelName}
-          isChannelAdmin={isChannelAdmin || false}
-          adminUser={currentUser?.id ? {
-            id: currentUser.id,
-            firstName: currentUser.firstName || currentUser.name?.split(' ')[0] || 'Admin',
-            lastName: currentUser.lastName || currentUser.name?.split(' ').slice(1).join(' ') || '',
-            email: currentUser.email || '',
-            avatar: currentUser.avatar,
-          } : null}
-          onClose={() => setShowAccessManager(false)}
-        />,
-        document.body
+      {/* Access Management Sidebar - Rendered inline to avoid DOM errors */}
+      {showAccessManager && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+              <div className="pointer-events-auto w-screen max-w-md">
+                <ChannelAccessManager
+                  channelId={channelId}
+                  channelName={channelName}
+                  isChannelAdmin={isChannelAdmin || false}
+                  adminUser={currentUser?.id ? {
+                    id: currentUser.id,
+                    firstName: currentUser.firstName || currentUser.name?.split(' ')[0] || 'Admin',
+                    lastName: currentUser.lastName || currentUser.name?.split(' ').slice(1).join(' ') || '',
+                    email: currentUser.email || '',
+                    avatar: currentUser.avatar,
+                  } : null}
+                  onClose={() => setShowAccessManager(false)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Statistics Sidebar - Slide from right */}
@@ -1174,11 +1296,7 @@ function PostComments({ channelId, postId, currentUserId, currentUserName, curre
 
   // Render nested replies recursively
   const renderNestedReplies = (nestedReplies: any[]) => {
-    console.log('🔍 renderNestedReplies llamado con:', nestedReplies);
-    if (!nestedReplies || nestedReplies.length === 0) {
-      console.log('⚠️ No hay respuestas anidadas para renderizar');
-      return null;
-    }
+    if (!nestedReplies || nestedReplies.length === 0) return null;
     return nestedReplies.map((nestedReply: any) => (
       <div key={nestedReply.id} className="flex gap-2">
         <div className="w-5 h-5 rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center text-white text-[10px] font-semibold flex-shrink-0">
@@ -1268,22 +1386,22 @@ function PostComments({ channelId, postId, currentUserId, currentUserName, curre
     const reply = replyInputs[commentId];
     if (!reply?.trim()) return;
     
-    console.log('🚀 handleReplySubmit - commentId:', commentId, 'content:', reply.trim(), 'channelId:', channelId, 'postId:', postId);
+    console.log(' handleReplySubmit - commentId:', commentId, 'content:', reply.trim(), 'channelId:', channelId, 'postId:', postId);
     
     try {
-      console.log('📤 Enviando a createCommentMutation...');
+      console.log(' Enviando a createCommentMutation...');
       const result = await createCommentMutation.mutateAsync({ 
         channelId,
         postId, 
         content: reply.trim(),
         replyToCommentId: commentId
       });
-      console.log('✅ Respuesta enviada exitosamente:', result);
+      console.log('Respuesta enviada exitosamente:', result);
       
       setReplyInputs(prev => ({ ...prev, [commentId]: '' }));
       setReplyingTo(null);
     } catch (error) {
-      console.error('❌ Error sending reply:', error);
+      console.error(' Error sending reply:', error);
     }
   };
 
@@ -1295,14 +1413,14 @@ function PostComments({ channelId, postId, currentUserId, currentUserName, curre
     return <div className="text-center py-4 text-gray-500 text-sm">No hay comentarios aún</div>;
   }
 
-  console.log('📊 Comments data structure:', comments.map((c: any) => ({ 
+  console.log('Comments data structure:', comments.map((c: any) => ({ 
     id: c.id, 
     content: c.content?.substring(0, 20), 
     replyToCommentId: c.replyToCommentId,
     repliesCount: c.replies?.length,
     replies: c.replies?.map((r: any) => ({ id: r.id, content: r.content?.substring(0, 15), replyToCommentId: r.replyToCommentId, repliesCount: r.replies?.length }))
   })));
-  console.log('📋 FULL comments data:', JSON.stringify(comments, null, 2));
+  console.log(' FULL comments data:', JSON.stringify(comments, null, 2));
 
   return (
     <div className="space-y-2 mt-2">
@@ -1382,92 +1500,10 @@ function PostComments({ channelId, postId, currentUserId, currentUserName, curre
                 </div>
               )}
               
-              {/* Replies */}
+            {/* Replies - Use recursive function for all nesting levels */}
               {comment.replies && comment.replies.length > 0 && (
-                <div className="mt-2 space-y-2">
-                  {comment.replies.map((reply: any) => (
-                    <div key={reply.id} className="flex gap-2 pl-4">
-                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                        {reply.userFirstName?.charAt(0).toUpperCase() || 'U'}
-                      </div>
-                      <div className="flex-1">
-                        <div className="bg-gray-50 rounded-lg px-3 py-2 border border-gray-200">
-                          <span className="font-semibold text-xs text-gray-900">
-                            {reply.userFirstName} {reply.userLastName}
-                          </span>
-                          <p className="text-sm text-gray-800 mt-0.5">{reply.content}</p>
-                          <span className="text-xs text-gray-400">{formatTimeAgo(reply.createdAt)}</span>
-                        </div>
-                        
-                        {/* Like and Reply buttons for nested replies */}
-                        <div className="flex gap-4 px-3 py-1 mt-1">
-                          <button
-                            onClick={() => handleCommentLike(reply.id, reply.hasUserLiked)}
-                            className={`text-xs flex items-center gap-1 transition-colors ${
-                              reply.hasUserLiked
-                                ? 'text-blue-500 hover:text-blue-600 font-medium' 
-                                : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                          >
-                            <span>👍</span>
-                            Me gusta
-                          </button>
-                          
-                          <button
-                            onClick={() => handleReplyToComment(reply.id)}
-                            className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
-                          >
-                            Responder
-                          </button>
-                        </div>
-                        
-                        {/* Reply input for nested replies */}
-                        {replyingTo === reply.id && (
-                          <div className="mt-2 px-3">
-                            <div className="bg-gray-100 rounded-lg p-2 border border-gray-200">
-                              <div className="flex items-center gap-2 mb-2 text-xs text-gray-600">
-                                <span>Respondiendo a {reply.userFirstName}</span>
-                                <button
-                                  onClick={() => setReplyingTo(null)}
-                                  className="text-gray-400 hover:text-gray-600"
-                                >
-                                  ✕
-                                </button>
-                              </div>
-                              <div className="flex gap-2">
-                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                                  {currentUserInitial}
-                                </div>
-                                <input
-                                  type="text"
-                                  value={replyInputs[reply.id] || ''}
-                                  onChange={(e) => setReplyInputs(prev => ({ ...prev, [reply.id]: e.target.value }))}
-                                  onKeyPress={(e) => e.key === 'Enter' && handleReplySubmit(reply.id)}
-                                  placeholder="Escribe una respuesta..."
-                                  className="flex-1 px-2 py-1 bg-white border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                  autoFocus
-                                />
-                                <button
-                                  onClick={() => handleReplySubmit(reply.id)}
-                                  disabled={!replyInputs[reply.id]?.trim()}
-                                  className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  Enviar
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* Nested replies (recursive) */}
-                        {reply.replies && reply.replies.length > 0 && (
-                          <div className="mt-2 space-y-2 pl-4 border-l-2 border-gray-200">
-                            {renderNestedReplies(reply.replies)}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                <div className="mt-2 space-y-2 pl-4 border-l-2 border-gray-200">
+                  {renderNestedReplies(comment.replies)}
                 </div>
               )}
             </div>
