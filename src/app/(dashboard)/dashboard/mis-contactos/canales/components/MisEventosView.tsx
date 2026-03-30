@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react';
 import { Calendar, MapPin, Users, Clock, Search, Filter, ChevronDown, X, Heart, MessageCircle, Share2 } from 'lucide-react';
-import { useGetChannels, useChannelEvents } from '@/presentation/hooks/useContacts';
+import { useGetChannels, useGetMyCreatedEvents } from '@/presentation/hooks/useContacts';
+import CreateEventModal from './CreateEventModal';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface MisEventosViewProps {
   user: any;
@@ -11,47 +13,33 @@ interface MisEventosViewProps {
 }
 
 export default function MisEventosView({ user, onEventSelect, onCreateEvent }: MisEventosViewProps) {
-  const { data: channels, isLoading: channelsLoading } = useGetChannels(user?.id);
+  const { data: myCreatedEvents, isLoading: eventsLoading } = useGetMyCreatedEvents(user?.id);
+  const { data: userChannels } = useGetChannels(user?.id);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeFilter, setActiveFilter] = useState<'todos' | 'proximos' | 'pasados' | 'mis_respuestas'>('proximos');
+  const [activeFilter, setActiveFilter] = useState<'todos' | 'proximos' | 'pasados' | 'suscritos'>('todos');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [showCreateEventModal, setShowCreateEventModal] = useState(false);
+  const queryClient = useQueryClient();
 
   // Check if user can create events (Agents and Inmobiliarias)
   const canCreateEvent = user?.role === 'AGENT' || user?.role === 'INMOBILIARIA';
-
-  // Get events from subscribed channels using real backend data
-  const getAllEvents = () => {
-    if (!channels) return [];
-    
-    const allEvents: any[] = [];
-    
-    // Only process channels where user is subscribed
-    const subscribedChannels = channels.filter((channel: any) => channel.isSubscribed);
-    
-    subscribedChannels.forEach((channel: any) => {
-      // Check if channel has events (when backend integrates them)
-      if (channel.events && Array.isArray(channel.events)) {
-        channel.events.forEach((event: any) => {
-          allEvents.push({
-            ...event,
-            channelName: channel.name,
-            channelCity: channel.city,
-            channelId: channel.id,
-            channelAvatar: channel.avatar,
-            userResponseStatus: event.userResponseStatus || null,
-          });
-        });
-      }
-    });
-    
-    return allEvents;
-  };
-
-  const allEvents = getAllEvents();
   
+  // Debug for button visibility
+  console.log('🔍 DEBUG - canCreateEvent:', canCreateEvent);
+  console.log('🔍 DEBUG - user role:', user?.role);
+  console.log('🔍 DEBUG - showCreateEventModal:', showCreateEventModal);
+  
+  // Get first channel ID for creating events
+  const firstChannelId = userChannels?.[0]?.id || 1;
+  
+  // Debug para verificar el estado
+  console.log('🔍 DEBUG - showCreateEventModal:', showCreateEventModal);
+  console.log('🔍 DEBUG - canCreateEvent:', canCreateEvent);
+  console.log('🔍 DEBUG - userChannels:', userChannels);
+
   // Filter events
   const getFilteredEvents = () => {
-    let filtered = allEvents;
+    let filtered = myCreatedEvents || [];
     
     // Filter by search term
     if (searchTerm) {
@@ -70,9 +58,6 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
         break;
       case 'pasados':
         filtered = filtered.filter((event: any) => new Date(event.startDateTime) <= now);
-        break;
-      case 'mis_respuestas':
-        filtered = filtered.filter((event: any) => event.userResponseStatus);
         break;
       // 'todos' no filter
     }
@@ -130,12 +115,12 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
     return emojis[eventType] || '📅';
   };
 
-  if (channelsLoading) {
+  if (eventsLoading) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-          <p className="text-gray-500 text-sm">Loading your events...</p>
+          <p className="text-gray-500 text-sm">Cargando tus eventos...</p>
         </div>
       </div>
     );
@@ -148,19 +133,22 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
           <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
             <Calendar className="w-8 h-8 text-gray-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No events available</h3>
-          <p className="text-gray-500 text-sm mb-4">
-            {activeFilter === 'mis_respuestas' 
-              ? "You haven't responded to any events yet. Explore channels and participate in events that interest you."
-              : "No events available in your subscribed channels. Subscribe to more channels to see their events."
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No has creado eventos</h3>
+          <p className="text-gray-500 text-sm mb-6">
+            {canCreateEvent 
+              ? "Comienza creando tu primer evento para compartir con tus seguidores."
+              : "No tienes eventos creados. Los agentes e inmobiliarias pueden crear eventos."
             }
           </p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-blue-700 text-sm font-medium mb-1">💡 Tip:</p>
-            <p className="text-blue-600 text-xs">
-              Explore the "Discover channels" section to find channels with interesting events and subscribe to them.
-            </p>
-          </div>
+          {canCreateEvent && onCreateEvent && (
+            <button
+              onClick={onCreateEvent}
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-teal-700 transition-colors mx-auto"
+            >
+              <Calendar className="w-5 h-5" />
+              Crear evento
+            </button>
+          )}
         </div>
       </div>
     );
@@ -171,22 +159,41 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-bold text-gray-900">My Events</h2>
-          {canCreateEvent && onCreateEvent && (
+          <h2 className="text-xl font-bold text-gray-900">Mis Eventos Creados</h2>
+          {/* Botón de prueba */}
+          <button
+            onClick={() => console.log('Botón de prueba clicked')}
+            className="px-4 py-2 bg-red-500 text-white rounded-lg font-medium"
+          >
+            BOTÓN PRUEBA
+          </button>
+          {canCreateEvent && (
             <button
-              onClick={onCreateEvent}
+              onClick={() => setShowCreateEventModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-teal-700 transition-colors"
             >
               <Calendar className="w-4 h-4" />
-              Create Event
+              Crear Evento
             </button>
           )}
         </div>
         <p className="text-gray-600 text-sm">
-          Events from channels you're subscribed to. Participate, comment and connect with other professionals.
-          {canCreateEvent && " As a professional, you can also create your own events."}
+          Eventos que has creado en tus canales. Gestiona tus eventos y ve quién participa.
+          {canCreateEvent && " Como profesional, puedes crear nuevos eventos para tu audiencia."}
         </p>
       </div>
+
+      {/* Create Event Modal */}
+      <CreateEventModal
+        isOpen={showCreateEventModal}
+        onClose={() => setShowCreateEventModal(false)}
+        channelId={firstChannelId}
+        onSuccess={() => {
+          setShowCreateEventModal(false);
+          // Refrescar eventos del usuario
+          queryClient.invalidateQueries({ queryKey: ['my-created-events', user?.id] });
+        }}
+      />
 
       {/* Search and Filter */}
       <div className="flex gap-3 mb-6">
@@ -194,7 +201,7 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
           <Search className="w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search events..."
+            placeholder="Buscar mis eventos..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="bg-transparent text-sm text-gray-700 placeholder-gray-400 flex-1 focus:outline-none"
@@ -208,10 +215,9 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
           >
             <Filter className="w-4 h-4 text-gray-600" />
             <span className="text-sm text-gray-700">
-              {activeFilter === 'todos' && 'All'}
-              {activeFilter === 'proximos' && 'Upcoming'}
-              {activeFilter === 'pasados' && 'Past'}
-              {activeFilter === 'mis_respuestas' && 'My responses'}
+              {activeFilter === 'todos' && 'Todos'}
+              {activeFilter === 'proximos' && 'Próximos'}
+              {activeFilter === 'pasados' && 'Pasados'}
             </span>
             <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`} />
           </button>
@@ -224,7 +230,7 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
                   activeFilter === 'todos' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
                 }`}
               >
-                All events
+                Todos los eventos
               </button>
               <button
                 onClick={() => { setActiveFilter('proximos'); setShowFilterDropdown(false); }}
@@ -232,7 +238,7 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
                   activeFilter === 'proximos' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
                 }`}
               >
-                Upcoming events
+                Eventos próximos
               </button>
               <button
                 onClick={() => { setActiveFilter('pasados'); setShowFilterDropdown(false); }}
@@ -240,15 +246,7 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
                   activeFilter === 'pasados' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
                 }`}
               >
-                Past events
-              </button>
-              <button
-                onClick={() => { setActiveFilter('mis_respuestas'); setShowFilterDropdown(false); }}
-                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                  activeFilter === 'mis_respuestas' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-                }`}
-              >
-                My responses
+                Eventos pasados
               </button>
             </div>
           )}
@@ -278,11 +276,11 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getEventStatusColor(event)}`}>
                     {getEventStatusText(event)}
                   </span>
-                  {event.userResponseStatus && (
-                    <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                      {event.userResponseStatus === 'ATTENDING' ? 'Asistiré' : 'Interesado'}
-                    </span>
-                  )}
+                    {event.userResponseStatus && (
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                        {event.userResponseStatus === 'ATTENDING' ? 'Asistiré' : 'Interesado'}
+                      </span>
+                    )}
                 </div>
 
                 {/* Channel Name */}
@@ -315,6 +313,44 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
                     {event.attendeeCount || 0} asistentes
                   </div>
                 </div>
+
+                {activeFilter === 'pasados' && (
+                  <div>
+                    <h4 className="font-medium text-gray-700 mb-2">🗂️ Eventos pasados</h4>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Eventos que ya finalizaron. ¡Gracias por participar!
+                    </p>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <p className="text-sm text-gray-700">
+                        <strong>Finalizados:</strong> {getFilteredEvents().length} eventos
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {activeFilter === 'suscritos' && (
+                  <div>
+                    <h4 className="font-medium text-gray-700 mb-2 flex items-center gap-2">
+                      ⭐ Eventos suscritos
+                      <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                        {getFilteredEvents().length} activos
+                      </span>
+                    </h4>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Eventos donde estás suscrito y participando activamente.
+                    </p>
+                    <div className="space-y-3">
+                      {getFilteredEvents().slice(0, 3).map((event: any, index: number) => (
+                        <div key={`${event.channelId}-${event.id}-${index}`} className="bg-white rounded-lg border border-gray-200 p-4">
+                          <h5 className="font-medium text-gray-900 mb-1">{event.title}</h5>
+                          <p className="text-sm text-gray-600">
+                            {formatEventDate(event.startDateTime)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2">

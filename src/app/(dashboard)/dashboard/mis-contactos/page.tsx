@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import StatusDetailPanel from './StatusDetailPanel';
 import { GrupoPostsPanel } from './grupos/components/GrupoPostsPanel';
 import CanalesListPanel from './canales/components/CanalesListPanel';
@@ -39,7 +41,7 @@ import { toast } from '@/presentation/store/toastStore';
 import StatusInput, { StatusInteractions } from '@/components/StatusInput';
 import LocationAutocomplete from '@/presentation/components/LocationAutocomplete';
 import { useGooglePlaces } from '@/presentation/hooks/useGooglePlaces';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useWebSocket, getCurrentUserId } from '@/presentation/hooks/useWebSocket';
 
 // Helper function for API calls
 async function apiCall(endpoint: string, options: RequestInit = {}) {
@@ -106,6 +108,74 @@ function timeAgo(date: Date | string): string {
   if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
   if (diff < 604800) return `${Math.floor(diff / 86400)}d`;
   return d.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit' });
+}
+
+// Formatear "última vez conectado" estilo WhatsApp
+function formatLastSeen(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const now = new Date();
+  const diff = Math.floor((now.getTime() - d.getTime()) / 1000);
+  
+  // Menos de 1 minuto
+  if (diff < 60) return 'ahora';
+  
+  // Menos de 1 hora
+  if (diff < 3600) {
+    const mins = Math.floor(diff / 60);
+    return `hace ${mins} minuto${mins > 1 ? 's' : ''}`;
+  }
+  
+  // Menos de 24 horas
+  if (diff < 86400) {
+    const hours = Math.floor(diff / 3600);
+    return `hace ${hours} hora${hours > 1 ? 's' : ''}`;
+  }
+  
+  // Menos de 7 días
+  if (diff < 604800) {
+    const days = Math.floor(diff / 86400);
+    if (days === 1) return 'ayer';
+    return `hace ${days} días`;
+  }
+  
+  // Más de 7 días - mostrar fecha
+  return d.toLocaleDateString('es-PE', { 
+    day: '2-digit', 
+    month: 'short',
+    year: d.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+  });
+}
+
+// Formatear separador de fecha estilo WhatsApp
+function formatDateSeparator(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  // Hoy
+  if (d.toDateString() === now.toDateString()) {
+    return 'Hoy';
+  }
+  
+  // Ayer
+  if (d.toDateString() === yesterday.toDateString()) {
+    return 'Ayer';
+  }
+  
+  // Esta semana
+  const diffDays = Math.floor((now.getTime() - d.getTime()) / 86400000);
+  if (diffDays < 7) {
+    const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    return days[d.getDay()];
+  }
+  
+  // Fecha completa
+  return d.toLocaleDateString('es-PE', { 
+    day: '2-digit', 
+    month: 'short',
+    year: d.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+  });
 }
 
 function timeLeft(expiresAt: Date | string): string {
@@ -675,10 +745,20 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
   const { searchPredictions, loading: placesLoading } = useGooglePlaces();
 
   const { data: chats, isLoading: loadingChats, error: chatsError } = useGetChats(filter);
-  const { data: messages, isLoading: loadingMessages } = useGetChatMessages(selectedChatId!, { enabled: !!selectedChatId });
+  const { data: messages, isLoading: loadingMessages, error: messagesError } = useGetChatMessages(selectedChatId!, { enabled: !!selectedChatId });
   const sendMessage = useSendMessage();
   const markAsRead = useMarkChatAsRead();
   const toggleFavorite = useToggleFavoriteChat();
+
+  // Helper para obtener ID del remitente (funciona con backend real)
+  const getSenderId = (msg: any) => {
+    return msg.senderId ?? 
+           msg.sender?.id ?? 
+           msg.userId ?? 
+           msg.fromUserId ?? 
+           msg.authorId ?? 
+           null;
+  };
 
   // Queries para búsqueda específica
   const { data: searchResults = [], isLoading: loadingSearch } = useQuery({
@@ -1668,6 +1748,7 @@ function GrupoDetailPanel({ group, user, onBack }: { group: any; user: any; onBa
 
 // ──── MAIN PAGE COMPONENT ────────────────────────────────────────────────────────────────
 export default function MisContactosPage() {
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<MainTab>('chats');
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [selectedStatusId, setSelectedStatusId] = useState<number | null>(null);
@@ -1678,8 +1759,14 @@ export default function MisContactosPage() {
   const [activeRightView, setActiveRightView] = useState<'default' | 'create-group' | 'discover'>('default' as const);
   const [showNewStatus, setShowNewStatus] = useState(false);
   const [newMessage, setNewMessage] = useState('');
+  const [pinnedMessage, setPinnedMessage] = useState<any>(null);
+  const [contextMenu, setContextMenu] = useState<{ msg: any; x: number; y: number } | null>(null);
+  const [replyToMessage, setReplyToMessage] = useState<any>(null);
+  const [showReactionPicker, setShowReactionPicker] = useState<{ msg: any; x: number; y: number } | null>(null);
+  const [localReactions, setLocalReactions] = useState<{[key: string]: {[emoji: string]: {count: number, users: string[]}}}>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user, token, isAuthenticated } = useAuthStore();
+  const [initialChatProcessed, setInitialChatProcessed] = useState(false);
 
   // Monitorear cambios en selectedGroup para depuración
   useEffect(() => {
@@ -1688,7 +1775,32 @@ export default function MisContactosPage() {
   
   // Get chats data to find selected chat
   const { data: chats } = useGetChats('all');
-  const { data: messages, isLoading: loadingMessages } = useGetChatMessages(selectedChatId!, { enabled: !!selectedChatId });
+  const { data: messages, isLoading: loadingMessages, error: messagesError } = useGetChatMessages(selectedChatId!, { enabled: !!selectedChatId });
+  
+  // Debug messages
+  useEffect(() => {
+    console.log('📨 Messages data:', messages);
+    console.log('📨 Loading:', loadingMessages);
+    console.log('📨 Messages Error:', messagesError);
+    console.log('📨 Selected chat ID:', selectedChatId);
+    
+    // Debug específico para respuestas
+    if (messages && messages.length > 0) {
+      messages.forEach((msg: any, index: number) => {
+        console.log(`📨 Mensaje ${index}:`, {
+          id: msg.id,
+          content: msg.content,
+          isOwn: msg.isOwn,
+          replyToMessageId: msg.replyToMessageId,
+          replyToContent: msg.replyToContent,
+          replyToSenderName: msg.replyToSenderName,
+          replyToIsOwn: msg.replyToIsOwn,
+          fullMessage: msg
+        });
+      });
+    }
+  }, [messages, loadingMessages, selectedChatId]);
+  
   const sendMessage = useSendMessage();
   const markAsRead = useMarkChatAsRead();
   const toggleFavorite = useToggleFavoriteChat();
@@ -1707,15 +1819,148 @@ export default function MisContactosPage() {
     }, 100);
   }, [messages]);
 
-  // Mark chat as read when selected
+  // Close context menu and reaction picker when clicking outside
   useEffect(() => {
-    if (selectedChatId) markAsRead.mutate(selectedChatId);
-  }, [selectedChatId]);
+    const handleClick = () => {
+      setContextMenu(null);
+      setShowReactionPicker(null);
+    };
+    if (contextMenu || showReactionPicker) {
+      document.addEventListener('click', handleClick);
+      return () => document.removeEventListener('click', handleClick);
+    }
+  }, [contextMenu, showReactionPicker]);
+
+  const queryClient = useQueryClient();
+
+  // Función para manejar reacciones
+  const handleReaction = (msg: any, emoji: string) => {
+    const messageId = String(msg.id);
+    const userId = String(user?.id || 'anonymous');
+    
+    setLocalReactions(prev => {
+      const messageReactions = { ...prev[messageId] };
+      const reaction = messageReactions[emoji] || { count: 0, users: [] };
+      
+      // Si el usuario ya reaccionó con este emoji, quitar la reacción
+      if (reaction.users.includes(userId)) {
+        reaction.count--;
+        reaction.users = reaction.users.filter(id => id !== userId);
+        if (reaction.count === 0) {
+          delete messageReactions[emoji];
+        }
+      } else {
+        // Si no ha reaccionado, añadir la reacción
+        reaction.count++;
+        reaction.users.push(userId);
+        messageReactions[emoji] = reaction;
+      }
+      
+      return {
+        ...prev,
+        [messageId]: messageReactions
+      };
+    });
+    
+    setShowReactionPicker(null);
+    console.log('💫 Reacción local:', emoji, 'Mensaje:', messageId, 'Usuario:', userId);
+  };
+
+  // Conectar WebSocket para mensajes en tiempo real (manejo automático de instancias)
+  const { isConnected: wsConnected } = useWebSocket({
+    onNewMessage: (message) => {
+      console.log('💬 Mensaje WebSocket recibido:', message);
+      // Invalidar cache para refrescar mensajes
+      queryClient.invalidateQueries({ queryKey: ['chat-messages', message.chatId] });
+      queryClient.invalidateQueries({ queryKey: ['chats'] });
+    },
+    onConnectionChange: (connected) => {
+      console.log('🔌 WebSocket conexión:', connected ? 'Conectado' : 'Desconectado');
+    }
+  });
+
+  // Handle auto-open chat from event organizer (using localStorage)
+  useEffect(() => {
+    if (!chats || initialChatProcessed) return;
+    
+    // Check for organizer data in localStorage
+    const organizerData = localStorage.getItem('chat_with_organizer');
+    
+    if (organizerData) {
+      const { userId, name, phone, timestamp } = JSON.parse(organizerData);
+      
+      // Only use if less than 30 seconds old
+      if (Date.now() - timestamp < 30000) {
+        console.log('📱 Datos de organizador encontrados:', { userId, name, phone });
+        
+        // Switch to chats tab
+        setActiveTab('chats');
+        
+        // Find existing chat with this user
+        const existingChat = chats.find((c: any) => 
+          c.participantId === userId || c.targetUserId === userId
+        );
+        
+        if (existingChat) {
+          console.log('✅ Chat existente encontrado:', existingChat.id);
+          setSelectedChatId(existingChat.id);
+        } else {
+          console.log('🆕 Creando nuevo chat con usuario:', userId);
+          // Create new chat
+          apiCall('/contacts/extended/chats', {
+            method: 'POST',
+            body: JSON.stringify({
+              targetUserId: userId,
+              initialMessage: `Hola ${name || ''}, me interesa contactarte sobre tu evento.`,
+              interactionType: 'event_contact'
+            })
+          }).then((response: any) => {
+            console.log('✅ Chat creado:', response);
+            if (response?.id) {
+              setSelectedChatId(response.id);
+            }
+          }).catch((err: any) => {
+            console.error('❌ Error creando chat:', err);
+            toast.error('No se pudo iniciar la conversación');
+          });
+        }
+      }
+      
+      // Clear localStorage to prevent reprocessing
+      localStorage.removeItem('chat_with_organizer');
+    }
+    
+    setInitialChatProcessed(true);
+  }, [chats, initialChatProcessed]);
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !selectedChatId) return;
-    sendMessage.mutate({ chatId: selectedChatId, content: newMessage, type: 'TEXT' });
+    
+    // Construir el payload del mensaje
+    const messagePayload: any = {
+      chatId: selectedChatId,
+      content: newMessage,
+      type: 'TEXT'
+    };
+    
+    // Agregar replyToMessage si está respondiendo a un mensaje
+    if (replyToMessage) {
+      messagePayload.replyToMessageId = String(replyToMessage.id);  // Convertir a string
+      console.log('📨 Enviando respuesta:', {
+        chatId: selectedChatId,
+        content: newMessage,
+        replyToMessageId: String(replyToMessage.id),
+        replyToContent: replyToMessage.content
+      });
+    }
+    
+    sendMessage.mutate(messagePayload);
     setNewMessage('');
+    
+    // Limpiar el estado de respuesta después de enviar
+    if (replyToMessage) {
+      setReplyToMessage(null);
+    }
   };
 
   const { data: chatsData } = useGetChats('unread');
@@ -1824,90 +2069,352 @@ export default function MisContactosPage() {
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Si hay un chat seleccionado, mostrar conversación ocupando todo el espacio */}
         {activeTab === 'chats' && selectedChatId && chats?.find((c: any) => c.id === selectedChatId) ? (
-          <div className="flex flex-col h-full">
-            {/* Header conversación */}
-            <div className="flex items-center gap-3 px-4 py-3 bg-[#075e54] border-b border-[#054d44]">
-              <button onClick={() => setSelectedChatId(null)}
-                className="text-white/70 hover:text-white transition-colors">
+          <div className="flex flex-col h-full" onClick={() => setContextMenu(null)}>
+    
+            {/* ── HEADER ── */}
+            <div className="flex items-center gap-3 px-4 py-3 bg-[#075e54] border-b border-[#054d44] flex-shrink-0">
+              <button onClick={() => {
+                setSelectedChatId(null);
+                setReplyToMessage(null);
+              }} className="text-white/70 hover:text-white transition-colors">
                 <IC.ArrowBack />
               </button>
               <div className="flex-1 min-w-0">
-                <p className="text-white font-semibold text-sm">{(() => {
-                  const chat = chats?.find((c: { id: number; participantName: string }) => c.id === selectedChatId);
-                  return chat?.participantName;
-                })()}</p>
-                <p className="text-white/60 text-xs">{(() => {
-                  const chat = chats?.find((c: { id: number; participantEmail: string }) => c.id === selectedChatId);
-                  return chat?.participantEmail;
-                })()}</p>
+                <p className="text-white font-semibold text-sm">
+                  {chats?.find((c: any) => c.id === selectedChatId)?.participantName}
+                </p>
+                <p className="text-white/70 text-xs">
+                  {(() => {
+                    const chat = chats?.find((c: any) => c.id === selectedChatId);
+                    const lastSeen = chat?.participantLastSeen || chat?.lastMessageAt;
+                    return lastSeen ? `visto ${formatLastSeen(lastSeen)}` : 'en línea';
+                  })()}
+                </p>
               </div>
-              <button onClick={() => toggleFavorite.mutate(selectedChatId)}
-                className={`text-sm ${(() => {
-                  const chat = chats?.find((c: { id: number; isFavorite: boolean }) => c.id === selectedChatId);
-                  return chat?.isFavorite ? 'text-yellow-400' : 'text-white/40 hover:text-white/70';
-                })()} transition-colors`}>
+              <button
+                onClick={() => toggleFavorite.mutate(selectedChatId)}
+                className={`text-sm transition-colors ${
+                  chats?.find((c: any) => c.id === selectedChatId)?.isFavorite
+                    ? 'text-yellow-400'
+                    : 'text-white/40 hover:text-white/70'
+                }`}
+              >
                 ⭐
               </button>
             </div>
-
-            {/* Área de mensajes con fondo verde estilo WhatsApp */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4"
-                 style={{
-                   backgroundColor: '#e5ddd5',
-                   backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0)`,
-                   backgroundSize: '24px 24px',
-                 }}>
-              {loadingMessages ? (
-                <div className="flex justify-center py-8">
-                  <div className="w-6 h-6 rounded-full border-2 border-white/30 border-t-transparent animate-spin" />
+    
+            {/* ── BANNER MENSAJE FIJADO ── */}
+            {pinnedMessage && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-white border-b border-gray-200 flex-shrink-0">
+                <div className="w-1 h-8 rounded-full bg-[#075e54] flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-semibold text-[#075e54]">
+                    📌 {pinnedMessage.isOwn ? 'Tú' : pinnedMessage.senderName?.split(' ')[0]}
+                  </p>
+                  <p className="text-xs text-gray-600 truncate">{pinnedMessage.content}</p>
                 </div>
-              ) : messages?.length ? (
-                messages.map((msg: any) => (
-                  <div key={msg.id} className={`flex ${user && msg.senderId === user.id ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[70%] px-4 py-2 rounded-2xl ${
-                      user && msg.senderId === user.id 
-                        ? 'bg-[#dcf8c6] text-gray-800' 
-                        : 'bg-white text-gray-800 shadow-sm'
-                    }`}>
-                      <p className="text-sm break-words">{msg.content}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {new Date(msg.createdAt).toLocaleTimeString('es-PE', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </p>
-                    </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setPinnedMessage(null); }}
+                  className="text-gray-400 hover:text-gray-600 text-xl leading-none flex-shrink-0 ml-2"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+    
+            {/* ── ÁREA DE MENSAJES ── */}
+            <div
+              className="flex-1 overflow-y-auto px-3 py-3 space-y-1"
+              style={{
+                backgroundColor: '#e5ddd5',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M0 0h80v80H0z' fill='%23e5ddd5'/%3E%3Cpath d='M40 0v80M0 40h80' stroke='%23d4c9bf' stroke-width='0.5' opacity='0.4'/%3E%3C/svg%3E")`,
+              }}
+            >
+              {messagesError ? (
+                <div className="flex flex-col items-center justify-center h-full gap-4 text-red-600 p-4">
+                  <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                    <span className="text-2xl">⚠️</span>
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-500 text-sm">No hay mensajes aÃºn</p>
-                  <p className="text-gray-400 text-xs mt-1">EnvÃ­a el primer mensaje</p>
+                  <div className="text-center">
+                    <p className="font-semibold">Error al cargar mensajes</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {messagesError.message || 'Inténtalo de nuevo más tarde'}
+                    </p>
+                    <button 
+                      onClick={() => window.location.reload()}
+                      className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700"
+                    >
+                      Reintentar
+                    </button>
+                  </div>
                 </div>
+              ) : loadingMessages ? (
+                <div className="flex justify-center py-8">
+                  <div className="w-6 h-6 rounded-full border-2 border-[#075e54] border-t-transparent animate-spin" />
+                </div>
+              ) : !messages?.length ? (
+                <div className="flex flex-col items-center justify-center h-full gap-2 text-gray-500">
+                  <p className="text-sm">Sin mensajes aún</p>
+                </div>
+              ) : (
+                messages
+                  .slice()
+                  .sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+                  .map((msg: any, index: number, arr: any[]) => {
+                    // ✅ CAMPO CORRECTO: el backend devuelve isOwn: true/false
+                    const isMe = msg.isOwn === true;
+    
+                    const prevMsg = arr[index - 1] ?? null;
+                    const showDate =
+                      !prevMsg ||
+                      new Date(msg.createdAt).toDateString() !== new Date(prevMsg.createdAt).toDateString();
+    
+                    const isPinned = pinnedMessage?.id === msg.id;
+    
+                    return (
+                      <div key={msg.id ?? `msg-${index}`}>
+    
+                        {/* Separador de fecha */}
+                        {showDate && (
+                          <div className="flex justify-center my-3">
+                            <span
+                              className="text-[11px] px-3 py-1 rounded-lg shadow-sm"
+                              style={{ background: '#d9f0f9', color: '#54656f' }}
+                            >
+                              {formatDateSeparator(new Date(msg.createdAt))}
+                            </span>
+                          </div>
+                        )}
+    
+                        {/* Fila del mensaje */}
+                        <div
+                          className={`flex mb-0.5 ${isMe ? 'justify-end' : 'justify-start'}`}
+                          onContextMenu={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setContextMenu({ msg, x: e.clientX, y: e.clientY });
+                          }}
+                        >
+                          {/* Burbuja */}
+                          <div
+                            className={`
+                              relative max-w-[70%] px-3 py-2 shadow-sm text-sm leading-relaxed cursor-pointer
+                              ${isMe
+                                ? 'rounded-tl-2xl rounded-tr-sm rounded-bl-2xl rounded-br-2xl'
+                                : 'rounded-tl-sm rounded-tr-2xl rounded-bl-2xl rounded-br-2xl'
+                              }
+                              ${isPinned ? 'ring-2 ring-[#075e54]' : ''}
+                            `}
+                            style={{
+                              background: isMe ? '#dcf8c6' : '#ffffff',
+                              color: '#111b21',
+                              wordBreak: 'break-word',
+                              minWidth: '80px', // Aumentado para evitar superposición
+                              paddingBottom: '20px', // Espacio para timestamp
+                            }}
+                          >
+                            {/* Mensaje respondido */}
+                            {(msg.replyToContent || msg.replyToSenderName) && (
+                              <div className="mb-1 p-2 bg-gray-100 rounded-md border-l-2 border-blue-500">
+                                <p className="text-xs text-gray-600 font-medium">
+                                  Respondiendo a {msg.replyToIsOwn ? 'ti mismo' : msg.replyToSenderName?.split(' ')[0] || 'alguien'}
+                                </p>
+                                <p className="text-xs text-gray-800 truncate">{msg.replyToContent}</p>
+                              </div>
+                            )}
+    
+                            {/* Indicador fijado dentro burbuja */}
+                            {isPinned && (
+                              <span className="text-[10px] text-[#075e54] font-semibold block mb-0.5">
+                                📌 Fijado
+                              </span>
+                            )}
+                            
+                            {/* Reacciones */}
+                            {(() => {
+                              const messageId = String(msg.id);
+                              const messageReactions = localReactions[messageId] || {};
+                              const reactionList = Object.entries(messageReactions).map(([emoji, data]) => ({
+                                emoji,
+                                count: data.count,
+                                users: data.users
+                              }));
+                              
+                              return reactionList.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mb-1">
+                                  {reactionList.map((reaction, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="text-xs bg-gray-100 rounded-full px-1.5 py-0.5 flex items-center gap-0.5"
+                                    >
+                                      {reaction.emoji} {reaction.count}
+                                    </span>
+                                  ))}
+                                </div>
+                              );
+                            })()}
+    
+                            <span className="break-words">{msg.content}</span>
+    
+                            {/* Timestamp + doble check */}
+                            <div className="absolute bottom-1 right-2 flex items-center gap-0.5 pointer-events-none">
+                              <span className="text-[10px]" style={{ color: '#667781' }}>
+                                {new Date(msg.createdAt).toLocaleTimeString('es-PE', {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  hour12: false, // Usar formato 24h como WhatsApp
+                                })}
+                              </span>
+                              {isMe && (
+                                <svg viewBox="0 0 16 15" className="w-4 h-3" style={{ fill: '#53bdeb' }}>
+                                  <path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z" />
+                                </svg>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+    
+                      </div>
+                    );
+                  })
               )}
               <div ref={messagesEndRef} />
             </div>
-
-            {/* Input de mensaje */}
-            <div className="p-4 bg-white border-t border-gray-200">
+    
+            {/* ── MENÚ CONTEXTUAL (clic derecho sobre mensaje) ── */}
+            {contextMenu && (
+              <>
+                <div
+                  className="fixed z-[9999] bg-white rounded-xl shadow-2xl border border-gray-100 py-1 min-w-[180px] overflow-hidden"
+                  style={{ top: contextMenu.y, left: Math.min(contextMenu.x, window.innerWidth - 200) }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                    onClick={() => {
+                      setReplyToMessage(contextMenu.msg);
+                      setContextMenu(null);
+                    }}
+                  >
+                    <span>↩️</span>
+                    Responder
+                  </button>
+    
+                  <button
+                    className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                    onClick={() => {
+                      navigator.clipboard.writeText(contextMenu.msg.content ?? '');
+                      setContextMenu(null);
+                    }}
+                  >
+                    <span>📋</span>
+                    Copiar
+                  </button>
+                  
+                  <button
+                    className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                    onClick={() => {
+                      setContextMenu(null);
+                      setTimeout(() => {
+                        setShowReactionPicker({ msg: contextMenu.msg, x: contextMenu.x, y: contextMenu.y - 60 });
+                      }, 100);
+                    }}
+                  >
+                    <span>😊</span>
+                    Reaccionar
+                  </button>
+    
+                  <button
+                    className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                    onClick={() => {
+                      setPinnedMessage(contextMenu.msg);
+                      setContextMenu(null);
+                    }}
+                  >
+                    <span>📌</span>
+                    {pinnedMessage?.id === contextMenu.msg.id ? 'Ya está fijado' : 'Fijar mensaje'}
+                  </button>
+    
+                  {pinnedMessage?.id === contextMenu.msg.id && (
+                    <button
+                      className="w-full px-4 py-2.5 text-left text-sm text-red-500 hover:bg-red-50 flex items-center gap-3 transition-colors"
+                      onClick={() => {
+                        setPinnedMessage(null);
+                        setContextMenu(null);
+                      }}
+                    >
+                      <span>🗑️</span>
+                      Desfijar mensaje
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+    
+            {/* ── PICKER DE REACCIONES ── */}
+            {showReactionPicker && (
+              <div
+                className="fixed z-[10000] bg-white rounded-xl shadow-2xl border border-gray-100 p-2 flex gap-1"
+                style={{ top: showReactionPicker.y, left: Math.min(showReactionPicker.x, window.innerWidth - 250) }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {['👍', '❤️', '😂', '😮', '😢'].map((emoji) => (
+                  <button
+                    key={emoji}
+                    className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-lg transition-colors"
+                    onClick={() => handleReaction(showReactionPicker.msg, emoji)}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+                <button
+                  className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-sm transition-colors"
+                  onClick={() => setShowReactionPicker(null)}
+                >
+                  +
+                </button>
+              </div>
+            )}
+    
+            {/* ── INPUT DE MENSAJE ── */}
+            <div className="px-3 py-2 bg-[#f0f2f5] flex-shrink-0">
+              {/* Mensaje respondido */}
+              {replyToMessage && (
+                <div className="mb-2 p-2 bg-white rounded-lg border border-gray-200 flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-gray-600 font-medium">
+                      Respondiendo a {replyToMessage.isOwn ? 'ti mismo' : replyToMessage.senderName?.split(' ')[0] || 'alguien'}
+                    </p>
+                    <p className="text-sm text-gray-800 truncate">{replyToMessage.content}</p>
+                  </div>
+                  <button
+                    onClick={() => setReplyToMessage(null)}
+                    className="ml-2 text-gray-400 hover:text-gray-600 text-xl leading-none"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+              
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder={`Escribe un mensaje como ${user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.firstName || user?.lastName || `Usuario ${user?.id || ''}`}...`}
-                  className="flex-1 px-4 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder={replyToMessage ? "Escribe una respuesta..." : "Escribe un mensaje..."}
+                  className="flex-1 px-4 py-2.5 bg-white rounded-full text-sm focus:outline-none shadow-sm"
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={!newMessage.trim() || sendMessage.isPending}
-                  className="w-10 h-10 rounded-full bg-[#128c7e] text-white flex items-center justify-center hover:bg-[#075e54] transition-colors disabled:opacity-50"
+                  className="w-10 h-10 rounded-full bg-[#128c7e] text-white flex items-center justify-center hover:bg-[#075e54] transition-colors disabled:opacity-50 shadow-sm flex-shrink-0"
                 >
                   <IC.Send />
                 </button>
               </div>
             </div>
+    
           </div>
         ) : activeTab === 'estados' && selectedStatusId ? (
           /* Si hay un estado seleccionado, mostrar detalle */

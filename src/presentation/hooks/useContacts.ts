@@ -51,6 +51,15 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
     try {
       if (response) {
         errorText = await response.text();
+        // Intentar parsear como JSON para mostrar errores estructurados
+        try {
+          const errorData = JSON.parse(errorText);
+          if (errorData.code === 'INTERNAL_ERROR') {
+            errorText = `Error interno del backend: ${errorData.message || 'Error no especificado'}`;
+          }
+        } catch {
+          // Si no es JSON, usar el texto original
+        }
       }
     } catch (error) {
       errorText = `HTTP ${status}: ${statusText}`;
@@ -69,7 +78,7 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
       }
     }
     
-    if (response.status === 403 && errorText.includes('USER_SUSPENDED')) {
+    if (response?.status === 403 && errorText.includes('USER_SUSPENDED')) {
       let errorData;
       try {
         errorData = JSON.parse(errorText);
@@ -77,6 +86,12 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
         errorData = { message: 'Usuario suspendido' };
       }
       throw new Error(errorData.message || 'Usuario suspendido');
+    }
+    
+    // Para errores 500 internos del backend, devolver un error especial
+    if (response?.status === 500 && errorText.includes('INTERNAL_ERROR')) {
+      const errorData = JSON.parse(errorText);
+      throw new Error(`Error interno del backend: ${errorData.message || 'Error no especificado'}`);
     }
     
     throw new Error(`Error ${response.status}: ${response.statusText} - ${errorText}`);
@@ -153,16 +168,30 @@ export function useGetChats(filter: 'all' | 'unread' | 'favorites' = 'all') {
   });
 }
 
+async function apiCallWithFallback(url: string, options: RequestInit = {}, fallbackValue: any = null) {
+  try {
+    return await apiCall(url, options);
+  } catch (error: any) {
+    console.error("Backend error:", error);
+    throw error; // Lanzar el error para que React Query lo capture
+  }
+}
+
 export function useGetChatMessages(chatId: number, options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: ['chat-messages', chatId],
     queryFn: async () => {
-      const data = await apiCall(`/contacts/extended/chats/${chatId}/messages?size=100`);
+      const data = await apiCallWithFallback(
+        `/contacts/extended/chats/${chatId}/messages?size=100`,
+        {},
+        [] // fallback: array vacío
+      );
       // Normalizar siempre a array
       return Array.isArray(data) ? data : (data?.content ?? []);
     },
     enabled: !!chatId && (options.enabled !== false),
     staleTime: 1000 * 30,
+    retry: false, // Desactivar reintentos para evitar bucles
   });
 }
 
@@ -198,40 +227,11 @@ export function useSendMessage() {
         body: JSON.stringify({ content, type, mediaUrl, replyToMessageId }),
       });
     },
-    onMutate: async ({ chatId, content, type }) => {
+    onMutate: async ({ chatId }) => {
       await queryClient.cancelQueries({ queryKey: ['chat-messages', chatId] });
-      
-      const previousMessages = queryClient.getQueryData(['chat-messages', chatId]);
-      
-      const optimisticMessage = {
-        id: Date.now(),
-        content,
-        type,
-        senderId: 1,
-        createdAt: new Date().toISOString(),
-        isCurrentlyActive: true,
-        isDeleted: false,
-        isExpired: false,
-        sender: {
-          id: 1,
-          firstName: 'Tu',
-          lastName: '',
-          email: '',
-        }
-      };
-      
-      queryClient.setQueryData(['chat-messages', chatId], (old: any) => {
-        const messages = Array.isArray(old) ? old : (old?.content || []);
-        return [...messages, optimisticMessage];
-      });
-      
-      return { previousMessages };
+      // Sin optimistic = sin parpadeo
     },
-    onError: (error: any, variables, context) => {
-      if (context?.previousMessages) {
-        queryClient.setQueryData(['chat-messages', variables.chatId], context.previousMessages);
-      }
-      
+    onError: (error: any) => {
       if (error.message.includes('⚠️ ADVERTENCIA')) {
         toast.error(error.message);
       } else if (error.message.includes('suspendido') || error.message.includes('suspension')) {
@@ -699,6 +699,49 @@ export function useLeaveGroup() {
 
 // ==================== CHANNEL EVENTS ====================
 
+// ==================== CHANNEL EVENTS WITH DYNAMIC FILTERS ====================
+
+export function useChannelEventsWithFilters(
+  channelId: number, 
+  filters: {
+    eventType?: string;
+    city?: string;
+    featured?: boolean;
+    dateFilter?: string;
+    location?: string;
+  } = {},
+  page = 0, 
+  size = 9
+) {
+  // Build query string from filters
+  const params = new URLSearchParams();
+  if (filters.eventType) params.append('eventType', filters.eventType);
+  if (filters.city) params.append('city', filters.city);
+  if (filters.featured !== undefined) params.append('featured', filters.featured.toString());
+  if (filters.dateFilter) params.append('dateFilter', filters.dateFilter);
+  if (filters.location) params.append('location', filters.location);
+  params.append('page', page.toString());
+  params.append('size', size.toString());
+  
+  const queryString = params.toString();
+  
+  return useQuery({
+    queryKey: ['channelEvents', channelId, filters, page, size],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/events?${queryString}`);
+      
+      // Spring Data Page devuelve los datos en .content
+      if (response.data && typeof response.data === 'object' && 'content' in response.data) {
+        return response.data;
+      }
+      
+      return response.data;
+    },
+    enabled: !!channelId,
+    staleTime: 1000 * 30, // 30 seconds
+  });
+}
+
 export function useChannelEvents(channelId: number, page = 0, size = 9) {
   return useQuery({
     queryKey: ['channelEvents', channelId, page, size],
@@ -884,11 +927,24 @@ export function useInterestedChannelEvent(channelId: number) {
       toast.success('Interés registrado');
     },
     onError: (error: any) => {
-      // Don't show toast for subscription errors - handled by component
-      if (!error.message?.includes('must be subscribed') && !error.message?.includes('403')) {
-        toast.error(error.message || 'Error al registrar interés');
-      }
+      toast.error(error.message || 'Error al registrar interés');
     },
+  });
+}
+
+// ==================== USER CREATED EVENTS ====================
+
+export function useGetMyCreatedEvents(userId?: number, page = 0, size = 20) {
+  return useQuery({
+    queryKey: ['my-created-events', userId, page, size],
+    queryFn: async () => {
+      if (!userId) return [];
+      const response = await axiosClient.get(`/contacts/extended/users/${userId}/events?page=${page}&size=${size}`);
+      const data = response.data;
+      return Array.isArray(data) ? data : (data?.content ?? []);
+    },
+    enabled: !!userId,
+    staleTime: 1000 * 30, // 30 seconds
   });
 }
 

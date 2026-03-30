@@ -4,6 +4,10 @@ export interface NotificationPreferences {
   emailOnPropertyPublished: boolean;
   emailOnSubscriptionExpiring: boolean;
   emailMarketing: boolean;
+  emailOnEventCreated: boolean;
+  emailOnEventUpdated: boolean;
+  emailOnEventReminder: boolean;
+  emailOnEventJoined: boolean;
 }
 
 export type NotificationType = 
@@ -11,4 +15,8 @@ export type NotificationType =
   | 'FAVORITE' 
   | 'PROPERTY_PUBLISHED' 
   | 'SUBSCRIPTION_EXPIRING' 
-  | 'MARKETING';
+  | 'MARKETING'
+  | 'EVENT_CREATED'
+  | 'EVENT_UPDATED'
+  | 'EVENT_REMINDER'
+  | 'EVENT_JOINED';

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, Home, User, Bell, Plus, MapPin, Calendar, Users, Star, Share2, ChevronDown, Pin, MoreHorizontal } from 'lucide-react';
-import { useChannelEvents, useChannelUpcomingEvents, useCreateChannelEvent, useChannelSubscribers } from '@/presentation/hooks/useContacts';
+import { Search, Home, User, Bell, Plus, MapPin, Calendar, Users, Star, Share2, ChevronDown, Pin, MoreHorizontal, Filter } from 'lucide-react';
+import { useChannelEvents, useChannelUpcomingEvents, useCreateChannelEvent, useChannelSubscribers, useChannelEventsWithFilters } from '@/presentation/hooks/useContacts';
 import ChannelEventCard from './ChannelEventCard';
 import EventDetailView from './EventDetailView';
 
@@ -24,13 +24,51 @@ export default function ChannelEventsPanel({
   isOwner = false
 }: ChannelEventsPanelProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeFilter, setActiveFilter] = useState<'all' | 'upcoming' | 'following' | 'featured'>('upcoming');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'upcoming' | 'following' | 'featured' | 'date' | 'location'>('all');
   const [showUserEventsDropdown, setShowUserEventsDropdown] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [userLocation, setUserLocation] = useState<string>('');
 
-  // Queries
-  const { data: events, isLoading: eventsLoading } = useChannelEvents(channelId);
+  // Get user's location dynamically
+  const getUserLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          // Reverse geocoding to get city name
+          try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}&accept-language=es`);
+            const data = await response.json();
+            const city = data.address?.city || data.address?.town || data.address?.municipality || 'Ubicación actual';
+            setUserLocation(city);
+          } catch (error) {
+            console.error('Error getting location name:', error);
+            setUserLocation('Ubicación actual');
+          }
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          setUserLocation('Ubicación actual');
+        }
+      );
+    } else {
+      setUserLocation('Ubicación actual');
+    }
+  };
+
+  // Dynamic filters state - INICIA VACÍO PARA MOSTRAR TODOS
+  const [dynamicFilters, setDynamicFilters] = useState({
+    eventType: '',
+    city: '',
+    featured: undefined as boolean | undefined,
+    dateFilter: '',
+    location: ''
+  });
+
+  // Queries with dynamic filters
+  const { data: events, isLoading: eventsLoading, error: eventsError } = useChannelEventsWithFilters(channelId, dynamicFilters);
   const { data: upcomingEvents, isLoading: upcomingLoading } = useChannelUpcomingEvents(channelId);
   const { data: recommendedEvents } = useChannelUpcomingEvents(channelId);
   const { data: subscribers } = useChannelSubscribers(channelId);
@@ -38,17 +76,110 @@ export default function ChannelEventsPanel({
 
   const canCreateEvent = currentUser?.role === 'AGENT' || currentUser?.role === 'INMOBILIARIA';
   
-  // Filter events based on active filter
-  const getFilteredEvents = () => {
-    const baseEvents = activeFilter === 'upcoming' ? upcomingEvents : events;
-    if (!baseEvents) return [];
+  // Handle filter changes - makes API calls with dynamic filters
+  const handleFilterChange = (filterType: string, value: any) => {
+    let newFilters = { ...dynamicFilters };
     
-    let filtered = baseEvents;
-    
-    if (selectedCategory) {
-      filtered = filtered.filter((event: any) => event.eventType === selectedCategory);
+    switch (filterType) {
+      case 'all':
+        newFilters = {
+          eventType: '',
+          city: '',
+          featured: undefined,
+          dateFilter: '',
+          location: ''
+        };
+        setActiveFilter('all');
+        break;
+      case 'upcoming':
+        newFilters = {
+          eventType: '',
+          city: '',
+          featured: undefined,
+          dateFilter: 'upcoming',
+          location: ''
+        };
+        setActiveFilter('upcoming');
+        break;
+      case 'featured':
+        newFilters = {
+          eventType: '',
+          city: '',
+          featured: true,
+          dateFilter: '',
+          location: ''
+        };
+        setActiveFilter('featured');
+        break;
+      case 'following':
+        newFilters = {
+          eventType: '',
+          city: '',
+          featured: undefined,
+          dateFilter: '',
+          location: ''
+        };
+        setActiveFilter('following');
+        break;
+      case 'location':
+        newFilters = {
+          eventType: '',
+          city: '',
+          featured: undefined,
+          dateFilter: '',
+          location: value === 'mi-ubicacion' ? userLocation : value
+        };
+        setActiveFilter('location');
+        break;
+      case 'date':
+        newFilters = {
+          eventType: '',
+          city: '',
+          featured: undefined,
+          dateFilter: selectedDate || '',
+          location: ''
+        };
+        setActiveFilter('date');
+        break;
+      case 'category':
+        newFilters = {
+          eventType: value,
+          city: '',
+          featured: undefined,
+          dateFilter: '',
+          location: ''
+        };
+        setSelectedCategory(value);
+        break;
+      default:
+        newFilters = {
+          eventType: '',
+          city: '',
+          featured: undefined,
+          dateFilter: '',
+          location: ''
+        };
+        setActiveFilter('all');
     }
     
+    setDynamicFilters(newFilters);
+  };
+
+  // Legacy filter function for compatibility (now just returns events from API)
+  const getFilteredEvents = () => {
+    // Spring Data Page: los datos están en .content
+    let eventsData = events;
+    if (events && typeof events === 'object' && 'content' in events) {
+      eventsData = events.content;
+    }
+    
+    if (!eventsData || !Array.isArray(eventsData)) {
+      return [];
+    }
+    
+    let filtered = eventsData;
+    
+    // Apply client-side search if needed
     if (searchTerm) {
       filtered = filtered.filter((event: any) => 
         event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -179,7 +310,7 @@ export default function ChannelEventsPanel({
             {categories.map((category) => (
               <button
                 key={category.id}
-                onClick={() => setSelectedCategory(selectedCategory === category.id ? null : category.id)}
+                onClick={() => handleFilterChange('category', category.id === selectedCategory ? null : category.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   selectedCategory === category.id
                     ? 'bg-blue-100 text-blue-700'
@@ -206,38 +337,133 @@ export default function ChannelEventsPanel({
           />
         ) : (
           <div className="h-full overflow-y-auto">
-            {/* Header */}
+            {/* Header con filtros mejorados */}
             <div className="bg-white border-b border-gray-200 p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Descubrir eventos</h2>
-            </div>
-
-            {/* Filtros */}
-            <div className="flex items-center gap-3 flex-wrap">
-              <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-200">
-                <Pin className="w-4 h-4" />
-                Mi ubicación
-                <ChevronDown className="w-4 h-4" />
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-gray-900">Eventos del canal</h2>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Calendar className="w-4 h-4" />
+                  {filteredEvents?.length || 0} eventos encontrados
+                </div>
+              </div>
+              
+              {/* Filtros mejorados con mejor visibilidad */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Filter className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm font-medium text-gray-700">Filtros:</span>
+                </div>
+                <div className="flex items-center gap-3 flex-wrap">
+              <button 
+                onClick={() => handleFilterChange('all', null)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  activeFilter === 'all'
+                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Todos
               </button>
               
-              <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-200">
+              <button 
+                onClick={() => handleFilterChange('featured', null)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  activeFilter === 'featured'
+                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Destacados
+              </button>
+              
+              <button 
+                onClick={() => handleFilterChange('upcoming', null)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  activeFilter === 'upcoming'
+                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Próximos
+              </button>
+              
+              <button 
+                onClick={() => handleFilterChange('following', null)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  activeFilter === 'following'
+                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Siguiendo
+              </button>
+              
+              {/* Filtro de fecha con calendario */}
+              <button 
+                onClick={() => setShowDatePicker(!showDatePicker)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  activeFilter === 'date'
+                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
                 <Calendar className="w-4 h-4" />
-                Cualquier fecha
-                <ChevronDown className="w-4 h-4" />
+                Fecha
               </button>
               
-              {['Destacados', 'Próximos', 'Siguiendo'].map((filter) => (
-                <button
-                  key={filter}
-                  onClick={() => setActiveFilter(filter.toLowerCase() as any)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    activeFilter === filter.toLowerCase()
-                      ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {filter}
-                </button>
-              ))}
+              {/* Filtro de ubicación */}
+              <button 
+                onClick={() => {
+                  getUserLocation();
+                  handleFilterChange('location', 'mi-ubicacion');
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  activeFilter === 'location'
+                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <MapPin className="w-4 h-4" />
+                Mi ubicación
+              </button>
+              
+              {/* Calendario emergente */}
+              {showDatePicker && (
+                <div className="absolute top-20 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50">
+                  <div className="mb-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Seleccionar fecha
+                    </label>
+                    <input
+                      type="date"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        if (selectedDate) {
+                          handleFilterChange('date', selectedDate);
+                          setShowDatePicker(false);
+                        }
+                      }}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      Filtrar
+                    </button>
+                    <button
+                      onClick={() => setShowDatePicker(false)}
+                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              )}
+                </div>
+              </div>
             </div>
 
           {/* Events Grid */}
@@ -284,7 +510,7 @@ export default function ChannelEventsPanel({
                   />
                 ))}
               </div>
-                       )}
+            )}
           </div>
         </div>
         )}

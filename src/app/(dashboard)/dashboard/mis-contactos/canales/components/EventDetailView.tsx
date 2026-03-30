@@ -83,10 +83,17 @@ export default function EventDetailView({
     
     console.log('📱 Redirigiendo a mensajes:', { organizerPhone, organizerName, organizerId });
     
-    if (organizerPhone) {
-      // Redirect to messages with phone number to start conversation
-      // Using pattern: /dashboard/mis-contactos?tab=chats&phone=PHONE&name=NAME&userId=ID
-      router.push(`/dashboard/mis-contactos?tab=chats&phone=${encodeURIComponent(organizerPhone)}&name=${encodeURIComponent(organizerName)}&userId=${organizerId}`);
+    if (organizerPhone && organizerId) {
+      // Store data in localStorage for reliable passing
+      localStorage.setItem('chat_with_organizer', JSON.stringify({
+        userId: organizerId,
+        name: organizerName,
+        phone: organizerPhone,
+        timestamp: Date.now()
+      }));
+      
+      // Force navigation using window.location (more reliable than router.push)
+      window.location.href = '/dashboard/mis-contactos';
     } else {
       toast.info('Información del organizador no disponible');
     }

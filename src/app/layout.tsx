@@ -36,7 +36,7 @@ export default function RootLayout({
           {/* ✅ MercadoPago SDK */}
           <script src="https://sdk.mercadopago.com/js/v2" async />
         </head>
-        <body className={hind.className}>
+        <body className={hind.className} suppressHydrationWarning>
           <Header />
           <Toaster richColors position="top-right" />
           {children}
