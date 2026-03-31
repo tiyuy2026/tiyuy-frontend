@@ -742,6 +742,132 @@ export function useChannelEventsWithFilters(
   });
 }
 
+export function useChannelEventsForSubscribedUser(channelId: number, page = 0, size = 9) {
+  return useQuery({
+    queryKey: ['channelEventsSubscribed', channelId, page, size],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/events/subscribed?page=${page}&size=${size}`);
+      
+      // Spring Data Page devuelve los datos en .content
+      if (response.data && typeof response.data === 'object' && 'content' in response.data) {
+        return response.data;
+      }
+      
+      return response.data;
+    },
+    enabled: !!channelId,
+    staleTime: 1000 * 30, // 30 seconds
+  });
+}
+
+export function useChannelEventsBySubscriberCount(channelId: number, page = 0, size = 9) {
+  return useQuery({
+    queryKey: ['channelEventsFeatured', channelId, page, size],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/events/featured?page=${page}&size=${size}`);
+      
+      // Spring Data Page devuelve los datos en .content
+      if (response.data && typeof response.data === 'object' && 'content' in response.data) {
+        return response.data;
+      }
+      
+      return response.data;
+    },
+    enabled: !!channelId,
+    staleTime: 1000 * 30, // 30 seconds
+  });
+}
+
+export function useUserSubscribedEvents(userId: number) {
+  return useQuery({
+    queryKey: ['userSubscribedEvents', userId],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/extended/users/events/subscribed?page=0&size=50`);
+      
+      // Spring Data Page devuelve los datos en .content
+      if (response.data && typeof response.data === 'object' && 'content' in response.data) {
+        return response.data.content;
+      }
+      
+      return Array.isArray(response.data) ? response.data : [];
+    },
+    enabled: !!userId,
+    staleTime: 1000 * 30, // 30 seconds
+  });
+}
+
+export function useUserEvents(userId?: number, page = 0, size = 10) {
+  return useQuery({
+    queryKey: ['userEvents', userId, page, size],
+    queryFn: async () => {
+      console.log('=== useUserEvents API CALL ===');
+      console.log('Calling: /contacts/extended/users/events?page=', page, '&size=', size);
+      console.log('UserId:', userId);
+      
+      const response = await axiosClient.get(`/contacts/extended/users/events?page=${page}&size=${size}`);
+      
+      console.log('=== useUserEvents RESPONSE ===');
+      console.log('Response data:', response.data);
+      console.log('Response status:', response.status);
+      
+      if (response.data) {
+        console.log('Total elements:', response.data.totalElements);
+        console.log('Content length:', response.data.content?.length);
+        
+        if (response.data.content) {
+          console.log('Eventos recibidos:');
+          response.data.content.forEach((event: any, index: number) => {
+            console.log(`  ${index + 1}. ID: ${event.id}, Title: ${event.title}, Channel: ${event.channelId || event.channel?.id}`);
+          });
+        }
+      }
+      console.log('=== END useUserEvents DEBUG ===');
+      
+      return response.data;
+    },
+    enabled: !!userId,
+    staleTime: 1000 * 30, // 30 seconds
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
+}
+
+export function useUserUpcomingEvents(userId?: number) {
+  return useQuery({
+    queryKey: ['userUpcomingEvents', userId],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/extended/users/events/upcoming`);
+      return response.data;
+    },
+    enabled: !!userId,
+    staleTime: 1000 * 30,
+  });
+}
+
+export function useUserPastEvents(userId?: number) {
+  return useQuery({
+    queryKey: ['userPastEvents', userId],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/extended/users/events/past`);
+      return response.data;
+    },
+    enabled: !!userId,
+    staleTime: 1000 * 30,
+  });
+}
+
+export function useUserSavedEvents(userId?: number) {
+  return useQuery({
+    queryKey: ['userSavedEvents', userId],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/extended/users/events/saved`);
+      return response.data;
+    },
+    enabled: !!userId,
+    staleTime: 1000 * 30,
+  });
+}
+
 export function useChannelEvents(channelId: number, page = 0, size = 9) {
   return useQuery({
     queryKey: ['channelEvents', channelId, page, size],
@@ -837,6 +963,26 @@ export function useDeleteChannelEvent() {
     },
     onError: (error: any) => {
       toast.error(error.message || 'Error al eliminar evento');
+    },
+  });
+}
+
+export function useUpdateChannelEvent() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ channelId, eventId, eventData }: { channelId: number; eventId: number; eventData: any }) => {
+      const response = await axiosClient.put(`/contacts/extended/channels/${channelId}/events/${eventId}`, eventData);
+      return response.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['channelEvents', variables.channelId] });
+      queryClient.invalidateQueries({ queryKey: ['channelUpcomingEvents', variables.channelId] });
+      queryClient.invalidateQueries({ queryKey: ['userEvents', variables.eventId] });
+      toast.success('Evento actualizado exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Error al actualizar evento');
     },
   });
 }

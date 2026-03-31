@@ -1754,7 +1754,7 @@ export default function MisContactosPage() {
   const [selectedStatusId, setSelectedStatusId] = useState<number | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<any>(null);
   const [selectedChannel, setSelectedChannel] = useState<any>(null);
-  const [channelsSection, setChannelsSection] = useState<'mis-canales-creados' | 'mis-canales-suscritos' | 'mis-eventos' | 'descubrir-canales' | 'crear-canal'>('mis-canales-creados');
+  const [channelsSection, setChannelsSection] = useState<'mis-canales-creados' | 'mis-canales-suscritos' | 'descubrir-canales' | 'crear-canal'>('mis-canales-creados');
   const [gruposSection, setGruposSection] = useState<'mis-grupos' | 'descubrir' | 'crear'>('mis-grupos');
   const [activeRightView, setActiveRightView] = useState<'default' | 'create-group' | 'discover'>('default' as const);
   const [showNewStatus, setShowNewStatus] = useState(false);
@@ -2566,12 +2566,6 @@ export default function MisContactosPage() {
                 <MisCanalesSuscritosView
                   user={user}
                   onChannelSelect={setSelectedChannel}
-                />
-              )}
-              {channelsSection === 'mis-eventos' && (
-                <MisEventosView
-                  user={user}
-                  onEventSelect={(event: any, channel: any) => setSelectedChannel(channel)}
                 />
               )}
               {channelsSection === 'descubrir-canales' && (

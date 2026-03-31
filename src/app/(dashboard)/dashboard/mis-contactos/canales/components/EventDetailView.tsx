@@ -25,6 +25,7 @@ interface EventDetailViewProps {
   currentUserId: number;
   isOwner: boolean;
   onBack: () => void;
+  isEditMode?: boolean;
 }
 
 export default function EventDetailView({ 
@@ -32,7 +33,8 @@ export default function EventDetailView({
   channelId, 
   currentUserId, 
   isOwner, 
-  onBack 
+  onBack,
+  isEditMode = false 
 }: EventDetailViewProps) {
   const router = useRouter();
   const { data: freshEvent } = useGetChannelEvent(channelId, initialEvent.id);
@@ -251,7 +253,12 @@ export default function EventDetailView({
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
-          <h2 className="text-base font-semibold text-gray-900">Evento</h2>
+          <h2 className="text-base font-semibold text-gray-900">
+            {isEditMode ? 'Editando Evento' : 'Evento'}
+          </h2>
+          {isEditMode && (
+            <p className="text-xs text-gray-500">Modo edición activado</p>
+          )}
         </div>
       </div>
 

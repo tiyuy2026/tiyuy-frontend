@@ -55,11 +55,11 @@ export default function ChannelEventCard({
             <div className="text-center">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-teal-100 rounded-xl flex items-center justify-center mx-auto mb-2">
                 <span className="text-lg font-bold text-blue-600">
-                  {new Date(event.startDateTime).getDate()}
+                  {event.startDateTime ? new Date(event.startDateTime).getDate() : '--'}
                 </span>
               </div>
               <span className="text-xs text-gray-500 font-medium">
-                {new Date(event.startDateTime).toLocaleDateString('es-PE', { month: 'short' }).toUpperCase()}
+                {event.startDateTime ? new Date(event.startDateTime).toLocaleDateString('es-PE', { month: 'short' }).toUpperCase() : '---'}
               </span>
             </div>
           </div>
@@ -83,7 +83,7 @@ export default function ChannelEventCard({
       <div className="p-3">
         {/* Date */}
         <div className="text-xs font-semibold text-blue-600 mb-2">
-          {formatDate(event.startDateTime)}
+          {event.startDateTime ? formatDate(event.startDateTime) : 'Fecha no disponible'}
         </div>
 
         {/* Title */}
@@ -100,7 +100,7 @@ export default function ChannelEventCard({
 
         {/* Location */}
         <div className="text-xs text-gray-500 mb-3 line-clamp-1">
-          {event.location?.address || 'Ubicación por confirmar'}
+          {event.address || event.city || 'Ubicación por confirmar'}
         </div>
 
         {/* Attendees */}

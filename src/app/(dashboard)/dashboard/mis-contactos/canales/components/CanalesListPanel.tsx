@@ -14,8 +14,8 @@ function CanalesListPanel({
 }: { 
   user: any; 
   onChannelSelect: (channel: any) => void;
-  activeSection: 'mis-canales-creados' | 'mis-canales-suscritos' | 'mis-eventos' | 'descubrir-canales' | 'crear-canal';
-  onSectionChange: (s: 'mis-canales-creados' | 'mis-canales-suscritos' | 'mis-eventos' | 'descubrir-canales' | 'crear-canal') => void;
+  activeSection: 'mis-canales-creados' | 'mis-canales-suscritos' | 'descubrir-canales' | 'crear-canal';
+  onSectionChange: (s: 'mis-canales-creados' | 'mis-canales-suscritos' | 'descubrir-canales' | 'crear-canal') => void;
 }) {
   const { data: channels, isLoading } = useGetChannels(user?.id);
   const [searchQuery, setSearchQuery] = useState('');
@@ -108,18 +108,6 @@ function CanalesListPanel({
               {misCanalesSuscritos.length}
             </span>
           )}
-        </button>
-
-        <button
-          onClick={() => onSectionChange('mis-eventos')}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'mis-eventos' ? 'bg-blue-100 text-blue-700' : 'text-gray-800 hover:bg-gray-100'
-          }`}
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4l8-4-8-4m0 4v4m0-4h8M4 20h16a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          Mis eventos
         </button>
 
         <button

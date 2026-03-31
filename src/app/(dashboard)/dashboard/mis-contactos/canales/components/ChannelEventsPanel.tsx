@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, Home, User, Bell, Plus, MapPin, Calendar, Users, Star, Share2, ChevronDown, Pin, MoreHorizontal, Filter } from 'lucide-react';
-import { useChannelEvents, useChannelUpcomingEvents, useCreateChannelEvent, useChannelSubscribers, useChannelEventsWithFilters } from '@/presentation/hooks/useContacts';
+import { useQueryClient } from '@tanstack/react-query';
+import { Search, User, Bell, Plus, MapPin, Calendar, Users, Star, Share2, ChevronDown, Pin, MoreHorizontal, Filter, Edit, Trash2 } from 'lucide-react';
+import { useChannelEvents, useChannelUpcomingEvents, useCreateChannelEvent, useChannelSubscribers, useChannelEventsWithFilters, useUserEvents, useDeleteChannelEvent, useUpdateChannelEvent } from '@/presentation/hooks/useContacts';
 import ChannelEventCard from './ChannelEventCard';
 import EventDetailView from './EventDetailView';
 
@@ -24,8 +25,9 @@ export default function ChannelEventsPanel({
   isOwner = false
 }: ChannelEventsPanelProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeFilter, setActiveFilter] = useState<'all' | 'upcoming' | 'following' | 'featured' | 'date' | 'location'>('all');
-  const [showUserEventsDropdown, setShowUserEventsDropdown] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'upcoming' | 'featured' | 'date' | 'location'>('all');
+  // Estado para controlar si se están mostrando eventos del usuario
+  const [showUserEvents, setShowUserEvents] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -74,7 +76,68 @@ export default function ChannelEventsPanel({
   const { data: subscribers } = useChannelSubscribers(channelId);
   const createEventMutation = useCreateChannelEvent();
 
-  const canCreateEvent = currentUser?.role === 'AGENT' || currentUser?.role === 'INMOBILIARIA';
+  // Query para obtener todos los eventos creados por el usuario (para Agentes/Developers/Admins)
+  const { data: userCreatedEvents, isLoading: userCreatedLoading } = useUserEvents(currentUserId, 0, 50);
+  
+  // Hook para eliminar eventos
+  const deleteEventMutation = useDeleteChannelEvent();
+  
+  // Hook para actualizar eventos
+  const updateEventMutation = useUpdateChannelEvent();
+
+  const canCreateEvent = currentUser?.role === 'AGENT' || currentUser?.role === 'DEVELOPER' || currentUser?.role === 'ADMIN';
+  
+  // QueryClient para limpiar caché
+  const queryClient = useQueryClient();
+  
+  // Función para cerrar "Mis eventos" y limpiar caché
+  const handleCloseUserEvents = () => {
+    setShowUserEvents(false);
+    // Limpiar caché de user events para evitar duplicados
+    queryClient.removeQueries({ queryKey: ['userEvents', currentUserId] });
+  };
+  
+  // DEBUG: Log para depurar eventos del usuario
+  React.useEffect(() => {
+    console.log('=== USER CREATED EVENTS DEBUG ===');
+    console.log('Current User ID:', currentUserId);
+    console.log('Current User:', currentUser);
+    console.log('Current User Role:', currentUser?.role);
+    console.log('Can Create Event:', canCreateEvent);
+    console.log('User Created Events Data:', userCreatedEvents);
+    console.log('User Created Events Loading:', userCreatedLoading);
+    
+    if (userCreatedEvents) {
+      console.log('Total elements:', userCreatedEvents.totalElements);
+      console.log('Content length:', userCreatedEvents.content?.length);
+      
+      if (userCreatedEvents.content && userCreatedEvents.content.length > 0) {
+        console.log('Eventos del usuario:');
+        userCreatedEvents.content.forEach((event: any, index: number) => {
+          console.log(`  ${index + 1}. ID: ${event.id}, Title: ${event.title}, Channel: ${event.channelId || event.channel?.id}`);
+          console.log(`      - Creator ID: ${event.creatorId || event.creator?.id}`);
+          console.log(`      - Start Date: ${event.startDateTime}`);
+          console.log(`      - Is Active: ${event.isActive}`);
+        });
+        
+        // Verificar si los datos parecen reales
+        const hasValidIds = userCreatedEvents.content.every((e: any) => e.id && e.id > 0);
+        const hasValidTitles = userCreatedEvents.content.every((e: any) => e.title && e.title.trim() !== '');
+        const hasValidDates = userCreatedEvents.content.every((e: any) => e.startDateTime);
+        
+        console.log('=== VERIFICACIÓN DE DATOS ===');
+        console.log('Todos tienen IDs válidos:', hasValidIds);
+        console.log('Todos tienen títulos válidos:', hasValidTitles);
+        console.log('Todos tienen fechas válidas:', hasValidDates);
+        console.log('¿Los datos parecen reales?', hasValidIds && hasValidTitles && hasValidDates);
+      } else {
+        console.log('NO HAY CONTENIDO EN userCreatedEvents.content');
+      }
+    } else {
+      console.log('userCreatedEvents es null o undefined');
+    }
+    console.log('=== END USER CREATED EVENTS DEBUG ===');
+  }, [currentUserId, currentUser, userCreatedEvents, userCreatedLoading, canCreateEvent]);
   
   // Handle filter changes - makes API calls with dynamic filters
   const handleFilterChange = (filterType: string, value: any) => {
@@ -110,16 +173,6 @@ export default function ChannelEventsPanel({
           location: ''
         };
         setActiveFilter('featured');
-        break;
-      case 'following':
-        newFilters = {
-          eventType: '',
-          city: '',
-          featured: undefined,
-          dateFilter: '',
-          location: ''
-        };
-        setActiveFilter('following');
         break;
       case 'location':
         newFilters = {
@@ -163,6 +216,11 @@ export default function ChannelEventsPanel({
     }
     
     setDynamicFilters(newFilters);
+    
+    // Al aplicar filtros, salir de "Mis eventos creados" y volver a eventos del canal
+    if (showUserEvents) {
+      setShowUserEvents(false);
+    }
   };
 
   // Legacy filter function for compatibility (now just returns events from API)
@@ -182,8 +240,9 @@ export default function ChannelEventsPanel({
     // Apply client-side search if needed
     if (searchTerm) {
       filtered = filtered.filter((event: any) => 
-        event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.location?.address?.toLowerCase().includes(searchTerm.toLowerCase())
+        event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.city?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     
@@ -222,36 +281,21 @@ export default function ChannelEventsPanel({
 
         {/* Menu */}
         <div className="p-3 space-y-1">
-          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">
-            <Home className="w-4 h-4" />
-            Inicio
-          </button>
-
-          {/* Tus eventos dropdown */}
-          <div className="relative">
+          {/* Tus eventos - solo para Agentes, Developers, Admins */}
+          {canCreateEvent && (
             <button
-              onClick={() => setShowUserEventsDropdown(!showUserEventsDropdown)}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100"
+              onClick={() => setShowUserEvents(!showUserEvents)}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                showUserEvents
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
             >
               <User className="w-4 h-4" />
               Tus eventos
-              <ChevronDown className={`w-4 h-4 ml-auto transition-transform ${showUserEventsDropdown ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-4 h-4 ml-auto transition-transform ${showUserEvents ? 'rotate-180' : ''}`} />
             </button>
-            
-            {showUserEventsDropdown && (
-              <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left">
-                  Próximos
-                </button>
-                <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left">
-                  Guardados
-                </button>
-                <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left">
-                  Pasados
-                </button>
-              </div>
-            )}
-          </div>
+          )}
 
           <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100">
             <Bell className="w-4 h-4" />
@@ -283,6 +327,7 @@ export default function ChannelEventsPanel({
               {recommendedEvents.slice(0, 3).map((event: any) => (
                 <button
                   key={event.id}
+                  onClick={() => setSelectedEvent(event)}
                   className="w-full flex items-start gap-2 p-2 hover:bg-gray-50 rounded-lg text-left"
                 >
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-teal-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -334,7 +379,130 @@ export default function ChannelEventsPanel({
             currentUserId={currentUserId}
             isOwner={isOwner}
             onBack={() => setSelectedEvent(null)}
+            isEditMode={selectedEvent.isEditMode || false}
           />
+        ) : showUserEvents ? (
+          <div className="h-full overflow-y-auto">
+            {/* Header para eventos del usuario */}
+            <div className="bg-white border-b border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleCloseUserEvents}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title="Volver a eventos del canal"
+                  >
+                    <ChevronDown className="w-5 h-5 text-gray-600 rotate-90" />
+                  </button>
+                  <h2 className="text-2xl font-bold text-gray-900">Mis eventos creados</h2>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Calendar className="w-4 h-4" />
+                  {userCreatedEvents?.content?.length || 0} eventos creados
+                </div>
+              </div>
+            </div>
+
+            {/* Events Grid para eventos del usuario */}
+            <div className="p-6">
+              {userCreatedLoading ? (
+                // Loading skeleton
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div key={i} className="bg-white rounded-xl border border-gray-200 overflow-hidden animate-pulse">
+                      <div className="h-32 bg-gray-200"></div>
+                      <div className="p-4 space-y-3">
+                        <div className="h-4 bg-gray-200 rounded"></div>
+                        <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                        <div className="flex gap-2">
+                          <div className="h-8 bg-gray-200 rounded flex-1"></div>
+                          <div className="h-8 bg-gray-200 rounded flex-1"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : !userCreatedEvents || !userCreatedEvents.content || userCreatedEvents.content.length === 0 ? (
+                // Empty state
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No has creado eventos</h3>
+                  <p className="text-gray-600 text-sm">
+                    Crea tu primer evento para empezar
+                  </p>
+                </div>
+              ) : (
+                // Events grid con botones de acción - CON VALIDACIÓN DE IDs ÚNICOS
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {(() => {
+                    // Validar IDs únicos para evitar duplicados
+                    const seenIds = new Set();
+                    const uniqueEvents = userCreatedEvents.content.filter((event: any) => {
+                      if (!event.id || seenIds.has(event.id)) {
+                        console.warn('Evento duplicado o sin ID:', event);
+                        return false;
+                      }
+                      seenIds.add(event.id);
+                      return true;
+                    });
+                    console.log('Eventos únicos a mostrar:', uniqueEvents.length);
+                    return uniqueEvents;
+                  })().map((event: any) => (
+                    <div key={event.id} className="group relative">
+                      <ChannelEventCard
+                        event={event}
+                        currentUserId={currentUserId}
+                        isOwner={true}
+                        onView={() => setSelectedEvent(event)}
+                      />
+                      
+                      {/* Botones de acción - solo visibles en hover */}
+                      <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => {
+                            setSelectedEvent({
+                              ...event,
+                              isEditMode: true
+                            });
+                          }}
+                          className="p-2 bg-white rounded-lg shadow-md text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+                          title="Editar evento"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (confirm('¿Estás seguro de que quieres eliminar este evento?')) {
+                              deleteEventMutation.mutate(
+                                { channelId, eventId: event.id },
+                                {
+                                  onSuccess: () => {
+                                    console.log('Evento eliminado exitosamente');
+                                  },
+                                  onError: (error) => {
+                                    console.error('Error al eliminar evento:', error);
+                                    alert('Error al eliminar el evento');
+                                  }
+                                }
+                              );
+                            }
+                          }}
+                          className="p-2 bg-white rounded-lg shadow-md text-gray-400 hover:text-red-600 hover:bg-red-50"
+                          title="Eliminar evento"
+                          disabled={deleteEventMutation.isPending}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         ) : (
           <div className="h-full overflow-y-auto">
             {/* Header con filtros mejorados */}
@@ -385,17 +553,6 @@ export default function ChannelEventsPanel({
                 }`}
               >
                 Próximos
-              </button>
-              
-              <button 
-                onClick={() => handleFilterChange('following', null)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  activeFilter === 'following'
-                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Siguiendo
               </button>
               
               {/* Filtro de fecha con calendario */}
