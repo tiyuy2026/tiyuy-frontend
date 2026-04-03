@@ -1,50 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { Avatar } from './PropertySearchAndContact';
-import { toast } from '@/presentation/store/toastStore';
-
-// Helper function for API calls
-async function apiCall(endpoint: string, options: RequestInit = {}) {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-  const url = `${API_BASE_URL}${endpoint}`;
-  
-  let token = null;
-  if (typeof window !== 'undefined') {
-    try {
-      const { useAuthStore } = require('@/presentation/store/authStore');
-      const authStore = useAuthStore.getState();
-      token = authStore.token;
-      
-      if (!token) {
-        token = localStorage.getItem('tiyuy-auth-token') || 
-               localStorage.getItem('token') || 
-               localStorage.getItem('auth-token');
-      }
-    } catch {
-      token = localStorage.getItem('tiyuy-auth-token') || 
-             localStorage.getItem('token') || 
-             localStorage.getItem('auth-token');
-    }
-  }
-  
-  const response = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` }),
-      ...options.headers,
-    },
-    ...options,
-  });
-  
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => 'Unknown error');
-    throw new Error(`Error ${response.status}: ${response.statusText} - ${errorText}`);
-  }
-  
-  return response.json();
-}
+import { useDirectChatSearch } from '@/presentation/hooks/useDirectChatSearch';
 
 interface User {
   id: number;
@@ -64,122 +22,15 @@ interface DirectChatSearchProps {
   onChatCreated?: (chatId: number) => void;
 }
 
-// Mock users - replace with actual API call
-const mockUsers: User[] = [
-  {
-    id: 201,
-    name: "Roberto Sánchez",
-    role: "DEVELOPER",
-    phone: "+51 987 123 456",
-    properties: [
-      { id: 10, title: "Edificio Catalina Heights", city: "Catalina", price: 1500 },
-      { id: 11, title: "Torre Miraflores Prime", city: "Miraflores", price: 2000 }
-    ]
-  },
-  {
-    id: 202,
-    name: "Ana Martínez",
-    role: "AGENT",
-    phone: "+51 976 543 210",
-    properties: [
-      { id: 12, title: "Casa de Campo", city: "Surco", price: 3000 }
-    ]
-  },
-  {
-    id: 203,
-    name: "Luis Torres",
-    role: "USER",
-    phone: "+51 965 432 109",
-    properties: [
-      { id: 13, title: "Departamento Amoblado", city: "San Borja", price: 800 }
-    ]
-  }
-];
-
 export default function DirectChatSearch({ onChatCreated }: DirectChatSearchProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchType, setSearchType] = useState<'all' | 'name' | 'role' | 'phone' | 'city'>('all');
 
-  // Fetch users from API
-  const { data: apiUsers = [], isLoading: loadingUsers } = useQuery({
-    queryKey: ['search-users', searchTerm, searchType],
-    queryFn: async () => {
-      if (!searchTerm) return mockUsers; // Return mock if no search
-      
-      const params = new URLSearchParams();
-      
-      // Build search parameters based on search type
-      switch (searchType) {
-        case 'name':
-          params.append('keyword', searchTerm);
-          break;
-        case 'role':
-          params.append('role', searchTerm.toUpperCase());
-          break;
-        case 'phone':
-          params.append('keyword', searchTerm);
-          break;
-        case 'city':
-          params.append('city', searchTerm);
-          break;
-        default:
-          params.append('keyword', searchTerm);
-      }
-      
-      params.append('sortBy', 'createdAt');
-      params.append('sortOrder', 'desc');
-      
-      try {
-        const response = await apiCall(`/api/contacts/extended/search/users?${params}`);
-        return response.map((user: any) => ({
-          id: user.id,
-          name: user.name,
-          role: user.role,
-          phone: user.phone,
-          avatar: user.avatar,
-          properties: user.properties?.map((prop: any) => ({
-            id: prop.id,
-            title: prop.title,
-            city: prop.city,
-            price: prop.price
-          })) || []
-        }));
-      } catch (error) {
-        console.error('Error fetching users:', error);
-        return mockUsers; // Fallback to mock
-      }
-    },
-    enabled: true
-  });
-
-  // Mutation to create direct chat
-  const createDirectChat = useMutation({
-    mutationFn: async ({ userId, initialMessage }: {
-      userId: number;
-      initialMessage: string;
-    }) => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/contacts/extended/chats`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          participantId: userId,
-          initialMessage
-        })
-      });
-      if (!response.ok) throw new Error('Error al crear chat');
-      return response.json();
-    },
-    onSuccess: (response) => {
-      toast.success('¡Chat creado! Ahora puedes conversar.');
-      onChatCreated?.(response.id);
-    },
-    onError: (error: any) => {
-      toast.error(error.message || 'Error al crear chat');
-    }
-  });
+  const { apiUsers, loadingUsers, createDirectChat } = useDirectChatSearch(
+    searchTerm,
+    searchType,
+    onChatCreated
+  );
 
   const handleStartChat = (user: User) => {
     createDirectChat.mutate({
@@ -190,7 +41,7 @@ export default function DirectChatSearch({ onChatCreated }: DirectChatSearchProp
 
   const filteredUsers = apiUsers.filter((user: User) => {
     if (!searchTerm) return true;
-    
+
     const term = searchTerm.toLowerCase();
     switch (searchType) {
       case 'name':
@@ -205,7 +56,7 @@ export default function DirectChatSearch({ onChatCreated }: DirectChatSearchProp
         return user.name.toLowerCase().includes(term) ||
                user.role.toLowerCase().includes(term) ||
                user.phone.includes(term) ||
-               user.properties?.some(prop => 
+               user.properties?.some(prop =>
                  prop.title.toLowerCase().includes(term) ||
                  prop.city.toLowerCase().includes(term)
                );
@@ -235,7 +86,7 @@ export default function DirectChatSearch({ onChatCreated }: DirectChatSearchProp
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h2 className="text-2xl font-bold mb-6">Buscar y Chatear Directamente</h2>
-      
+
       {/* Search Bar */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
         <div className="flex gap-3 mb-4">
@@ -266,7 +117,7 @@ export default function DirectChatSearch({ onChatCreated }: DirectChatSearchProp
           <div key={user.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-start gap-4">
               <Avatar name={user.name} role={user.role} size="lg" />
-              
+
               <div className="flex-1">
                 {/* User Info */}
                 <div className="flex items-center gap-3 mb-2">
@@ -275,7 +126,7 @@ export default function DirectChatSearch({ onChatCreated }: DirectChatSearchProp
                     {getRoleLabel(user.role)}
                   </span>
                 </div>
-                
+
                 <div className="text-gray-600 mb-3">
                   📞 {user.phone}
                 </div>

@@ -27,7 +27,7 @@ export function DashboardGuard({ children }: { children: React.ReactNode }) {
   const isExpired = now > expiresAt;
 
   // Si está expirada y está en una ruta protegida, redirigir a página de bloqueo
-  if (isExpired && pathname?.startsWith('/dashboard/proyectos')) {
+  if (isExpired && pathname?.startsWith('/my-projects')) {
     router.push('/dashboard/trial-expired');
     return null;
   }

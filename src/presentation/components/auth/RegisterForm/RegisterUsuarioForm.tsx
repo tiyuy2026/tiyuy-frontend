@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/presentation/hooks';
 import { useGoogleAuth } from '@/presentation/hooks/useGoogleAuth';
-import { useUserValidation } from '@/hooks/useUserValidation';
+import { useUserValidation } from '@/presentation/hooks/useUserValidation';
 import { Button, Input } from '@/presentation/components/ui';
 import { DniInput } from '@/presentation/components/kyc';
 import { Mail, User, Phone, Lock, Hash } from 'lucide-react';

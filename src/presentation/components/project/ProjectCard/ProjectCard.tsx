@@ -10,7 +10,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
   const formatPrice = (price: number) => `Desde S/ ${price.toLocaleString()}`;
 
   return (
-    <Link href={`/proyectos/${project.slug}`} className="group">
+    <Link href={`/projects/${project.slug}`} className="group">
       <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100 hover:border-blue-200 w-full h-full flex flex-col">
         {/* Imagen */}
         <div className="relative w-full h-64 bg-gray-200 overflow-hidden flex-shrink-0">

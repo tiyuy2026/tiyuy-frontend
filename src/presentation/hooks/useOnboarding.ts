@@ -17,7 +17,7 @@ export const useOnboarding = () => {
   const handleNext = () => {
     if (currentStep < totalSteps) {
       nextStep();
-      const routes = ['/onboarding/bienvenida', '/onboarding/kyc', '/onboarding/configuracion'];
+      const routes = ['/onboarding/welcome', '/onboarding/kyc', '/onboarding/configuracion'];
       router.push(routes[currentStep]); // currentStep ya fue incrementado
     } else {
       completeOnboarding();
@@ -28,7 +28,7 @@ export const useOnboarding = () => {
   const handlePrev = () => {
     if (currentStep > 1) {
       prevStep();
-      const routes = ['/onboarding/bienvenida', '/onboarding/kyc', '/onboarding/configuracion'];
+      const routes = ['/onboarding/welcome', '/onboarding/kyc', '/onboarding/configuracion'];
       router.push(routes[currentStep - 2]);
     }
   };

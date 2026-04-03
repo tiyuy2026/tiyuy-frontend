@@ -107,7 +107,7 @@ export const ResetPasswordForm: React.FC = () => {
         </p>
 
         <div className="space-y-4">
-          <Link href="/recuperar-contrasena">
+          <Link href="/recover-password">
             <Button variant="primary" size="lg" fullWidth>
               Solicitar Nuevo Enlace
             </Button>

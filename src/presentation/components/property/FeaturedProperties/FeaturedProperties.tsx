@@ -152,14 +152,14 @@ export function FeaturedProperties() {
         </p>
         <div className="flex gap-4 justify-center">
           <Link 
-            href="/alquiler" 
+            href="/rent" 
             className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
           >
             <span>Explorar alquileres</span>
             <span>→</span>
           </Link>
           <Link 
-            href="/venta" 
+            href="/sale" 
             className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
           >
             <span>Explorar ventas</span>

@@ -1,1 +1,1 @@
-export { default } from './FeaturedItems';
+export { FeaturedItems } from './FeaturedItems';

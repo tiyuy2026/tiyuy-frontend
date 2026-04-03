@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import './globals.css';
 import { Header } from '@/presentation/components/layout/Header/Header';
-import { FirebaseTest } from '@/components/FirebaseTest';
 import { metadata } from './metadata';
 
 const hind = Hind({ 

@@ -17,7 +17,7 @@ const HERO_IMAGES = [
 
 export default function HomePage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState<'alquiler' | 'venta' | 'proyectos'>('venta');
+  const [activeTab, setActiveTab] = useState<'rent' | 'sale' | 'projects'>('sale');
   const [selectedPropertyType, setSelectedPropertyType] = useState('departamentos');
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedBedrooms, setSelectedBedrooms] = useState('');
@@ -40,22 +40,22 @@ export default function HomePage() {
     const referrer = document.referrer;
     const currentPath = window.location.pathname;
     
-    if (currentPath.includes('/alquiler/') || referrer.includes('/alquiler/')) {
-      setActiveTab('alquiler');
-    } else if (currentPath.includes('/venta/') || referrer.includes('/venta/')) {
-      setActiveTab('venta');
-    } else if (currentPath.includes('/proyectos') || referrer.includes('/proyectos')) {
-      setActiveTab('proyectos');
+    if (currentPath.includes('/rent/') || referrer.includes('/rent/')) {
+      setActiveTab('rent');
+    } else if (currentPath.includes('/sale/') || referrer.includes('/sale/')) {
+      setActiveTab('sale');
+    } else if (currentPath.includes('/projects') || referrer.includes('/projects')) {
+      setActiveTab('projects');
     }
-    
+
     // También detectar desde localStorage si hay un estado guardado
     const savedTab = localStorage.getItem('selectedTab');
-    if (savedTab && ['alquiler', 'venta', 'proyectos'].includes(savedTab)) {
-      setActiveTab(savedTab as 'alquiler' | 'venta' | 'proyectos');
+    if (savedTab && ['rent', 'sale', 'projects'].includes(savedTab)) {
+      setActiveTab(savedTab as 'rent' | 'sale' | 'projects');
     }
   }, [pathname]);
 
-  const handleTabClick = (tab: 'alquiler' | 'venta' | 'proyectos') => {
+  const handleTabClick = (tab: 'rent' | 'sale' | 'projects') => {
     setActiveTab(tab);
     localStorage.setItem('selectedTab', tab);
     sessionStorage.setItem('lastActiveTab', tab);
@@ -66,7 +66,7 @@ export default function HomePage() {
   };
 
   const handleSearch = () => {
-    const baseUrl = activeTab === 'alquiler' ? '/alquiler' : activeTab === 'venta' ? '/venta' : '/proyectos';
+    const baseUrl = activeTab === 'rent' ? '/rent' : activeTab === 'sale' ? '/sale' : '/projects';
     const location = selectedLocation || 'lima';
     let url = `${baseUrl}/${selectedPropertyType}/${location}`;
     
@@ -95,7 +95,7 @@ export default function HomePage() {
 
   const getPropertyTypes = () => {
     switch (activeTab) {
-      case 'proyectos':
+      case 'projects':
         return [
           { value: 'departamentos', label: 'Departamentos' },
           { value: 'casas', label: 'Casas' },
@@ -144,31 +144,31 @@ export default function HomePage() {
                 <div className="bg-white rounded-2xl shadow-2xl overflow-visible">
                   <div className="border-b border-gray-200">
                     <div className="flex">
-                      <button 
-                        onClick={() => handleTabClick('alquiler')}
+                      <button
+                        onClick={() => handleTabClick('rent')}
                         className={`flex-1 py-4 text-base font-semibold transition-colors ${
-                          activeTab === 'alquiler' 
-                            ? 'text-gray-900 bg-white border-b-2 border-gray-900' 
+                          activeTab === 'rent'
+                            ? 'text-gray-900 bg-white border-b-2 border-gray-900'
                             : 'text-gray-600 hover:text-gray-900'
                         }`}
                       >
                         Alquilar
                       </button>
-                      <button 
-                        onClick={() => handleTabClick('venta')}
+                      <button
+                        onClick={() => handleTabClick('sale')}
                         className={`flex-1 py-4 text-base font-semibold transition-colors ${
-                          activeTab === 'venta' 
-                            ? 'text-gray-900 bg-white border-b-2 border-gray-900' 
+                          activeTab === 'sale'
+                            ? 'text-gray-900 bg-white border-b-2 border-gray-900'
                             : 'text-gray-600 hover:text-gray-900'
                         }`}
                       >
                         Comprar
                       </button>
-                      <button 
-                        onClick={() => handleTabClick('proyectos')}
+                      <button
+                        onClick={() => handleTabClick('projects')}
                         className={`flex-1 py-4 text-base font-semibold transition-colors ${
-                          activeTab === 'proyectos' 
-                            ? 'text-gray-900 bg-white border-b-2 border-gray-900' 
+                          activeTab === 'projects'
+                            ? 'text-gray-900 bg-white border-b-2 border-gray-900'
                             : 'text-gray-600 hover:text-gray-900'
                         }`}
                       >
@@ -277,26 +277,26 @@ export default function HomePage() {
         <div className="w-full px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             <div className="flex gap-8">
-              <Link 
-                href="/alquiler/departamentos/lima" 
+              <Link
+                href="/rent/departamentos/lima"
                 className="py-4 text-base font-semibold text-gray-600 hover:text-orange-600 hover:border-b-4 hover:border-orange-600"
               >
                 Alquilar
               </Link>
-              <Link 
-                href="/venta/departamentos/lima" 
+              <Link
+                href="/sale/departamentos/lima"
                 className="py-4 text-base font-semibold text-green-600 border-b-4 border-green-600 hover:text-green-700"
               >
                 Comprar
               </Link>
-              <Link 
-                href="/dashboard/mis-propiedades/nueva" 
+              <Link
+                href="/my-properties/new"
                 className="py-4 text-base font-medium text-gray-600 hover:text-green-600 hover:border-b-4 hover:border-green-600"
               >
                 Publicar
               </Link>
-              <Link 
-                href="/#proyectos" 
+              <Link
+                href="/#projects"
                 className="py-4 text-base font-medium text-gray-600 hover:text-green-600 hover:border-b-4 hover:border-green-600"
               >
                 Proyectos
@@ -331,7 +331,7 @@ export default function HomePage() {
                 </div>
               </Link>
 
-              <Link href="/guia-alquilar" className="block group">
+              <Link href="/rental-guide" className="block group">
                 <div className="bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-all border-2 border-transparent group-hover:border-yellow-200 group-hover:scale-105">
                   <div className="w-14 h-14 bg-yellow-100 rounded-xl flex items-center justify-center mb-5 group-hover:bg-yellow-200 transition-colors">
                     <svg className="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -351,7 +351,7 @@ export default function HomePage() {
                 </div>
               </Link>
 
-              <Link href="/proyectos" className="block group">
+              <Link href="/projects" className="block group">
                 <div className="bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-all border-2 border-transparent group-hover:border-purple-200 group-hover:scale-105">
                   <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-5 group-hover:bg-purple-200 transition-colors">
                     <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -371,7 +371,7 @@ export default function HomePage() {
                 </div>
               </Link>
 
-              <Link href="/conoce-tiyuy" className="block group">
+              <Link href="/about-tiyuy" className="block group">
                 <div className="bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-all border-2 border-transparent group-hover:border-blue-200 group-hover:scale-105">
                   <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-5 group-hover:bg-blue-200 transition-colors">
                     <svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -451,16 +451,16 @@ export default function HomePage() {
               Búsquedas populares en Perú
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-4">
-              <Link href="/alquiler/departamentos/lima" className="text-blue-600 hover:underline text-base">
+              <Link href="/rent/departamentos/lima" className="text-blue-600 hover:underline text-base">
                 Departamentos en Lima
               </Link>
-              <Link href="/alquiler/casas/arequipa" className="text-blue-600 hover:underline text-base">
+              <Link href="/rent/casas/arequipa" className="text-blue-600 hover:underline text-base">
                 Casas en Arequipa
               </Link>
-              <Link href="/alquiler/departamentos/cusco" className="text-blue-600 hover:underline text-base">
+              <Link href="/rent/departamentos/cusco" className="text-blue-600 hover:underline text-base">
                 Departamentos en Cusco
               </Link>
-              <Link href="/venta/casas/trujillo" className="text-blue-600 hover:underline text-base">
+              <Link href="/sale/casas/trujillo" className="text-blue-600 hover:underline text-base">
                 Casas en Trujillo
               </Link>
             </div>
