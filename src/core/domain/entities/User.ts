@@ -18,7 +18,9 @@ export interface User {
   city?: string;
   country?: string;
   bio?: string;
-  avatar?: string;
+  photoUrl?: string;  // Foto de perfil desde el backend
+  // Verificación de identidad
+  isVerified?: boolean;
 }
 
 // No necesitamos UserProfile separado, ya está incluido en User

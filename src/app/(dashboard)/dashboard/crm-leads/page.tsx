@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
+import { useAuthStore } from '@/presentation/store/authStore';
 import { 
   useReceivedLeads, 
   useUnreadLeadsCount, 
@@ -15,6 +16,10 @@ import {
 import Link from 'next/link';
 import { toast } from '@/presentation/store/toastStore';
 import { usePathname } from 'next/navigation';
+import { 
+  LayoutDashboard, Flame, Home, MessageSquare, Users, Diamond, User,
+  ChevronDown, LogOut, Building
+} from 'lucide-react';
 
 const STATUS_OPTIONS = [
   { value: 'ALL', label: 'Todos', color: 'bg-gray-500' },
@@ -29,23 +34,37 @@ const STATUS_OPTIONS = [
 // Sidebar Navigation Component
 function Sidebar() {
   const pathname = usePathname();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuthStore();
+  
+  // Cerrar dropdown al hacer click fuera
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   
   const menuItems = [
-    { href: '/dashboard', icon: '📊', label: 'Dashboard' },
-    { href: '/dashboard/crm-leads', icon: '🔥', label: 'CRM Leads', active: true },
-    { href: '/dashboard/mis-propiedades', icon: '🏠', label: 'Mis Propiedades' },
-    { href: '/dashboard/mensajes', icon: '💬', label: 'Mensajes' },
-    { href: '/dashboard/clientes', icon: '👥', label: 'Clientes' },
-    { href: '/dashboard/planes', icon: '💎', label: 'Planes' },
-    { href: '/dashboard/configuracion', icon: '⚙️', label: 'Configuración' },
+    { href: '/dashboard/crm-leads', icon: Flame, label: 'CRM Leads' },
+    { href: '/dashboard/mis-propiedades', icon: Home, label: 'Mis Propiedades' },
+    { href: '/dashboard/mensajes', icon: MessageSquare, label: 'Mensajes' },
+    { href: '/dashboard/clientes', icon: Users, label: 'Clientes' },
+    { href: '/dashboard/planes', icon: Diamond, label: 'Planes' },
+    { href: '/dashboard/perfil', icon: User, label: 'Perfil' },
   ];
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
-      {/* Logo */}
-      <div className="p-6 border-b border-gray-200">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center text-white font-bold text-xl">
+      {/* Header con Logo y Usuario Dropdown */}
+      <div className="p-4 border-b border-gray-200">
+        {/* Logo */}
+        <Link href="/dashboard" className="flex items-center gap-2 mb-4">
+          <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
             T
           </div>
           <div>
@@ -53,41 +72,91 @@ function Sidebar() {
             <p className="text-xs text-gray-500">CRM Inmobiliario</p>
           </div>
         </Link>
+        
+        {/* Usuario Dropdown - Botón Verde */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="w-full flex items-center gap-3 px-4 py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors"
+          >
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-semibold overflow-hidden">
+              {user?.photoUrl ? (
+                <img src={user.photoUrl} alt={user?.firstName || 'U'} className="w-full h-full object-cover"/>
+              ) : (
+                <span>{(user?.firstName || 'U').charAt(0).toUpperCase()}</span>
+              )}
+            </div>
+            <div className="flex-1 text-left min-w-0">
+              <p className="font-medium text-sm truncate">{user?.firstName || 'Usuario'} {user?.lastName || ''}</p>
+              <p className="text-xs text-teal-100 truncate capitalize">{user?.role?.toLowerCase() || 'Agente'}</p>
+            </div>
+            <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+          
+          {/* Dropdown Menu */}
+          {isDropdownOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+              <Link 
+                href="/dashboard/perfil" 
+                className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                <User className="w-4 h-4" />
+                <span className="text-sm">Mi Perfil</span>
+              </Link>
+              <Link 
+                href="/dashboard/mis-propiedades" 
+                className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                <Building className="w-4 h-4" />
+                <span className="text-sm">Mis Propiedades</span>
+              </Link>
+              <Link 
+                href="/dashboard/mensajes" 
+                className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span className="text-sm">Mensajes</span>
+              </Link>
+              <div className="border-t border-gray-100 my-1"></div>
+              <button 
+                className="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                }}
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="text-sm">Cerrar Sesión</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-1">
-        {menuItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              item.active || pathname === item.href
-                ? 'bg-blue-50 text-blue-700 font-medium'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-            }`}
-          >
-            <span className="text-xl">{item.icon}</span>
-            <span>{item.label}</span>
-            {item.active && (
-              <span className="ml-auto w-2 h-2 bg-blue-500 rounded-full"></span>
-            )}
-          </Link>
-        ))}
+        {menuItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                isActive
+                  ? 'bg-teal-50 text-teal-700 font-medium'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Icon className="w-5 h-5" />
+              <span>{item.label}</span>
+              {isActive && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
+            </Link>
+          );
+        })}
       </nav>
-
-      {/* User Profile */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50">
-          <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
-            A
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-gray-900 text-sm truncate">Agente</p>
-            <p className="text-xs text-gray-500 truncate">agente@tiyuy.com</p>
-          </div>
-        </div>
-      </div>
     </aside>
   );
 }
