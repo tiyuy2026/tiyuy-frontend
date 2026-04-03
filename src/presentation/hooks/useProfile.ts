@@ -18,10 +18,10 @@ export const useProfile = () => {
 
     // Record con UserRole exactos
     const profileRoutes: Record<UserRole, string> = {
-      USER: '/registro/usuario',
-      AGENT: '/registro/agente',
-      DEVELOPER: '/registro/desarrollador',
-      ADMIN: '/registro/admin',
+      USER: '/register/user',
+      AGENT: '/register/agent',
+      DEVELOPER: '/register/developer',
+      ADMIN: '/register/admin',
     };
 
     router.push(profileRoutes[profile]);

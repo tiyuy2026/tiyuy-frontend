@@ -3,12 +3,12 @@ import React, { useState } from 'react';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { Button, Input } from '@/presentation/components/ui';
 import Link from 'next/link';
+import { useForgotPassword } from '@/presentation/hooks/useForgotPassword';
 
 export const ForgotPasswordForm: React.FC = () => {
   const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const { sendForgotPassword, isLoading, error, isSuccess } = useForgotPassword();
 
   const validateEmail = (email: string) => {
     return /\S+@\S+\.\S+/.test(email);
@@ -16,43 +16,22 @@ export const ForgotPasswordForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email) {
-      setError('El email es requerido');
+      setValidationError('El email es requerido');
       return;
     }
 
     if (!validateEmail(email)) {
-      setError('Email inválido');
+      setValidationError('Email inválido');
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // Aquí llamaremos al backend para enviar el email de recuperación
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (response.ok) {
-        setIsSuccess(true);
-      } else {
-        const data = await response.json();
-        setError(data.message || 'Error al enviar el email de recuperación');
-      }
-    } catch (error) {
-      console.error('Error en recuperación de contraseña:', error);
-      setError('Error de conexión. Inténtalo nuevamente');
-    } finally {
-      setIsLoading(false);
-    }
+    setValidationError(null);
+    await sendForgotPassword(email);
   };
+
+  const displayError = validationError || error;
 
   if (isSuccess) {
     return (
@@ -60,13 +39,13 @@ export const ForgotPasswordForm: React.FC = () => {
         <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
           <CheckCircle className="w-10 h-10 text-green-600" />
         </div>
-        
+
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
           ¡Email Enviado!
         </h2>
-        
+
         <p className="text-gray-600 mb-8">
-          Hemos enviado un email a <strong>{email}</strong> con las instrucciones 
+          Hemos enviado un email a <strong>{email}</strong> con las instrucciones
           para recuperar tu contraseña.
         </p>
 
@@ -95,22 +74,22 @@ export const ForgotPasswordForm: React.FC = () => {
         <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center">
           <Mail className="w-8 h-8 text-white" />
         </div>
-        
+
         <h2 className="text-3xl font-bold text-gray-900 mb-3">
           ¿Olvidaste tu contraseña?
         </h2>
-        
+
         <p className="text-gray-600">
-          No te preocupes. Ingresa tu email y te enviaremos las instrucciones 
+          No te preocupes. Ingresa tu email y te enviaremos las instrucciones
           para recuperar tu cuenta.
         </p>
       </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        {error && (
+        {displayError && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-            {error}
+            {displayError}
           </div>
         )}
 
@@ -139,7 +118,7 @@ export const ForgotPasswordForm: React.FC = () => {
 
       {/* Back to Login */}
       <div className="mt-6 text-center">
-        <Link 
+        <Link
           href="/login"
           className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
         >
