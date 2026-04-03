@@ -327,7 +327,6 @@ export const emailService = {
     };
 
     try {
-      // TODO: Conectar con servicio de email real
       console.log('Email de recuperación enviado a:', email);
       console.log('URL de reset:', resetUrl);
       

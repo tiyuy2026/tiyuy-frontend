@@ -6,11 +6,12 @@ import { PropertyLocation } from './PropertyLocation';
 import { PropertyQuickInfo } from './PropertyQuickInfo';
 import { SimilarProperties } from '../SimilarProperties';
 import { PersonalizedRecommendations } from '../PersonalizedRecommendations';
-import { ContactForm } from '../../shared/ContactForm';
+import { ContactForm } from '../../shared/ContactForm/ContactForm';
 import { FavoriteButton } from '../../shared/FavoriteButton/FavoriteButton';
 import { ShareButton } from '../../shared/ShareButton/ShareButton';
 import { WhatsAppButton } from './WhatsAppButton';
 import { FeaturePropertyButton } from './FeaturePropertyButton';
+import { useAutoTrackCRMView } from '@/presentation/hooks/useCRMInteraction';
 
 interface PropertyDetailProps {
   property: Property;
@@ -31,6 +32,9 @@ const TRANSACTION_TYPE_LABELS: Record<string, string> = {
 };
 
 export function PropertyDetail({ property }: PropertyDetailProps) {
+  // Trackear vista en CRM automáticamente
+  useAutoTrackCRMView(property.id);
+
   const formatPrice = (price: number, currency: string) => {
     const symbol = currency === 'USD' ? 'US$' : 'S/';
     return `${symbol} ${price.toLocaleString('es-PE')}`;

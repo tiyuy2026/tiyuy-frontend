@@ -1,6 +1,26 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/dashboard/mensajes',
+        destination: '/dashboard/mis-contactos',
+      },
+      {
+        source: '/dashboard/clientes',
+        destination: '/dashboard/mis-contactos',
+      },
+      {
+        source: '/dashboard/mis-propiedades',
+        destination: '/mis-propiedades',
+      },
+      {
+        source: '/dashboard/planes',
+        destination: '/planes',
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

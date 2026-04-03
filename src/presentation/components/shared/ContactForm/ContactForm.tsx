@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useSendContact } from '@/presentation/hooks/useContacts';
+import { useCRMInteraction } from '@/presentation/hooks/useCRMInteraction';
 import { useAuthStore } from '@/presentation/store/authStore';
-import { useRouter } from 'next/navigation';
 
 interface ContactFormProps {
   propertyId: number;
@@ -11,9 +10,8 @@ interface ContactFormProps {
 }
 
 export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
-  const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
-  const sendContactMutation = useSendContact();
+  const { trackContactForm, isLoading } = useCRMInteraction();
 
   const [formData, setFormData] = useState({
     contactName: user?.firstName && user?.lastName 
@@ -37,22 +35,30 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isAuthenticated) {
-      router.push('/login');
-      return;
-    }
-
-    await sendContactMutation.mutateAsync({
-      propertyId,
-      ...formData,
-    });
-
-    // Reset form after success
-    if (sendContactMutation.isSuccess) {
-      setFormData({
-        ...formData,
-        message: '',
+    try {
+      // Enviar a CRM y crear lead (público - no requiere login)
+      await trackContactForm.mutateAsync({
+        propertyId,
+        contactName: formData.contactName,
+        contactEmail: formData.contactEmail,
+        contactPhone: formData.contactPhone,
+        message: formData.message,
+        preferredContactMethod: formData.preferredContactMethod,
       });
+
+      // Reset form after success
+      setFormData({
+        contactName: isAuthenticated && user?.firstName && user?.lastName 
+          ? `${user.firstName} ${user.lastName}` 
+          : '',
+        contactEmail: isAuthenticated && user?.email ? user.email : '',
+        contactPhone: '',
+        message: '¡Hola! Me interesa esta propiedad. ¿Está disponible?',
+        preferredContactMethod: 'EMAIL' as const,
+      });
+    } catch (error) {
+      // Error ya se maneja en el hook (toast)
+      console.error('Error enviando formulario:', error);
     }
   };
 
@@ -152,17 +158,11 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
         {/* Botón */}
         <button
           type="submit"
-          disabled={sendContactMutation.isPending}
+          disabled={isLoading}
           className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {sendContactMutation.isPending ? 'Enviando...' : 'Enviar mensaje'}
+          {isLoading ? 'Enviando...' : 'Enviar mensaje'}
         </button>
-
-        {!isAuthenticated && (
-          <p className="text-xs text-gray-500 text-center">
-            Necesitas iniciar sesión para contactar
-          </p>
-        )}
       </form>
     </div>
   );

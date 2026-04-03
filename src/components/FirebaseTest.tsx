@@ -9,14 +9,14 @@ export const FirebaseTest: React.FC = () => {
     const checkFirebase = () => {
       try {
         if (auth) {
-          setStatus('✅ Firebase Auth inicializado correctamente');
+          setStatus(' Firebase Auth inicializado correctamente');
           console.log('Firebase Auth:', auth);
           console.log('Configuración:', auth.app.options);
         } else {
-          setStatus('❌ Firebase Auth no disponible');
+          setStatus(' Firebase Auth no disponible');
         }
       } catch (error) {
-        setStatus(`❌ Error: ${error}`);
+        setStatus(` Error: ${error}`);
         console.error('Error en Firebase:', error);
       }
     };
@@ -29,7 +29,7 @@ export const FirebaseTest: React.FC = () => {
 
   return (
     <div className="fixed top-4 right-4 bg-white border border-gray-300 rounded-lg p-4 shadow-lg max-w-sm z-50">
-      <h3 className="font-bold text-sm mb-2">🔥 Firebase Status</h3>
+      <h3 className="font-bold text-sm mb-2"> Firebase Status</h3>
       <p className="text-xs">{status}</p>
       
       <div className="mt-2 text-xs text-gray-600">

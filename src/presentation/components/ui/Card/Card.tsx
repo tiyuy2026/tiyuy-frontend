@@ -13,7 +13,7 @@ export const Card: React.FC<CardProps> = ({ children, className = '', hover = fa
   return (
     <div
       className={`
-        bg-white rounded-2xl shadow-lg p-6
+        bg-white rounded-2xl shadow-lg
         transition-all duration-300
         border border-gray-100
         ${hoverStyles}
@@ -21,6 +21,45 @@ export const Card: React.FC<CardProps> = ({ children, className = '', hover = fa
       `}
       onClick={onClick}
     >
+      {children}
+    </div>
+  );
+};
+
+interface CardHeaderProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export const CardHeader: React.FC<CardHeaderProps> = ({ children, className = '' }) => {
+  return (
+    <div className={`px-6 py-4 border-b border-gray-100 ${className}`}>
+      {children}
+    </div>
+  );
+};
+
+interface CardTitleProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export const CardTitle: React.FC<CardTitleProps> = ({ children, className = '' }) => {
+  return (
+    <h3 className={`text-lg font-semibold text-gray-900 flex items-center gap-2 ${className}`}>
+      {children}
+    </h3>
+  );
+};
+
+interface CardContentProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export const CardContent: React.FC<CardContentProps> = ({ children, className = '' }) => {
+  return (
+    <div className={`p-6 ${className}`}>
       {children}
     </div>
   );

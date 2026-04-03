@@ -16,13 +16,22 @@ export const publicApiClient = axios.create({
   },
 });
 
-// Retry interceptor para Render cold start
+// Retry interceptor para Render cold start y errores de red
 axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.code === 'ECONNABORTED' && error.config && !error.config.__retry) {
+    const shouldRetry = (error.code === 'ECONNABORTED' || 
+                        error.code === 'ERR_NETWORK' || 
+                        error.code === 'ECONNREFUSED' ||
+                        !error.response) && 
+                        error.config && 
+                        !error.config.__retry;
+    
+    if (shouldRetry) {
       error.config.__retry = true;
-      console.log('🔄 Reintentando request (Render cold start)...');
+      console.log('🔄 Reintentando request (Render cold start / Network error)...', error.code);
+      // Esperar 2 segundos antes de reintentar
+      await new Promise(resolve => setTimeout(resolve, 2000));
       return axiosClient.request(error.config);
     }
     return Promise.reject(error);

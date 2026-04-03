@@ -181,7 +181,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       };
 
       globalWebSocket.onerror = (error) => {
-        console.error('❌ Error WebSocket (no crítico):', error);
+        // Error silenciado - la reconexión se maneja en onclose
         isConnectingRef.current = false;
         // No establecer error aquí, dejar que onclose maneje la reconexión
       };

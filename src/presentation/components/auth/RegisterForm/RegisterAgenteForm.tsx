@@ -4,6 +4,10 @@ import { useAuth } from '@/presentation/hooks';
 import { Button, Input } from '@/presentation/components/ui';
 import { DniInput } from '@/presentation/components/kyc';
 import { Mail, User, Phone, Lock, Hash, Briefcase } from 'lucide-react';
+import { AgentRepository } from '@/infrastructure/repositories/AgentRepository';
+import { toast } from 'sonner';
+
+const agentRepo = new AgentRepository();
 
 export const RegisterAgenteForm: React.FC = () => {
   const { register, isLoading, error } = useAuth();
@@ -73,8 +77,19 @@ export const RegisterAgenteForm: React.FC = () => {
         dni: formData.dni,
         role: 'AGENT',
       });
+
+      // Después del registro exitoso, actualizar perfil de agente con datos profesionales
+      try {
+        await agentRepo.updateProfile({
+          licenseNumber: formData.licenseNumber,
+          agency: formData.agency || undefined,
+        });
+      } catch (agentError) {
+        // Si falla la actualización del perfil de agente, no es crítico
+        console.warn('No se pudo actualizar perfil de agente inicialmente:', agentError);
+      }
     } catch (err) {
-      // Error manejado
+      // Error manejado por useAuth
     }
   };
 
