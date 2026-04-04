@@ -6,6 +6,7 @@
 import React, { useState, useRef } from 'react';
 import { useGroupPosts } from '@/presentation/hooks/useGroups';
 import { useGroupImages } from '@/presentation/hooks/useGroups';
+import { toast } from '@/presentation/store/toastStore';
 import { useMutation } from '@tanstack/react-query';
 import { GroupUseCases } from '@/core/domain/use-cases/GroupUseCases';
 import { GroupRepositoryImpl } from '@/infrastructure/repositories/GroupRepositoryImpl';
@@ -42,7 +43,7 @@ export function GrupoPostForm({ groupId, currentUserId, onClose, onSuccess }: Gr
     e.preventDefault();
     
     if (!content.trim()) {
-      alert('El contenido es obligatorio');
+      toast.error('El contenido es obligatorio');
       return;
     }
 
@@ -73,7 +74,7 @@ export function GrupoPostForm({ groupId, currentUserId, onClose, onSuccess }: Gr
       onClose?.();
     } catch (error) {
       console.error('Error al crear publicación:', error);
-      alert('Error al crear la publicación');
+      toast.error('Error al crear la publicación');
     }
   };
 
@@ -82,7 +83,7 @@ export function GrupoPostForm({ groupId, currentUserId, onClose, onSuccess }: Gr
     if (!files || files.length === 0) return;
 
     if (imageUrls.length + files.length > 3) {
-      alert('Máximo 3 imágenes permitidas');
+      toast.error('Máximo 3 imágenes permitidas');
       return;
     }
 
@@ -97,7 +98,7 @@ export function GrupoPostForm({ groupId, currentUserId, onClose, onSuccess }: Gr
       setImageUrls([...imageUrls, ...uploadedUrls]);
     } catch (error) {
       console.error('Error al subir imágenes:', error);
-      alert('Error al subir las imágenes');
+      toast.error('Error al subir las imágenes');
     }
   };
 

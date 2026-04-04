@@ -8,6 +8,7 @@ import { useGroups } from '@/presentation/hooks/useGroups';
 import { GrupoPostsPanel } from './components/GrupoPostsPanel';
 import { Plus, Search, Filter, Users } from 'lucide-react';
 import { Group } from '@/core/domain/entities/Group';
+import { toast } from '@/presentation/store/toastStore';
 
 export default function GruposPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -67,7 +68,7 @@ export default function GruposPage() {
       // El formulario está integrado en GrupoPostsPanel
       console.log('Crear post en grupo:', selectedGrupo.id);
     } else {
-      alert('Por favor selecciona un grupo primero');
+      toast.error('Por favor selecciona un grupo primero');
     }
   };
 

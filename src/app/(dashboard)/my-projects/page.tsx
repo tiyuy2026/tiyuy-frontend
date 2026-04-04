@@ -7,6 +7,7 @@ import { useAuthStore } from '@/presentation/store/authStore';
 import { useProjects } from '@/presentation/hooks/useProjects';
 import { TrialGuard } from '@/presentation/components/guards/TrialGuard/TrialGuard';
 import { TrialWarningBanner } from '@/presentation/components/guards/TrialGuard/TrialWarningBanner';
+import { toast } from '@/presentation/store/toastStore';
 
 export default function MisProyectosPage() {
   const { user } = useAuthStore();
@@ -27,14 +28,14 @@ export default function MisProyectosPage() {
       });
 
       if (response.ok) {
-        alert('¡Proyecto publicado exitosamente! 🎉');
+        toast.success('¡Proyecto publicado exitosamente!');
         refetch();
       } else {
         const error = await response.json();
-        alert(error.message || 'Error al publicar el proyecto');
+        toast.error(error.message || 'Error al publicar el proyecto');
       }
     } catch (error) {
-      alert('Error al publicar el proyecto');
+      toast.error('Error al publicar el proyecto');
     }
   };
 
@@ -51,14 +52,14 @@ export default function MisProyectosPage() {
       });
 
       if (response.ok) {
-        alert('¡Proyecto destacado exitosamente! 🌟');
+        toast.success('¡Proyecto destacado exitosamente!');
         refetch();
       } else {
         const error = await response.json();
-        alert(error.message || 'Error al destacar el proyecto');
+        toast.error(error.message || 'Error al destacar el proyecto');
       }
     } catch (error) {
-      alert('Error al destacar el proyecto');
+      toast.error('Error al destacar el proyecto');
     }
   };
 
@@ -78,13 +79,13 @@ export default function MisProyectosPage() {
       });
 
       if (response.ok) {
-        alert('Proyecto eliminado correctamente');
+        toast.success('Proyecto eliminado correctamente');
         refetch();
       } else {
-        alert('Error al eliminar el proyecto');
+        toast.error('Error al eliminar el proyecto');
       }
     } catch (error) {
-      alert('Error al eliminar el proyecto');
+      toast.error('Error al eliminar el proyecto');
     }
   };
 

@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { authStorage } from '@/infrastructure/storage/auth-storage';
+import { toast } from '@/presentation/store/toastStore';
 
 interface ProjectMultimediaStepProps {
   formData: any;
@@ -151,7 +152,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
 
   const handleFileUpload = async (files: FileList, type: 'images' | 'blueprints' | 'renders') => {
     if (!propertyId) {
-      alert('Primero debes guardar el proyecto para subir archivos');
+      toast.error('Primero debes guardar el proyecto para subir archivos');
       return;
     }
 
@@ -159,7 +160,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
     for (const file of Array.from(files)) {
       const error = await validateFile(file, type);
       if (error) {
-        alert(`⚠️ ${error}`);
+        toast.error(error);
         return; // Detener todo si hay un archivo inválido
       }
     }
@@ -230,7 +231,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
 
     } catch (error) {
       console.error('Error uploading files:', error);
-      alert('Error al subir los archivos');
+      toast.error('Error al subir los archivos');
     } finally {
       setUploading(false);
       setUploadProgress(0);

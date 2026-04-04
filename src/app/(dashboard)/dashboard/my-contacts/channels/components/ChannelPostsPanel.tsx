@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import { toast } from '@/presentation/store/toastStore';
 import { 
   useChannelPosts, 
   useChannelInteractions, 
@@ -254,11 +255,11 @@ export function ChannelPostsPanel({
       const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
       const validFiles = files.filter(file => {
         if (!validTypes.includes(file.type)) {
-          alert(`${file.name} no es un documento valido (solo PDF, Word, Excel)`);
+          toast.error(`${file.name} no es un documento válido (solo PDF, Word, Excel)`);
           return false;
         }
         if (file.size > 10 * 1024 * 1024) { // 10MB limit
-          alert(`${file.name} excede el limite de 10MB`);
+          toast.error(`${file.name} excede el límite de 10MB`);
           return false;
         }
         return true;
@@ -310,7 +311,7 @@ export function ChannelPostsPanel({
       setEditingPost(prev => ({ ...prev, [post.id]: false }));
     } catch (error) {
       console.error('Error editing post:', error);
-      alert('Error al editar el post. Inténtalo de nuevo.');
+      toast.error('Error al editar el post. Inténtalo de nuevo.');
     }
   };
 
@@ -1117,7 +1118,7 @@ export function ChannelPostsPanel({
                     const shareText = `Mira esta publicación de ${post.userFirstName} en "${channelName}": ${post.content?.substring(0, 100)}...`;
                     navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
                     setShowShareModal(prev => ({ ...prev, [post.id]: false }));
-                    alert('¡Link copiado al portapapeles!');
+                    toast.success('Link copiado al portapapeles');
                   }}
                   className="flex flex-col items-center p-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >

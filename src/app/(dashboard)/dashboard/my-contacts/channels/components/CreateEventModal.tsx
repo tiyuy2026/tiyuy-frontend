@@ -3,6 +3,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { X, Calendar, MapPin, Users, Image, Upload, Loader2 } from 'lucide-react';
 import { Modal } from '@/presentation/components/ui/Modal/Modal';
+import { toast } from '@/presentation/store/toastStore';
 import { useCreateChannelEvent, useUploadChannelEventImages } from '@/presentation/hooks/useContacts';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -381,18 +382,18 @@ export default function CreateEventModal({ isOpen, onClose, channelId, onSuccess
     const totalImages = selectedImages.length + newFiles.length;
 
     if (totalImages > MAX_IMAGES) {
-      alert(`Solo puedes subir maximo ${MAX_IMAGES} imagenes por evento`);
+      toast.error(`Solo puedes subir máximo ${MAX_IMAGES} imágenes por evento`);
       return;
     }
 
     // Validate file types and sizes
     const validFiles = newFiles.filter(file => {
       if (!file.type.startsWith('image/')) {
-        alert(`${file.name} no es una imagen valida`);
+        toast.error(`${file.name} no es una imagen válida`);
         return false;
       }
       if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        alert(`${file.name} excede el limite de 5MB`);
+        toast.error(`${file.name} excede el límite de 5MB`);
         return false;
       }
       return true;

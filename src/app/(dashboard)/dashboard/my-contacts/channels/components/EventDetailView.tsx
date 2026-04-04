@@ -232,7 +232,7 @@ export default function EventDetailView({
       });
     } else {
       navigator.clipboard.writeText(shareUrl);
-      alert('Link copiado al portapapeles');
+      toast.success('Link copiado al portapapeles');
     }
   };
 
