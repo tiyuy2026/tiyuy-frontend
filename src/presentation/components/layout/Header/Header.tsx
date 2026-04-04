@@ -993,15 +993,15 @@ export function Header() {
                         <p className="text-sm text-gray-500">{user?.email}</p>
                       </div>
                       <Link 
-                        href="/dashboard/perfil" 
+                        href="/dashboard/profile" 
                         className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                         onClick={() => setShowUserMenu(false)}
                       >
                         <User className="w-4 h-4" />
-                        <span className="text-sm">Mi Perfil</span>
+                        <span className="text-sm">My Profile</span>
                       </Link>
                       <Link 
-                        href="/dashboard/mis-propiedades" 
+                        href="/my-properties" 
                         className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                         onClick={() => setShowUserMenu(false)}
                       >
@@ -1009,7 +1009,7 @@ export function Header() {
                         <span className="text-sm">Mis Propiedades</span>
                       </Link>
                       <Link 
-                        href="/dashboard/mensajes" 
+                        href="/dashboard/my-contacts" 
                         className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                         onClick={() => setShowUserMenu(false)}
                       >

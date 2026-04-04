@@ -22,31 +22,31 @@ function Sidebar({ user }: { user: any }) {
   // Menú para agentes (sin Dashboard porque estamos en perfil)
   const fullMenuItems = [
     { href: '/dashboard/crm-leads', icon: Flame, label: 'CRM Leads' },
-    { href: '/dashboard/mis-propiedades', icon: Home, label: 'Mis Propiedades' },
-    { href: '/dashboard/mensajes', icon: MessageSquare, label: 'Mensajes' },
-    { href: '/dashboard/clientes', icon: Users, label: 'Clientes' },
-    { href: '/dashboard/planes', icon: Diamond, label: 'Planes' },
-    { href: '/dashboard/perfil', icon: User, label: 'Perfil' },
+    { href: '/my-properties', icon: Home, label: 'Mis Propiedades' },
+    { href: '/messages', icon: MessageSquare, label: 'Mensajes' },
+    { href: '/dashboard/clients', icon: Users, label: 'Clientes' },
+    { href: '/plans', icon: Diamond, label: 'Planes' },
+    { href: '/dashboard/profile', icon: User, label: 'Perfil' },
   ];
 
   // Menú para DEVELOPER (con Dashboard)
   const developerMenuItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/dashboard/crm-leads', icon: Flame, label: 'CRM Leads' },
-    { href: '/dashboard/mis-propiedades', icon: Home, label: 'Mis Propiedades' },
-    { href: '/dashboard/mensajes', icon: MessageSquare, label: 'Mensajes' },
-    { href: '/dashboard/clientes', icon: Users, label: 'Clientes' },
-    { href: '/dashboard/planes', icon: Diamond, label: 'Planes' },
-    { href: '/dashboard/perfil', icon: User, label: 'Perfil' },
+    { href: '/my-properties', icon: Home, label: 'Mis Propiedades' },
+    { href: '/messages', icon: MessageSquare, label: 'Mensajes' },
+    { href: '/dashboard/clients', icon: Users, label: 'Clientes' },
+    { href: '/plans', icon: Diamond, label: 'Planes' },
+    { href: '/dashboard/profile', icon: User, label: 'Perfil' },
   ];
   
   // Menú reducido para usuarios comunes (sin CRM, sin Dashboard)
   const userMenuItems = [
-    { href: '/dashboard/mis-propiedades', icon: Home, label: 'Mis Propiedades' },
-    { href: '/dashboard/favoritos', icon: Diamond, label: 'Favoritos' },
-    { href: '/dashboard/mensajes', icon: MessageSquare, label: 'Mensajes' },
-    { href: '/dashboard/planes', icon: Diamond, label: 'Planes' },
-    { href: '/dashboard/perfil', icon: User, label: 'Perfil' },
+    { href: '/my-properties', icon: Home, label: 'Mis Propiedades' },
+    { href: '/dashboard/favorites', icon: Diamond, label: 'Favoritos' },
+    { href: '/messages', icon: MessageSquare, label: 'Mensajes' },
+    { href: '/plans', icon: Diamond, label: 'Planes' },
+    { href: '/dashboard/profile', icon: User, label: 'Perfil' },
   ];
   
   let menuItems;

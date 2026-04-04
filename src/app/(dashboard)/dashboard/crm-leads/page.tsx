@@ -50,13 +50,12 @@ function Sidebar() {
   }, []);
   
   const menuItems = [
-    { href: '/dashboard', icon: '📊', label: 'Dashboard' },
-    { href: '/dashboard/crm-leads', icon: '🔥', label: 'CRM Leads', active: true },
-    { href: '/my-properties', icon: '🏠', label: 'Mis Propiedades' },
-    { href: '/messages', icon: '💬', label: 'Mensajes' },
-    { href: '/dashboard/clients', icon: '👥', label: 'Clientes' },
-    { href: '/plans', icon: '💎', label: 'Planes' },
-    { href: '/dashboard/configuracion', icon: '⚙️', label: 'Configuración' },
+    { href: '/dashboard/crm-leads', icon: Flame, label: 'CRM Leads' },
+    { href: '/my-properties', icon: Home, label: 'Mis Propiedades' },
+    { href: '/messages', icon: MessageSquare, label: 'Mensajes' },
+    { href: '/dashboard/clients', icon: Users, label: 'Clientes' },
+    { href: '/plans', icon: Diamond, label: 'Planes' },
+    { href: '/dashboard/profile', icon: User, label: 'Perfil' },
   ];
 
   return (
@@ -98,7 +97,7 @@ function Sidebar() {
           {isDropdownOpen && (
             <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
               <Link 
-                href="/dashboard/perfil" 
+                href="/dashboard/profile" 
                 className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                 onClick={() => setIsDropdownOpen(false)}
               >
@@ -106,7 +105,7 @@ function Sidebar() {
                 <span className="text-sm">Mi Perfil</span>
               </Link>
               <Link 
-                href="/dashboard/mis-propiedades" 
+                href="/my-properties" 
                 className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                 onClick={() => setIsDropdownOpen(false)}
               >
@@ -114,7 +113,7 @@ function Sidebar() {
                 <span className="text-sm">Mis Propiedades</span>
               </Link>
               <Link 
-                href="/dashboard/mensajes" 
+                href="/messages" 
                 className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                 onClick={() => setIsDropdownOpen(false)}
               >
