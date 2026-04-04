@@ -22,7 +22,7 @@ export function FeaturedProjects() {
       emptyIcon="🏢"
       emptyAction={{
         text: "Crear Proyecto",
-        href: "/dashboard/inmobiliarias/proyectos/nuevo",
+        href: "/my-projects/new",
         icon: "🏢"
       }}
     />

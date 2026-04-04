@@ -1,11 +1,11 @@
 export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
-  REGISTER: '/registro',
+  REGISTER: '/register',
   DASHBOARD: '/dashboard',
-  MY_PROPERTIES: '/mis-propiedades',
-  FAVORITES: '/favoritos',
-  MESSAGES: '/mensajes',
-  WALLET: '/billetera',
-  PROFILE: '/perfil',
+  MY_PROPERTIES: '/my-properties',
+  FAVORITES: '/favorites',
+  MESSAGES: '/messages',
+  WALLET: '/wallet',
+  PROFILE: '/profile',
 } as const;

@@ -33,10 +33,10 @@ function Sidebar() {
   const menuItems = [
     { href: '/dashboard', icon: '📊', label: 'Dashboard' },
     { href: '/dashboard/crm-leads', icon: '🔥', label: 'CRM Leads', active: true },
-    { href: '/dashboard/mis-propiedades', icon: '🏠', label: 'Mis Propiedades' },
-    { href: '/dashboard/mensajes', icon: '💬', label: 'Mensajes' },
-    { href: '/dashboard/clientes', icon: '👥', label: 'Clientes' },
-    { href: '/dashboard/planes', icon: '💎', label: 'Planes' },
+    { href: '/my-properties', icon: '🏠', label: 'Mis Propiedades' },
+    { href: '/messages', icon: '💬', label: 'Mensajes' },
+    { href: '/dashboard/clients', icon: '👥', label: 'Clientes' },
+    { href: '/plans', icon: '💎', label: 'Planes' },
     { href: '/dashboard/configuracion', icon: '⚙️', label: 'Configuración' },
   ];
 
@@ -231,7 +231,7 @@ function LeadRow({
           <div>
             <p className="font-medium text-gray-900 text-sm">{lead.propertyTitle}</p>
             <Link 
-              href={`/propiedad/${lead.propertySlug || lead.propertyId}`}
+              href={`/property/${lead.propertySlug || lead.propertyId}`}
               target="_blank"
               className="text-xs text-blue-600 hover:underline"
             >
@@ -408,7 +408,7 @@ function LeadCard({
           <div className="flex-1 min-w-0">
             <p className="font-medium text-gray-900 text-sm truncate">{lead.propertyTitle}</p>
             <Link 
-              href={`/propiedad/${lead.propertySlug || lead.propertyId}`}
+              href={`/property/${lead.propertySlug || lead.propertyId}`}
               target="_blank"
               className="text-xs text-blue-600 hover:underline"
             >

@@ -35,14 +35,14 @@ export function TrialWarningBanner() {
             </p>
             <div className="flex gap-2 mt-2">
               <a
-                href="/dashboard/planes"
+                href="/plans"
                 className="inline-flex items-center gap-1 bg-orange-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-orange-700 transition-colors"
               >
                 <Crown className="w-3 h-3" />
                 Ver Planes
               </a>
               <a
-                href="/dashboard/inmobiliarias/proyectos/nuevo"
+                href="/my-projects/new"
                 className="inline-flex items-center gap-1 bg-gray-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-gray-700 transition-colors"
               >
                 <Clock className="w-3 h-3" />

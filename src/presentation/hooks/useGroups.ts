@@ -136,7 +136,7 @@ export function useGroupPosts(groupId: number) {
 }
 
 // Hook for group comments
-export function useGroupComments(postId: number) {
+export function useGroupComments(groupId: number, postId: number) {
   const queryClient = useQueryClient();
   const groupUseCases = new GroupUseCases(new GroupRepositoryImpl());
 
@@ -146,17 +146,17 @@ export function useGroupComments(postId: number) {
     error: commentsError,
     refetch: refetchComments
   } = useQuery({
-    queryKey: ['group-comments', postId],
-    queryFn: () => groupUseCases.getGroupComments(postId),
+    queryKey: ['group-comments', groupId, postId],
+    queryFn: () => groupUseCases.getGroupComments(groupId, postId),
     staleTime: 1 * 60 * 1000, // 1 minute
   });
 
   // Mutation to create comment
   const createCommentMutation = useMutation({
-    mutationFn: (data: CreateGroupCommentData) => 
-      groupUseCases.createGroupComment(postId, data, 0),
+    mutationFn: (data: CreateGroupCommentData) =>
+      groupUseCases.createGroupComment(groupId, postId, data, 0),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['group-comments', postId] });
+      queryClient.invalidateQueries({ queryKey: ['group-comments', groupId, postId] });
       queryClient.invalidateQueries({ queryKey: ['group-posts'] }); // Para actualizar contador
       console.log('Comment created successfully');
     },

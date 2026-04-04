@@ -69,7 +69,7 @@ export const LoginForm: React.FC = () => {
 
   const handleRegisterClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    router.push('/perfil-selector');
+    router.push('/profile-selector');
   };
 
   const handleGoogleSignIn = async () => {
@@ -143,7 +143,7 @@ export const LoginForm: React.FC = () => {
             <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
             <span className="text-gray-600">Recordarme</span>
           </label>
-          <Link href="/recuperar-contrasena" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link href="/recover-password" className="text-blue-600 hover:text-blue-700 font-medium">
             ¿Olvidaste tu contraseña?
           </Link>
         </div>
@@ -196,7 +196,7 @@ export const LoginForm: React.FC = () => {
 
         <div className="text-center space-y-4">
           <a 
-            href="/recuperar-contrasena"
+            href="/recover-password"
             className="block text-blue-600 hover:text-blue-700 font-medium text-sm"
           >
             ¿Olvidaste tu contraseña?
