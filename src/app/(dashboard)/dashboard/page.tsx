@@ -270,26 +270,33 @@ export default function DashboardPage() {
               <h2 className="text-xl font-bold mb-4">Bienvenido a tu Dashboard</h2>
               <p className="text-gray-600 mb-6">Busca tu hogar ideal y gestiona tus propiedades favoritas</p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Link href="/dashboard/mis-propiedades" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <Link href="/dashboard/crm-leads" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  <div className="text-red-600 text-2xl mb-2">🔥</div>
+                  <h3 className="font-semibold">CRM Leads</h3>
+                  <p className="text-sm text-gray-600">Interesados en tiempo real</p>
+                </Link>
+                
+                <Link href="/my-properties" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
                   <div className="text-blue-600 text-2xl mb-2">🏠</div>
                   <h3 className="font-semibold">Mis Propiedades</h3>
                   <p className="text-sm text-gray-600">Publica y gestiona</p>
                 </Link>
                 
-                <Link href="/dashboard/favoritos" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
-                  <div className="text-green-600 text-2xl mb-2">❤️</div>
+                <Link href="/dashboard/favorites" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
+                  <div className="text-green-600 text-2xl mb-2">Favoritos</div>
                   <h3 className="font-semibold">Favoritos</h3>
                   <p className="text-sm text-gray-600">Propiedades guardadas</p>
                 </Link>
                 
-                <Link href="/dashboard/perfil" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
+                <Link href="/dashboard/profile" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
                   <div className="text-orange-600 text-2xl mb-2">👤</div>
                   <h3 className="font-semibold">Mi Perfil</h3>
                   <p className="text-sm text-gray-600">Datos personales</p>
                 </Link>
                 
-                <Link href="/planes" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
+                <Link href="/plans" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
                   <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                     {getPlanBadge()}
                   </div>
@@ -317,19 +324,19 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600">Interesados en tiempo real</p>
                 </Link>
                 
-                <Link href="/dashboard/mis-propiedades" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
+                <Link href="/my-properties" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
                   <div className="text-blue-600 text-2xl mb-2">🏠</div>
                   <h3 className="font-semibold">Mis Propiedades</h3>
                   <p className="text-sm text-gray-600">Gestiona publicaciones</p>
                 </Link>
                 
-                <Link href="/dashboard/mensajes" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
+                <Link href="/messages" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
                   <div className="text-green-600 text-2xl mb-2">Mensajes</div>
                   <h3 className="font-semibold">Mensajes</h3>
                   <p className="text-sm text-gray-600">Leads de clientes</p>
                 </Link>
                 
-                <Link href="/planes" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
+                <Link href="/plans" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
                   <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                     {getPlanBadge()}
                   </div>
@@ -357,31 +364,31 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600">Interesados en tiempo real</p>
                 </Link>
                 
-                <Link href="/dashboard/mis-propiedades" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
+                <Link href="/my-properties" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
                   <div className="text-blue-600 text-2xl mb-2">🏠</div>
                   <h3 className="font-semibold">Mis Propiedades</h3>
                   <p className="text-sm text-gray-600">Gestiona publicaciones</p>
                 </Link>
                 
-                <Link href="/dashboard/proyectos" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
+                <Link href="/my-projects" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
                   <div className="text-green-600 text-2xl mb-2">🏗️</div>
                   <h3 className="font-semibold">Mis Proyectos</h3>
                   <p className="text-sm text-gray-600">Desarrollos activos</p>
                 </Link>
                 
-                <Link href="/dashboard/proyectos/nuevo" className="bg-purple-50 p-4 rounded-lg hover:bg-purple-100 transition-colors">
+                <Link href="/my-projects/new" className="bg-purple-50 p-4 rounded-lg hover:bg-purple-100 transition-colors">
                   <div className="text-purple-600 text-2xl mb-2">🏢</div>
                   <h3 className="font-semibold">Nuevo Proyecto</h3>
                   <p className="text-sm text-gray-600">Crear desarrollo</p>
                 </Link>
                 
-                <Link href="/dashboard/billetera" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
+                <Link href="/wallet" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
                   <div className="text-orange-600 text-2xl mb-2">Billetera</div>
                   <h3 className="font-semibold">Billetera</h3>
                   <p className="text-sm text-gray-600">Créditos y pagos</p>
                 </Link>
                 
-                <Link href="/planes" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors">
+                <Link href="/plans" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors">
                   <div className="text-red-600 text-2xl mb-2">Planes</div>
                   <h3 className="font-semibold">Planes</h3>
                   <p className="text-sm text-gray-600">999 publicaciones</p>
@@ -416,25 +423,25 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600">Interesados en tiempo real</p>
                 </Link>
                 
-                <Link href="/dashboard/mis-propiedades" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
+                <Link href="/my-properties" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
                   <div className="text-blue-600 text-2xl mb-2">🏠</div>
                   <h3 className="font-semibold">Mis Propiedades</h3>
                   <p className="text-sm text-gray-600">Gestiona publicaciones</p>
                 </Link>
                 
-                <Link href="/dashboard/mensajes" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
+                <Link href="/messages" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
                   <div className="text-green-600 text-2xl mb-2">Mensajes</div>
                   <h3 className="font-semibold">Mensajes</h3>
                   <p className="text-sm text-gray-600">Leads de clientes</p>
                 </Link>
                 
-                <Link href="/dashboard/billetera" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
+                <Link href="/wallet" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
                   <div className="text-orange-600 text-2xl mb-2">�</div>
                   <h3 className="font-semibold">Billetera</h3>
                   <p className="text-sm text-gray-600">Pagos y métodos</p>
                 </Link>
                 
-                <Link href="/planes" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
+                <Link href="/plans" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
                   <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                     {getPlanBadge()}
                   </div>

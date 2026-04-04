@@ -261,17 +261,17 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
               action: {
                 label: 'Ver Planes',
                 onClick: () => {
-                  console.log(' Toast: Navegando a /planes...');
+                  console.log(' Toast: Navegando a /plans...');
                   console.log(' URL actual:', window.location.href);
-                  router.push('/planes');
+                  router.push('/plans');
                 }
               }
             });
             
             // Redirigir después de un tiempo
             setTimeout(() => {
-              console.log(' Timeout: Navegando a /planes...');
-              router.push('/planes');
+              console.log(' Timeout: Navegando a /plans...');
+              router.push('/plans');
             }, 3000);
           } else {
             toast.error('Error al crear el proyecto');
@@ -604,7 +604,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
 
           if (response.ok) {
             toast.success('¡Proyecto publicado exitosamente! 🎉');
-            router.push('/dashboard/proyectos');
+            router.push('/my-projects');
           } else {
             const error = await response.json();
             toast.error(error.message || 'Error al publicar el proyecto');
@@ -619,15 +619,15 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
     } else if (mode === 'create' && formType === 'project' && !createdPropertyId) {
       // Crear proyecto y redirigir (se creó como DRAFT en handleNext)
       toast.success('Proyecto guardado como BORRADOR');
-      router.push('/dashboard/mis-proyectos'); //  Redirigir a mis-proyectos
+      router.push('/my-projects'); //  Redirigir a mis-proyectos
     } else if (mode === 'create' && formType !== 'project') {
       // Para propiedades, redirigir al historial
       if (createdPropertyId) {
-        router.push('/mis-propiedades');
+        router.push('/my-properties');
       } else {
         const createData = prepareCreateData(formData);
         createMutation.mutate(createData, {
-          onSuccess: () => router.push('/mis-propiedades'),
+          onSuccess: () => router.push('/my-properties'),
           onError: (error: any) => {
             toast.error('Error al guardar la propiedad');
           },
@@ -643,7 +643,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
             projectData,
           },
           {
-            onSuccess: () => router.push('/dashboard/proyectos'),
+            onSuccess: () => router.push('/my-projects'),
             onError: () => toast.error('Error al guardar el proyecto'),
           }
         );
@@ -664,7 +664,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
             },
           },
           {
-            onSuccess: () => router.push('/mis-propiedades'),
+            onSuccess: () => router.push('/my-properties'),
             onError: () => toast.error('Error al guardar la propiedad'),
           }
         );
@@ -761,7 +761,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
                       onSuccess: (result: any) => { 
                         console.log('✅ Proyecto guardado como BORRADOR:', result);
                         toast.success('¡Proyecto guardado como BORRADOR! 🎉');
-                        router.push('/dashboard/mis-proyectos'); // ✅ Redirigir a borradores
+                        router.push('/my-projects'); // ✅ Redirigir a borradores
                       },
                       onError: (error: any) => {
                         console.error('❌ Error guardando borrador:', error);
@@ -776,7 +776,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
                       onSuccess: (result: any) => { 
                         console.log('✅ Proyecto guardado como BORRADOR:', result);
                         toast.success('¡Proyecto guardado como BORRADOR! 🎉');
-                        router.push('/dashboard/mis-proyectos'); // ✅ Redirigir a borradores
+                        router.push('/my-projects'); // ✅ Redirigir a borradores
                       },
                       onError: (error: any) => {
                         console.error('❌ Error guardando borrador:', error);
@@ -791,7 +791,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
                     onSuccess: (result: any) => { 
                       console.log('✅ Proyecto guardado como BORRADOR:', result);
                       toast.success('¡Proyecto guardado como BORRADOR! 🎉');
-                      router.push('/dashboard/mis-proyectos'); // ✅ Redirigir a borradores
+                      router.push('/my-projects'); // ✅ Redirigir a borradores
                     },
                     onError: (error: any) => {
                       console.error('❌ Error guardando borrador:', error);

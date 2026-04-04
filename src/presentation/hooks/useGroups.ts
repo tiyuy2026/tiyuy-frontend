@@ -2,6 +2,7 @@
 // This file belongs to GROUPS module (Presentation Layer - React Hooks)
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from '../store/toastStore';
 import { GroupUseCases } from '../../core/domain/use-cases/GroupUseCases';
 import { GroupRepositoryImpl } from '../../infrastructure/repositories/GroupRepositoryImpl';
 import { CreateGroupPostData, CreateGroupCommentData, CreateGroupData } from '../../core/domain/repositories/GroupRepository';
@@ -136,7 +137,7 @@ export function useGroupPosts(groupId: number) {
 }
 
 // Hook for group comments
-export function useGroupComments(postId: number) {
+export function useGroupComments(groupId: number, postId: number) {
   const queryClient = useQueryClient();
   const groupUseCases = new GroupUseCases(new GroupRepositoryImpl());
 
@@ -146,17 +147,17 @@ export function useGroupComments(postId: number) {
     error: commentsError,
     refetch: refetchComments
   } = useQuery({
-    queryKey: ['group-comments', postId],
-    queryFn: () => groupUseCases.getGroupComments(postId),
+    queryKey: ['group-comments', groupId, postId],
+    queryFn: () => groupUseCases.getGroupComments(groupId, postId),
     staleTime: 1 * 60 * 1000, // 1 minute
   });
 
   // Mutation to create comment
   const createCommentMutation = useMutation({
-    mutationFn: (data: CreateGroupCommentData) => 
-      groupUseCases.createGroupComment(postId, data, 0),
+    mutationFn: (data: CreateGroupCommentData) =>
+      groupUseCases.createGroupComment(groupId, postId, data, 0),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['group-comments', postId] });
+      queryClient.invalidateQueries({ queryKey: ['group-comments', groupId, postId] });
       queryClient.invalidateQueries({ queryKey: ['group-posts'] }); // Para actualizar contador
       console.log('Comment created successfully');
     },
@@ -233,7 +234,7 @@ export function useGroupInteractions(currentUserId?: number) {
     },
     onError: (error) => {
       console.error('Error sharing post:', error);
-      alert('Error sharing post. Please try again.');
+      toast.error('Error al compartir la publicación. Inténtalo de nuevo.');
     }
   });
 

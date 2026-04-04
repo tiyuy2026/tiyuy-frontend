@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import { ResetPasswordForm } from '@/presentation/components/auth/ResetPasswordForm/ResetPasswordForm';
 
 export const metadata: Metadata = {
@@ -12,7 +13,9 @@ export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <ResetPasswordForm />
+        <Suspense fallback={<div className="animate-pulse h-96 bg-white rounded-xl" />}>
+          <ResetPasswordForm />
+        </Suspense>
       </div>
     </div>
   );
