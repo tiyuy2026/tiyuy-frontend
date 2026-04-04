@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useGetChannels, useCreateChannel } from '@/presentation/hooks/useContacts';
+import { InfoDialog } from '@/presentation/components/ui';
 
 function CanalesListPanel({ 
   user, 
@@ -19,6 +20,7 @@ function CanalesListPanel({
 }) {
   const { data: channels, isLoading } = useGetChannels(user?.id);
   const [searchQuery, setSearchQuery] = useState('');
+  const [infoDialog, setInfoDialog] = useState(false);
   
   // ✅ Canales que creé (soy admin)
   const misCanalesCreados = channels?.filter((c: any) => c.isAdmin) ?? [];
@@ -192,6 +194,14 @@ function CanalesListPanel({
         </div>
       )}
 
+      <InfoDialog
+        isOpen={infoDialog}
+        onClose={() => setInfoDialog(false)}
+        title="Permisos insuficientes"
+        message="Para crear canales necesitas ser Agente Inmobiliario o Empresa. Contacta a nuestro equipo para actualizar tu rol."
+        variant="info"
+      />
+
       {/* Botón crear - Verificación inteligente de rol */}
       <div className="px-3 pb-3">
         <button
@@ -202,7 +212,7 @@ function CanalesListPanel({
               onSectionChange('crear-canal');
             } else {
               // Mostrar mensaje amable si no tiene permisos
-              alert('¡Hola! Para crear canales necesitas ser Agente Inmobiliario o Empresa. Contacta a nuestro equipo para actualizar tu rol.');
+              setInfoDialog(true);
             }
           }}
           className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-colors relative ${

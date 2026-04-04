@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
+import { toast } from '@/presentation/store/toastStore';
 import { Search, User, Bell, Plus, MapPin, Calendar, Users, Star, Share2, ChevronDown, Pin, MoreHorizontal, Filter, Edit, Trash2, Clock, Check, CheckCheck, MailOpen } from 'lucide-react';
 import { useChannelEvents, useChannelUpcomingEvents, useCreateChannelEvent, useChannelSubscribers, useChannelEventsWithFilters, useUserEvents, useDeleteChannelEvent, useUpdateChannelEvent } from '@/presentation/hooks/useContacts';
 import { apiClient } from '@/infrastructure/api/axios-client';
@@ -360,7 +361,7 @@ export default function ChannelEventsPanel({
         queryClient.invalidateQueries({ queryKey: ['events'] });
         
         // Mostrar mensaje temporal
-        alert('Cargando evento... Por favor espera un momento y vuelve a intentar.');
+        toast.error('Cargando evento... Por favor espera un momento y vuelve a intentar.');
       }
     } else {
       // Si no tiene eventId, solo marcar como leída
@@ -1154,7 +1155,7 @@ export default function ChannelEventsPanel({
                                   },
                                   onError: (error) => {
                                     console.error('Error al eliminar evento:', error);
-                                    alert('Error al eliminar el evento');
+                                    toast.error('Error al eliminar el evento');
                                   }
                                 }
                               );

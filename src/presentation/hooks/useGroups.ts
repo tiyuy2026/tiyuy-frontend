@@ -2,6 +2,7 @@
 // This file belongs to GROUPS module (Presentation Layer - React Hooks)
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from '../store/toastStore';
 import { GroupUseCases } from '../../core/domain/use-cases/GroupUseCases';
 import { GroupRepositoryImpl } from '../../infrastructure/repositories/GroupRepositoryImpl';
 import { CreateGroupPostData, CreateGroupCommentData, CreateGroupData } from '../../core/domain/repositories/GroupRepository';
@@ -233,7 +234,7 @@ export function useGroupInteractions(currentUserId?: number) {
     },
     onError: (error) => {
       console.error('Error sharing post:', error);
-      alert('Error sharing post. Please try again.');
+      toast.error('Error al compartir la publicación. Inténtalo de nuevo.');
     }
   });
 

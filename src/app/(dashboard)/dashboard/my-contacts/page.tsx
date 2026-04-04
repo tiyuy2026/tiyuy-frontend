@@ -38,6 +38,7 @@ import {
 import { useAuthStore } from '@/presentation/store/authStore';
 import MessageInput from '@/presentation/components/contacts/MessageInput';
 import { toast } from '@/presentation/store/toastStore';
+import { InfoDialog } from '@/presentation/components/ui';
 import StatusInput, { StatusInteractions } from '@/presentation/components/contacts/StatusInput';
 import LocationAutocomplete from '@/presentation/components/LocationAutocomplete';
 import { useGooglePlaces } from '@/presentation/hooks/useGooglePlaces';
@@ -436,37 +437,32 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isRestricted, setIsRestricted] = useState(false);
+  const [infoDialog, setInfoDialog] = useState<{ isOpen: boolean; title: string; message: string; variant: 'warning' | 'error' }>({ isOpen: false, title: '', message: '', variant: 'warning' });
   const createGroup = useCreateGroup();
   const { data: groups } = useGetGroups(0, 50);
-  
+
   // Verificar si el usuario ya tiene un grupo
   const userGroups = groups?.filter((g: any) => g.isMember && g.isOwner) ?? [];
   const hasGroup = userGroups.length > 0;
 
   const handleSubmit = async () => {
     if (!name.trim()) return;
-    
+
     try {
       await createGroup.mutateAsync({ name, description, isRestrictedByEmail: isRestricted });
       onClose();
     } catch (error: any) {
-      // Manejar error específico de límite de grupos
       if (error?.code === 'GROUP_LIMIT_EXCEEDED') {
-        // Mensaje más claro y persistente
-        const message = `⚠️ LIMITE DE GRUPOS ALCANZADO\n\nYa tienes un grupo creado y no puedes crear mas.\n\nTu grupo actual: "${userGroups[0]?.name || 'Tu grupo'}"\n\nSolo puedes tener UN (1) grupo activo en Tiyuy.\n\nVe a la seccion "Mis Grupos" para gestionarlo.`;
-        
-        alert(message);
+        setInfoDialog({
+          isOpen: true,
+          title: 'Límite de grupos alcanzado',
+          message: `Ya tienes un grupo creado y no puedes crear más.\n\nTu grupo actual: "${userGroups[0]?.name || 'Tu grupo'}"\n\nSolo puedes tener UN (1) grupo activo en Tiyuy.\n\nVe a la sección "Mis Grupos" para gestionarlo.`,
+          variant: 'warning',
+        });
         onClose();
-        
-        // Opcional: Mostrar notificación toast adicional
-        setTimeout(() => {
-          alert('💡 Recuerda: Puedes encontrar tu grupo en la seccion "Tus Grupos" del menu izquierdo');
-        }, 1000);
-        
       } else {
-        // Otros errores
         const errorMessage = error?.message || 'Error al crear el grupo';
-        alert(` Error: ${errorMessage}`);
+        toast.error(errorMessage);
       }
     }
   };
@@ -512,6 +508,14 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
+    <>
+    <InfoDialog
+      isOpen={infoDialog.isOpen}
+      onClose={() => setInfoDialog(prev => ({ ...prev, isOpen: false }))}
+      title={infoDialog.title}
+      message={infoDialog.message}
+      variant={infoDialog.variant}
+    />
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
         <div className="bg-gradient-to-r from-blue-600 to-teal-500 p-5">
@@ -563,6 +567,7 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

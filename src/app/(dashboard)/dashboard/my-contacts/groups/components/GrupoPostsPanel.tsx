@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useGroupPosts, useGroupInteractions } from '@/presentation/hooks/useGroups';
+import { toast } from '@/presentation/store/toastStore';
 import { GroupUseCases } from '@/core/domain/use-cases/GroupUseCases';
 import { GroupRepositoryImpl } from '@/infrastructure/repositories/GroupRepositoryImpl';
 import { Plus, MessageSquare, Heart, Share2, Image, MapPin, X, Send, MoreVertical, Edit, Trash2 } from 'lucide-react';
@@ -168,7 +169,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
       console.log('Post edited successfully');
     } catch (error) {
       console.error('Error editing post:', error);
-      alert('Error editing post. Please try again.');
+      toast.error('Error al editar la publicación. Inténtalo de nuevo.');
     }
   };
 
@@ -186,7 +187,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
       console.log('Post deleted successfully');
     } catch (error) {
       console.error('Error deleting post:', error);
-      alert('Error deleting post. Please try again.');
+      toast.error('Error al eliminar la publicación. Inténtalo de nuevo.');
     }
   };
 
@@ -230,13 +231,13 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
           
         } catch (uploadError) {
           console.error('Error uploading images:', uploadError);
-          alert('Error uploading images. Post created but without images.');
+          toast.error('Error al subir imágenes. Publicación creada sin imágenes.');
         }
       }
       
     } catch (error) {
       console.error('Error creating post:', error);
-      alert('Error creating post. Please try again.');
+      toast.error('Error al crear la publicación. Inténtalo de nuevo.');
       return; // Don't reset form if there was error
     }
     
@@ -356,7 +357,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
       
     } catch (error) {
       console.error('Error sending reply:', error);
-      alert('Error sending reply. Please try again.');
+      toast.error('Error al enviar la respuesta. Inténtalo de nuevo.');
     }
   };
 
@@ -389,7 +390,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
       
     } catch (error) {
       console.error('Error sending comment:', error);
-      alert('Error sending comment. Please try again.');
+      toast.error('Error al enviar el comentario. Inténtalo de nuevo.');
     }
   };
 
@@ -1010,7 +1011,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                     const shareText = `Check out this post from ${post.userName} in "${groupName}": ${post.content?.substring(0, 100)}...`;
                     navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
                     setShowShareModal(prev => ({ ...prev, [post.id]: false }));
-                    alert('Link copied to clipboard!');
+                    toast.success('Link copiado al portapapeles');
                   }}
                   className="flex flex-col items-center p-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/presentation/hooks';
 import { useGoogleAuth } from '@/presentation/hooks/useGoogleAuth';
-import { Button, Input } from '@/presentation/components/ui';
+import { Button, Input, InfoDialog } from '@/presentation/components/ui';
 
 export const LoginForm: React.FC = () => {
   const router = useRouter();
@@ -15,6 +15,7 @@ export const LoginForm: React.FC = () => {
     password: '',
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [infoDialog, setInfoDialog] = useState<{ isOpen: boolean; message: string }>({ isOpen: false, message: '' });
 
   const validateForm = () => {
     console.log('LoginForm: validateForm llamado');
@@ -79,7 +80,7 @@ export const LoginForm: React.FC = () => {
       if (googleUserData) {
         // Para login con Google, necesitamos una contraseña temporal o manejarlo diferente
         // Por ahora, mostramos un mensaje indicando que el usuario debe registrarse primero
-        alert('Para usar Google, primero regístrate con tu correo de Google en la página de registro.');
+        setInfoDialog({ isOpen: true, message: 'Para usar Google, primero regístrate con tu correo de Google en la página de registro.' });
         console.log('LoginForm: Datos de Google obtenidos:', googleUserData);
       }
     } catch (error) {
@@ -88,6 +89,14 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
+    <>
+    <InfoDialog
+      isOpen={infoDialog.isOpen}
+      onClose={() => setInfoDialog({ isOpen: false, message: '' })}
+      title="Registro con Google"
+      message={infoDialog.message}
+      variant="info"
+    />
     <div className="w-full max-w-md">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3">
@@ -214,5 +223,6 @@ export const LoginForm: React.FC = () => {
         </div>
       </form>
     </div>
+    </>
   );
 };
