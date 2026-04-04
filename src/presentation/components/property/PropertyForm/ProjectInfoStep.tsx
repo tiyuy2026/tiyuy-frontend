@@ -129,7 +129,7 @@ export function ProjectInfoStep({ formData, onChange }: ProjectInfoStepProps) {
               <strong>📈 Proyectos adicionales</strong> requieren suscripción ENTERPRISE
               <br />
               <Link 
-                href="/planes"
+                href="/plans"
                 className="text-amber-900 underline hover:text-amber-700 font-medium"
               >
                 Ver planes y precios

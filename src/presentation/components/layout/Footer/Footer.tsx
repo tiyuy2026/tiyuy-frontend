@@ -12,104 +12,104 @@ export function Footer() {
     principal: {
       venta: [
         { city: 'Lima', links: [
-          { href: '/venta/casas/lima', text: 'Casas en venta en Lima' },
-          { href: '/venta/departamentos/lima', text: 'Departamentos en venta en Lima' }
+          { href: '/sale/casas/lima', text: 'Casas en venta en Lima' },
+          { href: '/sale/departamentos/lima', text: 'Departamentos en venta en Lima' }
         ]},
         { city: 'Arequipa', links: [
-          { href: '/venta/casas/arequipa', text: 'Casas en venta en Arequipa' },
-          { href: '/venta/departamentos/arequipa', text: 'Departamentos en venta en Arequipa' }
+          { href: '/sale/casas/arequipa', text: 'Casas en venta en Arequipa' },
+          { href: '/sale/departamentos/arequipa', text: 'Departamentos en venta en Arequipa' }
         ]},
         { city: 'Trujillo', links: [
-          { href: '/venta/casas/trujillo', text: 'Casas en venta en Trujillo' },
-          { href: '/venta/departamentos/trujillo', text: 'Departamentos en venta en Trujillo' }
+          { href: '/sale/casas/trujillo', text: 'Casas en venta en Trujillo' },
+          { href: '/sale/departamentos/trujillo', text: 'Departamentos en venta en Trujillo' }
         ]},
         { city: 'Callao', links: [
-          { href: '/venta/casas/callao', text: 'Casas en venta en Callao' },
-          { href: '/venta/departamentos/callao', text: 'Departamentos en venta en Callao' }
+          { href: '/sale/casas/callao', text: 'Casas en venta en Callao' },
+          { href: '/sale/departamentos/callao', text: 'Departamentos en venta en Callao' }
         ]}
       ],
       alquiler: [
         { city: 'Lima', links: [
-          { href: '/alquiler/casas/lima', text: 'Casas en alquiler en Lima' },
-          { href: '/alquiler/departamentos/lima', text: 'Departamentos en alquiler en Lima' }
+          { href: '/rent/casas/lima', text: 'Casas en alquiler en Lima' },
+          { href: '/rent/departamentos/lima', text: 'Departamentos en alquiler en Lima' }
         ]},
         { city: 'Arequipa', links: [
-          { href: '/alquiler/casas/arequipa', text: 'Casas en alquiler en Arequipa' },
-          { href: '/alquiler/departamentos/arequipa', text: 'Departamentos en alquiler en Arequipa' }
+          { href: '/rent/casas/arequipa', text: 'Casas en alquiler en Arequipa' },
+          { href: '/rent/departamentos/arequipa', text: 'Departamentos en alquiler en Arequipa' }
         ]},
         { city: 'Trujillo', links: [
-          { href: '/alquiler/casas/trujillo', text: 'Casas en alquiler en Trujillo' },
-          { href: '/alquiler/departamentos/trujillo', text: 'Departamentos en alquiler en Trujillo' }
+          { href: '/rent/casas/trujillo', text: 'Casas en alquiler en Trujillo' },
+          { href: '/rent/departamentos/trujillo', text: 'Departamentos en alquiler en Trujillo' }
         ]},
         { city: 'Callao', links: [
-          { href: '/alquiler/casas/callao', text: 'Casas en alquiler en Callao' },
-          { href: '/alquiler/departamentos/callao', text: 'Departamentos en alquiler en Callao' }
+          { href: '/rent/casas/callao', text: 'Casas en alquiler en Callao' },
+          { href: '/rent/departamentos/callao', text: 'Departamentos en alquiler en Callao' }
         ]}
       ]
     },
     lima: {
       venta: [
         { city: 'Lima', links: [
-          { href: '/venta/casas/lima', text: 'Casas en venta en Lima' },
-          { href: '/venta/departamentos/lima', text: 'Departamentos en venta en Lima' },
-          { href: '/venta/terrenos/lima', text: 'Terrenos en venta en Lima' },
-          { href: '/venta/oficinas/lima', text: 'Oficinas en venta en Lima' }
+          { href: '/sale/casas/lima', text: 'Casas en venta en Lima' },
+          { href: '/sale/departamentos/lima', text: 'Departamentos en venta en Lima' },
+          { href: '/sale/terrenos/lima', text: 'Terrenos en venta en Lima' },
+          { href: '/sale/oficinas/lima', text: 'Oficinas en venta en Lima' }
         ]}
       ],
       alquiler: [
         { city: 'Lima', links: [
-          { href: '/alquiler/casas/lima', text: 'Casas en alquiler en Lima' },
-          { href: '/alquiler/departamentos/lima', text: 'Departamentos en alquiler en Lima' },
-          { href: '/alquiler/habitaciones/lima', text: 'Habitaciones en alquiler en Lima' },
-          { href: '/alquiler/locales/lima', text: 'Locales en alquiler en Lima' }
+          { href: '/rent/casas/lima', text: 'Casas en alquiler en Lima' },
+          { href: '/rent/departamentos/lima', text: 'Departamentos en alquiler en Lima' },
+          { href: '/rent/habitaciones/lima', text: 'Habitaciones en alquiler en Lima' },
+          { href: '/rent/locales/lima', text: 'Locales en alquiler en Lima' }
         ]}
       ]
     },
     arequipa: {
       venta: [
         { city: 'Arequipa', links: [
-          { href: '/venta/casas/arequipa', text: 'Casas en venta en Arequipa' },
-          { href: '/venta/departamentos/arequipa', text: 'Departamentos en venta en Arequipa' },
-          { href: '/venta/terrenos/arequipa', text: 'Terrenos en venta en Arequipa' }
+          { href: '/sale/casas/arequipa', text: 'Casas en venta en Arequipa' },
+          { href: '/sale/departamentos/arequipa', text: 'Departamentos en venta en Arequipa' },
+          { href: '/sale/terrenos/arequipa', text: 'Terrenos en venta en Arequipa' }
         ]}
       ],
       alquiler: [
         { city: 'Arequipa', links: [
-          { href: '/alquiler/casas/arequipa', text: 'Casas en alquiler en Arequipa' },
-          { href: '/alquiler/departamentos/arequipa', text: 'Departamentos en alquiler en Arequipa' },
-          { href: '/alquiler/habitaciones/arequipa', text: 'Habitaciones en alquiler en Arequipa' }
+          { href: '/rent/casas/arequipa', text: 'Casas en alquiler en Arequipa' },
+          { href: '/rent/departamentos/arequipa', text: 'Departamentos en alquiler en Arequipa' },
+          { href: '/rent/habitaciones/arequipa', text: 'Habitaciones en alquiler en Arequipa' }
         ]}
       ]
     },
     trujillo: {
       venta: [
         { city: 'Trujillo', links: [
-          { href: '/venta/casas/trujillo', text: 'Casas en venta en Trujillo' },
-          { href: '/venta/departamentos/trujillo', text: 'Departamentos en venta en Trujillo' },
-          { href: '/venta/terrenos/trujillo', text: 'Terrenos en venta en Trujillo' }
+          { href: '/sale/casas/trujillo', text: 'Casas en venta en Trujillo' },
+          { href: '/sale/departamentos/trujillo', text: 'Departamentos en venta en Trujillo' },
+          { href: '/sale/terrenos/trujillo', text: 'Terrenos en venta en Trujillo' }
         ]}
       ],
       alquiler: [
         { city: 'Trujillo', links: [
-          { href: '/alquiler/casas/trujillo', text: 'Casas en alquiler en Trujillo' },
-          { href: '/alquiler/departamentos/trujillo', text: 'Departamentos en alquiler en Trujillo' },
-          { href: '/alquiler/habitaciones/trujillo', text: 'Habitaciones en alquiler en Trujillo' }
+          { href: '/rent/casas/trujillo', text: 'Casas en alquiler en Trujillo' },
+          { href: '/rent/departamentos/trujillo', text: 'Departamentos en alquiler en Trujillo' },
+          { href: '/rent/habitaciones/trujillo', text: 'Habitaciones en alquiler en Trujillo' }
         ]}
       ]
     },
     callao: {
       venta: [
         { city: 'Callao', links: [
-          { href: '/venta/casas/callao', text: 'Casas en venta en Callao' },
-          { href: '/venta/departamentos/callao', text: 'Departamentos en venta en Callao' },
-          { href: '/venta/terrenos/callao', text: 'Terrenos en venta en Callao' }
+          { href: '/sale/casas/callao', text: 'Casas en venta en Callao' },
+          { href: '/sale/departamentos/callao', text: 'Departamentos en venta en Callao' },
+          { href: '/sale/terrenos/callao', text: 'Terrenos en venta en Callao' }
         ]}
       ],
       alquiler: [
         { city: 'Callao', links: [
-          { href: '/alquiler/casas/callao', text: 'Casas en alquiler en Callao' },
-          { href: '/alquiler/departamentos/callao', text: 'Departamentos en alquiler en Callao' },
-          { href: '/alquiler/habitaciones/callao', text: 'Habitaciones en alquiler en Callao' }
+          { href: '/rent/casas/callao', text: 'Casas en alquiler en Callao' },
+          { href: '/rent/departamentos/callao', text: 'Departamentos en alquiler en Callao' },
+          { href: '/rent/habitaciones/callao', text: 'Habitaciones en alquiler en Callao' }
         ]}
       ]
     }
@@ -239,10 +239,10 @@ export function Footer() {
               <div>
                 <h3 className="font-bold text-gray-900 text-base mb-4">Búsquedas populares</h3>
                 <ul className="space-y-2 text-sm">
-                  <li><Link href="/alquiler/departamentos/miraflores" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Miraflores</Link></li>
-                  <li><Link href="/alquiler/departamentos/sanmiguel" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en San Miguel</Link></li>
-                  <li><Link href="/alquiler/departamentos/losolivos" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Los Olivos</Link></li>
-                  <li><Link href="/alquiler/departamentos/magdalena" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Magdalena</Link></li>
+                  <li><Link href="/rent/departamentos/miraflores" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Miraflores</Link></li>
+                  <li><Link href="/rent/departamentos/sanmiguel" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en San Miguel</Link></li>
+                  <li><Link href="/rent/departamentos/losolivos" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Los Olivos</Link></li>
+                  <li><Link href="/rent/departamentos/magdalena" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Magdalena</Link></li>
                   <li><Link href="/#busquedas" className="text-teal-600 hover:text-teal-700 font-medium">Ver más</Link></li>
                 </ul>
               </div>
@@ -251,10 +251,10 @@ export function Footer() {
               <div>
                 <h3 className="font-bold text-gray-900 text-base mb-4">También se busca</h3>
                 <ul className="space-y-2 text-sm">
-                  <li><Link href="/alquiler/departamentos/limacercado" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Lima Cercado</Link></li>
-                  <li><Link href="/alquiler/locales/lima" className="text-gray-600 hover:text-teal-600">Locales Comerciales en alquiler en Lima</Link></li>
-                  <li><Link href="/alquiler/habitaciones/lima" className="text-gray-600 hover:text-teal-600">Habitaciones en alquiler en Lima</Link></li>
-                  <li><Link href="/alquiler/habitaciones/santiagosurco" className="text-gray-600 hover:text-teal-600">Habitaciones en alquiler en Santiago de Surco</Link></li>
+                  <li><Link href="/rent/departamentos/limacercado" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Lima Cercado</Link></li>
+                  <li><Link href="/rent/locales/lima" className="text-gray-600 hover:text-teal-600">Locales Comerciales en alquiler en Lima</Link></li>
+                  <li><Link href="/rent/habitaciones/lima" className="text-gray-600 hover:text-teal-600">Habitaciones en alquiler en Lima</Link></li>
+                  <li><Link href="/rent/habitaciones/santiagosurco" className="text-gray-600 hover:text-teal-600">Habitaciones en alquiler en Santiago de Surco</Link></li>
                   <li><Link href="/#busquedas" className="text-teal-600 hover:text-teal-700 font-medium">Ver más</Link></li>
                 </ul>
               </div>
@@ -263,10 +263,10 @@ export function Footer() {
               <div>
                 <h3 className="font-bold text-gray-900 text-base mb-4">Consultas frecuentes</h3>
                 <ul className="space-y-2 text-sm">
-                  <li><Link href="/alquiler/departamentos/comas" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Comas</Link></li>
-                  <li><Link href="/alquiler/departamentos/santaanita" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Santa Anita</Link></li>
-                  <li><Link href="/alquiler/habitaciones/sanisidro" className="text-gray-600 hover:text-teal-600">Habitaciones en alquiler en San Isidro</Link></li>
-                  <li><Link href="/alquiler/departamentos/atevitarte" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Ate Vitarte</Link></li>
+                  <li><Link href="/rent/departamentos/comas" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Comas</Link></li>
+                  <li><Link href="/rent/departamentos/santaanita" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Santa Anita</Link></li>
+                  <li><Link href="/rent/habitaciones/sanisidro" className="text-gray-600 hover:text-teal-600">Habitaciones en alquiler en San Isidro</Link></li>
+                  <li><Link href="/rent/departamentos/atevitarte" className="text-gray-600 hover:text-teal-600">Departamentos en alquiler en Ate Vitarte</Link></li>
                   <li><Link href="/#busquedas" className="text-teal-600 hover:text-teal-700 font-medium">Ver más</Link></li>
                 </ul>
               </div>
@@ -295,8 +295,8 @@ export function Footer() {
               <div>
                 <h3 className="font-bold text-base mb-4">Más TIYUY</h3>
                 <ul className="space-y-2 text-sm text-gray-400">
-                  <li><Link href="/alquiler/departamentos/lima" className="hover:text-white">Inmuebles en Perú</Link></li>
-                  <li><Link href="/dashboard/mis-propiedades/nueva" className="hover:text-white">Publicar tu Inmueble</Link></li>
+                  <li><Link href="/rent/departamentos/lima" className="hover:text-white">Inmuebles en Perú</Link></li>
+                  <li><Link href="/my-properties/new" className="hover:text-white">Publicar tu Inmueble</Link></li>
                   <li><Link href="/#ayuda" className="hover:text-white">Ayuda</Link></li>
                   <li><Link href="/#blog" className="hover:text-white">Blog</Link></li>
                   <li><Link href="/#trabaja" className="hover:text-white">Trabaja con nosotros</Link></li>

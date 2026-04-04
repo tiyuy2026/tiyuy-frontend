@@ -23,6 +23,22 @@ const preferenceLabels: Record<keyof NotificationPreferences, { title: string; d
     title: 'Ofertas y promociones',
     description: 'Novedades, consejos y ofertas especiales'
   },
+  emailOnEventCreated: {
+    title: 'Eventos creados',
+    description: 'Notificación cuando se crea un nuevo evento en un canal que sigues'
+  },
+  emailOnEventUpdated: {
+    title: 'Eventos actualizados',
+    description: 'Notificación cuando se actualiza un evento al que asistirás'
+  },
+  emailOnEventReminder: {
+    title: 'Recordatorio de eventos',
+    description: 'Recordatorio antes de que comience un evento'
+  },
+  emailOnEventJoined: {
+    title: 'Nuevo asistente a evento',
+    description: 'Notificación cuando alguien se une a un evento que organizas'
+  },
 };
 
 interface Props {

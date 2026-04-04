@@ -62,7 +62,7 @@ export function TrialGuard({ children, fallback }: TrialGuardProps) {
             <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
               <Crown className="w-4 h-4" />
               <span>
-                Plan utilizado: {activeSubscription.plan?.name || 'FREE TRIAL'}
+                Plan utilizado: {activeSubscription?.plan?.name || 'FREE TRIAL'}
               </span>
             </div>
           </div>
@@ -70,7 +70,7 @@ export function TrialGuard({ children, fallback }: TrialGuardProps) {
           {/* Botones de acción */}
           <div className="space-y-3">
             <a
-              href="/dashboard/planes"
+              href="/plans"
               className="w-full flex items-center justify-center gap-2 bg-purple-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
             >
               <Crown className="w-4 h-4" />
@@ -78,7 +78,7 @@ export function TrialGuard({ children, fallback }: TrialGuardProps) {
             </a>
             
             <a
-              href="/dashboard/billetera/recargar"
+              href="/wallet/recargar"
               className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-700 transition-colors"
             >
               <CreditCard className="w-4 h-4" />

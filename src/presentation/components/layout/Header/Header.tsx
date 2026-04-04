@@ -71,7 +71,7 @@ export function Header() {
   const startNavigationTimer = (type: 'comprar' | 'alquilar') => {
     const timerRef = type === 'comprar' ? comprarTimerRef : alquilarTimerRef;
     const filters = type === 'comprar' ? comprarFilters : alquilarFilters;
-    const operacion = type === 'comprar' ? 'venta' : 'alquiler';
+    const operacion = type === 'comprar' ? 'sale' : 'rent';
 
     if (timerRef.current) clearTimeout(timerRef.current);
 
@@ -451,7 +451,7 @@ export function Header() {
                                 </li>
                                 <li>
                                   <Link
-                                    href="/dashboard/mis-propiedades/nueva"
+                                    href="/my-properties/new"
                                     className="text-gray-800 hover:text-black text-base block"
                                   >
                                     Publica un inmueble para venta
@@ -737,7 +737,7 @@ export function Header() {
                               <ul className="space-y-3">
                                 <li>
                                   <Link
-                                    href="/#guia-alquilar"
+                                    href="/#rental-guide"
                                     className="text-gray-800 hover:text-black text-base block"
                                   >
                                     Guía para alquilar un inmueble
@@ -745,7 +745,7 @@ export function Header() {
                                 </li>
                                 <li>
                                   <Link
-                                    href="/dashboard/mis-propiedades/nueva"
+                                    href="/my-properties/new"
                                     className="text-gray-800 hover:text-black text-base block"
                                   >
                                     Publica un inmueble para alquilar
@@ -805,7 +805,7 @@ export function Header() {
                               <ul className="space-y-3">
                                 <li>
                                   <Link
-                                    href="/dashboard/mis-propiedades/nueva"
+                                    href="/my-properties/new"
                                     className="text-gray-800 hover:text-black text-base block"
                                   >
                                     Publica un inmueble
@@ -835,7 +835,7 @@ export function Header() {
                                 </li>
                                 <li>
                                   <Link
-                                    href="/#guia-alquilar"
+                                    href="/#rental-guide"
                                     className="text-gray-800 hover:text-black text-base block"
                                   >
                                     Guía para alquilar un inmueble
@@ -928,8 +928,8 @@ export function Header() {
                 </div>
               )}
 
-              <Link 
-                href="/dashboard/mis-contactos"
+              <Link
+                href="/dashboard/my-contacts"
                 className="flex items-center gap-2 text-black hover:text-gray-800"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -950,8 +950,8 @@ export function Header() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => {
-                      console.log('Botón Registrarse clickeado - yendo a perfil-selector');
-                      router.push('/perfil-selector');
+                      console.log('Botón Registrarse clickeado - yendo a profile-selector');
+                      router.push('/profile-selector');
                     }}
                     className="bg-blue-600 text-white px-5 py-2 rounded-md font-medium text-base hover:bg-blue-700 transition-colors"
                   >
@@ -993,15 +993,15 @@ export function Header() {
                         <p className="text-sm text-gray-500">{user?.email}</p>
                       </div>
                       <Link 
-                        href="/dashboard/perfil" 
+                        href="/dashboard/profile" 
                         className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                         onClick={() => setShowUserMenu(false)}
                       >
                         <User className="w-4 h-4" />
-                        <span className="text-sm">Mi Perfil</span>
+                        <span className="text-sm">My Profile</span>
                       </Link>
                       <Link 
-                        href="/dashboard/mis-propiedades" 
+                        href="/my-properties" 
                         className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                         onClick={() => setShowUserMenu(false)}
                       >
@@ -1009,7 +1009,7 @@ export function Header() {
                         <span className="text-sm">Mis Propiedades</span>
                       </Link>
                       <Link 
-                        href="/dashboard/mensajes" 
+                        href="/dashboard/my-contacts" 
                         className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
                         onClick={() => setShowUserMenu(false)}
                       >

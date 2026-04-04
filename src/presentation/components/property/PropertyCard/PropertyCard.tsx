@@ -32,7 +32,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
   return (
     <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100 hover:border-blue-200 w-full h-full flex flex-col">
       {/* Imagen */}
-      <Link href={`/propiedad/${property.slug}`} className="relative block flex-shrink-0">
+      <Link href={`/property/${property.slug}`} className="relative block flex-shrink-0">
         <div className="relative w-full h-64 bg-gray-200 overflow-hidden">
           {property.coverPhotoUrl ? (
             <Image
@@ -92,7 +92,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
         </div>
 
         {/* Título */}
-        <Link href={`/propiedad/${property.slug}`}>
+        <Link href={`/property/${property.slug}`}>
           <h3 className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 mb-3 leading-tight">
             {property.title}
           </h3>

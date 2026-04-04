@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/presentation/components/ui/Input/Input';
+import { useLocationSearch } from '@/presentation/hooks/useLocationSearch';
 
 interface LocationSearchProps {
   onLocationSelect: (location: {
@@ -21,19 +22,16 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
   className = "",
 }) => {
   const [query, setQuery] = useState(defaultValue);
-  const [predictions, setPredictions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY;
+  const { predictions, loading } = useLocationSearch(query);
 
-  // Debug: Verificar si la API key está disponible
   useEffect(() => {
-    console.log('Google Places API Key disponible:', !!API_KEY);
-    console.log('API Key (primeros 10 chars):', API_KEY?.substring(0, 10) + '...');
-  }, []);
+    if (predictions.length > 0) setShowDropdown(true);
+  }, [predictions]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -51,53 +49,8 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const searchLocations = async (searchQuery: string) => {
-    if (!searchQuery || searchQuery.length < 2) {
-      setPredictions([]);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      console.log('Buscando:', searchQuery);
-      
-      // Usar proxy en lugar de llamada directa a Google
-      const url = `/api/google-places/autocomplete?input=${encodeURIComponent(searchQuery)}`;
-      console.log('URL (via proxy):', url);
-      
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      console.log('📥 Respuesta de Google Places:', data);
-      console.log('🔢 Predicciones:', data.predictions?.length || 0);
-      
-      setPredictions(data.predictions || []);
-      setShowDropdown(true);
-      console.log('✅ Dropdown mostrado:', true);
-    } catch (error) {
-      console.error('❌ Error en Google Places:', error);
-      setPredictions([]);
-    } finally {
-      setLoading(false);
-      console.log('🏁 Loading finalizado');
-    }
-  };
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (query) {
-        searchLocations(query);
-      } else {
-        setPredictions([]);
-      }
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [query]);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQuery(value);
+    setQuery(e.target.value);
   };
 
   const handleLocationClick = (prediction: any) => {
@@ -106,7 +59,6 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
 
     setQuery(mainText);
     setShowDropdown(false);
-    setPredictions([]);
 
     onLocationSelect({
       placeId: prediction.place_id,
@@ -117,9 +69,7 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
   };
 
   const handleInputFocus = () => {
-    if (query) {
-      setShowDropdown(true);
-    }
+    if (query) setShowDropdown(true);
   };
 
   return (
@@ -147,7 +97,7 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
       {/* Dropdown de predicciones */}
       {showDropdown && predictions.length > 0 && (
         <div className="absolute z-[9999] w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-          {predictions.map((prediction, index) => (
+          {predictions.map((prediction) => (
             <div
               key={prediction.place_id}
               className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors"

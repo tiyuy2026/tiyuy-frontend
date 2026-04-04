@@ -71,7 +71,7 @@ export function ProfileMenu() {
           </div>
 
           <Link
-            href="/dashboard/perfil"
+            href="/dashboard/profile"
             className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
             onClick={() => setShowMenu(false)}
           >
@@ -89,7 +89,7 @@ export function ProfileMenu() {
           </Link>
           
           <Link
-            href="/dashboard/mis-propiedades"
+            href="/my-properties"
             className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
             onClick={() => setShowMenu(false)}
           >
@@ -108,7 +108,7 @@ export function ProfileMenu() {
 
           {user?.role === 'AGENT' && (
             <Link
-              href="/dashboard/mensajes"
+              href="/messages"
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
               onClick={() => setShowMenu(false)}
             >

@@ -45,13 +45,13 @@ export function WalletCard({ wallet }: WalletCardProps) {
 
       <div className="grid grid-cols-2 gap-3">
         <Link
-          href="/planes"
+          href="/plans"
           className="py-3 px-4 bg-white/20 backdrop-blur-sm rounded-lg text-center font-semibold hover:bg-white/30 transition-all"
         >
           Recargar
         </Link>
         <Link
-          href="/billetera"
+          href="/wallet"
           className="py-3 px-4 bg-white/20 backdrop-blur-sm rounded-lg text-center font-semibold hover:bg-white/30 transition-all"
         >
           Ver historial
