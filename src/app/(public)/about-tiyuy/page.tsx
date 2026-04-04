@@ -183,7 +183,7 @@ export default function ConoceTiyuy() {
                 title: 'Dueños pequeños',
                 description: 'Un usuario común solo puede publicar una propiedad gratis',
                 color: 'from-blue-500 to-blue-600',
-                link: '/dashboard/my-properties/new'
+                link: '/my-properties/new'
               },
               {
                 icon: Users,

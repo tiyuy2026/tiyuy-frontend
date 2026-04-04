@@ -1,13 +1,201 @@
 'use client';
-import React from 'react';
+
+import { useState, useEffect, useRef } from 'react';
+import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { UserRole } from '@/core/domain/entities';
 import Link from 'next/link';
-import { ProfileMenu } from '@/presentation/components/dashboard/ProfileMenu';
+import { usePathname } from 'next/navigation';
+import { 
+  LayoutDashboard, Flame, Home, MessageSquare, Users, Diamond, User, Lock,
+  ChevronDown, LogOut, Building
+} from 'lucide-react';
 import { useActiveSubscription } from '@/presentation/hooks/useFinance';
+
+// Tipo para las secciones del dashboard
+type DashboardSection = 'dashboard' | 'crm-leads';
+
+// Componente Sidebar local para Dashboard
+function DashboardSidebar({ 
+  activeSection, 
+  setActiveSection, 
+  user 
+}: { 
+  activeSection: DashboardSection; 
+  setActiveSection: (section: DashboardSection) => void;
+  user: any;
+}) {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  
+  const userRole = (user?.role || '').toString().toUpperCase();
+  const isAgent = ['AGENT', 'DEVELOPER', 'ADMIN', 'INMOBILIARIA'].includes(userRole);
+
+  return (
+    <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200">
+        {/* Logo */}
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
+            T
+          </div>
+          <div>
+            <h1 className="font-bold text-gray-900 text-lg">TIYUY</h1>
+            <p className="text-xs text-gray-500">CRM Inmobiliario</p>
+          </div>
+        </Link>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-1">
+        {/* Dashboard - Botón local */}
+        <button
+          onClick={() => setActiveSection('dashboard')}
+          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${
+            activeSection === 'dashboard'
+              ? 'bg-teal-50 text-teal-700 font-medium'
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+          }`}
+        >
+          <LayoutDashboard className="w-5 h-5" />
+          <span>Dashboard</span>
+          {activeSection === 'dashboard' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
+        </button>
+
+        {/* CRM Leads - Botón local (solo para agentes) */}
+        {isAgent && (
+          <button
+            onClick={() => setActiveSection('crm-leads')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${
+              activeSection === 'crm-leads'
+                ? 'bg-teal-50 text-teal-700 font-medium'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            }`}
+          >
+            <Flame className="w-5 h-5" />
+            <span>CRM Leads</span>
+            {activeSection === 'crm-leads' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
+          </button>
+        )}
+
+        {/* Mis Propiedades - Link normal */}
+        <Link
+          href="/my-properties"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+            pathname === '/my-properties'
+              ? 'bg-teal-50 text-teal-700 font-medium'
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+          }`}
+        >
+          <Home className="w-5 h-5" />
+          <span>Mis Propiedades</span>
+          {pathname === '/my-properties' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
+        </Link>
+
+        {/* Mensajes - Link normal */}
+        <Link
+          href="/messages"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+            pathname === '/messages'
+              ? 'bg-teal-50 text-teal-700 font-medium'
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+          }`}
+        >
+          <MessageSquare className="w-5 h-5" />
+          <span>Mensajes</span>
+          {pathname === '/messages' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
+        </Link>
+
+        {/* Clientes - Link normal (solo para agentes) */}
+        {isAgent && (
+          <Link
+            href="/dashboard/clients"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+              pathname === '/dashboard/clients'
+                ? 'bg-teal-50 text-teal-700 font-medium'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            }`}
+          >
+            <Users className="w-5 h-5" />
+            <span>Clientes</span>
+            {pathname === '/dashboard/clients' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
+          </Link>
+        )}
+
+        {/* Planes - Link normal */}
+        <Link
+          href="/plans"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+            pathname === '/plans'
+              ? 'bg-teal-50 text-teal-700 font-medium'
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+          }`}
+        >
+          <Diamond className="w-5 h-5" />
+          <span>Planes</span>
+          {pathname === '/plans' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
+        </Link>
+        
+        {/* Configuracion Section */}
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Configuración</p>
+          
+          <Link
+            href="/dashboard/profile"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+              pathname === '/dashboard/profile'
+                ? 'bg-teal-50 text-teal-700 font-medium'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            }`}
+          >
+            <User className="w-5 h-5" />
+            <span>Mi Perfil</span>
+            {pathname === '/dashboard/profile' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
+          </Link>
+        </div>
+      </nav>
+    </aside>
+  );
+}
+
+// Contenido de CRM Leads básico
+function CRMLeadsContent() {
+  return (
+    <>
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="px-8 py-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">CRM Leads</h1>
+            <p className="text-gray-500 text-sm mt-1">Gestiona tus interesados y conviértelos en clientes</p>
+          </div>
+        </div>
+      </header>
+      <div className="p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <p className="text-gray-600">Contenido de CRM Leads...</p>
+        </div>
+      </div>
+    </>
+  );
+}
 
 export default function DashboardPage() {
   const { user, isAuthenticated } = useAuthStore();
+  // Estado para controlar la sección activa (dashboard o crm-leads)
+  const [activeSection, setActiveSection] = useState<DashboardSection>('dashboard');
+  
   const { data: activeSubscription, isLoading, error } = useActiveSubscription();
   
   console.log('DashboardPage: Estado completo:', {
@@ -112,7 +300,7 @@ export default function DashboardPage() {
                   <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                     {getPlanBadge()}
                   </div>
-                  <div className="text-red-600 text-2xl mb-2">Planes</div>
+                  <div className="text-red-600 text-2xl mb-2">💎</div>
                   <h3 className="font-semibold">{getPlanButtonText()}</h3>
                   <p className="text-sm text-gray-600">Gestiona tu plan</p>
                 </Link>
@@ -188,13 +376,13 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600">Desarrollos activos</p>
                 </Link>
                 
-                <Link href="/my-projects/new" className="bg-purple-50 p-4 rounded-lg hover:bg-purple-100 transition-colors">
+                <Link href="/dashboard/projects/new" className="bg-purple-50 p-4 rounded-lg hover:bg-purple-100 transition-colors">
                   <div className="text-purple-600 text-2xl mb-2">🏢</div>
                   <h3 className="font-semibold">Nuevo Proyecto</h3>
                   <p className="text-sm text-gray-600">Crear desarrollo</p>
                 </Link>
                 
-                <Link href="/wallet" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
+                <Link href="/dashboard/wallet" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
                   <div className="text-orange-600 text-2xl mb-2">Billetera</div>
                   <h3 className="font-semibold">Billetera</h3>
                   <p className="text-sm text-gray-600">Créditos y pagos</p>
@@ -247,7 +435,7 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600">Leads de clientes</p>
                 </Link>
                 
-                <Link href="/wallet" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
+                <Link href="/dashboard/wallet" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
                   <div className="text-orange-600 text-2xl mb-2">�</div>
                   <h3 className="font-semibold">Billetera</h3>
                   <p className="text-sm text-gray-600">Pagos y métodos</p>
@@ -281,28 +469,27 @@ export default function DashboardPage() {
     }
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Header del Dashboard */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {user?.role === 'USER' && 'Dashboard Personal'}
-              {user?.role === 'AGENT' && 'Dashboard de Agente'}
-              {user?.role === 'DEVELOPER' && 'Dashboard de Desarrollador'}
-              {user?.role === 'ADMIN' && 'Dashboard de Administrador'}
-            </h1>
-            <p className="text-gray-600 mt-1">
-              Bienvenido de vuelta, {user?.firstName || 'Usuario'}
-            </p>
-          </div>
-          <ProfileMenu />
-        </div>
-      </div>
+  // Renderizar contenido basado en sección activa
+  const renderContent = () => {
+    if (activeSection === 'crm-leads') {
+      return <CRMLeadsContent />;
+    }
+    return renderDashboardContent();
+  };
 
-      {/* Contenido del Dashboard */}
-      {renderDashboardContent()}
-    </div>
+  return (
+    <ProtectedRoute>
+      <div className="flex min-h-screen bg-gray-50">
+        <DashboardSidebar 
+          activeSection={activeSection} 
+          setActiveSection={setActiveSection}
+          user={user}
+        />
+        
+        <main className="flex-1 overflow-auto">
+          {renderContent()}
+        </main>
+      </div>
+    </ProtectedRoute>
   );
 }

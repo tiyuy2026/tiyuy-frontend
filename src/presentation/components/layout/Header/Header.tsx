@@ -5,18 +5,21 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { NotificationList } from '@/presentation/components/notifications/NotificationList/NotificationList';
+import { User, Building, MessageSquare, LogOut, ChevronDown } from 'lucide-react';
 
 export function Header() {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, logout } = useAuthStore();
 
   const [showComprarMenu, setShowComprarMenu] = useState(false);
   const [showAlquilarMenu, setShowAlquilarMenu] = useState(false);
   const [showServiciosMenu, setShowServiciosMenu] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [pinnedMenu, setPinnedMenu] = useState<'comprar' | 'alquilar' | null>(null);
   const [stripeColor, setStripeColor] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationsRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Estados para filtros seleccionados
   const [comprarFilters, setComprarFilters] = useState({
@@ -47,6 +50,9 @@ export function Header() {
     const handleClickOutside = (e: MouseEvent) => {
       if (notificationsRef.current && !notificationsRef.current.contains(e.target as Node)) {
         setShowNotifications(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -962,20 +968,69 @@ export function Header() {
                   </button>
                 </div>
               ) : (
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-2 bg-teal-600 text-white px-5 py-2 rounded-md font-medium text-base hover:bg-teal-700 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
-                  {user?.firstName || 'Mi cuenta'}
-                </Link>
+                <div className="relative" ref={userMenuRef}>
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center gap-2 bg-teal-600 text-white px-5 py-2 rounded-md font-medium text-base hover:bg-teal-700 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    {user?.firstName || 'Mi cuenta'}
+                    <ChevronDown className={`w-4 h-4 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {/* Dropdown Menu */}
+                  {showUserMenu && (
+                    <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="font-medium text-gray-900">{user?.firstName} {user?.lastName}</p>
+                        <p className="text-sm text-gray-500">{user?.email}</p>
+                      </div>
+                      <Link 
+                        href="/dashboard/profile" 
+                        className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <User className="w-4 h-4" />
+                        <span className="text-sm">My Profile</span>
+                      </Link>
+                      <Link 
+                        href="/my-properties" 
+                        className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <Building className="w-4 h-4" />
+                        <span className="text-sm">Mis Propiedades</span>
+                      </Link>
+                      <Link 
+                        href="/dashboard/my-contacts" 
+                        className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        <span className="text-sm">Mensajes</span>
+                      </Link>
+                      <div className="border-t border-gray-100 my-1"></div>
+                      <button 
+                        className="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
+                        onClick={() => {
+                          logout?.();
+                          setShowUserMenu(false);
+                          router.push('/');
+                        }}
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span className="text-sm">Cerrar Sesión</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
