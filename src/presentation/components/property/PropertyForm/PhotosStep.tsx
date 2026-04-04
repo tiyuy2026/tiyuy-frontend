@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { useUploadPhotos } from '@/presentation/hooks/useProperties';
 import Image from 'next/image';
+import { toast } from '@/presentation/store/toastStore';
 
 interface PhotosStepProps {
   formData: any;
@@ -27,12 +28,12 @@ export function PhotosStep({ propertyId }: PhotosStepProps) {
     const maxSize = 5 * 1024 * 1024; // 5MB
     
     if (!validTypes.includes(file.type)) {
-      alert('Solo se permiten archivos JPG y PNG');
+      toast.error('Solo se permiten archivos JPG y PNG');
       return false;
     }
     
     if (file.size > maxSize) {
-      alert('El archivo no debe superar los 5MB');
+      toast.error('El archivo no debe superar los 5MB');
       return false;
     }
     
@@ -47,7 +48,7 @@ export function PhotosStep({ propertyId }: PhotosStepProps) {
     const validFiles = fileArray.filter(validateFile);
     
     if (selectedFiles.length + validFiles.length > 10) {
-      alert('Máximo 10 fotos por propiedad');
+      toast.error('Máximo 10 fotos por propiedad');
       return;
     }
 
@@ -92,7 +93,7 @@ export function PhotosStep({ propertyId }: PhotosStepProps) {
       }
       setShowCamera(true);
     } catch (error) {
-      alert('No se pudo acceder a la cámara. Asegúrate de dar permisos.');
+      toast.error('No se pudo acceder a la cámara. Asegúrate de dar permisos.');
     }
   };
 
@@ -133,12 +134,12 @@ export function PhotosStep({ propertyId }: PhotosStepProps) {
 
   const handleUpload = async () => {
     if (!propertyId) {
-      alert('Primero debes crear la propiedad');
+      toast.error('Primero debes crear la propiedad');
       return;
     }
 
     if (selectedFiles.length === 0) {
-      alert('Selecciona al menos una foto');
+      toast.error('Selecciona al menos una foto');
       return;
     }
 
