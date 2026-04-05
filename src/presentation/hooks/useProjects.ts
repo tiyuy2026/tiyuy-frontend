@@ -5,15 +5,15 @@ import {
   ProjectFull, 
   ProjectUnit 
 } from '@/core/domain/entities/Project';
-// ✅ ELIMINADO: SearchFilters (no existe)
-// ✅ INLINE type en su lugar
+//  ELIMINADO: SearchFilters (no existe)
+//  INLINE type en su lugar
 
 const projectRepo = new ProjectRepository();
 
 const PROJECT_KEYS = {
   all: ['projects'] as const,
   lists: () => [...PROJECT_KEYS.all, 'list'] as const,
-  // ✅ INLINE type (igual que IProjectRepository)
+  //  INLINE type (igual que IProjectRepository)
   list: (filters: {
     district?: string;
     province?: string;
@@ -39,9 +39,9 @@ const PROJECT_KEYS = {
 export const useProjects = () => {
   const queryClient = useQueryClient();
 
-  // 🔍 QUERIES
+  //  QUERIES
   
-  // ✅ INLINE type para searchProjects
+  //  INLINE type para searchProjects
   const useSearchProjects = (
     filters: Parameters<typeof projectRepo.searchProjects>[0],
     options?: { enabled?: boolean }
@@ -106,22 +106,22 @@ export const useProjects = () => {
     });
   };
 
-  // 🚀 MUTATIONS (resto igual...)
+  //  MUTATIONS (resto igual...)
   const useCreateProject = () => {
     return useMutation({
       mutationFn: (projectData: Parameters<typeof projectRepo.createProject>[0]) => {
-        console.log('🚀 useCreateProject - Datos que se enviarán:', projectData);
-        console.log('🚀 useCreateProject - Llamando a projectRepo.createProject...');
+        console.log(' useCreateProject - Datos que se enviaran:', projectData);
+        console.log(' useCreateProject - Llamando a projectRepo.createProject...');
         
         return projectRepo.createProject(projectData);
       },
       onSuccess: (result) => {
-        console.log('✅ useCreateProject - Proyecto creado exitosamente:', result);
+        console.log(' useCreateProject - Proyecto creado exitosamente:', result);
         queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.lists() });
       },
       onError: (error) => {
-        console.error('❌ useCreateProject - Error al crear proyecto:', error);
-        console.error('❌ Error details:', {
+        console.error(' useCreateProject - Error al crear proyecto:', error);
+        console.error(' Error details:', {
           message: error.message,
           stack: error.stack,
           name: error.name
@@ -143,7 +143,34 @@ export const useProjects = () => {
     });
   };
 
-  // ... resto de mutations IGUALES
+  const usePublishProject = () => {
+    return useMutation({
+      mutationFn: (projectId: number) => projectRepo.publishProject(projectId),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.lists() });
+        queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.details() });
+      },
+    });
+  };
+
+  const useFeatureProject = () => {
+    return useMutation({
+      mutationFn: (projectId: number) => projectRepo.featureProject(projectId),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.lists() });
+        queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.details() });
+      },
+    });
+  };
+
+  const useDeleteProject = () => {
+    return useMutation({
+      mutationFn: (projectId: number) => projectRepo.deleteProject(projectId),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.lists() });
+      },
+    });
+  };
 
   return {
     // Queries
@@ -158,6 +185,8 @@ export const useProjects = () => {
     // Mutations
     createProject: useCreateProject,
     updateProject: useUpdateProject,
-    // ... resto
+    publishProject: usePublishProject,
+    featureProject: useFeatureProject,
+    deleteProject: useDeleteProject,
   };
 };

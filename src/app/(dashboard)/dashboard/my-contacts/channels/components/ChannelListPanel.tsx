@@ -22,13 +22,13 @@ function CanalesListPanel({
   const [searchQuery, setSearchQuery] = useState('');
   const [infoDialog, setInfoDialog] = useState(false);
   
-  // ✅ Canales que creé (soy admin)
+  // Canales que creé (soy admin)
   const misCanalesCreados = channels?.filter((c: any) => c.isAdmin) ?? [];
   
-  // ✅ Canales suscritos (soy miembro pero no admin)
+  // Canales suscritos (soy miembro pero no admin)
   const misCanalesSuscritos = channels?.filter((c: any) => c.isSubscribed && !c.isAdmin) ?? [];
   
-  // ✅ Filtrado por búsqueda
+  // Filtrado por búsqueda
   const filteredCanalesCreados = misCanalesCreados.filter((channel: any) =>
     channel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     channel.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||

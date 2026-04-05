@@ -7,7 +7,7 @@ let globalWebSocket: WebSocket | null = null;
 let globalConnectionCount = 0;
 let globalUserId: number | null = null;
 
-// 🔥 Exportar globalUserId para que otros componentes puedan acceder
+// Exportar globalUserId para que otros componentes puedan acceder
 export function getCurrentUserId(): number | null {
   return globalUserId;
 }
@@ -24,9 +24,13 @@ interface WebSocketMessage {
   messageType?: string;
   mediaUrl?: string;
   createdAt?: string;
+  // Para mensajes de error
+  message?: string;
+  code?: string;
 }
 
 interface UseWebSocketOptions {
+  enabled?: boolean;
   onNewMessage?: (message: any) => void;
   onTyping?: (userId: number, chatId: number) => void;
   onConnectionChange?: (connected: boolean) => void;
@@ -42,9 +46,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const instanceId = useRef(Math.random()); // ID único para esta instancia
 
   const connect = () => {
-    // 🔥 SINGLETON: Solo una conexión global por usuario
+    // SINGLETON: Solo una conexión global por usuario
     if (globalWebSocket && globalWebSocket.readyState === WebSocket.OPEN) {
-      console.log(`🔌 WebSocket global ya existe (Usuario ${globalUserId}), reutilizando...`);
+      console.log(`WebSocket global ya existe (Usuario ${globalUserId}), reutilizando...`);
       setIsConnected(true);
       setConnectionError(null);
       options.onConnectionChange?.(true);
@@ -53,13 +57,14 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
     // Evitar múltiples conexiones simultáneas
     if (isConnectingRef.current) {
-      console.log('🔌 Conexión ya en progreso, ignorando...');
+      console.log('Conexión ya en progreso, ignorando...');
       return;
     }
     
     if (globalWebSocket) {
       if (globalWebSocket.readyState === WebSocket.CONNECTING) {
-        console.log('🔌 WebSocket global conectando, esperando...');
+        console.log('WebSocket global conectando, esperando...');
+        console.log('WebSocket global conectando, esperando...');
         return;
       }
       // Cerrar conexión anterior si está cerrada o en error
@@ -79,11 +84,24 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
                    localStorage.getItem('token') || 
                    localStorage.getItem('auth-token');
 
-      // URL del WebSocket
-      const wsUrl = process.env.NEXT_PUBLIC_WS_URL 
-        || (process.env.NODE_ENV === 'production' 
-            ? `wss://wasynbackend-latest.onrender.com/api/ws/chat`  // ← /api
-            : `ws://localhost:8080/ws/chat`);
+      // Si no hay token, no intentar conectar (usuario no autenticado)
+      if (!token) {
+        console.log('🔌 No hay token de autenticación, omitiendo conexión WebSocket');
+        isConnectingRef.current = false;
+        return;
+      }
+
+      // URL del WebSocket - con validación para evitar URLs corruptas
+      let wsUrl = process.env.NEXT_PUBLIC_WS_URL?.trim();
+      
+      // Si no hay URL válida, usar la misma lógica de API que useContacts.ts
+      if (!wsUrl || wsUrl.includes('"') || wsUrl.includes('>') || !wsUrl.startsWith('ws')) {
+        // Usar la misma URL base que el resto de la app (para conectar al backend remoto)
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+        const wsProtocol = API_BASE_URL.startsWith('https') ? 'wss' : 'ws';
+        const host = API_BASE_URL.replace(/^https?:\/\//, '');
+        wsUrl = `${wsProtocol}://${host}/ws/chat`;
+      }
 
       console.log('🔌 Creando nueva conexión WebSocket a:', wsUrl);
       globalWebSocket = new WebSocket(wsUrl);
@@ -140,8 +158,11 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
               break;
 
             case 'error':
-              console.error('❌ Error WebSocket:', data);
-              setConnectionError('Error desconocido');
+              // Solo loguear si hay detalles del error
+              if (data.message || data.code) {
+                console.error('❌ Error WebSocket:', data.message || data.code);
+              }
+              setConnectionError(data.message || 'Error de conexión');
               break;
 
             default:
@@ -175,7 +196,6 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             connect();
           }, delay);
         } else {
-          console.error('❌ Máximo de intentos de reconexión alcanzado');
           setConnectionError('No se pudo conectar al servidor de chat');
         }
       };
@@ -187,7 +207,6 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       };
 
     } catch (error) {
-      console.error('❌ Error creando WebSocket:', error);
       isConnectingRef.current = false;
       setConnectionError('Error al crear conexión WebSocket');
     }
@@ -240,8 +259,16 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     }
   };
 
-  // Conectar automáticamente al montar el componente
+  // Conectar automáticamente al montar el componente SOLO si está habilitado
+  const shouldConnect = options.enabled !== false;
+  
   useEffect(() => {
+    // Si está deshabilitado, no conectar
+    if (!shouldConnect) {
+      console.log('🔌 WebSocket deshabilitado, no conectando');
+      return;
+    }
+    
     // 🔥 SINGLETON: Incrementar contador de instancias
     globalConnectionCount++;
     console.log(`🔌 useWebSocket instancia ${globalConnectionCount} (ID: ${instanceId.current})`);
@@ -263,7 +290,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         globalUserId = null;
       }
     };
-  }, []);
+  }, []); // Solo al montar/desmontar
 
   return {
     isConnected,

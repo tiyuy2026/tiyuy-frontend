@@ -91,6 +91,12 @@ export default async function PropertyPage({ params }: Props) {
     notFound();
   }
 
+  // Si no se encontró la propiedad, mostrar 404
+  if (!property) {
+    console.log('Propiedad no encontrada, mostrando 404');
+    notFound();
+  }
+
   // Generar JSON-LD para SEO
   const jsonLd = {
     '@context': 'https://schema.org',

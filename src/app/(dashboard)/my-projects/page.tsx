@@ -9,87 +9,53 @@ import { TrialGuard } from '@/presentation/components/guards/TrialGuard/TrialGua
 import { TrialWarningBanner } from '@/presentation/components/guards/TrialGuard/TrialWarningBanner';
 import { toast } from '@/presentation/store/toastStore';
 
-export default function MisProyectosPage() {
+export default function MyProjectsPage() {
   const { user } = useAuthStore();
-  const { myProjects } = useProjects();
+  const { myProjects, publishProject, featureProject, deleteProject } = useProjects();
   const [activeTab, setActiveTab] = useState<'ALL' | 'DRAFT' | 'PUBLISHED' | 'COMPLETED'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Función para publicar proyecto
+  // Query para obtener proyectos
+  const { data: projectsData, isLoading, refetch } = myProjects(0, 20);
+
+  // Mutations
+  const publishMutation = publishProject();
+  const featureMutation = featureProject();
+  const deleteMutation = deleteProject();
+
+  // Function to publish project
   const handlePublish = async (projectId: number) => {
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('tiyuy-auth-token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${projectId}/publish`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        toast.success('¡Proyecto publicado exitosamente!');
-        refetch();
-      } else {
-        const error = await response.json();
-        toast.error(error.message || 'Error al publicar el proyecto');
-      }
-    } catch (error) {
-      toast.error('Error al publicar el proyecto');
+      await publishMutation.mutateAsync(projectId);
+      toast.success('Proyecto publicado exitosamente!');
+    } catch (error: any) {
+      toast.error(error.message || 'Error al publicar proyecto');
     }
   };
 
-  // Función para destacar proyecto
+  // Function to feature project
   const handleFeature = async (projectId: number) => {
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('tiyuy-auth-token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${projectId}/feature`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        toast.success('¡Proyecto destacado exitosamente!');
-        refetch();
-      } else {
-        const error = await response.json();
-        toast.error(error.message || 'Error al destacar el proyecto');
-      }
-    } catch (error) {
-      toast.error('Error al destacar el proyecto');
+      await featureMutation.mutateAsync(projectId);
+      toast.success('Proyecto destacado exitosamente!');
+    } catch (error: any) {
+      toast.error(error.message || 'Error al destacar proyecto');
     }
   };
 
-  // Función para eliminar proyecto
+  // Function to delete project
   const handleDelete = async (projectId: number) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) {
+    if (!confirm('Estas seguro de eliminar este proyecto? Esta accion no se puede deshacer.')) {
       return;
     }
 
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('tiyuy-auth-token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${projectId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        toast.success('Proyecto eliminado correctamente');
-        refetch();
-      } else {
-        toast.error('Error al eliminar el proyecto');
-      }
-    } catch (error) {
-      toast.error('Error al eliminar el proyecto');
+      await deleteMutation.mutateAsync(projectId);
+      toast.success('Proyecto eliminado exitosamente');
+    } catch (error: any) {
+      toast.error(error.message || 'Error al eliminar proyecto');
     }
   };
-
-  const { data: projectsData, isLoading, refetch } = myProjects(0, 20);
 
   const projects = projectsData?.content || [];
   const filteredProjects = projects.filter((project: any) => {
@@ -137,39 +103,35 @@ export default function MisProyectosPage() {
 
   const getPhaseText = (phase: string) => {
     switch (phase) {
-      case 'PRE_SALE': return 'Preventa';
+      case 'PRE_SALE': return 'Pre-venta';
       case 'SALE': return 'En Venta';
       case 'DELIVERY': return 'Entrega';
       default: return phase;
     }
   };
 
-  // En contexto de inmobiliarias, permitimos acceso a usuarios autorizados
-  // La validación específica de roles se maneja a nivel de ProtectedRoute
+  // In real estate context, we allow access to authorized users
+  // Role-specific validation is handled at ProtectedRoute level
 
   return (
     <ProtectedRoute>
       <TrialGuard>
         <div className="min-h-screen bg-gray-50 py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Banner de advertencia de trial */}
+            {/* Trial warning banner */}
             <TrialWarningBanner />
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                  Mis Proyectos
-                </h1>
-                <p className="text-gray-600 mt-2">
-                  Gestiona tus proyectos inmobiliarios y desarrolllos
-                </p>
+                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Mis Proyectos</h1>
+                <p className="text-gray-600 mt-2">Administra tus proyectos inmobiliarios y desarrollos</p>
               </div>
               <Link
-                href="/my-projects/new"
+                href="/dashboard/projects/new"
                 className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
               >
-                🏢 Nuevo Proyecto
+                Nuevo Proyecto
               </Link>
             </div>
           </div>
@@ -222,7 +184,7 @@ export default function MisProyectosPage() {
                   <div className="w-6 h-6 bg-blue-600 rounded"></div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">En Construcción</p>
+                  <p className="text-sm font-medium text-gray-600">En Construccion</p>
                   <p className="text-2xl font-bold text-gray-900">
                     {projects.filter((p: any) => p.phase === 'SALE').length}
                   </p>
@@ -280,21 +242,14 @@ export default function MisProyectosPage() {
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <div className="w-8 h-8 bg-gray-300 rounded"></div>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {searchTerm ? 'No se encontraron proyectos' : 'No tienes proyectos'}
-              </h3>
-              <p className="text-gray-500 mb-6">
-                {searchTerm 
-                  ? 'Intenta con otros términos de búsqueda'
-                  : 'Comienza creando tu primer proyecto inmobiliario'
-                }
-              </p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{searchTerm ? 'No se encontraron proyectos' : 'No hay proyectos aun'}</h3>
+              <p className="text-gray-500 mb-6">{searchTerm ? 'Intenta otros terminos de busqueda' : 'Comienza creando tu primer proyecto inmobiliario'}</p>
               {!searchTerm && (
                 <Link
-                  href="/my-projects/new"
+                  href="/dashboard/projects/new"
                   className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                 >
-                  🏢 Crear Primer Proyecto
+                  Crear Primer Proyecto
                 </Link>
               )}
             </div>
@@ -326,7 +281,7 @@ export default function MisProyectosPage() {
                       </span>
                       {project.isFeatured && (
                         <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                          ⭐ Destacado
+                          Destacado
                         </span>
                       )}
                     </div>
@@ -356,19 +311,19 @@ export default function MisProyectosPage() {
                         <span className="font-medium">S/ {project.priceFrom?.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-500">Ubicación:</span>
+                        <span className="text-gray-500">Ubicacion:</span>
                         <span className="font-medium text-right">{project.district}</span>
                       </div>
                     </div>
 
                     {/* Actions */}
                     <div className="mt-4 pt-4 border-t border-gray-200">
-                      {/* Debug para verificar el estado del proyecto */}
-                      <div className="text-xs text-red-600 mb-2">
-                        DEBUG: status={project.status}, isFeatured={project.isFeatured}, typeof isFeatured={typeof project.isFeatured}
+                      {/* Debug to verify project status */}
+                      <div className="text-xs text-red-600 mb-2 hidden">
+                        DEBUG: status={project.status}, isFeatured={project.isFeatured}
                       </div>
                       
-                      {/* Primera fila: Ver y Editar */}
+                      {/* First row: View and Edit */}
                       <div className="flex gap-2 mb-2">
                         <Link
                           href={`/projects/${project.slug}`}
@@ -384,28 +339,23 @@ export default function MisProyectosPage() {
                         </Link>
                       </div>
                       
-                      {/* Segunda fila: Acciones según estado */}
+                      {/* Second row: Actions by status */}
                       {project.status === 'DRAFT' && (
                         <div className="flex gap-2">
                           <button
                             onClick={() => handlePublish(project.id)}
-                            className="flex-1 text-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
+                            disabled={publishMutation.isPending}
+                            className="flex-1 text-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            🚀 Publicar
+                            {publishMutation.isPending ? 'Publicando...' : 'Publicar'}
                           </button>
                           <button
                             onClick={() => handleDelete(project.id)}
-                            className="flex-1 text-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+                            disabled={deleteMutation.isPending}
+                            className="flex-1 text-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            🗑️ Eliminar
+                            {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
                           </button>
-                        </div>
-                      )}
-                      
-                      {/* Mostrar siempre para proyectos publicados */}
-                      {project.status === 'PUBLISHED' && (
-                        <div className="text-xs text-green-600 mb-2">
-                          ✅ Status es PUBLISHED - Mostrando botón de destacar
                         </div>
                       )}
                       
@@ -413,15 +363,17 @@ export default function MisProyectosPage() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleFeature(project.id)}
-                            className="flex-1 text-center px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 text-sm font-medium"
+                            disabled={featureMutation.isPending}
+                            className="flex-1 text-center px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            ⭐ Destacar
+                            {featureMutation.isPending ? 'Destacando...' : 'Destacar'}
                           </button>
                           <button
                             onClick={() => handleDelete(project.id)}
-                            className="flex-1 text-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+                            disabled={deleteMutation.isPending}
+                            className="flex-1 text-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            🗑️ Eliminar
+                            {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
                           </button>
                         </div>
                       )}
@@ -429,7 +381,7 @@ export default function MisProyectosPage() {
                       {project.status === 'PUBLISHED' && project.isFeatured && (
                         <div className="text-center">
                           <span className="inline-flex items-center px-3 py-2 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-medium">
-                            ⭐ Proyecto Destacado
+                            Proyecto Destacado
                           </span>
                         </div>
                       )}

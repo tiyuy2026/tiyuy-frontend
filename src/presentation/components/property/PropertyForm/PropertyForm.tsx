@@ -25,7 +25,7 @@ interface PropertyFormProps {
   property?: Property | Project;
   mode: 'create' | 'edit';
   onStepChange?: (step: number) => void;
-  formType?: 'property' | 'project'; // ← NUEVO: para diferenciar tipos
+  formType?: 'property' | 'project'; // NEW: to differentiate types
 }
 
 const STEPS = [
@@ -77,15 +77,15 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
 
   const canPublish = useMemo(() => {
     if (activeSubscription) return activeSubscription.remainingPublications > 0;
-    //  Sin suscripción: 1 publicación gratis entre propiedades + proyectos
+    // Without subscription: 1 free publication between properties + projects
     return (publishedPropertiesCount + publishedProjectsCount) < 1;
   }, [activeSubscription, publishedPropertiesCount, publishedProjectsCount]);
 
   const [formData, setFormData] = useState({
-    // Propiedades existentes (solo si es property form)
+    // Existing properties (only if property form)
     type: property?.type || 'APARTMENT',
     transactionType: (property && 'transactionType' in property) ? property.transactionType : 'SALE',
-    // 🔍 FIX: Agregar estado para archivos de unidades
+    // FIX: Add state for unit files
     unitBlueprintFiles: {},
     groupBlueprintFiles: {},
     price: (property && 'price' in property) ? property.price : 0,
@@ -111,7 +111,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
     longitude: (property && 'location' in property) ? property.location?.longitude : 0,
     showExactAddress: (property && 'location' in property) ? property.location?.showExactAddress : true,
     
-    // Campos para proyectos (solo si es project form)
+    // Fields for projects (only if project form)
     ...(formType === 'project' ? {
       name: (property && 'name' in property) ? property.name : '',
       phase: (property && 'phase' in property) ? property.phase : 'PRE_SALE',
@@ -140,7 +140,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
   const createProjectMutation = useProjects().createProject(); // ← Hook para proyectos
   const updateProjectMutation = useProjects().updateProject(); // ← Hook para actualizar proyectos
 
-  // Determinar steps y componentes según el tipo
+  // Determine steps and components according to type
   const currentSteps = formType === 'project' ? PROJECT_STEPS : STEPS;
   const currentStepComponents = formType === 'project' ? ProjectStepComponents : StepComponents;
   const totalSteps = currentSteps.length;
@@ -154,9 +154,9 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
     setFormData((prev) => ({ ...prev, [field]: value }));
 
   const handleNext = () => {
-    // Crear proyecto cuando llegamos al paso 5 (antes de mostrar el componente)
+    // Create project when reaching step 5 (before showing component)
     if (formType === 'project' && currentStep === 4 && !createdPropertyId) {
-      //  VALIDACIÓN PREVIA de campos obligatorios
+      // PREVIOUS VALIDATION of required fields
       const requiredFields = {
         name: formData.name,
         description: formData.description,
@@ -193,7 +193,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
 
       console.log('✅ Todos los campos obligatorios están presentes');
       
-      // Crear proyecto al pasar del paso 4 al 5
+      // Create project when passing from step 4 to 5
       const projectData = prepareProjectData(formData);
       console.log(' Creando proyecto como DRAFT con todos los datos:', projectData);
       
@@ -219,7 +219,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
           
           console.log('🔧 Final projectId found:', projectId);
           
-          // Validar que projectId exista antes de guardar
+          // Validate that projectId exists before saving
           if (projectId) {
             console.log('🔧 Saving project ID:', projectId);
             // ✅ Fix 1: Guardar en estado y localStorage con key correcta
@@ -227,20 +227,20 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
             localStorage.setItem('lastCreatedProjectId', String(projectId)); // ✅ Key correcta
             console.log('✅ Project ID guardado en localStorage:', projectId);
             
-            // Avanzar al paso 5 después de crear el proyecto
+            // Go to step 5 after creating project
             goToStep(5);
             
-            // Mostrar toast de éxito y permitir subir imágenes
+            // Show success toast and allow uploading images
             toast.success('Proyecto guardado, ahora sube las imágenes');
           } else {
-            console.error('❌ Error: projectId es undefined después de crear el proyecto');
+            console.error('Error: projectId is undefined after creating project');;
             toast.error('Error al guardar el proyecto - ID no encontrado');
           }
         },
         onError: (error: any) => {
           console.error(' Error al crear proyecto:', error);
           
-          // Manejar error de validación específicamente
+          // Handle validation error specifically
           if (error.isValidationError) {
             toast.error(error.message, {
               duration: 5000,
@@ -252,29 +252,29 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
             return;
           }
           
-          // Manejar error de suscripción específicamente
-          if (error.isSubscriptionError || error.message?.includes('ENTERPRISE') || error.message?.includes('suscripción')) {
-            const errorMessage = 'Para crear proyectos necesitas una suscripción ENTERPRISE.';
+          // Handle subscription error specifically
+          if (error.isSubscriptionError || error.message?.includes('ENTERPRISE') || error.message?.includes('subscription')) {
+            const errorMessage = 'You need an ENTERPRISE subscription to create projects.';
             
             toast.error(errorMessage, {
               duration: 5000,
               action: {
-                label: 'Ver Planes',
+                label: 'View Plans',
                 onClick: () => {
-                  console.log(' Toast: Navegando a /plans...');
+                  console.log(' Toast: Navigating to /plans...');
                   console.log(' URL actual:', window.location.href);
                   router.push('/plans');
                 }
               }
             });
             
-            // Redirigir después de un tiempo
+            // Redirect after some time
             setTimeout(() => {
-              console.log(' Timeout: Navegando a /plans...');
+              console.log(' Timeout: Navigating to /plans...');
               router.push('/plans');
             }, 3000);
           } else {
-            toast.error('Error al crear el proyecto');
+            toast.error('Error creating the project');
           }
         },
       });
@@ -282,7 +282,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
     }
     
     if (mode === 'create' && formType === 'property' && currentStep === 3 && !createdPropertyId) {
-      // Crear propiedad en el paso 3 para poder subir fotos en el paso 4
+      // Create property in step 3 to upload photos in step 4
       const createData = prepareCreateData(formData);
       
       createMutation.mutate(createData, {
@@ -291,7 +291,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
           goToStep(4); 
         },
         onError: (error: any) => {
-          toast.error('Error al crear la propiedad');
+          toast.error('Error creating the property');
         },
       });
       return;
@@ -299,7 +299,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
     goToStep(Math.min(currentStep + 1, totalSteps));
   };
 
-  // Función para preparar datos según el tipo de propiedad
+  // Function to prepare data according to property type
   const prepareCreateData = (data: any) => {
     const baseData = {
       type: data.type,
@@ -316,20 +316,20 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       showExactAddress: Boolean(data.showExactAddress),
     };
 
-    // Agregar campos según el tipo de propiedad
+    // Add fields according to property type
     switch (data.type) {
       case 'ROOM':
         return {
           ...baseData,
           totalArea: Number(data.roomArea) || undefined,
-          // Para habitaciones, no hay dormitorios ni baños en el backend actual
+          // For rooms, no bedrooms or bathrooms in current backend
         };
       
       case 'LAND':
         return {
           ...baseData,
           totalArea: Number(data.totalArea) || undefined,
-          // Para terrenos, no hay dormitorios ni baños
+          // For land, no bedrooms or bathrooms
         };
       
       case 'OFFICE':
@@ -353,20 +353,20 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
     }
   };
 
-  // Función para preparar datos para proyectos según el backend
+  // Function to prepare data for projects according to backend
   const prepareProjectData = (data: any) => {
-    console.log(' prepareProjectData - Todos los datos del formulario:', data);
+    console.log(' prepareProjectData - All form data:', data);
     
-    // Logging detallado para cada paso
-    console.log(' Paso 1 - Información básica:', {
+    // Detailed logging for each step
+    console.log(' Step 1 - Basic information:', {
       name: data.name || data.projectName || '',
       description: data.description || '',
       phase: data.phase || 'PRE_SALE',
       type: data.projectType || 'RESIDENTIAL',
-      mainAmenities: data.amenities || [] //  NUEVO: Amenidades principales del paso 1 (viene como 'amenities' del frontend)
+      mainAmenities: data.amenities || [] //  NEW: Main amenities from step 1 (comes as 'amenities' from frontend)
     });
     
-    console.log(' Paso 2 - Ubicación:', {
+    console.log(' Step 2 - Location:', {
       address: data.address || data.fullAddress || '',
       district: data.district || '',
       province: data.province || '',
@@ -380,7 +380,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       showExactAddress: data.showExactAddress
     });
     
-    console.log(' Paso 3 - Comercial y Unidades:', {
+    console.log(' Step 3 - Commercial and Units:', {
       totalUnits: data.totalUnits,
       availableUnits: data.availableUnits,
       priceFrom: data.priceFrom,
@@ -392,28 +392,28 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       amenities: data.amenities || []
     });
     
-    console.log(' Paso 4 - Timeline:', {
+    console.log(' Step 4 - Timeline:', {
       timeline: data.timeline || []
     });
     
-    console.log(' Paso 5 - Multimedia (se subirá por separado):', {
+    console.log(' Step 5 - Multimedia (will be uploaded separately):', {
       images: data.images || [],
       blueprints: data.blueprints || [],
       renders: data.renders || []
     });
     
-    //  AHORA SÍ enviamos todos los campos que el backend acepta
+    // NOW send all fields that the backend accepts
     const projectData = {
-      // Paso 1: Información básica
+      // Step 1: Basic information
       name: data.name || data.projectName || '',
       description: data.description || '',
       phase: data.phase || 'PRE_SALE',
-      type: data.projectType || 'RESIDENTIAL', // ✅ Usar projectType en lugar de type
+      type: data.projectType || 'RESIDENTIAL', //  Use projectType instead of type
       
-      //  NUEVO: Amenidades principales (checkboxes del paso 1)
-      mainAmenities: data.amenities || [], //  NUEVO: Amenidades principales del paso 1 (viene como 'amenities' del frontend)
+      // NEW: Main amenities (checkboxes from step 1)
+      mainAmenities: data.amenities || [], //  NEW: Main amenities from step 1 (comes as 'amenities' from frontend)
       
-      // Paso 2: Ubicación
+      // Step 2: Location
       address: data.fullAddress || '',
       district: data.district || '',
       province: data.province || '',
@@ -421,14 +421,14 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       latitude: data.latitude ? Number(data.latitude) : undefined,
       longitude: data.longitude ? Number(data.longitude) : undefined,
       
-      //  NUEVO: Campos adicionales de dirección (del paso 2)
+      // NEW: Additional address fields (from step 2)
       urbanization: data.urbanization || '',
       street: data.street || '',
       streetNumber: data.streetNumber || '',
       fullAddress: data.fullAddress || '',
       showExactAddress: data.showExactAddress !== undefined ? data.showExactAddress : true,
       
-      // Paso 3: Información comercial
+      // Step 3: Commercial information
       totalUnits: Number(data.totalUnits) > 0 ? Number(data.totalUnits) : 1, // Default to 1 if 0 or invalid
       availableUnits: Number(data.availableUnits) || Number(data.totalUnits) || 0,
       priceFrom: Number(data.priceFrom) || 0,
@@ -440,7 +440,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       estimatedDelivery: data.estimatedDelivery || undefined,
       floors: data.floors ? Number(data.floors) : undefined,
       
-      //  NUEVO: Unidades (del paso 3) - CON IMÁGENES
+      // NEW: Units (from step 3) - WITH IMAGES
       units: (data.units || []).map((unit: any) => ({
         unitNumber: unit.unitNumber || '',
         type: unit.type || 'APARTMENT',
@@ -452,19 +452,19 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
         price: unit.price || 150000,
         status: unit.status || 'AVAILABLE',
         view: unit.view || '',
-        // 🔍 FIX: Agregar imágenes de las unidades
-        image: unit.image || '',           // Imagen de la unidad
-        blueprintImage: unit.blueprintImage || ''  // Plano de la unidad
+        // FIX: Add unit images
+        image: unit.image || '',           // Unit image
+        blueprintImage: unit.blueprintImage || ''  // Unit blueprint
       })),
       
-      // 🔍 FIX: Agregar campos que faltaban del paso 3
-      certifications: data.certifications || [],  // Certificados
-      timeline: data.timeline || [],              // Timeline/Fechas importantes
+      // FIX: Add missing fields from step 3
+      certifications: data.certifications || [],  // Certificates
+      timeline: data.timeline || [],              // Timeline/Important dates
       
-      // Paso 5: Multimedia (se subirá por separado, pero incluimos URLs si ya existen)
+      // Step 5: Multimedia (will be uploaded separately, but include URLs if they already exist)
       coverImageUrl: data.coverImageUrl || '',
       
-      //  NUEVO: Grupos de unidades (del paso 3)
+      // NEW: Unit groups (from step 3)
       unitGroups: (data.unitGroups || []).map((group: any) => ({
         groupName: group.groupName || '',
         unitType: group.unitType || 'APARTMENT',
@@ -478,11 +478,11 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
         status: group.status || 'AVAILABLE',
         view: group.view || '',
         quantity: group.quantity || 1,
-        image: group.image || '',           // Imagen del grupo
-        blueprintImage: group.blueprintImage || ''  // Plano del grupo
+        image: group.image || '',           // Group image
+        blueprintImage: group.blueprintImage || ''  // Group blueprint
       })),
       
-      //  NUEVO: Amenidades detalladas (del paso 3)
+      // NEW: Detailed amenities (from step 3)
       amenities: (data.amenities || []).map((amenity: any) => ({
         name: amenity.name || '',
         description: amenity.description || '',
@@ -490,7 +490,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       }))
     };
     
-    console.log('📦 Datos finales a enviar:', projectData);
+    console.log('📦 Final data to send:', projectData);
     return projectData;
   };
 
@@ -505,7 +505,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       const projectRepository = new ProjectRepository();
       const project = await projectRepository.getById(projectId);
       
-      console.log('✅ Verificación de datos guardados:', {
+      console.log('✅ Verification of saved data:', {
           id: project.id,
           name: project.name,
           description: project.description,
@@ -536,7 +536,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
         });
         
         // Verificar arrays
-        console.log(' Verificación de arrays:', {
+        console.log(' Verification of arrays:', {
           amenities: project.amenities?.length || 0,
           certifications: project.certifications?.length || 0,
           timeline: project.timeline?.length || 0,
@@ -546,7 +546,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
         });
       
     } catch (error) {
-      console.error(' Error en verificación:', error);
+      console.error(' Error in verification:', error);
     }
   };
 
@@ -719,20 +719,20 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
         {formType === 'project' && !createdPropertyId && currentStep === 5 && (
           <button
             onClick={async () => {
-              console.log('🔍 DEBUG - Datos actuales del formulario:', formData);
+              console.log('DEBUG - Datos actuales del formulario:', formData);
               
               try {
-                // 🔍 FIX: Primero subir planos de unidades si existen
+                // FIX: Primero subir planos de unidades si existen
                 if (formData.unitBlueprintFiles || formData.groupBlueprintFiles) {
-                  console.log('� Subiendo planos de unidades antes de guardar...');
+                  console.log('Subiendo planos de unidades antes de guardar...');
                   
                   // Obtener referencia al componente ProjectMultimediaStep
                   const multimediaStepRef = document.querySelector('[data-multimedia-step]') as any;
                   if (multimediaStepRef && multimediaStepRef.uploadUnitBlueprints) {
                     const uploadedBlueprints = await multimediaStepRef.uploadUnitBlueprints();
-                    console.log('✅ Planos subidos:', uploadedBlueprints);
+                    console.log('Planos subidos:', uploadedBlueprints);
                     
-                    // 🔍 FIX: Actualizar las unidades y grupos con las URLs subidas
+                    // FIX: Actualizar las unidades y grupos con las URLs subidas
                     const updatedUnits = Array.isArray(formData.units) ? formData.units.map((unit: any) => {
                       if (uploadedBlueprints[unit.id]) {
                         return { ...unit, blueprintImage: uploadedBlueprints[unit.id] };
@@ -754,32 +754,32 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
                       groups: updatedGroups
                     };
                     
-                    console.log('💾 Guardando proyecto con planos actualizados:', updatedFormData);
+                    console.log('Guardando proyecto con planos actualizados:', updatedFormData);
                     
                     const projectData = prepareProjectData(updatedFormData);
                     createProjectMutation.mutate(projectData, {
                       onSuccess: (result: any) => { 
-                        console.log('✅ Proyecto guardado como BORRADOR:', result);
-                        toast.success('¡Proyecto guardado como BORRADOR! 🎉');
-                        router.push('/my-projects'); // ✅ Redirigir a borradores
+                        console.log('Proyecto guardado como BORRADOR:', result);
+                        toast.success('Proyecto guardado como BORRADOR');
+                        router.push('/my-projects'); // Redirigir a borradores
                       },
                       onError: (error: any) => {
-                        console.error('❌ Error guardando borrador:', error);
+                        console.error('Error guardando borrador:', error);
                         toast.error('Error al guardar el borrador');
                       }
                     });
                   } else {
-                    console.warn('⚠️ No se encontró la función uploadUnitBlueprints');
+                    console.warn('No se encontro la funcion uploadUnitBlueprints');
                     // Guardar sin planos si no se encuentra la función
                     const projectData = prepareProjectData(formData);
                     createProjectMutation.mutate(projectData, {
                       onSuccess: (result: any) => { 
-                        console.log('✅ Proyecto guardado como BORRADOR:', result);
-                        toast.success('¡Proyecto guardado como BORRADOR! 🎉');
-                        router.push('/my-projects'); // ✅ Redirigir a borradores
+                        console.log('Proyecto guardado como BORRADOR:', result);
+                        toast.success('Proyecto guardado como BORRADOR');
+                        router.push('/my-projects'); // Redirigir a borradores
                       },
                       onError: (error: any) => {
-                        console.error('❌ Error guardando borrador:', error);
+                        console.error('Error guardando borrador:', error);
                         toast.error('Error al guardar el borrador');
                       }
                     });
@@ -789,18 +789,18 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
                   const projectData = prepareProjectData(formData);
                   createProjectMutation.mutate(projectData, {
                     onSuccess: (result: any) => { 
-                      console.log('✅ Proyecto guardado como BORRADOR:', result);
-                      toast.success('¡Proyecto guardado como BORRADOR! 🎉');
-                      router.push('/my-projects'); // ✅ Redirigir a borradores
+                      console.log('Proyecto guardado como BORRADOR:', result);
+                      toast.success('Proyecto guardado como BORRADOR');
+                      router.push('/my-projects'); // Redirigir a borradores
                     },
                     onError: (error: any) => {
-                      console.error('❌ Error guardando borrador:', error);
+                      console.error('Error guardando borrador:', error);
                       toast.error('Error al guardar el borrador');
                     }
                   });
                 }
               } catch (error) {
-                console.error('❌ Error en el proceso de guardado:', error);
+                console.error('Error en el proceso de guardado:', error);
                 toast.error('Error al guardar el proyecto');
               }
             }}

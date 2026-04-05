@@ -27,16 +27,16 @@ export default function MyPropertiesPage() {
   const [previousPlan, setPreviousPlan] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  // Detectar cambio de plan
+  // Detect plan change
   useEffect(() => {
     if (activeSubscription && activeSubscription.plan) {
       const currentPlan = activeSubscription.plan.name;
       
-      // Si hay un plan anterior y es diferente al actual
+      // If there is a previous plan and it is different from the current one
       if (previousPlan && previousPlan !== currentPlan) {
         setShowWelcomeMessage(true);
         
-        // Ocultar mensaje después de 5 segundos
+        // Hide message after 5 seconds
         const timer = setTimeout(() => {
           setShowWelcomeMessage(false);
         }, 5000);
@@ -44,22 +44,22 @@ export default function MyPropertiesPage() {
         return () => clearTimeout(timer);
       }
       
-      // Guardar el plan actual como anterior para futuras comparaciones
+      // Save current plan as previous for future comparisons
       setPreviousPlan(currentPlan);
     }
   }, [activeSubscription, previousPlan]);
 
-  // Forzar recarga de datos cuando se monta el componente
+  // Force data reload when component mounts
   useEffect(() => {
     refetch();
     refetchSubscription();
     
-    // Forzar invalidación de cache
+    // Force cache invalidation
     queryClient.invalidateQueries({ queryKey: ['properties'] });
     queryClient.invalidateQueries({ queryKey: ['subscription'] });
   }, [refetch, refetchSubscription, queryClient]);
 
-  // Forzar recarga cuando se cierra el modal de actualización
+  // Force reload when upgrade modal closes
   useEffect(() => {
     if (!showUpgradeModal) {
       setTimeout(() => {
@@ -71,7 +71,7 @@ export default function MyPropertiesPage() {
     }
   }, [showUpgradeModal, refetch, refetchSubscription, queryClient]);
 
-  // Refresco periódico cada 30 segundos
+  // Periodic refresh every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       refetch();
@@ -94,18 +94,18 @@ export default function MyPropertiesPage() {
     return normalizedProperties.filter((p: any) => p.status === 'PUBLISHED').length;
   }, [normalizedProperties]);
 
-  // Usar la lógica exacta del backend
+  // Use exact backend logic
   const canPublish = useMemo(() => {
     if (activeSubscription) {
-      // Tiene plan: usa la lógica del plan (remainingPublications)
+      // Has plan: use plan logic (remainingPublications)
       return activeSubscription.remainingPublications > 0;
     }
     
-    // SIN SUSCRIPCIÓN: hasta 1 propiedad PUBLICADA gratis
+    // WITHOUT SUBSCRIPTION: up to 1 FREE PUBLISHED property
     return publishedCount < 1;
   }, [activeSubscription, publishedCount]);
 
-  // Para mostrar en la UI
+  // To display in the UI
   const maxPublications = activeSubscription?.plan?.maxPublications || 1;
   const remainingPublications = activeSubscription?.remainingPublications ?? (1 - publishedCount);
 
@@ -173,14 +173,14 @@ export default function MyPropertiesPage() {
   const handleEdit = (id: unknown) => {
     const parsedId = typeof id === 'number' ? id : Number(id);
     if (!parsedId || Number.isNaN(parsedId)) {
-      toast.error('No se pudo abrir la edición: falta el ID de la propiedad');
+      toast.error('No se pudo abrir edicion: falta ID de propiedad');
       return;
     }
     router.push(`/my-properties/${parsedId}/edit`);
   };
 
   const handleDelete = async (id: number, title: string) => {
-    if (confirm(`¿Estás seguro de eliminar "${title}"?`)) {
+    if (confirm(`Estas seguro de eliminar "${title}"?`)) {
       await deleteMutation.mutateAsync(id);
     }
   };
@@ -188,7 +188,7 @@ export default function MyPropertiesPage() {
   const handlePublish = async (id: unknown) => {
     const parsedId = typeof id === 'number' ? id : Number(id);
     if (!parsedId || Number.isNaN(parsedId)) {
-      toast.error('No se pudo publicar: falta el ID de la propiedad');
+      toast.error('No se pudo publicar: falta ID de propiedad');
       return;
     }
     if (!canPublish) {
@@ -212,50 +212,48 @@ export default function MyPropertiesPage() {
   };
 
   const handleRefresh = () => {
-    // Forzar limpieza completa de cache
+    // Clear cache completely
     queryClient.clear();
     
-    // Refrescar todo
+    // Refresh everything
     refetch();
     refetchSubscription();
     
-    toast.info('🔄 Forzando actualización completa de datos...');
+    toast.info('Forzando actualizacion completa...');
     
-    // Refrescar nuevamente después de 2 segundos
+    // Refresh again after 2 seconds
     setTimeout(() => {
       refetch();
       refetchSubscription();
     }, 2000);
   };
 
-  // ✅ FUNCIÓN PARA DESTACAR PROPIEDAD
+  // Function to feature property
   const handleFeatureProperty = async (propertyId: number) => {
     try {
-      // Crear instancia del repositorio
+      // Create repository instance
       const propertyRepo = new PropertyRepository();
       
-      // Llamar al backend para destacar la propiedad
+      // Call backend to feature property
       await propertyRepo.featureProperty(propertyId);
       
-      // Mostrar éxito
-      toast.success('✅ ¡Propiedad destacada correctamente!');
+      // Show success
+      toast.success('Propiedad destacada exitosamente!');
       
-      // Refrescar las propiedades
+      // Refresh properties
       refetch();
       
     } catch (error: any) {
-      console.error('Error destacando propiedad:', error);
+      console.error('Error featuring property:', error);
       
-      // Manejar errores específicos
+      // Handle specific errors
       if (error.response?.status === 403) {
-        toast.error('❌ No tienes permiso para destacar esta propiedad');
-      } else if (error.response?.status === 409) {
-        toast.error('❌ La propiedad ya está destacada');
-      } else if (error.response?.status === 400) {
-        toast.error('❌ Solo se pueden destacar propiedades publicadas');
-      } else {
-        toast.error('❌ Error al destacar propiedad: ' + (error.response?.data?.message || error.message));
+        toast.error('No tienes permiso para destacar esta propiedad');
+        return;
       }
+      
+      // Generic error message for other errors
+      toast.error('Error al destacar propiedad. Intenta nuevamente.');
     }
   };
 
@@ -278,14 +276,14 @@ export default function MyPropertiesPage() {
               className="px-5 py-3 rounded-lg font-semibold transition-colors bg-red-100 text-red-800 hover:bg-red-200"
               disabled={isLoading}
             >
-              {isLoading ? 'Actualizando...' : '🔄 Forzar Actualización'}
+              {isLoading ? 'Actualizando...' : 'Forzar Actualizacion'}
             </button>
             <button
               type="button"
               onClick={goToPublishedHistory}
               className="px-5 py-3 rounded-lg font-semibold transition-colors bg-gray-100 text-gray-800 hover:bg-gray-200"
             >
-              Historial publicadas ({counts.PUBLISHED})
+              Historial Publicados ({counts.PUBLISHED})
             </button>
 
             <Link
@@ -313,7 +311,7 @@ export default function MyPropertiesPage() {
               <input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Buscar por título, distrito o provincia"
+                placeholder="Buscar por titulo, distrito o provincia"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <div className="flex flex-wrap gap-2">
@@ -358,9 +356,9 @@ export default function MyPropertiesPage() {
           </div>
         )}
 
-        {/* Debug Panel - Eliminado */}
+        {/* Debug Panel - Deleted */}
 
-        {/* Mensaje de bienvenida al nuevo plan */}
+        {/* Welcome message for new plan */}
         {showWelcomeMessage && activeSubscription && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 animate-pulse">
             <p className="text-green-800 font-medium">
@@ -370,20 +368,19 @@ export default function MyPropertiesPage() {
           </div>
         )}
 
-        {/* Límite de publicaciones - Solo mostrar si no hay mensaje de bienvenida */}
         {!canPublish && !showWelcomeMessage && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
             <p className="text-yellow-800 font-medium">
-              ⚠️ {activeSubscription && activeSubscription.plan
-                ? `Has alcanzado el límite de ${activeSubscription.plan.maxPublications} publicaciones de tu plan ${activeSubscription.plan.name}.` 
-                : 'Has alcanzado el límite de 1 propiedad gratuita.'}{' '}
+              {activeSubscription && activeSubscription.plan
+                ? `Has alcanzado el limite de ${activeSubscription.plan.maxPublications} publicaciones para tu plan ${activeSubscription.plan.name}.` 
+                : 'Has alcanzado el limite de 1 propiedad gratis.'}{' '}
               <button
                 onClick={() => setShowUpgradeModal(true)}
                 className="text-blue-600 hover:underline font-semibold"
               >
-                {activeSubscription && activeSubscription.plan ? 'Renovar plan' : 'Actualiza tu plan'}
+                {activeSubscription && activeSubscription.plan ? 'Renovar plan' : 'Mejorar tu plan'}
               </button>{' '}
-              para publicar más propiedades.
+              para publicar mas propiedades.
             </p>
           </div>
         )}
@@ -401,7 +398,7 @@ export default function MyPropertiesPage() {
         {/* Empty State */}
         {!isLoading && properties.length === 0 && (
           <div className="text-center py-16 bg-white rounded-lg shadow-md">
-            <div className="text-6xl mb-4">🏠</div>
+            <div className="text-6xl mb-4">HOME</div>
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
               Aún no tienes propiedades
             </h3>
@@ -421,7 +418,7 @@ export default function MyPropertiesPage() {
         {/* Empty tab state */}
         {!isLoading && properties.length > 0 && filteredProperties.length === 0 && (
           <div className="text-center py-12 bg-white rounded-lg shadow-md">
-            <div className="text-5xl mb-3">📁</div>
+            <div className="text-5xl mb-3">FOLDER</div>
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               No tienes propiedades en esta sección
             </h3>
@@ -484,13 +481,13 @@ export default function MyPropertiesPage() {
                     </div>
                   )}
                     
-                    {/* Badge de estado */}
+                    {/* Status badge */}
                     <div className="absolute top-3 left-3">
                       <StatusBadge status={property.status} />
                     </div>
                   </div>
 
-                  {/* Contenido */}
+                  {/* Content */}
                   <div className="p-4">
                     <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
                       {property.title}
@@ -509,7 +506,7 @@ export default function MyPropertiesPage() {
                       </span>
                     </div>
 
-                    {/* Acciones */}
+                    {/* Actions */}
                     <div className="flex gap-2 flex-wrap">
                       {property.status === 'DRAFT' && (
                         <button
@@ -521,7 +518,7 @@ export default function MyPropertiesPage() {
                         </button>
                       )}
                       
-                      {/* ✅ BOTÓN DESTACAR PROPIEDAD */}
+                      {/* Featured property button */}
                       {property.status === 'PUBLISHED' && !property.isFeatured && (
                         <button
                           onClick={() => handleFeatureProperty(property.id)}
@@ -531,12 +528,12 @@ export default function MyPropertiesPage() {
                         </button>
                       )}
                       
-                      {/* ✅ DEBUG: Mostrar estado de la propiedad */}
+                      {/* Debug: Show property status */}
                       <div className="text-xs text-gray-400 hidden">
                         Status: {property.status} | Featured: {property.isFeatured ? 'true' : 'false'}
                       </div>
                       
-                      {/* ✅ BADGE DE PROPIEDAD DESTACADA */}
+                      {/* Featured property badge */}
                       {property.status === 'PUBLISHED' && property.isFeatured && (
                         <div className="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full flex items-center gap-1">
                           ⭐ Destacada
@@ -574,7 +571,7 @@ export default function MyPropertiesPage() {
         )}
       </div>
       
-      {/* Modal de actualización de plan */}
+      {/* Plan upgrade modal */}
       <UpgradePlanModal 
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
@@ -595,10 +592,10 @@ function normalizeStatus(status: unknown): 'PUBLISHED' | 'DRAFT' | 'RENTED' | 'S
 function StatusBadge({ status }: { status: string }) {
   const badges: Record<string, { bg: string; text: string; label: string }> = {
     DRAFT: { bg: 'bg-gray-500', text: 'text-white', label: 'Borrador' },
-    PUBLISHED: { bg: 'bg-green-500', text: 'text-white', label: 'Publicado' },
-    INACTIVE: { bg: 'bg-yellow-500', text: 'text-white', label: 'Inactivo' },
-    SOLD: { bg: 'bg-red-500', text: 'text-white', label: 'Vendido' },
-    RENTED: { bg: 'bg-blue-500', text: 'text-white', label: 'Alquilado' },
+    PUBLISHED: { bg: 'bg-green-500', text: 'text-white', label: 'Publicada' },
+    INACTIVE: { bg: 'bg-yellow-500', text: 'text-white', label: 'Inactiva' },
+    SOLD: { bg: 'bg-red-500', text: 'text-white', label: 'Vendida' },
+    RENTED: { bg: 'bg-blue-500', text: 'text-white', label: 'Alquilada' },
   };
 
   const badge = badges[status] || badges.DRAFT;

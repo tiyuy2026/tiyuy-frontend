@@ -4,20 +4,20 @@ import { useState } from 'react';
 import { useGetChannels } from '@/presentation/hooks/useContacts';
 import { formatCompactNumber } from '@/utils/formatters';
 
-interface MisCanalesSuscritosViewProps {
+interface MisCanalesCreadosViewProps {
   user: any;
   onChannelSelect: (channel: any) => void;
 }
 
-export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCanalesSuscritosViewProps) {
+export default function MisCanalesCreadosView({ user, onChannelSelect }: MisCanalesCreadosViewProps) {
   const { data: channels, isLoading } = useGetChannels(user?.id);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // ✅ Canales suscritos (soy miembro pero no admin)
-  const misCanalesSuscritos = channels?.filter((c: any) => c.isSubscribed && !c.isAdmin) ?? [];
+  //  Canales que creé (soy admin)
+  const misCanalesCreados = channels?.filter((c: any) => c.isAdmin) ?? [];
   
-  // ✅ Filtrado por búsqueda
-  const filteredChannels = misCanalesSuscritos.filter((channel: any) =>
+  //  Filtrado por búsqueda
+  const filteredChannels = misCanalesCreados.filter((channel: any) =>
     channel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     channel.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     channel.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -40,8 +40,8 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-          <p className="text-gray-500 text-sm">Cargando tus suscripciones...</p>
+          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+          <p className="text-gray-500 text-sm">Cargando tus canales...</p>
         </div>
       </div>
     );
@@ -58,33 +58,33 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No se encontraron canales</h3>
           <p className="text-gray-500 text-sm">
-            No hay canales suscritos que coincidan con "{searchQuery}"
+            No hay canales que coincidan con "{searchQuery}"
           </p>
         </div>
       </div>
     );
   }
 
-  if (misCanalesSuscritos.length === 0) {
+  if (misCanalesCreados.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center max-w-md">
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No estás suscrito a canales</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No tienes canales creados</h3>
           <p className="text-gray-500 text-sm mb-4">
-            Descubre canales de otros agentes e inmobiliarias para estar al día con las últimas novedades del mercado.
+            Como Agente o Inmobiliaria, puedes crear tus propios canales para publicar contenido y conectar con clientes.
           </p>
-          <div className="bg-teal-50 border border-teal-200 rounded-lg p-3">
-            <p className="text-teal-700 text-sm font-medium mb-1">💡 Beneficios de suscribirte:</p>
-            <ul className="text-teal-600 text-xs space-y-1">
-              <li>• Recibir actualizaciones de propiedades</li>
-              <li>• Conocer nuevas oportunidades</li>
-              <li>• Comentar y interactuar</li>
-              <li>• Mantenerte informado del mercado</li>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-blue-700 text-sm font-medium mb-1"> Beneficios de crear un canal:</p>
+            <ul className="text-blue-600 text-xs space-y-1">
+              <li>• Publicar propiedades y noticias</li>
+              <li>• Conectar con clientes interesados</li>
+              <li>• Construir tu marca personal</li>
+              <li>• Generar leads de calidad</li>
             </ul>
           </div>
         </div>
@@ -95,9 +95,9 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
   return (
     <div className="flex-1 p-6">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Mis Canales Suscritos</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Mis Canales Creados</h2>
         <p className="text-gray-600 text-sm mb-4">
-          Canales en los que estás suscrito. Puedes ver contenido, comentar y interactuar con las publicaciones.
+          Gestiona tus canales como administrador. Puedes publicar contenido, ver estadísticas y gestionar suscriptores.
         </p>
         
         {/* Input de búsqueda */}
@@ -107,7 +107,7 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
           </svg>
           <input 
             type="text"
-            placeholder="Buscar canales suscritos por nombre, descripción, categoría o ciudad..." 
+            placeholder="Buscar canales por nombre, descripción, categoría o ciudad..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="bg-transparent text-sm text-gray-700 placeholder-gray-400 flex-1 focus:outline-none" 
@@ -126,7 +126,7 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
         
         {searchQuery && (
           <p className="text-xs text-gray-500 mt-2">
-            Se encontraron {filteredChannels.length} canal(es) suscrito(s) que coinciden con "{searchQuery}"
+            Se encontraron {filteredChannels.length} canal(es) que coinciden con "{searchQuery}"
           </p>
         )}
       </div>
@@ -139,15 +139,15 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
             onClick={() => onChannelSelect(channel)}
           >
             {/* Header del canal */}
-            <div className="h-20 bg-gradient-to-r from-teal-500 to-blue-400 relative">
+            <div className="h-20 bg-gradient-to-r from-blue-500 to-teal-400 relative">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center text-2xl">
                   {getChannelEmoji(channel.city)}
                 </div>
               </div>
               <div className="absolute top-2 right-2">
-                <span className="bg-teal-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                  SUSCRIPTOR
+                <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                  ADMIN
                 </span>
               </div>
             </div>
@@ -174,11 +174,11 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
               </div>
 
               <div className="flex gap-2">
-                <button className="flex-1 bg-teal-50 text-teal-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-teal-100 transition-colors">
+                <button className="flex-1 bg-blue-50 text-blue-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">
                   Ver posts
                 </button>
-                <button className="flex-1 bg-gray-50 text-gray-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors">
-                  Comentar
+                <button className="flex-1 bg-teal-50 text-teal-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-teal-100 transition-colors">
+                  Estadísticas
                 </button>
               </div>
             </div>

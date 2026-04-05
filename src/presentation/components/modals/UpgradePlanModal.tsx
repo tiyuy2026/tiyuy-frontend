@@ -38,7 +38,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
             const userId = user.id;
             const used = await financeRepository.hasUserUsedFreePlan(userId);
             setHasUsedFreePlan(used);
-            console.log('🔍 Usuario ya usó plan FREE:', used);
+            console.log('Usuario ya uso plan FREE:', used);
           }
         } catch (error) {
           console.error('Error checking free plan usage:', error);
@@ -57,11 +57,11 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
     }, {
       onSuccess: (subscription) => {
         // Suscripción creada, ahora abrir MercadoPago
-        console.log('💳 Suscripción pendiente creada:', subscription);
+        console.log('Suscripcion pendiente creada:', subscription);
         openMercadoPagoPayment(plan, subscription.id);
       },
       onError: (error: any) => {
-        console.error('❌ Error creando suscripción:', error);
+        console.error('Error creando suscripcion:', error);
         
         // Si es error 409 (ya tiene suscripción activa), mostrar modal bonito
         if (error?.response?.status === 409) {

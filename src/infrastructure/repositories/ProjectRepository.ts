@@ -6,12 +6,12 @@ import {
   ProjectUnit 
 } from '@/core/domain/entities/Project';
 
-// ✅ INLINE type (no necesita SearchFilters import)
+//  INLINE type (no necesita SearchFilters import)
 type SearchFilters = Parameters<IProjectRepository['searchProjects']>[0];
 
 export class ProjectRepository implements IProjectRepository {
   /**
-   * Obtener proyecto por ID (básico - para cards/listados) - Público
+   * Get project by ID (basic - for cards/lists) - Public
    */
   async getById(projectId: number): Promise<Project> {
     try {
@@ -26,7 +26,7 @@ export class ProjectRepository implements IProjectRepository {
       
       return project;
     } catch (error) {
-      console.error('❌ Error in getById, trying fallback:', error);
+      console.error('Error in getById, trying fallback:', error);
       // Fallback a público si falla
       const publicResponse = await publicApiClient.get(`/projects/${projectId}`);
       return publicResponse.data;
@@ -40,7 +40,7 @@ export class ProjectRepository implements IProjectRepository {
     const response = await publicApiClient.get(`/projects/${projectId}/full`);
     const data = response.data;
     
-    // ✅ Separar media por tipo
+    //  Separar media por tipo
     const media: Array<{ id: number; url: string; mediaType: string; title: string; displayOrder: number }> = data.media || [];
     
     const images = media
@@ -71,7 +71,7 @@ export class ProjectRepository implements IProjectRepository {
     const response = await publicApiClient.get(`/projects/slug/${slug}`);
     const data = response.data;
     
-    // ✅ Mismo mapeo
+    //  Mismo mapeo
     const media: Array<{ url: string; mediaType: string; displayOrder: number }> = data.media || [];
     
     return {
@@ -102,7 +102,7 @@ export class ProjectRepository implements IProjectRepository {
       const response = await apiClient.get(`/projects/${projectId}/media`);
       return response.data;
     } catch (error) {
-      console.error('❌ getProjectMedia failed with auth, trying public:', error);
+      console.error('getProjectMedia failed with auth, trying public:', error);
       // Fallback a público si falla
       const publicResponse = await publicApiClient.get(`/projects/${projectId}/media`);
       return publicResponse.data;
@@ -173,132 +173,12 @@ export class ProjectRepository implements IProjectRepository {
    */
   async createProject(projectData: Parameters<IProjectRepository['createProject']>[0]): Promise<Project> {
     try {
-      console.log('🚀 Enviando solicitud de creación de proyecto al backend...');
-      
-      // Check authentication status
-      if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('tiyuy-auth-token') || 
-                     localStorage.getItem('token') || 
-                     localStorage.getItem('auth-token');
-        console.log('🔑 Authentication status:', token ? 'AUTHENTICATED' : 'NOT AUTHENTICATED');
-        if (!token) {
-          console.log('❌ No authentication token found. User may need to log in again.');
-        }
-      }
-      
-      console.log('👤 Usuario actual (rol debería ir en token JWT)');
-      console.log('📋 Datos completos del proyecto a enviar:', JSON.stringify(projectData, null, 2));
-      
-      // Validar campos críticos antes de enviar
-      console.log('🔍 Validación previa:');
-      console.log('- Nombre:', projectData.name);
-      console.log('- Tipo:', projectData.type);
-      console.log('- Fase:', projectData.phase);
-      console.log('- Total Unidades:', projectData.totalUnits);
-      console.log('- Precio Desde:', projectData.priceFrom);
-      console.log('- Dirección:', projectData.address);
-      console.log('- Distrito:', projectData.district);
-      
-      console.log('📤 Enviando al backend:', JSON.stringify(projectData, null, 2));
-      
-      // Debugging de la petición antes de enviar
-      const token = localStorage.getItem('tiyuy-auth-token') || 
-                   localStorage.getItem('token') || 
-                   localStorage.getItem('auth-token');
-      
-      console.log('🔍 Request details:');
-      console.log('- URL:', `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects`);
-      console.log('- Method: POST');
-      console.log('- Headers:', {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token ? token.substring(0, 20) + '...' : 'NO_TOKEN'}`
-      });
-      console.log('- Data size:', JSON.stringify(projectData).length, 'characters');
-      
-      try {
-        console.log('🚀 Enviando petición al backend...');
-        const startTime = Date.now();
-        
-        const response = await apiClient.post('/projects', projectData);
-        
-        const endTime = Date.now();
-        console.log(`✅ Petición completada en ${endTime - startTime}ms`);
-        console.log('✅ Response status:', response.status);
-        console.log('✅ Response headers:', response.headers);
-        console.log('✅ Proyecto creado exitosamente:', response.data);
-        console.log('🔍 Full response data:', JSON.stringify(response.data, null, 2));
-        
-        // 🔍 FIX: Debug completo de la respuesta del backend
-        console.log('🔍 Response status:', response.status);
-        console.log('🔍 Response headers:', response.headers);
-        console.log('🔍 Response data type:', typeof response.data);
-        console.log('🔍 Response data length:', response.data?.length || 0);
-        console.log('🔍 First 500 chars:', response.data?.substring(0, 500));
-        console.log('🔍 Last 500 chars:', response.data?.substring(-500));
-        
-        // 🔍 FIX: response.data viene como string, necesitamos parsearlo a objeto
-        let parsedProjectData: any = response.data;
-        if (typeof response.data === 'string') {
-          try {
-            // 🔍 FIX: Buscar el JSON dentro del string (eliminar texto extra)
-            const jsonStart = response.data.indexOf('{');
-            const jsonEnd = response.data.lastIndexOf('}');
-            
-            if (jsonStart !== -1 && jsonEnd !== -1) {
-              const jsonString = response.data.substring(jsonStart, jsonEnd + 1);
-              console.log('🔍 Extracted JSON string length:', jsonString.length);
-              parsedProjectData = JSON.parse(jsonString);
-            } else {
-              throw new Error('No JSON found in response');
-            }
-            
-            console.log('🔍 Parsed project data:', parsedProjectData);
-          } catch (parseError) {
-            console.error('❌ Error parsing response data:', parseError);
-            console.error('❌ Raw response data:', response.data);
-            parsedProjectData = {};
-          }
-        }
-        
-        // Verificar que los datos importantes estén en la respuesta
-        if (parsedProjectData) {
-          console.log('🔍 Verificación de datos guardados:');
-          console.log('- ID:', parsedProjectData.id);
-          console.log('- Nombre:', parsedProjectData.name);
-          console.log('- Descripción:', parsedProjectData.description?.substring(0, 100) + '...');
-          console.log('- Tipo:', parsedProjectData.type);
-          console.log('- Fase:', parsedProjectData.phase);
-          console.log('- Total Unidades:', parsedProjectData.totalUnits);
-          console.log('- Precio Desde:', parsedProjectData.priceFrom);
-          console.log('- Dirección:', parsedProjectData.address);
-          console.log('- Distrito:', parsedProjectData.district);
-          console.log('- Amenidades principales:', parsedProjectData.mainAmenities?.length || 0);
-          console.log('- Amenidades detalladas:', parsedProjectData.amenities?.length || 0);
-          console.log('- Unidades:', parsedProjectData.units?.length || 0);
-          console.log('- Timeline:', parsedProjectData.timeline?.length || 0);
-        }
-        
-        return response.data;
-      } catch (networkError) {
-        console.error('❌ Error de red/conexión:', networkError);
-        console.error('❌ ¿El backend está corriendo?');
-        console.error('❌ ¿La URL es correcta?');
-        throw networkError;
-      }
+      const response = await apiClient.post('/projects', projectData);
+      return response.data;
     } catch (error: any) {
-      console.error('❌ Error completo del backend:', error.response?.data);
-      console.error('❌ Status:', error.response?.status);
-      console.error('❌ Headers:', error.response?.config?.headers);
-      console.error('❌ Request URL:', error.response?.config?.url);
-      console.error('❌ Request Method:', error.response?.config?.method);
-      console.error('❌ Request Data:', error.response?.config?.data);
-      
-      // Si es error de validación, mostrar detalles específicos
+      // Error de validacion
       if (error.response?.status === 400) {
         const validationError = error.response?.data;
-        console.error('❌ Detalles de validación:', validationError?.details);
-        
-        // Crear mensaje amigable para el usuario
         let errorMessage = 'Error en los datos del formulario';
         
         if (validationError?.details) {
@@ -314,12 +194,9 @@ export class ProjectRepository implements IProjectRepository {
         throw validationErrorObj;
       }
       
-      // Si es error de suscripción, manejar apropiadamente
+      // Error de suscripcion
       if (error.response?.status === 402) {
-        const errorMessage = error.response?.data?.message || 'Para crear proyectos necesitas una suscripción ENTERPRISE.';
-        console.error('❌ Error de suscripción del backend:', errorMessage);
-        
-        // El backend devuelve 402, significa que realmente necesita suscripción
+        const errorMessage = error.response?.data?.message || 'Para crear proyectos necesitas una suscripcion ENTERPRISE.';
         const subscriptionError = new Error(errorMessage);
         (subscriptionError as any).isSubscriptionError = true;
         (subscriptionError as any).requiresEnterprise = true;
@@ -442,6 +319,13 @@ export class ProjectRepository implements IProjectRepository {
   async featureProject(projectId: number): Promise<any> {
     const response = await apiClient.patch(`/projects/${projectId}/feature`);
     return response.data;
+  }
+
+  /**
+   * Eliminar proyecto
+   */
+  async deleteProject(projectId: number): Promise<void> {
+    await apiClient.delete(`/projects/${projectId}`);
   }
 
   /**

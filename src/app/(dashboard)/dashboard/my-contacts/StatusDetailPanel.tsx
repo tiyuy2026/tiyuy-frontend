@@ -5,6 +5,7 @@ import { formatDistanceToNow } from '@/utils/formatters';
 import { useCommentStatusPost, useStatusComments, useLikeStatusPost, useUnlikeStatusPost, useShareStatusPost, useLikeComment, useUnlikeComment, useGetActiveStatusPosts } from '@/presentation/hooks/useContacts';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/presentation/store/toastStore';
+import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 
 interface StatusDetailPanelProps {
   status: any;
@@ -14,17 +15,16 @@ interface StatusDetailPanelProps {
 
 export default function StatusDetailPanel({ status, user, onClose }: StatusDetailPanelProps) {
 
-  // ✅ Nombre real del usuario autenticado - usar firstName + lastName (campos válidos)
-  console.log('🔍 StatusDetailPanel - user:', user); // ← DEBUG
+  //  Nombre real del usuario autenticado - usar firstName + lastName (campos válidos)
+  console.log(' StatusDetailPanel - user:', user); // ← DEBUG
   const currentUserName = user?.firstName && user?.lastName
     ? `${user.firstName} ${user.lastName}`
     : user?.firstName
     || user?.lastName
     || `Usuario ${user?.id || ''}`;
-  const currentUserInitial = currentUserName.charAt(0).toUpperCase();
-  console.log('🔍 StatusDetailPanel - currentUserName:', currentUserName); // ← DEBUG
+  console.log(' StatusDetailPanel - currentUserName:', currentUserName); // ← DEBUG
 
-  // ✅ Función helper para detectar si un comentario es del usuario actual
+  //  Función helper para detectar si un comentario es del usuario actual
   const isCurrentUserComment = (comment: any) => {
     return comment.userId === user?.id
       || comment.user?.id === user?.id;
@@ -116,13 +116,13 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
       onSuccess: () => {
         setCommentText(''); // ← Limpiar input
         setReplyingTo(null); // ← Limpiar respuesta
-        toast.success('✅ Comentario enviado');
+        toast.success('Comentario enviado');
         // Refrescar los comentarios para mostrar el nuevo
         queryClient.invalidateQueries({ queryKey: ['status-comments', status.id] });
       },
       onError: (error) => {
         console.error('Error:', error);
-        toast.error('❌ Error al enviar comentario');
+        toast.error('Error al enviar comentario');
       }
     });
   };
@@ -183,7 +183,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
   };
 
   const handleLikeComment = (commentId: number, isCommentLiked: boolean) => {
-    // 🔄 Feedback visual inmediato
+    //  Feedback visual inmediato
     setLocalComments(prev => prev.map(comment => {
       if (comment.id === commentId) {
         return {
@@ -228,12 +228,10 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
       <div className="border-b border-gray-100 p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-white font-semibold">
-              {status.user?.id === user?.id || status.userId === user?.id
-                ? currentUserInitial
-                : (status.userName || status.user?.name || 'U').charAt(0).toUpperCase()
-              }
-            </div>
+            <UserAvatar 
+              user={status.user?.id === user?.id || status.userId === user?.id ? user : status.user} 
+              size="sm" 
+            />
             <div>
               <h3 className="font-semibold text-gray-900">
                 {status.user?.id === user?.id || status.userId === user?.id
@@ -332,12 +330,10 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
               <div key={comment.id || index} className="space-y-3">
                 {/* Comentario principal */}
                 <div className="flex gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 shadow-sm">
-                    {isCurrentUserComment(comment)
-                      ? currentUserInitial
-                      : comment.userName?.charAt(0).toUpperCase() || comment.user?.name?.charAt(0).toUpperCase() || 'U'
-                    }
-                  </div>
+                  <UserAvatar 
+                    user={isCurrentUserComment(comment) ? user : comment.user} 
+                    size="sm" 
+                  />
                   <div className="flex-1">
                     <div className="bg-gray-50 rounded-2xl p-4 shadow-sm">
                       <div className="flex items-center justify-between mb-2">
@@ -385,12 +381,10 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                   <div className="ml-12 space-y-2">
                     {comment.replies.map((reply: any, replyIndex: number) => (
                       <div key={reply.id || replyIndex} className="flex gap-2">
-                        <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
-                          {isCurrentUserComment(reply)
-                            ? currentUserInitial
-                            : reply.userName?.charAt(0).toUpperCase() || reply.user?.name?.charAt(0).toUpperCase() || 'U'
-                          }
-                        </div>
+                        <UserAvatar 
+                          user={isCurrentUserComment(reply) ? user : reply.user} 
+                          size="xs" 
+                        />
                         <div className="flex-1">
                           <div className="bg-gray-100 rounded-xl p-3">
                             <div className="flex items-center gap-2 mb-1">
@@ -433,12 +427,10 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
             // Fallback a comentarios recientes del status
             status.recentComments.map((comment: any, index: number) => (
               <div key={comment.id} className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600 flex-shrink-0">
-                  {isCurrentUserComment(comment)
-                    ? currentUserInitial
-                    : comment.userName?.charAt(0).toUpperCase() || 'U'
-                  }
-                </div>
+                <UserAvatar 
+                  user={isCurrentUserComment(comment) ? user : comment.user} 
+                  size="xs" 
+                />
                 <div className="flex-1">
                   <div className="bg-gray-50 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-1">
@@ -481,9 +473,10 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
             // Fallback a comentarios locales
             localComments.map((comment: any, index: number) => (
               <div key={index} className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600 flex-shrink-0">
-                  {comment.user?.name?.charAt(0).toUpperCase() || 'U'}
-                </div>
+                <UserAvatar 
+                  user={comment.user} 
+                  size="xs" 
+                />
                 <div className="flex-1">
                   <div className="bg-gray-50 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-1">
@@ -563,9 +556,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
         )}
 
         <div className="flex gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 shadow-sm">
-            {currentUserInitial}
-          </div>
+          <UserAvatar size="sm" />
           <div className="flex-1">
             <div className="relative">
               <input

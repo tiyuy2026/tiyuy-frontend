@@ -6,7 +6,8 @@ import { DniInput, RucInput } from '@/presentation/components/kyc';
 import { Mail, User, Phone, Lock, Hash, Building2, Star } from 'lucide-react';
 
 export const RegisterDeveloperForm: React.FC = () => {
-    const { register, isLoading, error } = useAuth();
+    const { register, isLoading, error, clearError } = useAuth();
+    const [showEmailExistsModal, setShowEmailExistsModal] = useState(false);
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -21,6 +22,13 @@ export const RegisterDeveloperForm: React.FC = () => {
     const [isDniValidated, setIsDniValidated] = useState(false);
     const [isRucValidated, setIsRucValidated] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    // Detectar error de email ya registrado y mostrar modal
+    React.useEffect(() => {
+        if (error && (error.includes('ya esta registrado') || error.includes('ya está registrado') || error.includes('email ya registrado'))) {
+            setShowEmailExistsModal(true);
+        }
+    }, [error]);
 
     const handleDniValidated = (dniData: any) => {
         setIsDniValidated(true);
@@ -71,19 +79,20 @@ export const RegisterDeveloperForm: React.FC = () => {
         e.preventDefault();
         if (!validateForm()) return;
 
-        try {
-            await register({
-                email: formData.email,
-                phone: formData.phone,
-                password: formData.password,
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                dni: formData.dni,
-                role: 'DEVELOPER'
-            });
-        } catch (err) {
-            // Error manejado
-        }
+        await register({
+            email: formData.email,
+            phone: formData.phone,
+            password: formData.password,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            dni: formData.dni,
+            role: 'DEVELOPER'
+        });
+    };
+
+    const handleCloseModal = () => {
+        setShowEmailExistsModal(false);
+        clearError();
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,7 +116,34 @@ export const RegisterDeveloperForm: React.FC = () => {
 
     return (
         <div className="w-full">
-            {error && (
+            {/* Modal de Email Ya Registrado */}
+            {showEmailExistsModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
+                        <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Mail className="w-8 h-8 text-orange-500" />
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">Email ya registrado</h3>
+                        <p className="text-gray-600 mb-6">Este email ya esta registrado. Intenta iniciar sesion.</p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handleCloseModal}
+                                className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+                            >
+                                OK
+                            </button>
+                            <a
+                                href="/login"
+                                className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors text-center"
+                            >
+                                Iniciar sesion
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {error && !error.includes('ya esta registrado') && !error.includes('ya está registrado') && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6">
                     {error}
                 </div>
