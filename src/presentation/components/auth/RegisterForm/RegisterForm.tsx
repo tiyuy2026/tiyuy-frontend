@@ -26,7 +26,7 @@ export const RegisterForm: React.FC = () => {
               Selecciona un perfil para continuar
             </h2>
             <p className="text-gray-600 mb-6">
-              Primero elige cómo quieres usar TIYUY
+              Primero elige como quieres usar TIYUY
             </p>
             <a
               href="/profile-selector"

@@ -2,6 +2,7 @@
 
 import { User } from '@/core/domain/entities';
 import { Camera, MapPin, Mail, Phone, Calendar, Shield } from 'lucide-react';
+import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 
 interface ProfileHeaderProps {
   user: User;
@@ -50,9 +51,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user }) => {
         <div className="flex flex-col sm:flex-row items-center sm:items-end -mt-16 sm:-mt-12 space-y-4 sm:space-y-0 sm:space-x-6">
           {/* Avatar */}
           <div className="relative group">
-            <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-xl border-4 border-white">
-              {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-            </div>
+            <UserAvatar user={user} size="2xl" className="shadow-xl border-4 border-white" />
             <button className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors opacity-0 group-hover:opacity-100">
               <Camera className="w-4 h-4" />
             </button>

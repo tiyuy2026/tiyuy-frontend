@@ -4,47 +4,47 @@ import { useState, useEffect, useRef } from 'react';
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
 import { useAuthStore } from '@/presentation/store/authStore';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { toast } from '@/presentation/store/toastStore';
 import { axiosClient } from '@/infrastructure/api/axios-client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Sun, Moon, Type, Globe, Lock, User, Camera, CheckCircle, Palette, MessageSquare, Users, Diamond, LayoutDashboard, Home, Flame, ChevronDown, LogOut, Building } from 'lucide-react';
+import { Sun, Moon, Type, Globe, Lock, User, Camera, CheckCircle, Palette, MessageSquare, Users, Diamond, LayoutDashboard, Home, Flame, ChevronDown, LogOut, Building, FolderGit, PlusCircle } from 'lucide-react';
+import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 
 // Sidebar Navigation Component
 function Sidebar({ user }: { user: any }) {
   const pathname = usePathname();
   
-  // Determinar si el usuario puede ver opciones de agente/inmobiliaria
+  // Check if user can view agent/real estate options
   const userRole = (user?.role || '').toString().toUpperCase();
   const isAgent = userRole === 'AGENT' || userRole === 'DEVELOPER' || userRole === 'ADMIN' || userRole === 'INMOBILIARIA';
   const isDeveloper = userRole === 'DEVELOPER';
   
-  // Menú para agentes (sin Dashboard porque estamos en perfil)
+  // Menu for agents (without Dashboard because we are in profile)
   const fullMenuItems = [
     { href: '/dashboard/crm-leads', icon: Flame, label: 'CRM Leads' },
     { href: '/my-properties', icon: Home, label: 'Mis Propiedades' },
-    { href: '/messages', icon: MessageSquare, label: 'Mensajes' },
+    { href: '/dashboard/my-contacts', icon: MessageSquare, label: 'Mensajes' },
     { href: '/dashboard/clients', icon: Users, label: 'Clientes' },
     { href: '/plans', icon: Diamond, label: 'Planes' },
     { href: '/dashboard/profile', icon: User, label: 'Perfil' },
   ];
 
-  // Menú para DEVELOPER (con Dashboard)
+  // Menu for DEVELOPER (with Dashboard)
   const developerMenuItems = [
-    { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/dashboard/crm-leads', icon: Flame, label: 'CRM Leads' },
     { href: '/my-properties', icon: Home, label: 'Mis Propiedades' },
-    { href: '/messages', icon: MessageSquare, label: 'Mensajes' },
+    { href: '/dashboard/my-contacts', icon: MessageSquare, label: 'Mensajes' },
     { href: '/dashboard/clients', icon: Users, label: 'Clientes' },
     { href: '/plans', icon: Diamond, label: 'Planes' },
     { href: '/dashboard/profile', icon: User, label: 'Perfil' },
   ];
   
-  // Menú reducido para usuarios comunes (sin CRM, sin Dashboard)
+  // Reduced menu for common users (without CRM, without Dashboard)
   const userMenuItems = [
     { href: '/my-properties', icon: Home, label: 'Mis Propiedades' },
     { href: '/dashboard/favorites', icon: Diamond, label: 'Favoritos' },
-    { href: '/messages', icon: MessageSquare, label: 'Mensajes' },
+    { href: '/dashboard/my-contacts', icon: MessageSquare, label: 'Mensajes' },
     { href: '/plans', icon: Diamond, label: 'Planes' },
     { href: '/dashboard/profile', icon: User, label: 'Perfil' },
   ];
@@ -108,7 +108,7 @@ function useCurrentUser() {
     queryFn: async () => {
       const response = await axiosClient.get('/auth/me');
       const userData = response.data;
-      // Actualizar el authStore con los datos frescos
+      // Update authStore with fresh data
       if (userData) {
         setUser(userData);
       }
@@ -138,11 +138,6 @@ function useUpdatePreferences() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-preferences'] });
       queryClient.invalidateQueries({ queryKey: ['current-user'] });
-      toast.success('Preferencias guardadas exitosamente');
-    },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || 'Error al guardar preferencias';
-      toast.error(message);
     },
   });
 }
@@ -161,18 +156,16 @@ function useUploadProfilePhoto() {
       return response.data;
     },
     onSuccess: (data) => {
-      // Actualizar el authStore con la nueva URL de foto
+      // Update authStore with new photo URL
       if (user && data?.avatar) {
         setUser({ ...user, photoUrl: data.avatar });
       }
-      // Invalidar queries para refrescar datos
+      // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['current-user'] });
       queryClient.invalidateQueries({ queryKey: ['user-profile'] });
-      toast.success('Foto de perfil actualizada');
     },
     onError: (error: any) => {
-      const message = error?.response?.data?.message || 'Error al subir foto';
-      toast.error(message);
+      console.error('Error uploading photo:', error);
     },
   });
 }
@@ -181,10 +174,10 @@ function useVerifyIdentity() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: { documentType: 'DNI' | 'RUC'; documentNumber: string }) => {
-      // Usar el endpoint correcto del backend para verificación KYC
+      // Use correct backend endpoint for KYC verification
       const endpoint = data.documentType === 'DNI' 
         ? '/identity/complete-kyc'  // Para DNI
-        : '/identity/upgrade-to-developer';  // Para RUC (empresas)
+        : '/identity/upgrade-to-developer';  // Para RUC (companies)
       
       const payload = data.documentType === 'DNI' 
         ? { dni: data.documentNumber }
@@ -194,14 +187,12 @@ function useVerifyIdentity() {
       return response.data;
     },
     onSuccess: () => {
-      // Refrescar datos del usuario para obtener estado de verificación actualizado
+      // Refresh user data to get updated verification status
       queryClient.invalidateQueries({ queryKey: ['current-user'] });
       queryClient.invalidateQueries({ queryKey: ['user-profile'] });
-      toast.success('Identidad verificada exitosamente');
     },
     onError: (error: any) => {
-      const message = error?.response?.data?.message || 'Error en la verificación de identidad';
-      toast.error(message);
+      console.error('Identity verification error:', error);
     },
   });
 }
@@ -212,12 +203,23 @@ function useChangePassword() {
       const response = await axiosClient.post('/auth/change-password', data);
       return response.data;
     },
-    onSuccess: () => {
-      toast.success('Contraseña actualizada exitosamente');
+  });
+}
+
+function useUpdateEmail() {
+  const queryClient = useQueryClient();
+  const { setUser } = useAuthStore();
+  
+  return useMutation({
+    mutationFn: async (newEmail: string) => {
+      const response = await axiosClient.patch('/auth/me', { email: newEmail });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['current-user'] });
     },
     onError: (error: any) => {
-      const message = error?.response?.data?.message || 'Error al cambiar la contraseña';
-      toast.error(message);
+      console.error('Email update error:', error);
     },
   });
 }
@@ -230,16 +232,18 @@ export default function ProfilePage() {
   const uploadPhoto = useUploadProfilePhoto();
   const verifyIdentity = useVerifyIdentity();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const pathname = usePathname();
 
-  // Usar el usuario actualizado del backend si está disponible
+  // Use updated user from backend if available
   const user = currentUser || authUser;
 
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [crmBackground, setCrmBackground] = useState('#ffffff');
   const [fontSize, setFontSize] = useState<'small' | 'normal' | 'large'>('normal');
-  const [language, setLanguage] = useState<'es' | 'en' | 'pt'>('es');
+  const [language, setLanguage] = useState<'es' | 'en' | 'pt' | 'fr'>('es');
   const [timezone, setTimezone] = useState('America/Lima');
-  const [country, setCountry] = useState('Perú');
+  const [country, setCountry] = useState('Peru');
   const [city, setCity] = useState('Lima');
   const [documentType, setDocumentType] = useState<'DNI' | 'RUC'>('DNI');
   const [documentNumber, setDocumentNumber] = useState('');
@@ -249,9 +253,22 @@ export default function ProfilePage() {
       setTheme(preferences.theme || 'light');
       setCrmBackground(preferences.crmBackground || '#ffffff');
       setFontSize(preferences.fontSize || 'normal');
-      setLanguage(preferences.language || 'es');
+      
+      // IDIOMA: Solo aplicar backend si no hay localStorage
+      const savedLang = localStorage.getItem('tiyuy-language');
+      const validLangs: ('es' | 'en' | 'pt' | 'fr')[] = ['es', 'en', 'pt', 'fr'];
+      
+      if (savedLang && validLangs.includes(savedLang as any)) {
+        setLanguage(savedLang as 'es' | 'en' | 'pt' | 'fr');
+      } else {
+        const backendLang = preferences.language || 'es';
+        setLanguage(backendLang);
+        // Inicializar localStorage con el valor del backend
+        localStorage.setItem('tiyuy-language', backendLang);
+      }
+      
       setTimezone(preferences.timezone || 'America/Lima');
-      setCountry(preferences.country || 'Perú');
+      setCountry(preferences.country || 'Peru');
       setCity(preferences.city || 'Lima');
     }
   }, [preferences]);
@@ -259,20 +276,73 @@ export default function ProfilePage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
 
-  // Verificar si el usuario puede ver el CRM (solo AGENT, DEVELOPER/INMOBILIARIA o ADMIN)
+  // Update email state when user data loads
+  useEffect(() => {
+    if (user?.email) {
+      setEmail(user.email);
+    }
+  }, [user?.email]);
+
+  // Verify if user can view CRM (only AGENT, DEVELOPER/REAL ESTATE or ADMIN)
   const userRole = (user?.role || 'USER').toString().toUpperCase().trim();
   const canViewCRM = ['AGENT', 'DEVELOPER', 'ADMIN', 'INMOBILIARIA'].includes(userRole);
+  const isDeveloper = userRole === 'DEVELOPER';
   
-  // Debug: ver qué rol está llegando
+  // Debug: see which role is arriving
   console.log('DEBUG - User role raw:', user?.role, '| normalized:', userRole, '| canViewCRM:', canViewCRM);
+
+  const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) uploadPhoto.mutate(file);
+    if (file) {
+      // Crear preview local antes de subir
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewPhoto(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      
+      // Subir al servidor
+      uploadPhoto.mutate(file, {
+        onSuccess: () => {
+          setPreviewPhoto(null); // Limpiar preview cuando se suba exitosamente
+        },
+        onError: () => {
+          setPreviewPhoto(null); // Limpiar preview si hay error
+        }
+      });
+    }
   };
 
+  // Apply visual preferences: theme (dark/light), background color, and font size - ONLY on profile page
+  const themeClasses = theme === 'dark' ? 'dark bg-gray-900 text-white' : 'bg-gray-50 text-gray-900';
+  const fontSizeClass = fontSize === 'small' ? 'text-sm' : fontSize === 'large' ? 'text-lg' : 'text-base';
+  
+  // Apply CRM background color to main content (only on this page)
+  const mainContentStyle = { backgroundColor: crmBackground };
+  
   const changePassword = useChangePassword();
+  const updateEmail = useUpdateEmail();
+
+  const handleUpdateEmail = () => {
+    if (!email || email === user?.email) {
+      toast.error('Ingresa un email diferente al actual');
+      return;
+    }
+    if (!email.includes('@')) {
+      toast.error('Ingresa un email valido');
+      return;
+    }
+    updateEmail.mutate(email, {
+      onSuccess: () => {
+        setIsEditingEmail(false);
+      }
+    });
+  };
 
   const handleChangePassword = () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -280,11 +350,11 @@ export default function ProfilePage() {
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error('Las contraseñas no coinciden');
+      toast.error('Las contrasenas no coinciden');
       return;
     }
     if (newPassword.length < 6) {
-      toast.error('La contraseña debe tener al menos 6 caracteres');
+      toast.error('La contrasena debe tener al menos 6 caracteres');
       return;
     }
     changePassword.mutate({ currentPassword, newPassword }, {
@@ -298,7 +368,7 @@ export default function ProfilePage() {
 
   const handleVerifyIdentity = () => {
     if (!documentNumber) {
-      toast.error('Ingresa tu número de documento');
+      toast.error('Ingresa tu numero de documento');
       return;
     }
     verifyIdentity.mutate({ documentType, documentNumber });
@@ -312,13 +382,13 @@ export default function ProfilePage() {
 
   const timezones = [
     { value: 'America/Lima', label: 'Lima (GMT-5)' },
-    { value: 'America/Bogota', label: 'Bogotá (GMT-5)' },
-    { value: 'America/Mexico_City', label: 'Ciudad de México (GMT-6)' },
+    { value: 'America/Bogota', label: 'Bogota (GMT-5)' },
+    { value: 'America/Mexico_City', label: 'Mexico City (GMT-6)' },
     { value: 'America/Santiago', label: 'Santiago (GMT-4/-3)' },
     { value: 'America/Argentina/Buenos_Aires', label: 'Buenos Aires (GMT-3)' },
     { value: 'Europe/Madrid', label: 'Madrid (GMT+1/+2)' },
-    { value: 'America/New_York', label: 'Nueva York (GMT-5/-4)' },
-    { value: 'America/Los_Angeles', label: 'Los Ángeles (GMT-8/-7)' },
+    { value: 'America/New_York', label: 'New York (GMT-5/-4)' },
+    { value: 'America/Los_Angeles', label: 'Los Angeles (GMT-8/-7)' },
   ];
 
   const crmColors = [
@@ -326,22 +396,22 @@ export default function ProfilePage() {
     { name: 'Gris Claro', value: '#f8fafc', class: 'bg-slate-50' },
     { name: 'Verde Menta', value: '#ecfdf5', class: 'bg-emerald-50' },
     { name: 'Azul Cielo', value: '#eff6ff', class: 'bg-blue-50' },
-    { name: 'Cálido', value: '#fff7ed', class: 'bg-orange-50' },
+    { name: 'Calido', value: '#fff7ed', class: 'bg-orange-50' },
     { name: 'Personalizado', value: 'custom', class: 'bg-gradient-to-br from-teal-400 to-emerald-500' },
   ];
 
   return (
     <ProtectedRoute>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className={`flex min-h-screen ${themeClasses} ${fontSizeClass}`}>
         <Sidebar user={user} />
         
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto transition-colors duration-300" style={mainContentStyle}>
           {/* Loading State */}
           {isLoadingUser && (
             <div className="flex items-center justify-center h-64">
               <div className="flex items-center gap-3 text-gray-500">
                 <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-                <span>Cargando perfil...</span>
+                <span>Cargando...</span>
               </div>
             </div>
           )}
@@ -351,104 +421,141 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">Mi Perfil</h1>
-                  <p className="text-gray-500 text-sm mt-1">Gestiona tu cuenta y personaliza tu experiencia</p>
+                  <p className="text-gray-500 text-sm mt-1">Gestiona tu cuenta y preferencias</p>
                 </div>
-                <button
-                  onClick={handleSavePreferences}
-                  disabled={updatePreferences.isPending}
-                  className="px-6 py-2 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 transition-colors disabled:opacity-50"
-                >
-                  {updatePreferences.isPending ? 'Guardando...' : '💾 Guardar Cambios'}
-                </button>
+                <div className="flex items-center gap-3">
+                  {isDeveloper && (
+                    <Link
+                      href="/dashboard/projects/new"
+                      className="px-4 py-2 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors flex items-center gap-2"
+                    >
+                      <PlusCircle className="w-4 h-4" />
+                      Publicar mi primer proyecto
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleSavePreferences}
+                    disabled={updatePreferences.isPending}
+                    className="px-6 py-2 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 transition-colors disabled:opacity-50"
+                  >
+                    { updatePreferences.isPending ? 'Guardando...' : 'Guardar Cambios' }
+                  </button>
+                </div>
               </div>
             </div>
           </header>
 
           <div className="p-8 max-w-6xl mx-auto space-y-8">
-            {/* Foto de Perfil e Identidad */}
+            {/* Profile Photo and Identity */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><User className="w-5 h-5" /> Perfil e Identidad</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><User className="w-5 h-5" /> Identidad</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Foto de Perfil */}
+                {/* Profile Photo */}
                 <div className="flex items-start gap-6">
                   <div className="relative">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white text-3xl font-bold overflow-hidden">
-                      {user?.photoUrl ? (
-                        <img src={user.photoUrl} alt="Perfil" className="w-full h-full object-cover"/>
-                      ) : ((user?.firstName || 'U').charAt(0).toUpperCase())}
-                    </div>
+                    {previewPhoto ? (
+                      <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg">
+                        <img src={previewPhoto} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <UserAvatar size="xl" />
+                    )}
+                    {uploadPhoto.isPending && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full">
+                        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    )}
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploadPhoto.isPending}
-                      className="absolute -bottom-1 -right-1 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-teal-600 hover:bg-teal-50 transition-colors border border-gray-200"
-                    >📷</button>
+                      className="absolute -bottom-1 -right-1 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-teal-600 hover:bg-teal-50 transition-colors border border-gray-200 disabled:opacity-50"
+                    >
+                      <Camera className="w-4 h-4" />
+                    </button>
                     <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload}/>
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">Foto de Perfil</h3>
-                    <p className="text-sm text-gray-500 mb-3">Sube una foto para personalizar tu cuenta</p>
+                    <p className="text-sm text-gray-500 mb-3">JPG, PNG. Maximo 2MB.</p>
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
-                    >Cambiar foto</button>
+                      disabled={uploadPhoto.isPending}
+                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors disabled:opacity-50"
+                    >
+                      {uploadPhoto.isPending ? 'Subiendo...' : 'Cambiar Foto'}
+                    </button>
                   </div>
                 </div>
 
                 {/* Verificación de Identidad */}
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4" /> Verificación de Identidad
+                    <CheckCircle className="w-4 h-4" /> Verificacion
                     {user?.isVerified && (
                       <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">Verificado</span>
                     )}
                   </h3>
                   
                   <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setDocumentType('DNI')}
-                        className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
-                          documentType === 'DNI' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >DNI</button>
-                      <button
-                        onClick={() => setDocumentType('RUC')}
-                        className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
-                          documentType === 'RUC' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >RUC</button>
+                    {/* Mostrar DNI del usuario - solo lectura */}
+                    <div className="bg-gray-50 px-4 py-3 rounded-xl border border-gray-200">
+                      <label className="block text-xs text-gray-500 mb-1">Numero de Documento</label>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-medium rounded">DNI</span>
+                        <span className="font-semibold text-gray-900">{user?.dni || 'No disponible'}</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-2">Tu DNI esta vinculado a tu cuenta</p>
                     </div>
                     
-                    <input
-                      type="text"
-                      value={documentNumber}
-                      onChange={(e) => setDocumentNumber(e.target.value)}
-                      placeholder={`Número de ${documentType}`}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all"
-                    />
-                    
-                    <button
-                      onClick={handleVerifyIdentity}
-                      disabled={verifyIdentity.isPending || !documentNumber}
-                      className="w-full py-3 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 disabled:opacity-50 transition-colors"
-                    >{verifyIdentity.isPending ? 'Verificando...' : 'Verificar Identidad'}</button>
-                    
-                    <p className="text-xs text-gray-500">La verificación aumenta la confianza en tus publicaciones</p>
+                    <p className="text-xs text-gray-500">La verificacion de identidad mejora la confianza en tu cuenta.</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Personalización Visual - SOLO para AGENT/DEVELOPER/ADMIN */}
+            {/* Proyectos y Desarrollos - SOLO para DEVELOPER */}
+            {isDeveloper && (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><FolderGit className="w-5 h-5" /> Proyectos y Desarrollos</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* My Projects */}
+                <Link href="/my-projects" className="flex items-center gap-4 p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors">
+                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                    <FolderGit className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">My Projects</h3>
+                    <p className="text-sm text-gray-600">Active developments</p>
+                  </div>
+                  <span className="ml-auto text-green-600">→</span>
+                </Link>
+
+                {/* New Project */}
+                <Link href="/dashboard/projects/new" className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors">
+                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <PlusCircle className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">New Project</h3>
+                    <p className="text-sm text-gray-600">Create development</p>
+                  </div>
+                  <span className="ml-auto text-purple-600">→</span>
+                </Link>
+              </div>
+            </div>
+            )}
+
+            {/* Personalizacion Visual - SOLO para AGENT/DEVELOPER/ADMIN */}
             {canViewCRM && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><Palette className="w-5 h-5" /> Personalización Visual</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><Palette className="w-5 h-5" /> Personalizacion Visual</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* Tema */}
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-4">Modo de Visualización</h3>
+                  <h3 className="font-semibold text-gray-900 mb-4">Tema</h3>
                   <div className="space-y-2">
                     <button
                       onClick={() => setTheme('light')}
@@ -459,7 +566,7 @@ export default function ProfilePage() {
                       <Sun className="w-6 h-6 text-orange-500" />
                       <div className="text-left">
                         <p className="font-medium text-gray-900">Claro</p>
-                        <p className="text-xs text-gray-500">Mejor para el día</p>
+                        <p className="text-xs text-gray-500">Interfaz clara y luminosa</p>
                       </div>
                     </button>
                     <button
@@ -471,7 +578,7 @@ export default function ProfilePage() {
                       <Moon className="w-6 h-6 text-indigo-500" />
                       <div className="text-left">
                         <p className="font-medium text-gray-900">Oscuro</p>
-                        <p className="text-xs text-gray-500">Reduce fatiga visual</p>
+                        <p className="text-xs text-gray-500">Interfaz oscura para reducir fatiga visual</p>
                       </div>
                     </button>
                   </div>
@@ -517,45 +624,22 @@ export default function ProfilePage() {
                         <span className={`${size === 'small' ? 'text-sm' : size === 'normal' ? 'text-base' : 'text-lg'} font-bold text-gray-700`}>Aa</span>
                       <span className="font-medium text-gray-900 capitalize flex items-center gap-2">
                         <Type className="w-4 h-4" />
-                        {size === 'small' ? 'Pequeño' : size === 'normal' ? 'Normal' : 'Grande'}
+                        {size === 'small' ? 'Pequeno' : size === 'normal' ? 'Normal' : 'Grande'}
                       </span>
                       </button>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-500 mt-3">Mejora la accesibilidad según tus necesidades</p>
+                  <p className="text-xs text-gray-500 mt-3">Ajusta el tamaño del texto para mayor comodidad.</p>
                 </div>
               </div>
             </div>
             )}
 
-            {/* Localización e Idioma */}
+            {/* Localizacion */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><Globe className="w-5 h-5" /> Localización e Idioma</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><Globe className="w-5 h-5" /> Ubicacion</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Idioma */}
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-4">Idioma</h3>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { code: 'es', label: 'Español', flag: 'ES' },
-                      { code: 'en', label: 'English', flag: 'EN' },
-                      { code: 'pt', label: 'Português', flag: 'PT' },
-                    ].map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => setLanguage(lang.code as 'es' | 'en' | 'pt')}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all ${
-                          language === lang.code ? 'bg-teal-50 border-2 border-teal-500' : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
-                        }`}
-                      >
-                        <span className="text-lg font-bold text-gray-600">{lang.flag}</span>
-                        <span className="text-sm font-medium text-gray-900">{lang.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
                 {/* Zona Horaria */}
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-4">Zona Horaria</h3>
@@ -568,25 +652,25 @@ export default function ProfilePage() {
                       <option key={tz.value} value={tz.value}>{tz.label}</option>
                     ))}
                   </select>
-                  <p className="text-xs text-gray-500 mt-2">Importante para notificaciones de citas y publicaciones</p>
+                  <p className="text-xs text-gray-500 mt-2">Se usara para mostrar fechas y horas correctamente.</p>
                 </div>
 
-                {/* País y Ciudad */}
-                <div className="md:col-span-2">
-                  <h3 className="font-semibold text-gray-900 mb-4">Ubicación Preferida</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Pais y Ciudad */}
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-4">Ubicacion</h3>
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm text-gray-600 mb-1 block">País de Residencia</label>
+                      <label className="text-sm text-gray-600 mb-1 block">Pais</label>
                       <input
                         type="text"
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
-                        placeholder="Ej: Perú"
+                        placeholder="Ej: Peru"
                         className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="text-sm text-gray-600 mb-1 block">Ciudad Preferida</label>
+                      <label className="text-sm text-gray-600 mb-1 block">Ciudad</label>
                       <input
                         type="text"
                         value={city}
@@ -596,17 +680,17 @@ export default function ProfilePage() {
                       />
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-3">Usamos esta información para mostrarte propiedades relevantes primero</p>
+                  <p className="text-xs text-gray-500 mt-3">Tu ubicacion ayuda a personalizar la experiencia.</p>
                 </div>
               </div>
             </div>
 
-            {/* Información de la Cuenta y Cambio de Contraseña */}
+            {/* Informacion de la Cuenta y Cambio de Contrasena */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><Lock className="w-5 h-5" /> Información de la Cuenta y Seguridad</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><Lock className="w-5 h-5" /> Seguridad</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Información de la Cuenta */}
+                {/* Informacion de la Cuenta */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-gray-900 mb-4">Datos de la Cuenta</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -621,8 +705,37 @@ export default function ProfilePage() {
                   </div>
                   
                   <div>
-                    <label className="text-sm text-gray-600 mb-1 block">Correo Electrónico</label>
-                    <input type="email" value={user?.email || ''} readOnly className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-600"/>
+                    <label className="text-sm text-gray-600 mb-1 block">Email</label>
+                    <div className="flex gap-2">
+                      <input 
+                        type="email" 
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)}
+                        readOnly={!isEditingEmail}
+                        className={`flex-1 px-4 py-3 rounded-xl border outline-none transition-all ${
+                          isEditingEmail 
+                            ? 'border-teal-500 ring-2 ring-teal-200 bg-white' 
+                            : 'border-gray-200 bg-gray-50 text-gray-600'
+                        }`}
+                      />
+                      {isEditingEmail ? (
+                        <button
+                          onClick={handleUpdateEmail}
+                          disabled={updateEmail.isPending}
+                          className="px-4 py-2 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 disabled:opacity-50 transition-colors"
+                        >
+                          {updateEmail.isPending ? '...' : 'Guardar'}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setIsEditingEmail(true)}
+                          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                        >
+                          Cambiar
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">El email es tu identificador unico en Tiyuy.</p>
                   </div>
                   
                   <div>
@@ -631,39 +744,39 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                {/* Cambio de Contraseña */}
+                {/* Cambio de Contrasena */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900 mb-4">Cambiar Contraseña</h3>
+                  <h3 className="font-semibold text-gray-900 mb-4">Cambiar Contrasena</h3>
                   
                   <div>
-                    <label className="text-sm text-gray-600 mb-1 block">Contraseña Actual</label>
+                    <label className="text-sm text-gray-600 mb-1 block">Contrasena Actual</label>
                     <input
                       type="password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="Ingresa tu contraseña actual"
+                      placeholder="Ingresa tu contrasena actual"
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all"
                     />
                   </div>
 
                   <div>
-                    <label className="text-sm text-gray-600 mb-1 block">Nueva Contraseña</label>
+                    <label className="text-sm text-gray-600 mb-1 block">Nueva Contrasena</label>
                     <input
                       type="password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Mínimo 6 caracteres"
+                      placeholder="Minimo 6 caracteres"
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all"
                     />
                   </div>
 
                   <div>
-                    <label className="text-sm text-gray-600 mb-1 block">Confirmar Nueva Contraseña</label>
+                    <label className="text-sm text-gray-600 mb-1 block">Confirmar Contrasena</label>
                     <input
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Repite la nueva contraseña"
+                      placeholder="Repite la nueva contrasena"
                       className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all"
                     />
                   </div>
@@ -673,7 +786,7 @@ export default function ProfilePage() {
                     disabled={changePassword.isPending}
                     className="w-full py-3 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 disabled:opacity-50 transition-colors"
                   >
-                    {changePassword.isPending ? 'Actualizando...' : <><Lock className="w-4 h-4 inline mr-1" /> Cambiar Contraseña</>}
+                    {changePassword.isPending ? 'Cargando...' : <><Lock className="w-4 h-4 inline mr-1" /> Cambiar Contrasena</>}
                   </button>
                 </div>
               </div>

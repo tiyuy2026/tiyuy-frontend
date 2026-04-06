@@ -18,12 +18,10 @@ export const useAuth = () => {
 
   const login = async (email: string, password: string) => {
     try {
-      console.log('useAuth: Iniciando login con:', email);
       setLoading(true);
       clearError();
 
       const response: AuthResponse = await loginUseCase.execute(email, password);
-      console.log('useAuth: Respuesta del backend:', response);
 
       // Crear User desde AuthResponse del backend
       const userData: User = {
@@ -40,22 +38,16 @@ export const useAuth = () => {
         createdAt: new Date(),
       };
 
-      console.log('useAuth: Guardando token y usuario, redirigiendo al home');
       authStorage.setToken(response.token);
       authStorage.setUser(userData);
       setAuth(response.token, userData);
-      console.log('useAuth: Token guardado en authStorage:', response.token);
-      console.log('useAuth: Usuario guardado en authStorage:', userData);
-      console.log('useAuth: Ejecutando router.replace("/")');
       router.replace('/');
-      console.log('useAuth: Router.replace ejecutado, intentando redirección forzada...');
       setTimeout(() => {
         window.location.assign('/');
       }, 100);
     } catch (err: any) {
-      console.log('useAuth: Error en login:', err);
-      setError(err.message || 'Error al iniciar sesión');
-      throw err;
+      setError(err.message || 'Error al iniciar sesion');
+      // No relanzamos el error para evitar que burbujee y cause crash
     } finally {
       setLoading(false);
     }
@@ -95,16 +87,14 @@ export const useAuth = () => {
           email: response.email,
           role: response.role
         });
-        console.log('Email de bienvenida enviado exitosamente');
       } catch (emailError) {
-        console.error('Error al enviar email de bienvenida:', emailError);
         // No fallamos el registro si el email no se envía
       }
 
       router.push('/dashboard'); // Ir directamente al dashboard
     } catch (err: any) {
       setError(err.message || 'Error al registrar usuario');
-      throw err;
+      // No relanzamos el error para evitar que burbujee y cause crash
     } finally {
       setLoading(false);
     }

@@ -6,6 +6,7 @@ import { toast } from '@/presentation/store/toastStore';
 import { GroupUseCases } from '@/core/domain/use-cases/GroupUseCases';
 import { GroupRepositoryImpl } from '@/infrastructure/repositories/GroupRepositoryImpl';
 import { Plus, MessageSquare, Heart, Share2, Image, MapPin, X, Send, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 import { GroupPost } from '@/core/domain/entities/GroupPost';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -30,7 +31,6 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
     || currentUser?.name
     || currentUser?.username
     || `Usuario ${currentUserId}`;
-  const currentUserInitial = currentUserName.charAt(0).toUpperCase();
   
   const [showCreateForm, setShowCreateForm] = useState(false);
   
@@ -446,8 +446,8 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
         // Initial state: "write first post" and "skip" buttons
         <div className="bg-white m-4 rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
-              {currentUserInitial}
+            <div className="w-16 h-16 mx-auto mb-4">
+              <UserAvatar size="lg" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               ¡Bienvenido a {groupName}!
@@ -476,9 +476,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
         <div className="bg-white m-4 rounded-lg shadow-sm border border-gray-200">
           <div className="p-3">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-semibold">
-                {currentUserInitial}
-              </div>
+              <UserAvatar size="sm" />
               <div className="flex-1">
                 <div
                   onClick={() => setShowCreateForm(true)}
@@ -510,9 +508,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
             
             <div className="p-6">
               <div className="flex items-start gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-semibold">
-                  {currentUserId ? currentUserId.toString().charAt(0).toUpperCase() : 'U'}
-                </div>
+                <UserAvatar size="sm" />
                 <div className="flex-1">
                   <textarea
                     value={newPost}
@@ -711,12 +707,10 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                 {/* Header del post tipo Facebook */}
                 <div className="p-4">
                   <div className="flex items-start gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-white font-semibold">
-                      {post.userId === currentUserId 
-                        ? currentUserInitial 
-                        : post.userName?.charAt(0).toUpperCase() || 'U'
-                      }
-                    </div>
+                    <UserAvatar 
+                      user={post.userId === currentUserId ? currentUser : { firstName: post.userName }} 
+                      size="sm" 
+                    />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <div>
@@ -920,9 +914,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                   
                   {/* Input para nuevo comentario */}
                   <div className="flex items-start gap-2 mb-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white text-sm font-semibold">
-                      {currentUserInitial}
-                    </div>
+                    <UserAvatar size="xs" />
                     <div className="flex-1 flex items-center gap-2">
                       <input
                         type="text"
@@ -961,7 +953,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                         groupId={groupId}
                         currentUserId={currentUserId}
                         currentUserName={currentUserName}
-                        currentUserInitial={currentUserInitial}
+                        currentUser={currentUser}
                         handleCommentLike={handleCommentLike}
                         handleReplyToComment={handleReplyToComment}
                         handleReplyInputChange={handleReplyInputChange}
@@ -1072,14 +1064,14 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
 }
 
 // ──── COMPONENTE POST COMMENTS LIST ────────────────────────────────────────────────────────
-function PostCommentsList({ postId, groupId, currentUserId, currentUserName, currentUserInitial,
+function PostCommentsList({ postId, groupId, currentUserId, currentUserName, currentUser,
   handleCommentLike, handleReplyToComment, handleReplyInputChange, handleReplySubmit,
   commentLikes, commentLikeCounts, replyingTo, replyingToName, setReplyingTo, replyInputs, refreshTrigger }: {
   postId: number;
   groupId: number;
   currentUserId: number;
   currentUserName: string;
-  currentUserInitial: string;
+  currentUser: any;
   handleCommentLike: (commentId: number) => void;
   handleReplyToComment: (commentId: number, userName: string) => void;
   handleReplyInputChange: (commentId: number, value: string) => void;
@@ -1192,12 +1184,10 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
             .filter((comment: any) => !comment.replyToCommentId) // ← SOLO comentarios principales
             .map((comment: any, index: number) => (
         <div key={comment.id || index} className="flex gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-            {comment.userId === currentUserId
-              ? currentUserInitial
-              : (comment.userName || 'U').charAt(0).toUpperCase()
-            }
-          </div>
+          <UserAvatar 
+            user={comment.userId === currentUserId ? currentUser : { firstName: comment.userName }} 
+            size="xs" 
+          />
           <div className="flex-1">
             <div className="bg-white rounded-lg px-3 py-2 border border-gray-200">
               <span className="font-semibold text-xs text-gray-900">
@@ -1250,9 +1240,7 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
                     </button>
                   </div>
                   <div className="flex gap-2">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                      {currentUserInitial}
-                    </div>
+                    <UserAvatar size="xs" />
                     <input
                       type="text"
                       value={replyInputs[comment.id] || ''}
@@ -1279,12 +1267,10 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
               <div className="mt-2 space-y-1">
                 {comment.replies.map((reply: any, replyIndex: number) => (
                   <div key={reply.id || replyIndex} className="flex gap-2 pl-4">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                      {reply.userId === currentUserId
-                        ? currentUserInitial
-                        : (reply.userName || 'U').charAt(0).toUpperCase()
-                      }
-                    </div>
+                    <UserAvatar 
+                      user={reply.userId === currentUserId ? currentUser : { firstName: reply.userName }} 
+                      size="xs" 
+                    />
                     <div className="flex-1 bg-gray-50 rounded-lg px-2 py-1 border border-gray-100">
                       <span className="font-semibold text-xs text-gray-900">
                         {reply.userId === currentUserId ? currentUserName : reply.userName || 'Usuario'}

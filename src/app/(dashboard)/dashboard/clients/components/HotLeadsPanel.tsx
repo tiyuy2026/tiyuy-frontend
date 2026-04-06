@@ -3,6 +3,7 @@
 import { useHotLeads } from '@/presentation/hooks/useAgentCRM';
 import { Flame, Phone, Mail, Eye, Download, Heart } from 'lucide-react';
 import Link from 'next/link';
+import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 
 export function HotLeadsPanel() {
   const { data: hotLeads, isLoading } = useHotLeads(30, 3);
@@ -70,6 +71,10 @@ export function HotLeadsPanel() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
+                  <UserAvatar 
+                    user={{ firstName: lead.clientName, lastName: '' }} 
+                    size="xs" 
+                  />
                   <span className="font-semibold text-gray-900">{lead.clientName}</span>
                   <span className={`text-xs px-2 py-0.5 rounded-full border ${getPriorityColor(lead.priority)}`}>
                     {lead.priority}

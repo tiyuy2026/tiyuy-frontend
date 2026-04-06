@@ -1,68 +1,27 @@
+'use client';
+
 interface BasicInfoStepProps {
   formData: any;
   onChange: (field: string, value: any) => void;
   propertyId?: number;
 }
 
-const PROPERTY_TYPES = [
-  {
-    value: 'APARTMENT',
-    label: 'Departamento',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-      </svg>
-    ),
-  },
-  {
-    value: 'HOUSE',
-    label: 'Casa',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-      </svg>
-    ),
-  },
-  {
-    value: 'LAND',
-    label: 'Terreno',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-      </svg>
-    ),
-  },
-  {
-    value: 'OFFICE',
-    label: 'Oficina',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-    ),
-  },
-  {
-    value: 'COMMERCIAL',
-    label: 'Local Comercial',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-      </svg>
-    ),
-  },
-  {
-    value: 'ROOM',
-    label: 'Habitación',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-      </svg>
-    ),
-  },
-];
-
 export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
   const isActive = (field: string, value: string) => formData[field] === value;
+
+  const PROPERTY_TYPES = [
+    { value: 'APARTMENT', label: 'Departamento', icon: (<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>) },
+    { value: 'HOUSE', label: 'Casa', icon: (<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>) },
+    { value: 'LAND', label: 'Terreno', icon: (<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>) },
+    { value: 'OFFICE', label: 'Oficina', icon: (<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>) },
+    { value: 'COMMERCIAL', label: 'Local Comercial', icon: (<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>) },
+    { value: 'ROOM', label: 'Habitacion', icon: (<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>) },
+  ];
+
+  const TRANSACTION_LABELS: Record<string, string> = {
+    SALE: 'Venta',
+    RENT: 'Alquiler',
+  };
 
   return (
     <div className="space-y-8">
@@ -192,7 +151,7 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
         {/* ── TRANSACCIÓN ── */}
         <div>
           <div className="section-divider" />
-          <label className="field-label">¿Qué quieres hacer?</label>
+          <label className="field-label">¿Que deseas hacer?</label>
           <div className="flex gap-3">
             <button
               type="button"
@@ -250,8 +209,8 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
                 className="form-select pr-8"
                 style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center', backgroundSize: '14px' }}
               >
-                <option value="PEN">S/ Soles</option>
-                <option value="USD">US$ Dólares</option>
+                <option value="PEN">S/ PEN</option>
+                <option value="USD">$ USD</option>
               </select>
             </div>
             <input
@@ -260,7 +219,7 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
               onChange={(e) => onChange('price', Number(e.target.value))}
               required
               className="form-input flex-1"
-              placeholder="Ej: 250,000"
+              placeholder="Ingresa el precio"
             />
           </div>
         </div>
@@ -268,19 +227,19 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
         {/* ── DESCRIPCIÓN ── */}
         <div>
           <div className="section-divider" />
-          <label className="field-label">Descripción de la propiedad</label>
+          <label className="field-label">Descripcion</label>
           <textarea
             value={formData.description}
             onChange={(e) => onChange('description', e.target.value)}
             rows={5}
             className="form-input resize-none"
-            placeholder="Describe tu propiedad: características, estado, cerca de qué lugares está, etc."
+            placeholder="Describe tu propiedad..."
           />
           <p className="text-[11px] text-slate-400 mt-2 flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5 text-green-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Una buena descripción atrae más compradores. Incluye detalles importantes.
+            Una buena descripcion ayuda a vender mas rapido
           </p>
         </div>
 

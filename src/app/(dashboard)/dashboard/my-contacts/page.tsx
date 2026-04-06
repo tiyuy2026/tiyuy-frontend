@@ -4,12 +4,12 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import StatusDetailPanel from './StatusDetailPanel';
-import { GrupoPostsPanel } from './groups/components/GrupoPostsPanel';
-import CanalesListPanel from './channels/components/CanalesListPanel';
+import { GrupoPostsPanel } from './groups/components/GroupPostsPanel';
+import CanalesListPanel from './channels/components/ChannelListPanel';
 import { ChannelPostsPanel } from './channels/components/ChannelPostsPanel';
-import MisCanalesCreadosView from './channels/components/MisCanalesCreadosView';
-import MisCanalesSuscritosView from './channels/components/MisCanalesSuscritosView';
-import MisEventosView from './channels/components/MisEventosView';
+import MisCanalesCreadosView from './channels/components/MyCreatedChannelsView';
+import MisCanalesSuscritosView from './channels/components/MySubscribedChannelsView';
+import MisEventosView from './channels/components/MyEventsView';
 import DiscoverChannelsView from './channels/components/DiscoverChannelsView';
 import CreateChannelView from './channels/components/CreateChannelView';
 import { formatCompactNumber } from '@/utils/formatters';
@@ -1871,11 +1871,11 @@ function MisContactosPageContent() {
     console.log('💫 Reacción local:', emoji, 'Mensaje:', messageId, 'Usuario:', userId);
   };
 
-  // Conectar WebSocket para mensajes en tiempo real (manejo automático de instancias)
+  // Conectar WebSocket SOLO si está autenticado
   const { isConnected: wsConnected } = useWebSocket({
+    enabled: isAuthenticated,
     onNewMessage: (message) => {
       console.log('💬 Mensaje WebSocket recibido:', message);
-      // Invalidar cache para refrescar mensajes
       queryClient.invalidateQueries({ queryKey: ['chat-messages', message.chatId] });
       queryClient.invalidateQueries({ queryKey: ['chats'] });
     },
@@ -1983,11 +1983,40 @@ function MisContactosPageContent() {
 
   return (
     <div className="flex h-[calc(100vh-64px)] bg-[#efebe2] overflow-hidden">
-      {/* Indicador de autenticación */}
+      {/* Modal simple para usuarios no logueados */}
       {!isAuthenticated && (
-        <div className="fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg">
-          <p className="text-sm font-medium">⚠️ No autenticado</p>
-          <p className="text-xs">Por favor inicia sesión</p>
+        <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
+            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg viewBox="0 0 24 24" className="w-7 h-7 fill-white">
+                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+              </svg>
+            </div>
+            
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Inicia sesión para chatear</h2>
+            <p className="text-gray-500 text-sm mb-6">
+              Conecta con profesionales inmobiliarios en Tiyuy
+            </p>
+            
+            <div className="space-y-3">
+              <a 
+                href="/login"
+                className="block w-full py-3 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
+              >
+                Iniciar sesión
+              </a>
+              <a 
+                href="/profile-selector"
+                className="block w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+              >
+                Crear cuenta
+              </a>
+            </div>
+            
+            <a href="/" className="block text-gray-400 text-sm mt-4 hover:text-gray-600">
+              ← Volver
+            </a>
+          </div>
         </div>
       )}
 

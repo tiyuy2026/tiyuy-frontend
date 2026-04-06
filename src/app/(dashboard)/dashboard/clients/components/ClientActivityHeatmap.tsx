@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { ClientHeatmapData, CRMClient } from '@/core/domain/entities/CRM';
 import { Clock, Calendar, TrendingUp, MessageCircle } from 'lucide-react';
+import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 
 interface ClientActivityHeatmapProps {
   heatmapData: ClientHeatmapData[];
@@ -154,10 +155,10 @@ export function ClientActivityHeatmap({
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 
-                      flex items-center justify-center text-white font-semibold text-sm">
-                      {client.name.charAt(0).toUpperCase()}
-                    </div>
+                    <UserAvatar 
+                      user={{ firstName: client.name, lastName: '' }} 
+                      size="xs" 
+                    />
                     <div>
                       <span className="font-medium text-gray-900">{client.name}</span>
                       <div className="flex items-center gap-2 text-xs text-gray-500">

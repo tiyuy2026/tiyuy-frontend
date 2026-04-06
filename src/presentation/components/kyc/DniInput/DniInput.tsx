@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Input, Button, Spinner } from '@/presentation/components/ui';
 import { useKyc } from '@/presentation/hooks';
+import { XCircle } from 'lucide-react';
 
 interface DniInputProps {
   value: string;
@@ -24,6 +25,8 @@ export const DniInput: React.FC<DniInputProps> = ({
 }) => {
   const { validateDni, isValidating, dniValidation } = useKyc();
   const [error, setError] = useState<string>('');
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('Su DNI no puede ser validado. Corrobore los digitos.');
 
   const handleValidate = async () => {
     if (value.length !== 8) {
@@ -39,7 +42,16 @@ export const DniInput: React.FC<DniInputProps> = ({
         setError(result.message || 'DNI no válido');
       }
     } catch (err: any) {
-      setError(err.message || 'Error al validar DNI');
+      const errorMsg = err.message || '';
+      if (errorMsg.includes('no disponible') || errorMsg.includes('servicio') || errorMsg.includes('Error al validar')) {
+        setModalMessage('Servicio de validacion no disponible. Intente mas tarde.');
+      } else if (errorMsg.includes('no encontrado') || errorMsg.includes('DNI no')) {
+        setModalMessage('Su DNI no puede ser validado. Corrobore los digitos.');
+      } else {
+        setModalMessage(errorMsg || 'Su DNI no puede ser validado. Corrobore los digitos.');
+      }
+      setShowErrorModal(true);
+      setError('');
     }
   };
 
@@ -95,9 +107,22 @@ export const DniInput: React.FC<DniInputProps> = ({
         </div>
       </div>
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-3">
-          <p className="text-sm text-red-800">{error}</p>
+      {/* Modal de error de validacion */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <XCircle className="w-8 h-8 text-red-500" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Validacion de DNI</h3>
+            <p className="text-gray-600 mb-6">{modalMessage}</p>
+            <button
+              onClick={() => setShowErrorModal(false)}
+              className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+            >
+              OK
+            </button>
+          </div>
         </div>
       )}
     </div>

@@ -24,16 +24,16 @@ export const LoginForm: React.FC = () => {
     if (!formData.email) {
       errors.email = 'El email es requerido';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Email inválido';
+      errors.email = 'Email invalido';
     }
 
     if (!formData.password) {
-      errors.password = 'La contraseña es requerida';
+      errors.password = 'La contrasena es requerida';
     } else if (formData.password.length < 6) {
-      errors.password = 'Mínimo 6 caracteres';
+      errors.password = 'Minimo 6 caracteres';
     }
 
-    console.log('LoginForm: errores de validación:', errors);
+    console.log('LoginForm: errores de validacion:', errors);
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -78,9 +78,7 @@ export const LoginForm: React.FC = () => {
       const googleUserData = await signInWithGoogle();
       
       if (googleUserData) {
-        // Para login con Google, necesitamos una contraseña temporal o manejarlo diferente
-        // Por ahora, mostramos un mensaje indicando que el usuario debe registrarse primero
-        setInfoDialog({ isOpen: true, message: 'Para usar Google, primero regístrate con tu correo de Google en la página de registro.' });
+        setInfoDialog({ isOpen: true, message: 'Registrate primero con Google para continuar' });
         console.log('LoginForm: Datos de Google obtenidos:', googleUserData);
       }
     } catch (error) {
@@ -93,16 +91,16 @@ export const LoginForm: React.FC = () => {
     <InfoDialog
       isOpen={infoDialog.isOpen}
       onClose={() => setInfoDialog({ isOpen: false, message: '' })}
-      title="Registro con Google"
+      title="Registro Requerido"
       message={infoDialog.message}
       variant="info"
     />
     <div className="w-full max-w-md">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3">
-          Bienvenido a TIYUY
+          Bienvenido
         </h1>
-        <p className="text-gray-600">Inicia sesión para continuar</p>
+        <p className="text-gray-600">Inicia sesion en tu cuenta</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -118,7 +116,7 @@ export const LoginForm: React.FC = () => {
         <Input
           type="email"
           name="email"
-          label="Correo electrónico"
+          label="Email"
           placeholder="tu@email.com"
           value={formData.email}
           onChange={handleChange}
@@ -134,7 +132,7 @@ export const LoginForm: React.FC = () => {
         <Input
           type="password"
           name="password"
-          label="Contraseña"
+          label="Contrasena"
           placeholder="••••••••"
           value={formData.password}
           onChange={handleChange}
@@ -153,7 +151,7 @@ export const LoginForm: React.FC = () => {
             <span className="text-gray-600">Recordarme</span>
           </label>
           <Link href="/recover-password" className="text-blue-600 hover:text-blue-700 font-medium">
-            ¿Olvidaste tu contraseña?
+            Olvide mi contrasena
           </Link>
         </div>
 
@@ -164,10 +162,10 @@ export const LoginForm: React.FC = () => {
   fullWidth 
   isLoading={isLoading}
   onClick={(e) => {
-    console.log('LoginForm: Botón Iniciar Sesión clickeado');
+    console.log('LoginForm: Boton Iniciar Sesion clickeado');
   }}
 >
-  Iniciar Sesión
+  Iniciar Sesion
 </Button>
 
         <div className="relative my-6">
@@ -175,7 +173,7 @@ export const LoginForm: React.FC = () => {
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white text-gray-500">o continúa con</span>
+            <span className="px-4 bg-white text-gray-500">O continua con</span>
           </div>
         </div>
 
@@ -208,16 +206,16 @@ export const LoginForm: React.FC = () => {
             href="/recover-password"
             className="block text-blue-600 hover:text-blue-700 font-medium text-sm"
           >
-            ¿Olvidaste tu contraseña?
+            Olvide mi contrasena
           </a>
           
           <p className="text-sm text-gray-600">
-            ¿No tienes cuenta?{' '}
+            No tienes cuenta?{' '}
             <button 
               onClick={handleRegisterClick}
               className="text-blue-600 hover:text-blue-700 font-semibold underline bg-transparent border-none cursor-pointer"
             >
-              Regístrate aquí
+              Registrate aqui
             </button>
           </p>
         </div>

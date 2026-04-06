@@ -1,4 +1,3 @@
-// 🏗️ COMPONENTES DE GRUPOS - Arquitectura Hexagonal
 // Este archivo pertenece al módulo de GRUPOS (Presentation Layer - Componentes UI)
 
 'use client';

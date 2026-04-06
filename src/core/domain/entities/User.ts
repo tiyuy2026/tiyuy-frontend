@@ -19,6 +19,7 @@ export interface User {
   country?: string;
   bio?: string;
   photoUrl?: string;  // Foto de perfil desde el backend
+  avatar?: string;  // Avatar URL (opcional)
   // Verificación de identidad
   isVerified?: boolean;
 }

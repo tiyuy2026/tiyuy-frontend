@@ -1,6 +1,7 @@
 'use client';
 
 import { CRMClient, ClientFilter, SortBy } from '@/core/domain/entities/CRM';
+import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 import { 
   Search, 
   Filter, 
@@ -150,10 +151,10 @@ export function ClientList({ clients, filterClients, selectedClientId, onClientS
                 >
                   <div className="flex items-start gap-3">
                     {/* Avatar */}
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 
-                      flex items-center justify-center text-white font-semibold flex-shrink-0">
-                      {client.name.charAt(0).toUpperCase()}
-                    </div>
+                    <UserAvatar 
+                      user={{ firstName: client.name, lastName: '' }} 
+                      size="sm" 
+                    />
 
                     <div className="flex-1 min-w-0">
                       {/* Name and Score */}

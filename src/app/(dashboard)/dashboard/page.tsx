@@ -12,10 +12,10 @@ import {
 } from 'lucide-react';
 import { useActiveSubscription } from '@/presentation/hooks/useFinance';
 
-// Tipo para las secciones del dashboard
+// Type for dashboard sections
 type DashboardSection = 'dashboard' | 'crm-leads';
 
-// Componente Sidebar local para Dashboard
+// Local Dashboard Sidebar component
 function DashboardSidebar({ 
   activeSection, 
   setActiveSection, 
@@ -53,14 +53,14 @@ function DashboardSidebar({
           </div>
           <div>
             <h1 className="font-bold text-gray-900 text-lg">TIYUY</h1>
-            <p className="text-xs text-gray-500">CRM Inmobiliario</p>
+            <p className="text-xs text-gray-500">Real Estate CRM</p>
           </div>
         </Link>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-1">
-        {/* Dashboard - Botón local */}
+        {/* Dashboard - Local button */}
         <button
           onClick={() => setActiveSection('dashboard')}
           className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${
@@ -74,7 +74,7 @@ function DashboardSidebar({
           {activeSection === 'dashboard' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
         </button>
 
-        {/* CRM Leads - Botón local (solo para agentes) */}
+        {/* CRM Leads - Local button (agents only) */}
         {isAgent && (
           <button
             onClick={() => setActiveSection('crm-leads')}
@@ -85,12 +85,12 @@ function DashboardSidebar({
             }`}
           >
             <Flame className="w-5 h-5" />
-            <span>CRM Leads</span>
+            <span>Oportunidades</span>
             {activeSection === 'crm-leads' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
           </button>
         )}
 
-        {/* Mis Propiedades - Link normal */}
+        {/* My Properties - Normal Link */}
         <Link
           href="/my-properties"
           className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
@@ -104,9 +104,9 @@ function DashboardSidebar({
           {pathname === '/my-properties' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
         </Link>
 
-        {/* Mensajes - Link normal */}
+        {/* Messages - Normal Link */}
         <Link
-          href="/messages"
+          href="/dashboard/my-contacts"
           className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
             pathname === '/messages'
               ? 'bg-teal-50 text-teal-700 font-medium'
@@ -118,7 +118,7 @@ function DashboardSidebar({
           {pathname === '/messages' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
         </Link>
 
-        {/* Clientes - Link normal (solo para agentes) */}
+        {/* Clients - Normal Link (agents only) */}
         {isAgent && (
           <Link
             href="/dashboard/clients"
@@ -134,7 +134,7 @@ function DashboardSidebar({
           </Link>
         )}
 
-        {/* Planes - Link normal */}
+        {/* Plans - Normal Link */}
         <Link
           href="/plans"
           className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
@@ -148,9 +148,9 @@ function DashboardSidebar({
           {pathname === '/plans' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
         </Link>
         
-        {/* Configuracion Section */}
+        {/* Settings Section */}
         <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Configuración</p>
+          <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Configuracion</p>
           
           <Link
             href="/dashboard/profile"
@@ -170,7 +170,7 @@ function DashboardSidebar({
   );
 }
 
-// Contenido de CRM Leads básico
+// Basic CRM Leads content
 function CRMLeadsContent() {
   return (
     <>
@@ -178,13 +178,13 @@ function CRMLeadsContent() {
         <div className="px-8 py-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">CRM Leads</h1>
-            <p className="text-gray-500 text-sm mt-1">Gestiona tus interesados y conviértelos en clientes</p>
+            <p className="text-gray-500 text-sm mt-1">Gestiona tus interesados y conviertelos en clientes</p>
           </div>
         </div>
       </header>
       <div className="p-8">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          <p className="text-gray-600">Contenido de CRM Leads...</p>
+          <p className="text-gray-600">CRM Leads content...</p>
         </div>
       </div>
     </>
@@ -193,12 +193,12 @@ function CRMLeadsContent() {
 
 export default function DashboardPage() {
   const { user, isAuthenticated } = useAuthStore();
-  // Estado para controlar la sección activa (dashboard o crm-leads)
+  // State to control active section (dashboard or crm-leads)
   const [activeSection, setActiveSection] = useState<DashboardSection>('dashboard');
   
   const { data: activeSubscription, isLoading, error } = useActiveSubscription();
   
-  console.log('DashboardPage: Estado completo:', {
+  console.log('DashboardPage: Complete state:', {
     isAuthenticated,
     user: user ? {
       id: user.id,
@@ -207,42 +207,42 @@ export default function DashboardPage() {
     } : null
   });
   
-  console.log('DashboardPage: Verificando si el usuario está autenticado:', isAuthenticated);
+  console.log('DashboardPage: Checking if user is authenticated:', isAuthenticated);
   
-  // Forzar actualización del estado
+  // Force state update
   const { user: storeUser } = useAuthStore();
-  console.log('DashboardPage: Usuario desde store:', storeUser);
+  console.log('DashboardPage: User from store:', storeUser);
   console.log('DashboardPage: activeSubscription:', activeSubscription);
   console.log('DashboardPage: isLoading:', isLoading);
   console.log('DashboardPage: error:', error);
   console.log('DashboardPage: activeSubscription.plan?.name:', activeSubscription?.plan?.name);
 
-  // ✅ Lógica inteligente para el botón de planes
+  // Smart logic for plan button
   const getPlanButtonText = () => {
     console.log('getPlanButtonText - activeSubscription:', activeSubscription);
     console.log('getPlanButtonText - plan name:', activeSubscription?.plan?.name);
     
     if (isLoading) {
-      return 'Cargando...';
+      return 'Loading...';
     }
     
     if (error) {
-      console.log('Error en subscription - Actualizar plan');
-      return 'Actualizar plan';
+      console.log('Error in subscription - Upgrade plan');
+      return 'Upgrade plan';
     }
     
     if (!activeSubscription) {
-      console.log('No hay activeSubscription - Actualizar plan');
-      return 'Actualizar plan';
+      console.log('No activeSubscription - Upgrade plan');
+      return 'Upgrade plan';
     }
     
     if (activeSubscription.plan.name === 'FREE') {
-      console.log('Plan FREE detectado - Actualizar plan');
-      return 'Actualizar plan';
+      console.log('FREE plan detected - Upgrade plan');
+      return 'Upgrade plan';
     }
     
-    console.log('Plan pagado detectado - Ver planes');
-    return 'Ver planes';
+    console.log('Paid plan detected - View plans');
+    return 'View plans';
   };
 
   const getPlanBadge = () => {
@@ -253,11 +253,11 @@ export default function DashboardPage() {
     }
     
     if (error || !activeSubscription) {
-      console.log('Error o no hay activeSubscription - Badge FREE');
+      console.log('Error or no activeSubscription - Badge FREE');
       return 'FREE';
     }
     
-    console.log('Badge con plan:', activeSubscription.plan.name);
+    console.log('Badge with plan:', activeSubscription.plan.name);
     return activeSubscription.plan.name;
   };
 
@@ -267,42 +267,42 @@ export default function DashboardPage() {
         return (
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold mb-4">Bienvenido a tu Dashboard</h2>
-              <p className="text-gray-600 mb-6">Busca tu hogar ideal y gestiona tus propiedades favoritas</p>
+              <h2 className="text-xl font-bold mb-4">Welcome to your Dashboard</h2>
+              <p className="text-gray-600 mb-6">Find your ideal home and manage your favorite properties</p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <Link href="/dashboard/crm-leads" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                  <div className="text-red-600 text-2xl mb-2">🔥</div>
+                  <div className="text-red-600 text-2xl mb-2">Hot</div>
                   <h3 className="font-semibold">CRM Leads</h3>
-                  <p className="text-sm text-gray-600">Interesados en tiempo real</p>
+                  <p className="text-sm text-gray-600">Real-time prospects</p>
                 </Link>
                 
                 <Link href="/my-properties" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
-                  <div className="text-blue-600 text-2xl mb-2">🏠</div>
-                  <h3 className="font-semibold">Mis Propiedades</h3>
-                  <p className="text-sm text-gray-600">Publica y gestiona</p>
+                  <div className="text-blue-600 text-2xl mb-2">Props</div>
+                  <h3 className="font-semibold">My Properties</h3>
+                  <p className="text-sm text-gray-600">Manage listings</p>
                 </Link>
                 
                 <Link href="/dashboard/favorites" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
-                  <div className="text-green-600 text-2xl mb-2">Favoritos</div>
-                  <h3 className="font-semibold">Favoritos</h3>
-                  <p className="text-sm text-gray-600">Propiedades guardadas</p>
+                  <div className="text-green-600 text-2xl mb-2">Favorites</div>
+                  <h3 className="font-semibold">Favorites</h3>
+                  <p className="text-sm text-gray-600">Saved properties</p>
                 </Link>
                 
                 <Link href="/dashboard/profile" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
-                  <div className="text-orange-600 text-2xl mb-2">👤</div>
-                  <h3 className="font-semibold">Mi Perfil</h3>
-                  <p className="text-sm text-gray-600">Datos personales</p>
+                  <div className="text-orange-600 text-2xl mb-2">Profile</div>
+                  <h3 className="font-semibold">My Profile</h3>
+                  <p className="text-sm text-gray-600">Personal data</p>
                 </Link>
                 
                 <Link href="/plans" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
                   <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                     {getPlanBadge()}
                   </div>
-                  <div className="text-red-600 text-2xl mb-2">💎</div>
+                  <div className="text-red-600 text-2xl mb-2">Diamond</div>
                   <h3 className="font-semibold">{getPlanButtonText()}</h3>
-                  <p className="text-sm text-gray-600">Gestiona tu plan</p>
+                  <p className="text-sm text-gray-600">Manage your plan</p>
                 </Link>
               </div>
             </div>
@@ -313,36 +313,36 @@ export default function DashboardPage() {
         return (
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold mb-4">Dashboard de Agente Inmobiliario</h2>
-              <p className="text-gray-600 mb-6">Gestiona tus propiedades y cartera de clientes</p>
+              <h2 className="text-xl font-bold mb-4">Real Estate Agent Dashboard</h2>
+              <p className="text-gray-600 mb-6">Manage your properties and client portfolio</p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <Link href="/dashboard/crm-leads" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                  <div className="text-red-600 text-2xl mb-2">🔥</div>
+                  <div className="text-red-600 text-2xl mb-2">Hot</div>
                   <h3 className="font-semibold">CRM Leads</h3>
-                  <p className="text-sm text-gray-600">Interesados en tiempo real</p>
+                  <p className="text-sm text-gray-600">Real-time prospects</p>
                 </Link>
                 
                 <Link href="/my-properties" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
-                  <div className="text-blue-600 text-2xl mb-2">🏠</div>
-                  <h3 className="font-semibold">Mis Propiedades</h3>
-                  <p className="text-sm text-gray-600">Gestiona publicaciones</p>
+                  <div className="text-blue-600 text-2xl mb-2">Props</div>
+                  <h3 className="font-semibold">My Properties</h3>
+                  <p className="text-sm text-gray-600">Manage listings</p>
                 </Link>
                 
-                <Link href="/messages" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
-                  <div className="text-green-600 text-2xl mb-2">Mensajes</div>
-                  <h3 className="font-semibold">Mensajes</h3>
-                  <p className="text-sm text-gray-600">Leads de clientes</p>
+                <Link href="/dashboard/my-contacts" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
+                  <div className="text-green-600 text-2xl mb-2">Msg</div>
+                  <h3 className="font-semibold">Messages</h3>
+                  <p className="text-sm text-gray-600">Client leads</p>
                 </Link>
                 
                 <Link href="/plans" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
                   <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                     {getPlanBadge()}
                   </div>
-                  <div className="text-red-600 text-2xl mb-2">Planes</div>
+                  <div className="text-red-600 text-2xl mb-2">Plans</div>
                   <h3 className="font-semibold">{getPlanButtonText()}</h3>
-                  <p className="text-sm text-gray-600">Gestiona tu plan</p>
+                  <p className="text-sm text-gray-600">Manage your plan</p>
                 </Link>
               </div>
             </div>
@@ -353,55 +353,55 @@ export default function DashboardPage() {
         return (
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold mb-4">Dashboard de Desarrollador Inmobiliario</h2>
-              <p className="text-gray-600 mb-6">Gestiona tus proyectos y desarrollos inmobiliarios</p>
+              <h2 className="text-xl font-bold mb-4">Real Estate Developer Dashboard</h2>
+              <p className="text-gray-600 mb-6">Manage your projects and real estate developments</p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                 <Link href="/dashboard/crm-leads" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                  <div className="text-red-600 text-2xl mb-2">🔥</div>
+                  <div className="text-red-600 text-2xl mb-2">Hot</div>
                   <h3 className="font-semibold">CRM Leads</h3>
-                  <p className="text-sm text-gray-600">Interesados en tiempo real</p>
+                  <p className="text-sm text-gray-600">Real-time prospects</p>
                 </Link>
                 
                 <Link href="/my-properties" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
-                  <div className="text-blue-600 text-2xl mb-2">🏠</div>
-                  <h3 className="font-semibold">Mis Propiedades</h3>
-                  <p className="text-sm text-gray-600">Gestiona publicaciones</p>
+                  <div className="text-blue-600 text-2xl mb-2">Props</div>
+                  <h3 className="font-semibold">My Properties</h3>
+                  <p className="text-sm text-gray-600">Manage listings</p>
                 </Link>
                 
                 <Link href="/my-projects" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
-                  <div className="text-green-600 text-2xl mb-2">🏗️</div>
-                  <h3 className="font-semibold">Mis Proyectos</h3>
-                  <p className="text-sm text-gray-600">Desarrollos activos</p>
+                  <div className="text-green-600 text-2xl mb-2">Projects</div>
+                  <h3 className="font-semibold">My Projects</h3>
+                  <p className="text-sm text-gray-600">Active developments</p>
                 </Link>
                 
                 <Link href="/dashboard/projects/new" className="bg-purple-50 p-4 rounded-lg hover:bg-purple-100 transition-colors">
-                  <div className="text-purple-600 text-2xl mb-2">🏢</div>
-                  <h3 className="font-semibold">Nuevo Proyecto</h3>
-                  <p className="text-sm text-gray-600">Crear desarrollo</p>
+                  <div className="text-purple-600 text-2xl mb-2">New</div>
+                  <h3 className="font-semibold">New Project</h3>
+                  <p className="text-sm text-gray-600">Create development</p>
                 </Link>
                 
                 <Link href="/dashboard/wallet" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
-                  <div className="text-orange-600 text-2xl mb-2">Billetera</div>
-                  <h3 className="font-semibold">Billetera</h3>
-                  <p className="text-sm text-gray-600">Créditos y pagos</p>
+                  <div className="text-orange-600 text-2xl mb-2">Wallet</div>
+                  <h3 className="font-semibold">Wallet</h3>
+                  <p className="text-sm text-gray-600">Credits and payments</p>
                 </Link>
                 
                 <Link href="/plans" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors">
-                  <div className="text-red-600 text-2xl mb-2">Planes</div>
-                  <h3 className="font-semibold">Planes</h3>
-                  <p className="text-sm text-gray-600">999 publicaciones</p>
+                  <div className="text-red-600 text-2xl mb-2">Plans</div>
+                  <h3 className="font-semibold">Plans</h3>
+                  <p className="text-sm text-gray-600">999 publications</p>
                 </Link>
               </div>
               
               <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="text-yellow-600 text-xl">Planes</div>
-                  <h3 className="font-semibold text-yellow-800">Plan Desarrollador</h3>
+                  <div className="text-yellow-600 text-xl">Plans</div>
+                  <h3 className="font-semibold text-yellow-800">Developer Plan</h3>
                 </div>
                 <p className="text-yellow-700 text-sm">
-                  <strong>999 publicaciones</strong> disponibles • <strong>Proyectos ilimitados</strong> • <strong>30 días gratis</strong>
+                  <strong>999 publications</strong> available • <strong>Unlimited projects</strong> • <strong>30 days free</strong>
                 </p>
               </div>
             </div>
@@ -412,42 +412,42 @@ export default function DashboardPage() {
         return (
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold mb-4">Dashboard de Administrador</h2>
-              <p className="text-gray-600 mb-6">Gestión completa de la plataforma TIYUY</p>
+              <h2 className="text-xl font-bold mb-4">Admin Dashboard</h2>
+              <p className="text-gray-600 mb-6">Complete management of the TIYUY platform</p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                 <Link href="/dashboard/crm-leads" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                  <div className="text-red-600 text-2xl mb-2">🔥</div>
+                  <div className="text-red-600 text-2xl mb-2">Hot</div>
                   <h3 className="font-semibold">CRM Leads</h3>
-                  <p className="text-sm text-gray-600">Interesados en tiempo real</p>
+                  <p className="text-sm text-gray-600">Real-time prospects</p>
                 </Link>
                 
                 <Link href="/my-properties" className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors">
-                  <div className="text-blue-600 text-2xl mb-2">🏠</div>
-                  <h3 className="font-semibold">Mis Propiedades</h3>
-                  <p className="text-sm text-gray-600">Gestiona publicaciones</p>
+                  <div className="text-blue-600 text-2xl mb-2">Props</div>
+                  <h3 className="font-semibold">My Properties</h3>
+                  <p className="text-sm text-gray-600">Manage listings</p>
                 </Link>
                 
-                <Link href="/messages" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
-                  <div className="text-green-600 text-2xl mb-2">Mensajes</div>
-                  <h3 className="font-semibold">Mensajes</h3>
-                  <p className="text-sm text-gray-600">Leads de clientes</p>
+                <Link href="/dashboard/my-contacts" className="bg-green-50 p-4 rounded-lg hover:bg-green-100 transition-colors">
+                  <div className="text-green-600 text-2xl mb-2">Msg</div>
+                  <h3 className="font-semibold">Messages</h3>
+                  <p className="text-sm text-gray-600">Client leads</p>
                 </Link>
                 
                 <Link href="/dashboard/wallet" className="bg-orange-50 p-4 rounded-lg hover:bg-orange-100 transition-colors">
-                  <div className="text-orange-600 text-2xl mb-2">�</div>
-                  <h3 className="font-semibold">Billetera</h3>
-                  <p className="text-sm text-gray-600">Pagos y métodos</p>
+                  <div className="text-orange-600 text-2xl mb-2">Wallet</div>
+                  <h3 className="font-semibold">Wallet</h3>
+                  <p className="text-sm text-gray-600">Payments and methods</p>
                 </Link>
                 
                 <Link href="/plans" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors relative">
                   <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                     {getPlanBadge()}
                   </div>
-                  <div className="text-red-600 text-2xl mb-2">Planes</div>
+                  <div className="text-red-600 text-2xl mb-2">Plans</div>
                   <h3 className="font-semibold">{getPlanButtonText()}</h3>
-                  <p className="text-sm text-gray-600">Gestiona tu plan</p>
+                  <p className="text-sm text-gray-600">Manage your plan</p>
                 </Link>
               </div>
             </div>
@@ -457,19 +457,19 @@ export default function DashboardPage() {
       default:
         return (
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-bold mb-4">Bienvenido, {user?.firstName || 'Usuario'}!</h2>
+            <h2 className="text-xl font-bold mb-4">Welcome, {user?.firstName || 'User'}!</h2>
             <p className="text-gray-600">
-              {user?.role === 'USER' && 'Tu dashboard personal está listo'}
-              {user?.role === 'AGENT' && 'Tu dashboard de agente está listo'}
-              {user?.role === 'DEVELOPER' && 'Tu dashboard de desarrollador está listo'}
-              {user?.role === 'ADMIN' && 'Tu dashboard de administrador está listo'}
+              {user?.role === 'USER' && 'Your personal dashboard is ready'}
+              {user?.role === 'AGENT' && 'Your agent dashboard is ready'}
+              {user?.role === 'DEVELOPER' && 'Your developer dashboard is ready'}
+              {user?.role === 'ADMIN' && 'Your admin dashboard is ready'}
             </p>
           </div>
         );
     }
   };
 
-  // Renderizar contenido basado en sección activa
+  // Render content based on active section
   const renderContent = () => {
     if (activeSection === 'crm-leads') {
       return <CRMLeadsContent />;

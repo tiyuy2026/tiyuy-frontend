@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/presentation/store/authStore';
 import Link from 'next/link';
+import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 
 export function ProfileMenu() {
   const router = useRouter();
@@ -34,9 +35,7 @@ export function ProfileMenu() {
         onClick={() => setShowMenu(!showMenu)}
         className="flex items-center gap-3 bg-white border border-gray-200 rounded-lg px-4 py-3 hover:bg-gray-50 transition-colors shadow-sm"
       >
-        <div className="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold">
-          {user?.firstName?.charAt(0) || 'U'}
-        </div>
+        <UserAvatar size="md" />
         <div className="text-left">
           <div className="font-medium text-gray-900">
             {user?.firstName || 'Usuario'}
@@ -88,27 +87,9 @@ export function ProfileMenu() {
             </div>
           </Link>
           
-          <Link
-            href="/my-properties"
-            className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-            onClick={() => setShowMenu(false)}
-          >
-            <div className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                />
-              </svg>
-              Mis Propiedades
-            </div>
-          </Link>
-
-          {user?.role === 'AGENT' && (
+          {user?.role === 'DEVELOPER' ? (
             <Link
-              href="/messages"
+              href="/my-projects"
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
               onClick={() => setShowMenu(false)}
             >
@@ -118,13 +99,49 @@ export function ProfileMenu() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
                   />
                 </svg>
-                Mensajes
+                Mis Proyectos
+              </div>
+            </Link>
+          ) : (
+            <Link
+              href="/my-properties"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+              onClick={() => setShowMenu(false)}
+            >
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                  />
+                </svg>
+                Mis Propiedades
               </div>
             </Link>
           )}
+
+          <Link
+            href="/messages"
+            className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
+            onClick={() => setShowMenu(false)}
+          >
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+              Mensajes
+            </div>
+          </Link>
 
           {user?.role === 'ADMIN' && (
             <Link
