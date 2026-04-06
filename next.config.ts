@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
+      // Existing rewrites
       {
         source: '/dashboard/mensajes',
         destination: '/dashboard/mis-contactos',

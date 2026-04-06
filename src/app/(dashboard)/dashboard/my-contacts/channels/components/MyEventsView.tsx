@@ -24,19 +24,8 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
   // Check if user can create events (Agents and Inmobiliarias)
   const canCreateEvent = user?.role === 'AGENT' || user?.role === 'INMOBILIARIA';
   
-  // Debug for button visibility
-  console.log('🔍 DEBUG - canCreateEvent:', canCreateEvent);
-  console.log('🔍 DEBUG - user role:', user?.role);
-  console.log('🔍 DEBUG - showCreateEventModal:', showCreateEventModal);
-  
   // Get first channel ID for creating events
   const firstChannelId = userChannels?.[0]?.id || 1;
-  
-  // Debug para verificar el estado
-  console.log('🔍 DEBUG - showCreateEventModal:', showCreateEventModal);
-  console.log('🔍 DEBUG - canCreateEvent:', canCreateEvent);
-  console.log('🔍 DEBUG - userChannels:', userChannels);
-
   // Filter events
   const getFilteredEvents = () => {
     let filtered = myCreatedEvents || [];

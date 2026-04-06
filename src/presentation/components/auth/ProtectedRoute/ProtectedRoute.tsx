@@ -8,12 +8,16 @@ import { authStorage } from '@/infrastructure/storage';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: 'USER' | 'AGENT' | 'DEVELOPER' | 'ADMIN';
+  requiredRoles?: ('USER' | 'AGENT' | 'DEVELOPER' | 'ADMIN')[];
 }
 
-export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, requiredRole, requiredRoles }: ProtectedRouteProps) {
   const router = useRouter();
   const { isAuthenticated, user, setAuth } = useAuthStore();
   const [isInitializing, setIsInitializing] = useState(true);
+
+  // Combinar requiredRole y requiredRoles en un array de roles permitidos
+  const allowedRoles = requiredRoles || (requiredRole ? [requiredRole] : []);
 
   useEffect(() => {
     const token = authStorage.getToken();
@@ -35,12 +39,12 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
       return;
     }
 
-    if (requiredRole && user?.role !== requiredRole) {
+    if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role as any)) {
       console.log('ProtectedRoute: Rol no coincide, redirigiendo a acceso denegado');
       // En lugar de redirigir a dashboard, mostrar mensaje de acceso denegado
       return;
     }
-  }, [isAuthenticated, user, requiredRole, router, isInitializing]);
+  }, [isAuthenticated, user, allowedRoles, router, isInitializing]);
 
   if (isInitializing) {
     return (
@@ -58,7 +62,7 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
     );
   }
 
-  if (requiredRole && user?.role !== requiredRole) {
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role as any)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">

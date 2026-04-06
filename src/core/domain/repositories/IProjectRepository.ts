@@ -105,6 +105,16 @@ export interface IProjectRepository {
   publishProject(projectId: number): Promise<Project>;
 
   /**
+   * Destacar proyecto
+   */
+  featureProject(projectId: number): Promise<any>;
+
+  /**
+   * Eliminar proyecto
+   */
+  deleteProject(projectId: number): Promise<void>;
+
+  /**
    * Obtener todas las unidades de un proyecto
    * Usado para: tabla de disponibilidad, gestión de unidades
    */

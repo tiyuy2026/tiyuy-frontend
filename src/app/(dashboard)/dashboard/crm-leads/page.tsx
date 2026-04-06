@@ -3,16 +3,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
 import { useAuthStore } from '@/presentation/store/authStore';
-import { 
-  useReceivedLeads, 
-  useUnreadLeadsCount, 
-  useMarkLeadAsRead, 
+import {
+  useReceivedLeads,
+  useUnreadLeadsCount,
+  useMarkLeadAsRead,
   useUpdateLeadStatus,
   getStatusLabel,
   getStatusColor,
   getStatusIcon,
-  Lead 
+  Lead
 } from '@/presentation/hooks/useLeads';
+import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 import Link from 'next/link';
 import { toast } from '@/presentation/store/toastStore';
 import { usePathname } from 'next/navigation';
@@ -21,14 +22,25 @@ import {
   ChevronDown, LogOut, Building
 } from 'lucide-react';
 
-const STATUS_OPTIONS = [
-  { value: 'ALL', label: 'Todos', color: 'bg-gray-500' },
-  { value: 'NEW', label: 'Nuevos', color: 'bg-blue-500' },
-  { value: 'CONTACTED', label: 'Contactados', color: 'bg-yellow-500' },
-  { value: 'SCHEDULED', label: 'Visita Agendada', color: 'bg-purple-500' },
-  { value: 'NEGOTIATING', label: 'Negociando', color: 'bg-orange-500' },
-  { value: 'CLOSED_WON', label: 'Ganados', color: 'bg-green-500' },
-  { value: 'CLOSED_LOST', label: 'Perdidos', color: 'bg-gray-400' },
+const STATUS_COLORS: Record<string, string> = {
+  ALL: 'bg-gray-500',
+  NEW: 'bg-blue-500',
+  CONTACTED: 'bg-yellow-500',
+  SCHEDULED: 'bg-purple-500',
+  NEGOTIATING: 'bg-orange-500',
+  CLOSED_WON: 'bg-green-500',
+  CLOSED_LOST: 'bg-gray-400',
+};
+
+// Function to get status options - static Spanish labels
+const getStatusOptions = () => [
+  { value: 'ALL', label: 'Todos', color: STATUS_COLORS.ALL },
+  { value: 'NEW', label: 'Nuevo', color: STATUS_COLORS.NEW },
+  { value: 'CONTACTED', label: 'Contactado', color: STATUS_COLORS.CONTACTED },
+  { value: 'SCHEDULED', label: 'Agendado', color: STATUS_COLORS.SCHEDULED },
+  { value: 'NEGOTIATING', label: 'Negociando', color: STATUS_COLORS.NEGOTIATING },
+  { value: 'CLOSED_WON', label: 'Ganado', color: STATUS_COLORS.CLOSED_WON },
+  { value: 'CLOSED_LOST', label: 'Perdido', color: STATUS_COLORS.CLOSED_LOST },
 ];
 
 // Sidebar Navigation Component
@@ -38,7 +50,7 @@ function Sidebar() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user } = useAuthStore();
   
-  // Cerrar dropdown al hacer click fuera
+  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -52,7 +64,7 @@ function Sidebar() {
   const menuItems = [
     { href: '/dashboard/crm-leads', icon: Flame, label: 'CRM Leads' },
     { href: '/my-properties', icon: Home, label: 'Mis Propiedades' },
-    { href: '/messages', icon: MessageSquare, label: 'Mensajes' },
+    { href: '/dashboard/my-contacts', icon: MessageSquare, label: 'Mensajes' },
     { href: '/dashboard/clients', icon: Users, label: 'Clientes' },
     { href: '/plans', icon: Diamond, label: 'Planes' },
     { href: '/dashboard/profile', icon: User, label: 'Perfil' },
@@ -60,10 +72,10 @@ function Sidebar() {
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
-      {/* Header con Logo y Usuario Dropdown */}
+      {/* Header con Logo */}
       <div className="p-4 border-b border-gray-200">
         {/* Logo */}
-        <Link href="/dashboard" className="flex items-center gap-2 mb-4">
+        <Link href="/dashboard" className="flex items-center gap-2">
           <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
             T
           </div>
@@ -72,67 +84,6 @@ function Sidebar() {
             <p className="text-xs text-gray-500">CRM Inmobiliario</p>
           </div>
         </Link>
-        
-        {/* Usuario Dropdown - Botón Verde */}
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-full flex items-center gap-3 px-4 py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors"
-          >
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-semibold overflow-hidden">
-              {user?.photoUrl ? (
-                <img src={user.photoUrl} alt={user?.firstName || 'U'} className="w-full h-full object-cover"/>
-              ) : (
-                <span>{(user?.firstName || 'U').charAt(0).toUpperCase()}</span>
-              )}
-            </div>
-            <div className="flex-1 text-left min-w-0">
-              <p className="font-medium text-sm truncate">{user?.firstName || 'Usuario'} {user?.lastName || ''}</p>
-              <p className="text-xs text-teal-100 truncate capitalize">{user?.role?.toLowerCase() || 'Agente'}</p>
-            </div>
-            <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-          </button>
-          
-          {/* Dropdown Menu */}
-          {isDropdownOpen && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
-              <Link 
-                href="/dashboard/profile" 
-                className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
-                onClick={() => setIsDropdownOpen(false)}
-              >
-                <User className="w-4 h-4" />
-                <span className="text-sm">Mi Perfil</span>
-              </Link>
-              <Link 
-                href="/my-properties" 
-                className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
-                onClick={() => setIsDropdownOpen(false)}
-              >
-                <Building className="w-4 h-4" />
-                <span className="text-sm">Mis Propiedades</span>
-              </Link>
-              <Link 
-                href="/messages" 
-                className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
-                onClick={() => setIsDropdownOpen(false)}
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span className="text-sm">Mensajes</span>
-              </Link>
-              <div className="border-t border-gray-100 my-1"></div>
-              <button 
-                className="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
-                onClick={() => {
-                  setIsDropdownOpen(false);
-                }}
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="text-sm">Cerrar Sesión</span>
-              </button>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Navigation */}
@@ -194,7 +145,7 @@ function StatCard({
       {trend && (
         <div className="flex items-center gap-1 mt-2">
           <span className={`text-sm font-medium ${trend.positive ? 'text-green-300' : 'text-red-300'}`}>
-            {trend.positive ? '↗' : '↘'} {Math.abs(trend.value)}%
+            {trend.positive ? '↑' : '↓'} {Math.abs(trend.value)}%
           </span>
           <span className="text-white/50 text-xs">vs mes anterior</span>
         </div>
@@ -206,11 +157,11 @@ function StatCard({
 // Pipeline Funnel Component
 function PipelineFunnel({ leads }: { leads: Lead[] }) {
   const stages = [
-    { status: 'NEW', label: 'Nuevos', color: 'bg-blue-500', width: '100%' },
-    { status: 'CONTACTED', label: 'Contactados', color: 'bg-yellow-500', width: '85%' },
-    { status: 'SCHEDULED', label: 'Visita', color: 'bg-purple-500', width: '70%' },
+    { status: 'NEW', label: 'Nuevo', color: 'bg-blue-500', width: '100%' },
+    { status: 'CONTACTED', label: 'Contactado', color: 'bg-yellow-500', width: '85%' },
+    { status: 'SCHEDULED', label: 'Visita Agendada', color: 'bg-purple-500', width: '70%' },
     { status: 'NEGOTIATING', label: 'Negociando', color: 'bg-orange-500', width: '55%' },
-    { status: 'CLOSED_WON', label: 'Ganados', color: 'bg-green-500', width: '40%' },
+    { status: 'CLOSED_WON', label: 'Ganado', color: 'bg-green-500', width: '40%' },
   ];
 
   const getCount = (status: string) => leads.filter(l => l.status === status).length;
@@ -254,12 +205,14 @@ function LeadRow({
   lead, 
   onMarkAsRead, 
   onStatusChange,
-  isUpdating 
+  isUpdating,
+  statusOptions
 }: { 
   lead: Lead; 
   onMarkAsRead: (id: number) => void;
   onStatusChange: (id: number, status: string) => void;
   isUpdating: boolean;
+  statusOptions: {value: string; label: string; color: string}[];
 }) {
   const [showStatusMenu, setShowStatusMenu] = useState(false);
 
@@ -268,12 +221,13 @@ function LeadRow({
       {/* Lead Info */}
       <td className="px-6 py-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold">
-            {(lead.interestedUserName || lead.contactEmail).charAt(0).toUpperCase()}
-          </div>
+          <UserAvatar 
+            user={{ firstName: lead.interestedUserName || '', lastName: '' }} 
+            size="sm" 
+          />
           <div>
             <p className="font-semibold text-gray-900">
-              {lead.interestedUserName || 'Usuario Anónimo'}
+              {lead.interestedUserName || 'Usuario Anonimo'}
               {!lead.isRead && (
                 <span className="ml-2 inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
               )}
@@ -294,7 +248,7 @@ function LeadRow({
             />
           ) : (
             <div className="w-12 h-9 bg-gray-200 rounded-lg flex items-center justify-center">
-              <span className="text-lg">🏠</span>
+              <span className="text-lg"></span>
             </div>
           )}
           <div>
@@ -304,7 +258,7 @@ function LeadRow({
               target="_blank"
               className="text-xs text-blue-600 hover:underline"
             >
-              Ver propiedad →
+              Ver Propiedad →
             </Link>
           </div>
         </div>
@@ -328,9 +282,9 @@ function LeadRow({
           {showStatusMenu && (
             <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-20 py-2">
               <p className="px-4 py-2 text-xs font-medium text-gray-500 border-b border-gray-100">
-                Cambiar estado
+                Cambiar Estado
               </p>
-              {STATUS_OPTIONS.filter(s => s.value !== 'ALL').map((status) => (
+              {statusOptions.filter(s => s.value !== 'ALL').map(status => (
                 <button
                   key={status.value}
                   onClick={() => {
@@ -381,14 +335,14 @@ function LeadRow({
       {/* Date */}
       <td className="px-6 py-4">
         <p className="text-sm text-gray-600">
-          {new Date(lead.createdAt).toLocaleDateString('es-PE', {
+          {new Date(lead.createdAt).toLocaleDateString('es-ES', {
             day: 'numeric',
             month: 'short',
             year: 'numeric',
           })}
         </p>
         <p className="text-xs text-gray-400">
-          {new Date(lead.createdAt).toLocaleTimeString('es-PE', {
+          {new Date(lead.createdAt).toLocaleTimeString('es-ES', {
             hour: '2-digit',
             minute: '2-digit',
           })}
@@ -404,12 +358,12 @@ function LeadRow({
               disabled={isUpdating}
               className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
-              Marcar leído
+              Marcar como Leido
             </button>
           )}
           <button
             className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-            title="Ver detalles"
+            title="Ver Detalles"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -426,12 +380,14 @@ function LeadCard({
   lead, 
   onMarkAsRead, 
   onStatusChange,
-  isUpdating 
+  isUpdating,
+  statusOptions
 }: { 
   lead: Lead; 
   onMarkAsRead: (id: number) => void;
   onStatusChange: (id: number, status: string) => void;
   isUpdating: boolean;
+  statusOptions: {value: string; label: string; color: string}[];
 }) {
   const [showStatusMenu, setShowStatusMenu] = useState(false);
 
@@ -442,12 +398,13 @@ function LeadCard({
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
-            {(lead.interestedUserName || lead.contactEmail).charAt(0).toUpperCase()}
-          </div>
+          <UserAvatar 
+            user={{ firstName: lead.interestedUserName || '', lastName: '' }} 
+            size="md" 
+          />
           <div>
             <h3 className="font-bold text-gray-900">
-              {lead.interestedUserName || 'Usuario Anónimo'}
+              {lead.interestedUserName || 'Usuario Anonimo'}
               {!lead.isRead && (
                 <span className="ml-2 inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
               )}
@@ -471,7 +428,7 @@ function LeadCard({
             />
           ) : (
             <div className="w-16 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">🏠</span>
+              <span className="text-2xl"></span>
             </div>
           )}
           <div className="flex-1 min-w-0">
@@ -481,7 +438,7 @@ function LeadCard({
               target="_blank"
               className="text-xs text-blue-600 hover:underline"
             >
-              Ver propiedad →
+              Ver Propiedad →
             </Link>
           </div>
         </div>
@@ -508,9 +465,9 @@ function LeadCard({
         )}
       </div>
 
-      {/* Date */}
+      {/* Fecha */}
       <p className="text-xs text-gray-400 mb-4">
-        {new Date(lead.createdAt).toLocaleString('es-PE', {
+        {new Date(lead.createdAt).toLocaleString('es-ES', {
           day: 'numeric',
           month: 'long',
           hour: '2-digit',
@@ -526,7 +483,7 @@ function LeadCard({
             disabled={isUpdating}
             className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
-            Marcar leído
+            Marcar como Leido
           </button>
         )}
         
@@ -536,12 +493,12 @@ function LeadCard({
             disabled={isUpdating}
             className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-200 transition-colors"
           >
-            Cambiar estado
+            Cambiar Estado
           </button>
 
           {showStatusMenu && (
             <div className="absolute bottom-full right-0 mb-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-20 py-2">
-              {STATUS_OPTIONS.filter(s => s.value !== 'ALL').map((status) => (
+              {statusOptions.filter(s => s.value !== 'ALL').map(status => (
                 <button
                   key={status.value}
                   onClick={() => {
@@ -582,6 +539,8 @@ export default function CRMLeadsPage() {
   const [lastCount, setLastCount] = useState(0);
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
   
+  const statusOptions = getStatusOptions();
+  
   const { data: leadsData, isLoading, error } = useReceivedLeads();
   const { data: unreadData } = useUnreadLeadsCount();
   const markAsRead = useMarkLeadAsRead();
@@ -590,21 +549,21 @@ export default function CRMLeadsPage() {
   const unreadCount = unreadData?.unreadCount || 0;
   const leads = leadsData?.content || [];
 
-  // Notificación de nuevos leads
+  // New leads notification
   useEffect(() => {
     if (unreadCount > lastCount && lastCount > 0) {
       const newLeads = unreadCount - lastCount;
-      toast.success(`🎉 ¡${newLeads} nuevo${newLeads > 1 ? 's' : ''} lead${newLeads > 1 ? 's' : ''} recibido${newLeads > 1 ? 's' : ''}!`);
+      toast.success(`${newLeads} nuevo${newLeads > 1 ? 's' : ''} lead${newLeads > 1 ? 's' : ''} recibido${newLeads > 1 ? 's' : ''}!`);
     }
     setLastCount(unreadCount);
   }, [unreadCount, lastCount]);
 
-  // Filtrar leads
+  // Filter leads
   const filteredLeads = selectedStatus === 'ALL' 
     ? leads 
     : leads.filter(lead => lead.status === selectedStatus);
 
-  // Estadísticas
+  // Statistics
   const stats = {
     total: leads.length,
     new: leads.filter(l => l.status === 'NEW').length,
@@ -630,8 +589,8 @@ export default function CRMLeadsPage() {
           <Sidebar />
           <main className="flex-1 bg-gray-50 p-8">
             <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
-              <div className="text-5xl mb-4">⚠️</div>
-              <h2 className="text-xl font-semibold text-red-800 mb-2">Error al cargar leads</h2>
+              <div className="text-5xl mb-4">!</div>
+              <h2 className="text-xl font-semibold text-red-800 mb-2">Error cargando leads</h2>
               <p className="text-red-600">{error.message}</p>
             </div>
           </main>
@@ -653,7 +612,7 @@ export default function CRMLeadsPage() {
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">CRM Leads</h1>
                   <p className="text-gray-500 text-sm mt-1">
-                    Gestiona tus interesados y conviértelos en clientes
+                    Gestiona tus prospectos y conviertelos en clientes
                     {unreadCount > 0 && (
                       <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse">
                         {unreadCount} nuevo{unreadCount !== 1 ? 's' : ''}
@@ -683,8 +642,8 @@ export default function CRMLeadsPage() {
               <StatCard 
                 title="Total Leads" 
                 value={stats.total} 
-                subtitle={`${stats.unread} sin leer`}
-                icon="👥" 
+                subtitle={`${stats.unread} no leido${stats.unread !== 1 ? 's' : ''}`}
+                icon="Users" 
                 color="bg-gradient-to-br from-blue-500 to-blue-700"
                 trend={{ value: 12, positive: true }}
               />
@@ -692,21 +651,21 @@ export default function CRMLeadsPage() {
                 title="Nuevos" 
                 value={stats.new} 
                 subtitle="Este mes"
-                icon="🔥" 
+                icon="Fire" 
                 color="bg-gradient-to-br from-orange-500 to-red-600"
               />
               <StatCard 
-                title="En Negociación" 
+                title="Negociando" 
                 value={stats.negotiating} 
                 subtitle="Oportunidades activas"
-                icon="🤝" 
+                icon="Handshake" 
                 color="bg-gradient-to-br from-purple-500 to-purple-700"
               />
               <StatCard 
-                title="Tasa de Conversión" 
+                title="Tasa de Conversion" 
                 value={`${stats.conversionRate}%`}
                 subtitle={`${stats.won} leads ganados`}
-                icon="📈" 
+                icon="Chart" 
                 color="bg-gradient-to-br from-green-500 to-emerald-700"
                 trend={{ value: 5, positive: true }}
               />
@@ -725,10 +684,10 @@ export default function CRMLeadsPage() {
                       <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                       <div>
                         <p className="text-sm text-gray-900 font-medium">
-                          Nuevo lead de {lead.interestedUserName || 'anónimo'}
+                                                  Nuevo lead de {lead.interestedUserName || 'anonimo'}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {new Date(lead.createdAt).toLocaleString('es-PE', {
+                          {new Date(lead.createdAt).toLocaleString('es-ES', {
                             hour: '2-digit',
                             minute: '2-digit',
                             day: 'numeric',
@@ -740,7 +699,7 @@ export default function CRMLeadsPage() {
                   ))}
                   {leads.length === 0 && (
                     <p className="text-sm text-gray-500 text-center py-4">
-                      No hay actividad reciente
+                      Sin actividad reciente
                     </p>
                   )}
                 </div>
@@ -751,7 +710,7 @@ export default function CRMLeadsPage() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm font-medium text-gray-700 mr-2">Filtrar:</span>
-                {STATUS_OPTIONS.map((status) => (
+                {statusOptions.map(status => (
                   <button
                     key={status.value}
                     onClick={() => setSelectedStatus(status.value)}
@@ -810,13 +769,13 @@ export default function CRMLeadsPage() {
             {!isLoading && filteredLeads.length === 0 && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-16 text-center">
                 <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-4xl">📭</span>
+                  <span className="text-4xl text-gray-400">Vacio</span>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  {selectedStatus === 'ALL' ? 'No tienes leads todavía' : 'No hay leads en este estado'}
+                  {selectedStatus === 'ALL' ? 'No hay leads aun' : 'No hay leads en este estado'}
                 </h3>
                 <p className="text-gray-500 max-w-md mx-auto">
-                  Los interesados en tus propiedades aparecerán aquí automáticamente
+                  Los prospectos interesados en tus propiedades apareceran aqui automaticamente
                 </p>
                 {selectedStatus !== 'ALL' && (
                   <button
@@ -864,6 +823,7 @@ export default function CRMLeadsPage() {
                           onMarkAsRead={handleMarkAsRead}
                           onStatusChange={handleStatusChange}
                           isUpdating={markAsRead.isPending || updateStatus.isPending}
+                          statusOptions={statusOptions}
                         />
                       ))}
                     </tbody>
@@ -882,6 +842,7 @@ export default function CRMLeadsPage() {
                     onMarkAsRead={handleMarkAsRead}
                     onStatusChange={handleStatusChange}
                     isUpdating={markAsRead.isPending || updateStatus.isPending}
+                    statusOptions={statusOptions}
                   />
                 ))}
               </div>

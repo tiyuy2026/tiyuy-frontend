@@ -15,6 +15,7 @@ import {
   useLikeChannelComment
 } from '@/presentation/hooks/useContacts';
 import { Plus, MessageSquare, Heart, Share2, Image, X, Send, MoreVertical, Edit, Trash2, Calendar, Shield, BarChart3, FileText, Paperclip } from 'lucide-react';
+import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 import ChannelEventsPanel from './ChannelEventsPanel';
 import CreateEventModal from './CreateEventModal';
 import { ChannelAccessManager } from './ChannelAccessManager';
@@ -469,8 +470,8 @@ export function ChannelPostsPanel({
                 // Initial state: "write first post" and "skip" buttons
                 <div className="bg-white m-4 rounded-lg shadow-sm border border-gray-200 p-6">
                   <div className="text-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
-                      {currentUserInitial}
+                    <div className="w-16 h-16 mx-auto mb-4">
+                      <UserAvatar size="lg" />
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       ¡Bienvenido a {channelName}!
@@ -499,9 +500,7 @@ export function ChannelPostsPanel({
                 <div className="bg-white m-4 rounded-lg shadow-sm border border-gray-200">
                   <div className="p-3">
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-semibold">
-                        {currentUserInitial}
-                      </div>
+                      <UserAvatar size="sm" />
                       <div className="flex-1">
                         <div
                           onClick={() => setShowCreateForm(true)}
@@ -560,9 +559,7 @@ export function ChannelPostsPanel({
                   
                   <div className="p-6">
                     <div className="flex items-start gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-semibold">
-                        {currentUserInitial}
-                      </div>
+                      <UserAvatar size="sm" />
                       <div>
                         <p className="font-semibold text-gray-900">{currentUserName}</p>
                         <p className="text-xs text-gray-500">Creando post en {channelName}</p>
@@ -771,9 +768,10 @@ export function ChannelPostsPanel({
                   {/* Post Header - Facebook Style */}
                   <div className="p-4">
                     <div className="flex items-start gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
-                        {post.userFirstName?.charAt(0).toUpperCase() || 'U'}
-                      </div>
+                      <UserAvatar 
+                        user={{ firstName: post.userFirstName, lastName: post.userLastName }} 
+                        size="sm" 
+                      />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <div>
@@ -1001,9 +999,7 @@ export function ChannelPostsPanel({
                   <div className="bg-gray-50 p-4 border-t border-gray-100">
                     {/* Comment Input */}
                     <div className="flex items-start gap-2 mb-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
-                        {currentUserInitial}
-                      </div>
+                      <UserAvatar size="xs" />
                       <div className="flex-1 flex items-center gap-2">
                         <input
                           type="text"
@@ -1042,7 +1038,7 @@ export function ChannelPostsPanel({
                           postId={post.id} 
                           currentUserId={currentUserId}
                           currentUserName={currentUserName}
-                          currentUserInitial={currentUserInitial}
+                          currentUser={currentUser}
                           createCommentMutation={createCommentMutation}
                         />
                       )}
@@ -1239,12 +1235,12 @@ export function ChannelPostsPanel({
 }
 
 // Sub-component for comments with replies
-function PostComments({ channelId, postId, currentUserId, currentUserName, currentUserInitial, createCommentMutation }: { 
+function PostComments({ channelId, postId, currentUserId, currentUserName, currentUser, createCommentMutation }: { 
   channelId: number;
   postId: number; 
   currentUserId: number; 
   currentUserName: string;
-  currentUserInitial: string;
+  currentUser: any;
   createCommentMutation: any;
 }) {
   const { data: comments, isLoading } = useChannelComments(channelId, postId);
@@ -1300,9 +1296,10 @@ function PostComments({ channelId, postId, currentUserId, currentUserName, curre
     if (!nestedReplies || nestedReplies.length === 0) return null;
     return nestedReplies.map((nestedReply: any) => (
       <div key={nestedReply.id} className="flex gap-2">
-        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center text-white text-[10px] font-semibold flex-shrink-0">
-          {nestedReply.userFirstName?.charAt(0).toUpperCase() || 'U'}
-        </div>
+        <UserAvatar 
+          user={{ firstName: nestedReply.userFirstName, lastName: nestedReply.userLastName }} 
+          size="xs" 
+        />
         <div className="flex-1">
           <div className="bg-gray-100 rounded-lg px-2 py-1.5 border border-gray-200">
             <span className="font-semibold text-xs text-gray-900">
@@ -1348,9 +1345,7 @@ function PostComments({ channelId, postId, currentUserId, currentUserName, curre
                   </button>
                 </div>
                 <div className="flex gap-1.5">
-                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-white text-[10px] font-semibold flex-shrink-0">
-                    {currentUserInitial}
-                  </div>
+                  <UserAvatar size="xs" />
                   <input
                     type="text"
                     value={replyInputs[nestedReply.id] || ''}
@@ -1429,9 +1424,10 @@ function PostComments({ channelId, postId, currentUserId, currentUserName, curre
         .filter((comment: any) => !comment.replyToCommentId)
         .map((comment: any) => (
           <div key={comment.id} className="flex gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-              {comment.userFirstName?.charAt(0).toUpperCase() || 'U'}
-            </div>
+            <UserAvatar 
+              user={{ firstName: comment.userFirstName, lastName: comment.userLastName }} 
+              size="xs" 
+            />
             <div className="flex-1">
               <div className="bg-white rounded-lg px-3 py-2 border border-gray-200">
                 <span className="font-semibold text-xs text-gray-900">
@@ -1477,9 +1473,7 @@ function PostComments({ channelId, postId, currentUserId, currentUserName, curre
                       </button>
                     </div>
                     <div className="flex gap-2">
-                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                        {currentUserInitial}
-                      </div>
+                      <UserAvatar size="xs" />
                       <input
                         type="text"
                         value={replyInputs[comment.id] || ''}

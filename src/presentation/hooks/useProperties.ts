@@ -35,9 +35,9 @@ export function useMyProperties(page = 0, size = 20) {
   return useQuery({
     queryKey: ['properties', 'my-properties', page, size],
     queryFn: () => propertyRepo.getMyProperties(page, size),
-    staleTime: 0, // Siempre considerar los datos como obsoletos
-    refetchOnMount: true, // Siempre refrescar al montar
-    refetchOnWindowFocus: true, // Refrescar cuando la ventana gana foco
+    staleTime: 0, // Always consider data as stale
+    refetchOnMount: true, // Always refresh on mount
+    refetchOnWindowFocus: true, // Refresh when window gains focus
   });
 }
 
@@ -53,7 +53,7 @@ export function useCreateProperty() {
     onError: (error: any) => {
       const status = error?.response?.status;
       if (status === 402) {
-        // No mostrar toast para error 402, el componente manejará el modal
+        // Do not show toast for 402 error, component will handle modal
         return;
       }
       toast.error(error.response?.data?.message || 'Error al crear propiedad');
@@ -92,10 +92,10 @@ export function usePublishProperty() {
     onError: (error: any) => {
       const status = error?.response?.status;
       if (status === 402) {
-        // No mostrar toast para error 402, el componente manejará el modal
+        // Do not show toast for 402 error, component will handle modal
         return;
       }
-      // ✅ Solo mostrar error si realmente hay un error, no si la publicación fue exitosa
+      // Only show error if there is actually an error, not if publication was successful
       if (error?.response?.data?.message) {
         toast.error(error.response.data.message);
       }

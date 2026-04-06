@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { NotificationList } from '@/presentation/components/notifications/NotificationList/NotificationList';
-import { User, Building, MessageSquare, LogOut, ChevronDown } from 'lucide-react';
+import { User, Building, MessageSquare, LogOut, ChevronDown, FolderGit } from 'lucide-react';
 
 export function Header() {
   const router = useRouter();
@@ -18,8 +18,10 @@ export function Header() {
   const [pinnedMenu, setPinnedMenu] = useState<'comprar' | 'alquilar' | null>(null);
   const [stripeColor, setStripeColor] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showContactsLogin, setShowContactsLogin] = useState(false);
   const notificationsRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const contactsRef = useRef<HTMLDivElement>(null);
 
   // Estados para filtros seleccionados
   const [comprarFilters, setComprarFilters] = useState({
@@ -53,6 +55,9 @@ export function Header() {
       }
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
         setShowUserMenu(false);
+      }
+      if (contactsRef.current && !contactsRef.current.contains(e.target as Node)) {
+        setShowContactsLogin(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -928,29 +933,82 @@ export function Header() {
                 </div>
               )}
 
-              <Link
-                href="/dashboard/my-contacts"
-                className="flex items-center gap-2 text-black hover:text-gray-800"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  />
-                </svg>
-                <span className="text-base font-normal hidden xl:inline">
-                  Mis contactos
-                </span>
-              </Link>
+              {/* MIS CONTACTOS - Dropdown cuando no está autenticado */}
+              {!isAuthenticated ? (
+                <div className="relative" ref={contactsRef}>
+                  <button
+                    onClick={() => setShowContactsLogin(!showContactsLogin)}
+                    className="flex items-center gap-2 text-black hover:text-gray-800"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
+                    </svg>
+                    <span className="text-base font-normal hidden xl:inline">
+                      Mis contactos
+                    </span>
+                  </button>
+
+                  {/* Dropdown de invitación a login */}
+                  {showContactsLogin && (
+                    <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 py-4 px-4 z-50">
+                      <div className="text-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <svg viewBox="0 0 24 24" className="w-6 h-6 fill-white">
+                            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+                          </svg>
+                        </div>
+                        <h3 className="text-base font-bold text-gray-900 mb-1">Inicia sesión para chatear</h3>
+                        <p className="text-xs text-gray-500 mb-4">Conecta con profesionales inmobiliarios</p>
+                        
+                        <div className="space-y-2">
+                          <Link 
+                            href="/login"
+                            className="block w-full py-2 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-lg font-medium text-sm hover:opacity-90 transition-opacity"
+                            onClick={() => setShowContactsLogin(false)}
+                          >
+                            Iniciar sesión
+                          </Link>
+                          <Link 
+                            href="/profile-selector"
+                            className="block w-full py-2 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-200 transition-colors"
+                            onClick={() => setShowContactsLogin(false)}
+                          >
+                            Crear cuenta
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  href="/dashboard/my-contacts"
+                  className="flex items-center gap-2 text-black hover:text-gray-800"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    />
+                  </svg>
+                  <span className="text-base font-normal hidden xl:inline">
+                    Mis contactos
+                  </span>
+                </Link>
+              )}
 
               {/* BOTÓN INGRESAR / PERFIL */}
               {!isAuthenticated ? (
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => {
-                      console.log('Botón Registrarse clickeado - yendo a profile-selector');
                       router.push('/profile-selector');
                     }}
                     className="bg-blue-600 text-white px-5 py-2 rounded-md font-medium text-base hover:bg-blue-700 transition-colors"
@@ -959,7 +1017,6 @@ export function Header() {
                   </button>
                   <button
                     onClick={() => {
-                      console.log('Botón Ingresar clickeado - yendo a login');
                       router.push('/login');
                     }}
                     className="bg-teal-600 text-white px-5 py-2 rounded-md font-medium text-base hover:bg-teal-700 transition-colors"
@@ -998,16 +1055,27 @@ export function Header() {
                         onClick={() => setShowUserMenu(false)}
                       >
                         <User className="w-4 h-4" />
-                        <span className="text-sm">My Profile</span>
+                        <span className="text-sm">Mi Perfil</span>
                       </Link>
-                      <Link 
-                        href="/my-properties" 
-                        className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
-                        onClick={() => setShowUserMenu(false)}
-                      >
-                        <Building className="w-4 h-4" />
-                        <span className="text-sm">Mis Propiedades</span>
-                      </Link>
+                      {user?.role === 'DEVELOPER' ? (
+                        <Link 
+                          href="/my-projects" 
+                          className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <FolderGit className="w-4 h-4" />
+                          <span className="text-sm">Mis Proyectos</span>
+                        </Link>
+                      ) : (
+                        <Link 
+                          href="/my-properties" 
+                          className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <Building className="w-4 h-4" />
+                          <span className="text-sm">Mis Propiedades</span>
+                        </Link>
+                      )}
                       <Link 
                         href="/dashboard/my-contacts" 
                         className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"

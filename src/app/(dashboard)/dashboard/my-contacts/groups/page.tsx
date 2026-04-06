@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { useGroups } from '@/presentation/hooks/useGroups';
-import { GrupoPostsPanel } from './components/GrupoPostsPanel';
+import { GrupoPostsPanel } from './components/GroupPostsPanel';
 import { Plus, Search, Filter, Users } from 'lucide-react';
 import { Group } from '@/core/domain/entities/Group';
 import { toast } from '@/presentation/store/toastStore';

@@ -21,18 +21,18 @@ export function SEOContent({ propertyType, propertyTypeLabel, district, transact
 
   // Contenido dinámico según tipo
   const firstSection = isRent ? {
-    title: '📍 Ubicación privilegiada',
+    title: ' Ubicación privilegiada',
     content: `${district} es uno de los distritos más estratégicos de Lima, con excelente conectividad, acceso a servicios básicos, centros comerciales, restaurantes y una amplia oferta educativa y de salud. Ideal para familias y profesionales que buscan calidad de vida.`
   } : {
-    title: '📍 Ubicación privilegiada',
+    title: ' Ubicación privilegiada',
     content: `${district} es uno de los distritos más estratégicos de Lima, con excelente conectividad, acceso a servicios básicos, centros comerciales, restaurantes y una amplia oferta educativa y de salud. Ideal para familias y profesionales.`
   };
 
   const secondSection = isRent ? {
-    title: '💰 Precios competitivos',
+    title: ' Precios competitivos',
     content: `Encontrarás ${propertyTypeLabel.toLowerCase()} en alquiler con las mejores tarifas del mercado. Opciones para todos los presupuestos con excelente relación calidad-precio y flexibilidad de contratos adaptados a tus necesidades.`
   } : {
-    title: '💰 Plusvalía garantizada',
+    title: ' Plusvalía garantizada',
     content: `Las propiedades en ${district} han mostrado un crecimiento constante en su valor, convirtiéndose en una excelente inversión a largo plazo. La demanda creciente asegura que tu propiedad se revalorice con el tiempo.`
   };
 
@@ -102,24 +102,24 @@ export function SEOContent({ propertyType, propertyTypeLabel, district, transact
 
           <div className="mt-8 grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-lg p-6 text-center">
-              <div className="text-3xl mb-3">🏘️</div>
+              <div className="text-3xl mb-3"></div>
               <h4 className="font-semibold text-gray-900 mb-2">Seguridad</h4>
               <p className="text-sm text-gray-600">Zonas seguras con vigilancia y acceso controlado</p>
             </div>
             <div className="bg-white rounded-lg p-6 text-center">
-              <div className="text-3xl mb-3">🚇</div>
+              <div className="text-3xl mb-3"></div>
               <h4 className="font-semibold text-gray-900 mb-2">Transporte</h4>
               <p className="text-sm text-gray-600">Excelente conexión con transporte público</p>
             </div>
             <div className="bg-white rounded-lg p-6 text-center">
-              <div className="text-3xl mb-3">🛍️</div>
+              <div className="text-3xl mb-3"></div>
               <h4 className="font-semibold text-gray-900 mb-2">Comercio</h4>
               <p className="text-sm text-gray-600">Centros comerciales y tiendas cercanas</p>
             </div>
           </div>
 
           <div className="mt-8 p-6 bg-white rounded-lg">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">💡 Por qué elegir TIYUY</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-4"> Por qué elegir TIYUY</h3>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex items-start gap-3">
                 <span className="text-green-600 text-xl">✓</span>

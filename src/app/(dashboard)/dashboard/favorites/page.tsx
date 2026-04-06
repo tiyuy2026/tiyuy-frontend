@@ -42,9 +42,9 @@ export default function FavoritesPage() {
     // <ProtectedRoute>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Mis favoritos</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Mis Favoritos</h1>
           <p className="text-gray-600 mt-1">
-            Propiedades que guardaste para revisar más tarde
+            Guarda las propiedades que mas te interesan
           </p>
         </div>
 
@@ -63,12 +63,12 @@ export default function FavoritesPage() {
 
         {!loading && !error && favorites.length === 0 && (
           <div className="text-center py-16 bg-white rounded-lg shadow">
-            <div className="text-6xl mb-4">Favoritos</div>
+            <div className="text-6xl mb-4">⭐</div>
             <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              No tienes favoritos aún
+              No tienes favoritos aun
             </h3>
             <p className="text-gray-500">
-              Guarda propiedades para encontrarlas fácilmente aquí.
+              Explora propiedades y guarda tus favoritos para verlos aqui
             </p>
           </div>
         )}
@@ -80,7 +80,13 @@ export default function FavoritesPage() {
                 key={fav.favoriteId}
                 property={{
                   id: fav.propertyId,
-                  slug: fav.propertySlug,
+                  seo: { 
+                    slug: fav.propertySlug,
+                    seoTitle: fav.propertyTitle,
+                    seoDescription: '',
+                    seoKeywords: [],
+                    canonicalUrl: '',
+                  },
                   title: fav.propertyTitle,
                   type: fav.propertyType as PropertyType,
                   transactionType: fav.transactionType as TransactionType,
@@ -90,12 +96,24 @@ export default function FavoritesPage() {
                   bedrooms: fav.bedrooms,
                   bathrooms: fav.bathrooms,
                   totalArea: fav.totalArea,
-                  district: fav.district,
-                  province: fav.province,
+                  location: {
+                    district: fav.district,
+                    province: fav.province,
+                    fullAddress: `${fav.district}, ${fav.province}`,
+                    region: '',
+                    showExactAddress: false,
+                  },
+                  media: [],
+                  owner: { id: 0, name: '', email: '', phone: '', role: '' },
                   coverPhotoUrl: fav.coverPhotoUrl,
                   isFeatured: false,
                   isVerified: false,
                   viewsCount: 0,
+                  favoritesCount: 0,
+                  contactsCount: 0,
+                  isNegotiable: false,
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
                 }}
               />
             ))}
