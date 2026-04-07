@@ -23,6 +23,9 @@ export const useAuth = () => {
 
       const response: AuthResponse = await loginUseCase.execute(email, password);
 
+      // Debug: Log the complete response
+      console.log('Auth Response Debug:', response);
+
       // Crear User desde AuthResponse del backend
       const userData: User = {
         id: response.userId,
@@ -38,12 +41,25 @@ export const useAuth = () => {
         createdAt: new Date(),
       };
 
+      // Extract admin data if present
+      const adminData = response.adminRoleType ? {
+        adminRoleType: response.adminRoleType,
+        permissions: response.permissions,
+        departments: response.departments,
+        isActive: response.isActive,
+      } : undefined;
+
+      console.log('Admin Data Extracted:', adminData);
+
       authStorage.setToken(response.token);
       authStorage.setUser(userData);
-      setAuth(response.token, userData);
-      router.replace('/');
+      setAuth(response.token, userData, adminData);
+      
+      // Redirigir según el rol - check for both ADMIN and SUPERADMIN
+      const targetRoute = (response.role === 'ADMIN' || response.adminRoleType === 'SUPER_ADMIN') ? '/admin' : '/';
+      router.replace(targetRoute);
       setTimeout(() => {
-        window.location.assign('/');
+        window.location.assign(targetRoute);
       }, 100);
     } catch (err: any) {
       setError(err.message || 'Error al iniciar sesion');
@@ -91,7 +107,9 @@ export const useAuth = () => {
         // No fallamos el registro si el email no se envía
       }
 
-      router.push('/dashboard'); // Ir directamente al dashboard
+      // Redirigir según el rol
+      const targetRoute = response.role === 'ADMIN' ? '/admin' : '/dashboard';
+      router.push(targetRoute);
     } catch (err: any) {
       setError(err.message || 'Error al registrar usuario');
       // No relanzamos el error para evitar que burbujee y cause crash

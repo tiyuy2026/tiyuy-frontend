@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Project } from '@/core/domain/entities/Project';  // ✅ Import del dominio
+import { Clock, AlertCircle } from 'lucide-react';
+import { Project } from '@/core/domain/entities/Project';  // Import del dominio
 
 interface ProjectCardProps {
   project: Project;
@@ -8,6 +9,41 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project }: ProjectCardProps) {
   const formatPrice = (price: number) => `Desde S/ ${price.toLocaleString()}`;
+
+  // Helper to render lifecycle status badge
+  const renderLifecycleBadge = () => {
+    const lifecycleStatus = project.lifecycleStatus;
+    const remainingDays = project.remainingGraceDays;
+
+    if (lifecycleStatus === 'GRACE_PERIOD' && remainingDays !== undefined && remainingDays > 0) {
+      return (
+        <div className="absolute bottom-3 left-3 right-3 bg-amber-500 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-lg flex items-center gap-2">
+          <Clock className="w-4 h-4" />
+          <span>Plan vencido - {remainingDays} dias para renovar</span>
+        </div>
+      );
+    }
+
+    if (lifecycleStatus === 'PENDING_DELETION' || lifecycleStatus === 'DELETED') {
+      return (
+        <div className="absolute bottom-3 left-3 right-3 bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-lg flex items-center gap-2">
+          <AlertCircle className="w-4 h-4" />
+          <span>Proyecto eliminado</span>
+        </div>
+      );
+    }
+
+    if (project.status === 'PAUSED') {
+      return (
+        <div className="absolute bottom-3 left-3 right-3 bg-gray-600 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-lg flex items-center gap-2">
+          <AlertCircle className="w-4 h-4" />
+          <span>Inactivo - requiere renovacion</span>
+        </div>
+      );
+    }
+
+    return null;
+  };
 
   return (
     <Link href={`/projects/${project.slug}`} className="group">
@@ -45,6 +81,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
               </span>
             )}
           </div>
+
+          {/* Lifecycle status badge */}
+          {renderLifecycleBadge()}
         </div>
 
         {/* Contenido */}

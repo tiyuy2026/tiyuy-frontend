@@ -3,12 +3,25 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, MapPin, Maximize, BedDouble, Bath, BadgeCheck, Star } from 'lucide-react';
-import type { Property } from '@/core/domain/entities/Property';
+import { Heart, MapPin, Maximize, BedDouble, Bath, BadgeCheck, Star, AlertCircle, Clock } from 'lucide-react';
+import type { Property, PropertySummary } from '@/core/domain/entities/Property';
 import { FavoriteButton } from '@/presentation/components/shared/FavoriteButton';
 
 interface PropertyCardProps {
-  property: Property;
+  property: Property | PropertySummary;
+}
+
+// Type guard to check if property is full Property (has seo)
+function isFullProperty(property: Property | PropertySummary): property is Property {
+  return 'seo' in property && property.seo !== undefined;
+}
+
+// Get the slug from either Property or PropertySummary
+function getPropertySlug(property: Property | PropertySummary): string {
+  if (isFullProperty(property)) {
+    return property.seo?.slug ?? String(property.id);
+  }
+  return property.slug ?? String(property.id);
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
@@ -32,10 +45,45 @@ export function PropertyCard({ property }: PropertyCardProps) {
     return `${symbol} ${price.toLocaleString('es-PE')}`;
   };
 
+  // Helper to render lifecycle status badge
+  const renderLifecycleBadge = () => {
+    const lifecycleStatus = property.lifecycleStatus;
+    const remainingDays = property.remainingGraceDays;
+
+    if (lifecycleStatus === 'GRACE_PERIOD' && remainingDays !== undefined && remainingDays > 0) {
+      return (
+        <div className="absolute bottom-3 left-3 right-3 bg-amber-500 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-lg flex items-center gap-2">
+          <Clock className="w-4 h-4" />
+          <span>Plan vencido - {remainingDays} dias para renovar</span>
+        </div>
+      );
+    }
+
+    if (lifecycleStatus === 'PENDING_DELETION' || lifecycleStatus === 'DELETED') {
+      return (
+        <div className="absolute bottom-3 left-3 right-3 bg-red-600 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-lg flex items-center gap-2">
+          <AlertCircle className="w-4 h-4" />
+          <span>Propiedad eliminada</span>
+        </div>
+      );
+    }
+
+    if (property.status === 'PAUSED') {
+      return (
+        <div className="absolute bottom-3 left-3 right-3 bg-gray-600 text-white text-xs font-bold px-3 py-2 rounded-lg shadow-lg flex items-center gap-2">
+          <AlertCircle className="w-4 h-4" />
+          <span>Inactiva - requiere renovacion</span>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100 hover:border-blue-200 w-full h-full flex flex-col">
       {/* Imagen */}
-      <Link href={`/property/${property.seo?.slug || property.id}`} className="relative block flex-shrink-0">
+      <Link href={`/property/${getPropertySlug(property)}`} className="relative block flex-shrink-0">
         <div className="relative w-full h-64 bg-gray-200 overflow-hidden">
           {property.coverPhotoUrl ? (
             <Image
@@ -77,6 +125,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
               <FavoriteButton propertyId={property.id} />
             </div>
           </div>
+
+          {/* Lifecycle status badge */}
+          {renderLifecycleBadge()}
         </div>
       </Link>
 
@@ -97,7 +148,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
         </div>
 
         {/* Título */}
-        <Link href={`/property/${property.seo?.slug || property.id}`}>
+        <Link href={`/property/${getPropertySlug(property)}`}>
           <h3 className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors line-clamp-2 mb-3 leading-tight">
             {property.title}
           </h3>
@@ -106,9 +157,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
         {/* Ubicación */}
         <p className="text-sm text-gray-600 mb-4 flex items-center gap-2">
           <span className="text-red-500">📍</span>
-          <span className="font-medium">{property.location?.district || 'N/A'}</span>
+          <span className="font-medium">{'location' in property ? property.location?.district : property.district || 'N/A'}</span>
           <span className="text-gray-400">•</span>
-          <span>{property.location?.province || 'N/A'}</span>
+          <span>{'location' in property ? property.location?.province : property.province || 'N/A'}</span>
         </p>
 
         {/* Características */}

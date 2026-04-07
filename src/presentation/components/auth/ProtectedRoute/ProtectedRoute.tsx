@@ -7,8 +7,8 @@ import { authStorage } from '@/infrastructure/storage';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: 'USER' | 'AGENT' | 'DEVELOPER' | 'ADMIN';
-  requiredRoles?: ('USER' | 'AGENT' | 'DEVELOPER' | 'ADMIN')[];
+  requiredRole?: 'USER' | 'AGENT' | 'DEVELOPER' | 'ADMIN' | 'SUPER_ADMIN' | 'SUPPORT';
+  requiredRoles?: ('USER' | 'AGENT' | 'DEVELOPER' | 'ADMIN' | 'SUPER_ADMIN' | 'SUPPORT')[];
 }
 
 export function ProtectedRoute({ children, requiredRole, requiredRoles }: ProtectedRouteProps) {

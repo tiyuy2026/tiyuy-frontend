@@ -6,7 +6,7 @@ import { Button } from '@/presentation/components/ui';
 import { ProfileCard } from '@/presentation/components/auth/ProfileSelector/ProfileCard';
 import { UserRole } from '@/core/domain/entities';
 
-const profiles: UserRole[] = ['USER', 'AGENT', 'DEVELOPER', 'ADMIN'];
+const profiles: UserRole[] = ['USER', 'AGENT', 'DEVELOPER'];
 
 export default function ProfileSelector() {
   const { selectProfile } = useProfile();
@@ -36,7 +36,7 @@ export default function ProfileSelector() {
         <p className="text-base sm:text-lg md:text-xl text-gray-600">Selecciona cómo quieres usar TIYUY</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 mb-8 sm:mb-12 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 items-stretch">
         {profiles.map((profile) => (
           <ProfileCard
             key={profile}

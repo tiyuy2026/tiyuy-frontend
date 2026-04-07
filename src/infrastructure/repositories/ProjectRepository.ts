@@ -354,6 +354,18 @@ export class ProjectRepository implements IProjectRepository {
       };
     } catch (error) {
       console.error('Error loading featured projects:', error);
+      
+      // Si es un error de red, log específico
+      if (error instanceof Error) {
+        if (error.message.includes('Network Error')) {
+          console.error('🌐 Network Error - Backend might be down');
+        } else if (error.message.includes('404')) {
+          console.error('🔍 Endpoint not found: /projects/featured');
+        } else {
+          console.error('❌ Unknown error:', error.message);
+        }
+      }
+      
       // Retornar datos vacíos en caso de error para que la app no se rompa
       return {
         content: [],

@@ -20,7 +20,7 @@ export default function MyPropertiesPage() {
   const { data: activeSubscription, refetch: refetchSubscription } = useActiveSubscription();
   const { user } = useAuthStore();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'ALL' | 'PUBLISHED' | 'DRAFT' | 'RENTED' | 'SOLD' | 'INACTIVE'>('ALL');
+  const [activeTab, setActiveTab] = useState<'ALL' | 'PUBLISHED' | 'DRAFT' | 'RENTED' | 'SOLD' | 'PAUSED' | 'INACTIVE'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
@@ -116,6 +116,7 @@ export default function MyPropertiesPage() {
       DRAFT: 0,
       RENTED: 0,
       SOLD: 0,
+      PAUSED: 0,
       INACTIVE: 0,
     };
 
@@ -351,6 +352,12 @@ export default function MyPropertiesPage() {
                   isActive={activeTab === 'INACTIVE'}
                   onClick={() => setActiveTab('INACTIVE')}
                 />
+                <TabButton
+                  label="Pausadas"
+                  count={counts.PAUSED}
+                  isActive={activeTab === 'PAUSED'}
+                  onClick={() => setActiveTab('PAUSED')}
+                />
               </div>
             </div>
           </div>
@@ -483,7 +490,11 @@ export default function MyPropertiesPage() {
                     
                     {/* Status badge */}
                     <div className="absolute top-3 left-3">
-                      <StatusBadge status={property.status} />
+                      <StatusBadge 
+                        status={property.status} 
+                        lifecycleStatus={property.lifecycleStatus}
+                        remainingGraceDays={property.remainingGraceDays}
+                      />
                     </div>
                   </div>
 
@@ -508,6 +519,18 @@ export default function MyPropertiesPage() {
 
                     {/* Actions */}
                     <div className="flex gap-2 flex-wrap">
+                      {/* Reactivate button for PAUSED properties */}
+                      {property.status === 'PAUSED' && (
+                        <button
+                          onClick={() => handlePublish(property.id)}
+                          disabled={publishMutation.isPending || !canPublish}
+                          className="px-3 py-1 bg-amber-600 text-white text-sm rounded hover:bg-amber-700 disabled:bg-gray-400"
+                        >
+                          {publishMutation.isPending ? 'Reactivando...' : 'Reactivar'}
+                        </button>
+                      )}
+                      
+                      {/* Publish button for DRAFT properties */}
                       {property.status === 'DRAFT' && (
                         <button
                           onClick={() => handlePublish(property.id)}
@@ -580,25 +603,41 @@ export default function MyPropertiesPage() {
   );
 }
 
-function normalizeStatus(status: unknown): 'PUBLISHED' | 'DRAFT' | 'RENTED' | 'SOLD' | 'INACTIVE' {
+function normalizeStatus(status: unknown): 'PUBLISHED' | 'DRAFT' | 'RENTED' | 'SOLD' | 'PAUSED' | 'INACTIVE' {
   const normalized = String(status || '').trim().toUpperCase();
   if (normalized === 'PUBLISHED') return 'PUBLISHED';
   if (normalized === 'RENTED') return 'RENTED';
   if (normalized === 'SOLD') return 'SOLD';
+  if (normalized === 'PAUSED') return 'PAUSED';
   if (normalized === 'INACTIVE') return 'INACTIVE';
   return 'DRAFT';
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, lifecycleStatus, remainingGraceDays }: { status: string; lifecycleStatus?: string; remainingGraceDays?: number }) {
   const badges: Record<string, { bg: string; text: string; label: string }> = {
     DRAFT: { bg: 'bg-gray-500', text: 'text-white', label: 'Borrador' },
     PUBLISHED: { bg: 'bg-green-500', text: 'text-white', label: 'Publicada' },
+    PAUSED: { bg: 'bg-amber-500', text: 'text-white', label: 'Pausada' },
     INACTIVE: { bg: 'bg-yellow-500', text: 'text-white', label: 'Inactiva' },
     SOLD: { bg: 'bg-red-500', text: 'text-white', label: 'Vendida' },
     RENTED: { bg: 'bg-blue-500', text: 'text-white', label: 'Alquilada' },
   };
 
   const badge = badges[status] || badges.DRAFT;
+
+  // Show grace period info if applicable
+  if (lifecycleStatus === 'GRACE_PERIOD' && remainingGraceDays !== undefined && remainingGraceDays > 0) {
+    return (
+      <div className="flex flex-col gap-1">
+        <span className={`${badge.bg} ${badge.text} text-xs font-bold px-2 py-1 rounded`}>
+          {badge.label}
+        </span>
+        <span className="bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded">
+          ⏰ {remainingGraceDays} dias para renovar
+        </span>
+      </div>
+    );
+  }
 
   return (
     <span className={`${badge.bg} ${badge.text} text-xs font-bold px-2 py-1 rounded`}>

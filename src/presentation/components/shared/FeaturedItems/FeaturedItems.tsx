@@ -80,7 +80,14 @@ export function FeaturedItems<T>({
         }
       } catch (error) {
         console.error(`❌ Error loading featured ${itemName}s:`, error);
-        setError(`No se pudieron cargar los ${itemName}s`);
+        
+        // Si es un error de red, mostrar mensaje específico
+        if (error instanceof Error && error.message.includes('Network Error')) {
+          setError('Error de conexión. Verifica tu internet o intenta más tarde.');
+        } else {
+          setError(`No se pudieron cargar los ${itemName}s`);
+        }
+        
         setItems([]);
       } finally {
         setIsLoading(false);

@@ -91,6 +91,12 @@ export class PropertyMapper {
 
       isNegotiable: false,
       parkingSpots: Number(anyDto.parkingSpots || 0),
+
+      // Lifecycle fields
+      lifecycleStatus: anyDto.lifecycleStatus || 'ACTIVE',
+      remainingGraceDays: anyDto.remainingGraceDays,
+      gracePeriodEnd: anyDto.gracePeriodEnd ? new Date(anyDto.gracePeriodEnd) : undefined,
+      canReactivate: anyDto.canReactivate,
     };
   }
 
@@ -117,6 +123,10 @@ export class PropertyMapper {
       isFeatured: dto.isFeatured,
       isVerified: false,
       viewsCount: dto.viewsCount,
+
+      // Lifecycle fields
+      lifecycleStatus: (anyDto as any).lifecycleStatus || 'ACTIVE',
+      remainingGraceDays: (anyDto as any).remainingGraceDays,
     };
   }
 }

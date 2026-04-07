@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
 export const axiosClient = axios.create({
   baseURL: API_URL,
@@ -75,19 +75,30 @@ axiosClient.interceptors.request.use(
     if (typeof window !== 'undefined') {
       // Check all possible token keys
       const tokenKeys = ['tiyuy-auth-token', 'token', 'auth-token'];
-      console.log('🔍 localStorage keys:', Object.keys(localStorage));
+      console.log(' localStorage keys:', Object.keys(localStorage));
       
-      const token = localStorage.getItem('tiyuy-auth-token') || 
-                   localStorage.getItem('token') || 
-                   localStorage.getItem('auth-token');
+      let token = localStorage.getItem('tiyuy-auth-token') || 
+              localStorage.getItem('token') || 
+              localStorage.getItem('auth-token');
       
-      console.log('🔑 Token check:', token ? 'EXISTS' : 'MISSING');
+      // Si el token está en formato de objeto Zustand, extraer el token real
+      if (token && token.startsWith('{"state":')) {
+        try {
+          const parsed = JSON.parse(token);
+          token = parsed.state?.token || token; // Extraer el token real
+          console.log(' Extracted token from Zustand object');
+        } catch (e) {
+          console.log(' Failed to parse token object:', e);
+        }
+      }
+      
+      console.log(' Token check:', token ? 'EXISTS' : 'MISSING');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
-        console.log('✅ Token added to headers');
+        console.log(' Token added to headers');
       } else {
-        console.log('❌ No token found in localStorage');
-        console.log('🔍 Available localStorage items:', Object.keys(localStorage));
+        console.log(' No token found in localStorage');
+        console.log(' Available localStorage items:', Object.keys(localStorage));
       }
     }
     return config;

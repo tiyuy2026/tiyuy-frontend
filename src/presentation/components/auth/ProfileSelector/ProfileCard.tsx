@@ -74,7 +74,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ profile, isSelected, o
 
 
   return (
-    <Card hover onClick={() => onClick(profile)} className={`${isSelected ? 'ring-4 ring-blue-500 ring-offset-2' : ''} p-4 sm:p-6 lg:p-8 h-full transition-all duration-300 hover:scale-105 hover:shadow-2xl`}>
+    <Card hover onClick={() => onClick(profile)} className={`${isSelected ? 'ring-4 ring-blue-500 ring-offset-2' : ''} p-4 sm:p-6 lg:p-8 h-full flex flex-col justify-between transition-all duration-300 hover:scale-105 hover:shadow-2xl relative`}>
       {profile === 'DEVELOPER' && (
         <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
           <Badge variant="warning" size="sm">30 días gratis</Badge>

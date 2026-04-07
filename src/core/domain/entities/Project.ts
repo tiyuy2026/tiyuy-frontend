@@ -1,9 +1,13 @@
+export type ProjectStatus = 'DRAFT' | 'PUBLISHED' | 'PAUSED' | 'COMPLETED';
+
+export type ProjectLifecycleStatus = 'ACTIVE' | 'GRACE_PERIOD' | 'PENDING_DELETION' | 'DELETED' | 'SUSPENDED';
+
 export interface Project {
   id: number;
   name: string;
   slug: string;
   description: string;
-  status: 'DRAFT' | 'PUBLISHED' | 'COMPLETED';
+  status: ProjectStatus;
   phase: 'PRE_SALE' | 'SALE' | 'DELIVERY';
   type: 'INDUSTRIAL' | 'COMMERCIAL' | 'MIXED_USE' | 'RESIDENTIAL';
   totalUnits: number;
@@ -51,6 +55,12 @@ export interface Project {
   isVerified: boolean;
   viewsCount: number;
   contactsCount: number;
+  
+  // Lifecycle fields for subscription management
+  lifecycleStatus?: ProjectLifecycleStatus;
+  remainingGraceDays?: number;
+  gracePeriodEnd?: string;
+  canReactivate?: boolean;
 }
 
 export interface ProjectUnit {
