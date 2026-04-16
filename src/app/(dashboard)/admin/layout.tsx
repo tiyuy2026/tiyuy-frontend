@@ -1,13 +1,13 @@
 /**
- * Admin Layout Component
- * Enhanced admin layout with profile loading and RBAC
+ * Admin Layout
+ * El header y sidebar están encapsulados dentro de GitHubShell
  */
 
 'use client';
 
 import { ReactNode } from 'react';
 import { AdminGuard } from '@/presentation/components/guards/AdminGuard';
-import { AdminShell } from '@/presentation/components/admin/AdminShell/AdminShell';
+import { GitHubShell } from '@/presentation/components/admin/AdminShell/AdminShell';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -16,9 +16,9 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <AdminGuard>
-      <AdminShell>
+      <GitHubShell>
         {children}
-      </AdminShell>
+      </GitHubShell>
     </AdminGuard>
   );
 }

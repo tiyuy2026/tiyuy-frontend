@@ -12,7 +12,29 @@ export class AuthRepository implements IAuthRepository {
       });
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al iniciar sesión');
+      // Manejar errores específicos de login
+      const status = error.response?.status;
+      const data = error.response?.data;
+      
+      if (status === 401) {
+        if (data?.message?.toLowerCase().includes('contraseña') || data?.message?.toLowerCase().includes('password')) {
+          throw new Error('La contraseña es incorrecta. Por favor, inténtalo de nuevo.');
+        } else if (data?.message?.toLowerCase().includes('correo') || data?.message?.toLowerCase().includes('email')) {
+          throw new Error('El correo electrónico no está registrado.');
+        } else {
+          throw new Error('Credenciales incorrectas. Verifica tu correo y contraseña.');
+        }
+      }
+      
+      if (status === 403) {
+        throw new Error('Tu cuenta está suspendida. Contacta con soporte.');
+      }
+      
+      if (status === 429) {
+        throw new Error('Demasiados intentos. Espera un momento y vuelve a intentar.');
+      }
+      
+      throw new Error(data?.message || 'Error al iniciar sesión. Inténtalo nuevamente.');
     }
   }
 

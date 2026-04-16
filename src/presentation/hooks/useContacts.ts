@@ -395,117 +395,96 @@ export function useGetChatMessages(chatId: number, options: { enabled?: boolean 
 
 
 export function useSendMessage() {
-
   const queryClient = useQueryClient();
 
-
-
   return useMutation({
-
     mutationFn: ({ chatId, content, type = 'TEXT', mediaUrl, replyToMessageId }: {
-
       chatId: number;
-
       content: string;
-
       type?: string;
-
       mediaUrl?: string;
-
       replyToMessageId?: string;
-
     }) => {
-
       let token = null;
 
       if (typeof window !== 'undefined') {
-
         try {
-
           const { useAuthStore } = require('@/presentation/store/authStore');
-
           const authStore = useAuthStore.getState();
-
           token = authStore.token || localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token');
-
         } catch {
-
           token = localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token');
-
         }
-
       }
-
-      
 
       const url = `/contacts/extended/chats/${chatId}/messages?t=${Date.now()}`;
-
       return apiCall(url, {
-
         method: 'POST',
-
         headers: {
-
           'Content-Type': 'application/json',
-
           ...(token && { 'Authorization': `Bearer ${token}` }),
-
         },
-
         body: JSON.stringify({ content, type, mediaUrl, replyToMessageId }),
-
       });
-
     },
 
-    onMutate: async ({ chatId }) => {
-
+    onMutate: async ({ chatId, content, type, replyToMessageId }) => {
+      // Cancelar refetches en curso
       await queryClient.cancelQueries({ queryKey: ['chat-messages', chatId] });
 
-      // Sin optimistic = sin parpadeo
+      const previousMessages = queryClient.getQueryData(['chat-messages', chatId]);
 
+      // Agregar mensaje temporal INMEDIATAMENTE
+      const tempMessage = {
+        id: `temp-${Date.now()}`,
+        chatId,
+        content,
+        type: type || 'TEXT',
+        isOwn: true,
+        createdAt: new Date().toISOString(),
+        replyToMessageId: replyToMessageId || null,
+        replyToContent: null,
+        replyToSenderName: null,
+        sending: true,
+      };
+
+      queryClient.setQueryData(['chat-messages', chatId], (old: any) => [
+        ...(Array.isArray(old) ? old : []),
+        tempMessage,
+      ]);
+
+      return { previousMessages, chatId };
     },
 
-    onError: (error: any) => {
+    onSuccess: (newMessage, { chatId }) => {
+      // Reemplazar el temporal con el real
+      queryClient.setQueryData(['chat-messages', chatId], (old: any) =>
+        (Array.isArray(old) ? old : []).map((m: any) =>
+          String(m.id).startsWith('temp-') ? { ...newMessage, sending: false } : m
+        )
+      );
+      queryClient.invalidateQueries({ queryKey: ['chats'] });
+    },
 
-      if (error.message.includes('⚠️ ADVERTENCIA')) {
-
-        toast.error(error.message);
-
-      } else if (error.message.includes('suspendido') || error.message.includes('suspension')) {
-
-        toast.error(error.message);
-
-      } else if (error.message.includes('403')) {
-
-        toast.error('Token invalido. Por favor, inicia sesion nuevamente.');
-
-        if (typeof window !== 'undefined') {
-
-          window.location.href = '/login';
-
-        }
-
-      } else {
-
-        toast.error(error.message || 'Error al enviar mensaje');
-
+    onError: (error: any, _vars, context) => {
+      // Revertir si falla
+      if (context?.previousMessages !== undefined) {
+        queryClient.setQueryData(
+          ['chat-messages', context.chatId],
+          context.previousMessages
+        );
       }
 
+      if (error.message.includes('suspendido') || error.message.includes('suspension')) {
+        toast.error(error.message);
+      } else if (error.message.includes('403')) {
+        toast.error('Token inválido. Por favor, inicia sesión nuevamente.');
+        if (typeof window !== 'undefined') window.location.href = '/login';
+      } else {
+        toast.error(error.message || 'Error al enviar mensaje');
+      }
     },
-
-    onSuccess: () => {
-
-      toast.success('Mensaje enviado');
-
-      queryClient.invalidateQueries({ queryKey: ['chat-messages'] });
-
-      queryClient.invalidateQueries({ queryKey: ['chats'] });
-
-    },
-
   });
-
 }
 
 

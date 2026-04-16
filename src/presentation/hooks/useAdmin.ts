@@ -6,15 +6,36 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AdminRepository } from '@/infrastructure/repositories/AdminRepository';
 import {
+  AdminUser,
   CreateAdminUserRequest,
   UpdateAdminUserRequest,
+  DashboardStats,
+  UserStats,
+  FinanceStats,
+  UserListItem,
   ChangeUserRoleRequest,
+  DiscountCode,
   CreateDiscountCodeRequest,
   UpdateDiscountCodeRequest,
+  Campaign,
   CreateCampaignRequest,
   UpdateCampaignRequest,
+  CampaignAlert,
+  PropertyModerationItem,
   ModeratePropertyRequest,
+  AuditLogEntry,
+  Department,
+  Permission,
+  SubscriptionPlan,
+  AgencyPlanDiscount,
 } from '@/core/domain/entities/Admin';
+import {
+  AgentDiscount,
+  AgentDiscountFilters,
+  AgentDiscountSummary,
+  AssignDiscountToAgentRequest,
+  CreateAgentDiscountRequest,
+} from '@/core/domain/entities/AgentDiscount';
 import { PaginationParams } from '@/core/domain/repositories/IAdminRepository';
 
 const adminRepository = new AdminRepository();
@@ -57,7 +78,11 @@ export const useDashboardStats = () => {
           usersByRole: {},
           propertiesByType: {},
           propertiesByStatus: {},
-          generatedAt: new Date().toISOString()
+          generatedAt: new Date().toISOString(),
+          usersGrowthPercent: 0,
+          propertiesGrowthPercent: 0,
+          projectsGrowthPercent: 0,
+          revenueGrowthPercent: 0
         };
       }
     },
@@ -88,6 +113,27 @@ export const useUserStats = () => {
   });
 };
 
+export const useUserRegistrationHistory = (period: string = '1M') => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'dashboard', 'registrationHistory', period],
+    queryFn: async () => {
+      try {
+        return await adminRepository.getUserRegistrationHistory(period);
+      } catch (error) {
+        console.error(' Error fetching registration history:', error);
+        return {
+          period: period,
+          startDate: '',
+          endDate: '',
+          totalRegistrations: 0,
+          dataPoints: []
+        };
+      }
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
 export const useFinanceStats = () => {
   return useQuery({
     queryKey: [ADMIN_QUERY_KEY, 'dashboard', 'financeStats'],
@@ -98,9 +144,20 @@ export const useFinanceStats = () => {
         console.error(' Error fetching finance stats:', error);
         return {
           totalRevenue: 0,
-          monthlyRevenue: 0,
-          pendingPayments: 0,
-          completedTransactions: 0
+          revenueToday: 0,
+          revenueThisWeek: 0,
+          revenueThisMonth: 0,
+          totalPayments: 0,
+          paymentsToday: 0,
+          averageTransactionValue: 0,
+          refundsTotal: 0,
+          refundsCount: 0,
+          totalSubscriptions: 0,
+          activeSubscriptions: 0,
+          newSubscriptionsToday: 0,
+          totalTransactions: 0,
+          transactionsToday: 0,
+          totalWalletBalance: 0
         };
       }
     },
@@ -201,6 +258,39 @@ export const useChangeUserRole = () => {
   });
 };
 
+// Agent management hooks
+export const useAgents = (
+  role?: string,
+  enabled?: boolean,
+  keyword?: string,
+  params: PaginationParams = { page: 0, size: 20 }
+) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'agents', { role, enabled, keyword, params }],
+    queryFn: () => adminRepository.getAgents(role, enabled, keyword, params),
+    staleTime: 60 * 1000,
+  });
+};
+
+export const useAgentById = (agentId: number) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'agents', agentId],
+    queryFn: () => adminRepository.getAgentById(agentId),
+    enabled: !!agentId,
+  });
+};
+
+export const useToggleAgentStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ agentId, verified, reason }: { agentId: number; verified: boolean; reason?: string }) =>
+      adminRepository.toggleAgentVerification(agentId, verified, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'agents'] });
+    },
+  });
+};
+
 // Discount code hooks
 export const useDiscountCodes = (params: PaginationParams = { page: 0, size: 20 }) => {
   return useQuery({
@@ -215,6 +305,84 @@ export const useDiscountCodeById = (codeId: number) => {
     queryKey: [ADMIN_QUERY_KEY, 'discounts', codeId],
     queryFn: () => adminRepository.getDiscountCodeById(codeId),
     enabled: !!codeId,
+  });
+};
+
+// Agent Discount Management hooks
+export const useAgentDiscounts = (
+  filters: AgentDiscountFilters = {},
+  params: PaginationParams = { page: 0, size: 20 }
+) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'agent-discounts', { filters, params }],
+    queryFn: () => adminRepository.getAgentDiscounts(filters, params),
+    staleTime: 60 * 1000,
+  });
+};
+
+export const useAgentDiscountSummary = (agentId: number) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'agent-discounts', 'summary', agentId],
+    queryFn: () => adminRepository.getAgentDiscountSummary(agentId),
+    enabled: !!agentId,
+    staleTime: 60 * 1000,
+  });
+};
+
+export const useAvailableDiscountsForAgent = (agentId: number) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'agent-discounts', 'available', agentId],
+    queryFn: () => adminRepository.getAvailableDiscountsForAgent(agentId),
+    enabled: !!agentId,
+    staleTime: 60 * 1000,
+  });
+};
+
+export const useAssignDiscountToAgent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (request: AssignDiscountToAgentRequest) =>
+      adminRepository.assignDiscountToAgent(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'agent-discounts'] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'discounts'] });
+    },
+  });
+};
+
+export const useCreateAgentDiscount = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (request: CreateAgentDiscountRequest) =>
+      adminRepository.createAgentDiscount(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'agent-discounts'] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'discounts'] });
+    },
+  });
+};
+
+export const useRemoveDiscountFromAgent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ agentId, discountCodeId }: { agentId: number; discountCodeId: number }) =>
+      adminRepository.removeDiscountFromAgent(agentId, discountCodeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'agent-discounts'] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'discounts'] });
+    },
+  });
+};
+
+export const useToggleAgentDiscountStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (discountId: number) =>
+      adminRepository.toggleAgentDiscountStatus(discountId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'agent-discounts'] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'discounts'] });
+    },
   });
 };
 
@@ -328,6 +496,171 @@ export const useToggleFeaturedProperty = () => {
       adminRepository.toggleFeaturedProperty(propertyId, featured),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'properties'] });
+    },
+  });
+};
+
+// Project management hooks
+export const useProjectsForAdmin = (
+  status?: string,
+  keyword?: string,
+  pagination?: PaginationParams
+) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'projects', status, keyword, pagination],
+    queryFn: () => adminRepository.getProjectsForAdmin(status, keyword, pagination),
+  });
+};
+
+export const useProjectStats = () => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'projects', 'stats'],
+    queryFn: () => adminRepository.getProjectStats(),
+  });
+};
+
+export const useModerateProject = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ projectId, request }: { projectId: number; request: any }) =>
+      adminRepository.moderateProject(projectId, request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'projects'] });
+    },
+  });
+};
+
+export const useToggleFeaturedProject = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ projectId, featured }: { projectId: number; featured: boolean }) =>
+      adminRepository.toggleFeaturedProject(projectId, featured),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'projects'] });
+    },
+  });
+};
+
+export const useDeleteProject = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ projectId, reason }: { projectId: number; reason?: string }) =>
+      adminRepository.deleteProject(projectId, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'projects'] });
+    },
+  });
+};
+
+// Finance and Monetization hooks
+
+export const useSubscriptionPlans = () => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'subscriptions', 'plans'],
+    queryFn: () => adminRepository.getSubscriptionPlans(),
+  });
+};
+
+export const useCreateSubscriptionPlan = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (plan: Partial<SubscriptionPlan>) =>
+      adminRepository.createSubscriptionPlan(plan),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'subscriptions', 'plans'] });
+    },
+  });
+};
+
+export const useUpdateSubscriptionPlan = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ planId, plan }: { planId: number; plan: Partial<SubscriptionPlan> }) =>
+      adminRepository.updateSubscriptionPlan(planId, plan),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'subscriptions', 'plans'] });
+    },
+  });
+};
+
+export const useDeleteSubscriptionPlan = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (planId: number) => adminRepository.deleteSubscriptionPlan(planId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'subscriptions', 'plans'] });
+    },
+  });
+};
+
+export const useTogglePlanStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (planId: number) => adminRepository.togglePlanStatus(planId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'subscriptions', 'plans'] });
+    },
+  });
+};
+
+// Agency discount hooks
+export const useAgencyPlanDiscounts = (planId?: number) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'plans', planId, 'agency-discounts'],
+    queryFn: () => adminRepository.getAgencyPlanDiscounts(planId!),
+    enabled: !!planId,
+  });
+};
+
+export const useCreateAgencyDiscount = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ planId, discount }: { planId: number; discount: Partial<AgencyPlanDiscount> }) =>
+      adminRepository.createAgencyDiscount(planId, discount),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'plans', variables.planId, 'agency-discounts'] });
+    },
+  });
+};
+
+export const useRemoveAgencyDiscount = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (discountId: number) => adminRepository.removeAgencyDiscount(discountId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'plans'] });
+    },
+  });
+};
+
+export const useAdminSubscriptions = (
+  status?: string,
+  pagination?: PaginationParams
+) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'subscriptions', status, pagination],
+    queryFn: () => adminRepository.getAdminSubscriptions(status, pagination),
+  });
+};
+
+export const usePaymentTransactions = (
+  status?: string,
+  pagination?: PaginationParams
+) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'transactions', status, pagination],
+    queryFn: () => adminRepository.getPaymentTransactions(status, pagination),
+  });
+};
+
+export const useRefundTransaction = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ transactionId, reason }: { transactionId: number; reason: string }) =>
+      adminRepository.refundTransaction(transactionId, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'transactions'] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'finance', 'stats'] });
     },
   });
 };

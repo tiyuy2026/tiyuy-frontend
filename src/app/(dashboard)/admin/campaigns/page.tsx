@@ -35,7 +35,7 @@ export default function CampaignsPage() {
 
   // Filter campaigns based on search and status
   const filteredCampaigns = campaignsData?.content?.filter(campaign => {
-    const matchesSearch = campaign.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = campaign.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || campaign.status === statusFilter;
     return matchesSearch && matchesStatus;
   }) || [];
@@ -83,7 +83,7 @@ export default function CampaignsPage() {
   };
 
   const handleToggleStatus = async (campaign: Campaign) => {
-    const newStatus = campaign.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+    const newStatus = campaign.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
     await handleUpdateCampaign({ status: newStatus });
   };
 
@@ -145,11 +145,10 @@ export default function CampaignsPage() {
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="all">All Status</option>
-              <option value="DRAFT">Draft</option>
+              <option value="SCHEDULED">Scheduled</option>
               <option value="ACTIVE">Active</option>
-              <option value="PAUSED">Paused</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="CANCELLED">Cancelled</option>
+              <option value="EXPIRED">Expired</option>
+              <option value="INACTIVE">Inactive</option>
             </select>
           </div>
         </CardContent>
@@ -161,13 +160,13 @@ export default function CampaignsPage() {
           <Card key={campaign.id} className="relative">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{campaign.name}</CardTitle>
+                <CardTitle className="text-lg">{campaign.title}</CardTitle>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                   campaign.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                  campaign.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
-                  campaign.status === 'PAUSED' ? 'bg-yellow-100 text-yellow-800' :
-                  campaign.status === 'COMPLETED' ? 'bg-blue-100 text-blue-800' :
-                  'bg-red-100 text-red-800'
+                  campaign.status === 'SCHEDULED' ? 'bg-blue-100 text-blue-800' :
+                  campaign.status === 'EXPIRED' ? 'bg-red-100 text-red-800' :
+                  campaign.status === 'INACTIVE' ? 'bg-gray-100 text-gray-800' :
+                  'bg-gray-100 text-gray-800'
                 }`}>
                   {campaign.status}
                 </span>
@@ -181,24 +180,24 @@ export default function CampaignsPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Discount Code:</span>
                   <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
-                    {campaign.discountCodeCode}
+                    {campaign.discountCodeCode || 'N/A'}
                   </span>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Target Audience:</span>
-                  <span className="text-sm">{campaign.targetAudience.replace('_', ' ')}</span>
+                  <span className="text-sm">{campaign.targetAudience?.replace('_', ' ') || 'N/A'}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Usage:</span>
-                  <span className="text-sm">{campaign.usageCount} uses</span>
+                  <span className="text-sm">{campaign.usageCount || 0} uses</span>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Revenue:</span>
                   <span className="text-sm font-semibold text-green-600">
-                    ${campaign.revenueGenerated.toLocaleString()}
+                    ${(campaign.revenueGenerated || 0).toLocaleString()}
                   </span>
                 </div>
 
@@ -238,9 +237,8 @@ export default function CampaignsPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleToggleStatus(campaign)}
-                        disabled={campaign.status === 'COMPLETED' || campaign.status === 'CANCELLED'}
                       >
-                        {campaign.status === 'ACTIVE' ? 'Pause' : 'Activate'}
+                        {campaign.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
                       </Button>
                       <Button
                         variant="outline"
@@ -297,7 +295,7 @@ interface CampaignModalProps {
 
 function CampaignModal({ isOpen, onClose, onSubmit, title, campaign, availableDiscounts }: CampaignModalProps) {
   const [formData, setFormData] = useState({
-    name: campaign?.name || '',
+    title: campaign?.title || campaign?.name || '',
     description: campaign?.description || '',
     discountCodeId: campaign?.discountCodeId || 0,
     startDate: campaign?.startDate ? new Date(campaign.startDate).toISOString().split('T')[0] : '',
@@ -320,8 +318,8 @@ function CampaignModal({ isOpen, onClose, onSubmit, title, campaign, availableDi
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             label="Campaign Name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             required
           />
 

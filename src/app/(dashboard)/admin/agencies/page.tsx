@@ -1,41 +1,52 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { usePermissions } from '@/presentation/hooks/usePermissions';
+import { useQuery } from '@tanstack/react-query';
+import { axiosClient } from '@/infrastructure/api/axios-client';
 import { Card, CardContent } from '@/presentation/components/ui/Card';
 import { Spinner } from '@/presentation/components/ui/Spinner';
 import { Modal } from '@/presentation/components/ui/Modal';
 import { Input } from '@/presentation/components/ui/Input';
-import { axiosClient } from '@/infrastructure/api/axios-client';
+import { PaginationParams } from '@/core/domain/repositories/IAdminRepository';
 
 interface Agent {
+  id: number;
   userId: number;
-  licenseNumber: string;
-  agency: string;
-  agencyRuc: string;
-  yearsOfExperience: number;
-  specialty: string;
-  isVerifiedAgent: boolean;
-  verificationStatus: string;
-  averageRating: number;
-  totalSales: number;
-  totalRentals: number;
-  responseTimeAvgMinutes: number;
-  aboutProfessional: string;
-  languages: string[];
-  serviceAreas: string[];
   user: {
     id: number;
     email: string;
+    phone: string;
     firstName: string;
     lastName: string;
-    phone: string;
+    dni: string;
+    role: 'USER' | 'AGENT' | 'DEVELOPER' | 'ADMIN';
     enabled: boolean;
+    emailVerified: boolean;
+    phoneVerified: boolean;
   };
+  licenseNumber?: string;
+  verificationStatus?: string;
+  averageRating?: number;
+  totalSales: number;
+  totalRentals: number;
+  isVerifiedAgent?: boolean;
+  agency?: string;
+  agencyRuc?: string;
+  yearsOfExperience?: number;
+  specialty?: string;
+  responseTimeAvgMinutes?: number;
+  aboutProfessional?: string;
+  languages: string[];
+  serviceAreas: string[];
+  publishedPropertiesCount: number;
+  city?: string;
+  country?: string;
+  lastLoginAt?: Date;
+  createdAt: Date;
 }
 
-interface AgencyGroup {
+interface InmobiliariaGroup {
   name: string;
   ruc: string;
   agents: Agent[];
@@ -46,32 +57,42 @@ interface AgencyGroup {
   totalAgents: number;
 }
 
-const fetchAgents = async (): Promise<Agent[]> => {
-  const response = await axiosClient.get('/admin/agents');
-  return response.data;
-};
-
 export default function AgenciesPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedAgency, setSelectedAgency] = useState<AgencyGroup | null>(null);
+  const [selectedAgency, setSelectedAgency] = useState<InmobiliariaGroup | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [isAgencyModalOpen, setIsAgencyModalOpen] = useState(false);
   const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
 
   const { hasPermission } = usePermissions();
   const canManageAgents = hasPermission('MANAGE_AGENTS');
 
-  const { data: agents, isLoading } = useQuery({
-    queryKey: ['admin-agents'],
-    queryFn: fetchAgents,
+  const params: PaginationParams = { page: currentPage - 1, size: pageSize };
+
+  // Get all agents from /api/agent/ endpoint - this returns complete agent profiles with agency info
+  const { data: agentsData, isLoading } = useQuery({
+    queryKey: ['admin-agencies'],
+    queryFn: async () => {
+      // Note: We need to get all agents with their complete profiles
+      // This would require a new endpoint in backend like /api/admin/agents
+      // For now, we'll use the existing structure but it needs backend support
+      const response = await axiosClient.get('/admin/users?role=AGENT&size=100');
+      return response.data;
+    },
   });
 
-  const agencies = useMemo((): AgencyGroup[] => {
-    if (!agents) return [];
+  const agents = agentsData?.content || [];
 
-    const grouped = agents.reduce((acc, agent) => {
-      const agencyName = agent.agency || 'Independent Agents';
-      const agencyRuc = agent.agencyRuc || '-';
+  const agencies = useMemo((): InmobiliariaGroup[] => {
+    if (!agents || agents.length === 0) return [];
+
+    const grouped = agents.reduce((acc: Record<string, InmobiliariaGroup>, agent: any) => {
+      // For now, we'll use the basic user structure
+      // TODO: Backend needs to provide agency info in admin users endpoint
+      const agencyName = 'Independent Agents'; // Default since we don't have agency data
+      const agencyRuc = '-';
       const key = `${agencyName}-${agencyRuc}`;
 
       if (!acc[key]) {
@@ -88,21 +109,17 @@ export default function AgenciesPage() {
       }
 
       acc[key].agents.push(agent);
-      acc[key].totalSales += agent.totalSales || 0;
-      acc[key].totalRentals += agent.totalRentals || 0;
       acc[key].totalAgents += 1;
-      if (agent.isVerifiedAgent) {
+      if (agent.emailVerified) {
         acc[key].verifiedAgents += 1;
       }
 
       return acc;
-    }, {} as Record<string, AgencyGroup>);
+    }, {});
 
-    return Object.values(grouped).map((agency) => ({
+    return (Object.values(grouped) as InmobiliariaGroup[]).map((agency) => ({
       ...agency,
-      averageRating:
-        agency.agents.reduce((sum, a) => sum + (a.averageRating || 0), 0) /
-        agency.agents.length || 0,
+      averageRating: 0, // No rating data in basic user response
     }));
   }, [agents]);
 
@@ -112,7 +129,7 @@ export default function AgenciesPage() {
       agency.ruc.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const openAgencyModal = (agency: AgencyGroup) => {
+  const openAgencyModal = (agency: InmobiliariaGroup) => {
     setSelectedAgency(agency);
     setIsAgencyModalOpen(true);
   };
@@ -122,17 +139,10 @@ export default function AgenciesPage() {
     setIsAgentModalOpen(true);
   };
 
-  const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case 'VERIFIED':
-        return 'bg-emerald-100 text-emerald-800';
-      case 'PENDING':
-        return 'bg-amber-100 text-amber-800';
-      case 'REJECTED':
-        return 'bg-rose-100 text-rose-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+  const getStatusBadgeClass = (status?: string) => {
+    return status === 'VERIFIED' || status === 'ACTIVE'
+      ? 'bg-emerald-100 text-emerald-800' 
+      : 'bg-rose-100 text-rose-800';
   };
 
   return (

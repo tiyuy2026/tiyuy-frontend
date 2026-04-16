@@ -1,1 +1,1 @@
-export { AdminSidebar } from './AdminSidebar';
+export { GitHubSidebar as AdminSidebar } from './AdminHubSidebar';

@@ -214,17 +214,17 @@ export default function AdminUsersPage() {
                       ? 'bg-blue-100 text-blue-800'
                       : 'bg-gray-100 text-gray-800'
                   }`}>
-                    {admin.role.replace('_', ' ')}
+                    {admin.role?.replace('_', ' ') || 'Unknown'}
                   </span>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex flex-wrap gap-1">
-                    {admin.departments.map((dept) => (
+                    {admin.departments?.map((dept) => (
                       <span 
                         key={dept}
                         className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded"
                       >
-                        {dept.replace('_', ' ')}
+                        {dept?.replace('_', ' ') || dept}
                       </span>
                     ))}
                   </div>

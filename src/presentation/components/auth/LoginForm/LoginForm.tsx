@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/presentation/hooks';
@@ -15,6 +15,16 @@ export const LoginForm: React.FC = () => {
     password: '',
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  
+  // Auto-clear error after 5 seconds
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        clearError();
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, clearError]);
   const [infoDialog, setInfoDialog] = useState<{ isOpen: boolean; message: string }>({ isOpen: false, message: '' });
 
   const validateForm = () => {
@@ -105,11 +115,27 @@ export const LoginForm: React.FC = () => {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-start gap-2">
-            <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-            <span className="text-sm">{error}</span>
+          <div className="relative animate-in slide-in-from-top-2 fade-in-0 duration-300">
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-start gap-3 shadow-sm">
+              <div className="flex-shrink-0 w-5 h-5 mt-0.5 bg-red-100 rounded-full flex items-center justify-center">
+                <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium">{error}</p>
+                <p className="text-xs text-red-600 mt-1 opacity-75">Este mensaje desaparecerá en 5 segundos</p>
+              </div>
+              <button
+                onClick={clearError}
+                className="flex-shrink-0 text-red-400 hover:text-red-600 transition-colors p-1 rounded-md hover:bg-red-100"
+                title="Cerrar mensaje"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
           </div>
         )}
 

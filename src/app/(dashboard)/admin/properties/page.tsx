@@ -1,20 +1,19 @@
 /**
  * Admin Property Management Page
- * Complete property moderation and management with backend integration
+ * Complete property moderation with real backend integration
  */
 
 'use client';
 
 import { useState } from 'react';
-import { usePropertiesForModeration, useModerateProperty, useToggleFeaturedProperty } from '@/presentation/hooks/useAdmin';
+import { usePropertiesForModeration, useToggleFeaturedProperty, useModerateProperty } from '@/presentation/hooks/useAdmin';
 import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/Card';
 import { Modal } from '@/presentation/components/ui/Modal';
-import { Input } from '@/presentation/components/ui/Input';
 import { Button } from '@/presentation/components/ui/Button';
 import { AdminTable } from '@/presentation/components/admin/AdminTable/AdminTable';
 import { AdminFilters } from '@/presentation/components/admin/AdminFilters/AdminFilters';
-import { LoadingState, EmptyState, ErrorState } from '@/presentation/components/admin/AdminUIStates';
+import { PaginationParams, PaginatedResponse } from '@/core/domain/repositories/IAdminRepository';
 import { PropertyModerationItem, ModeratePropertyRequest } from '@/core/domain/entities/Admin';
 
 export default function PropertiesPage() {
@@ -46,7 +45,7 @@ export default function PropertiesPage() {
     setIsViewModalOpen(true);
   };
 
-  const handleModerateProperty = (property: PropertyModerationItem) => {
+  const handleModerateProperty = (property: PropertyModerationItem, action: string) => {
     setSelectedProperty(property);
     setIsModerateModalOpen(true);
   };
@@ -83,10 +82,18 @@ export default function PropertiesPage() {
       label: 'Property',
       sortable: true,
       render: (value: string, property: PropertyModerationItem) => (
-        <div>
-          <div className="font-medium text-gray-900">{value}</div>
-          <div className="text-sm text-gray-500">{property.slug}</div>
-          <div className="text-xs text-gray-400">ID: {property.id}</div>
+        <div className="flex items-center gap-3">
+          {property.thumbnailUrl && (
+            <img 
+              src={property.thumbnailUrl} 
+              alt={property.title}
+              className="w-16 h-16 object-cover rounded"
+            />
+          )}
+          <div>
+            <div className="font-medium text-gray-900">{value}</div>
+            <div className="text-sm text-gray-500">{property.slug}</div>
+          </div>
         </div>
       )
     },
@@ -98,7 +105,6 @@ export default function PropertiesPage() {
         <div>
           <div className="font-medium text-gray-900">{value}</div>
           <div className="text-sm text-gray-500">{property.ownerEmail}</div>
-          <div className="text-xs text-gray-400">ID: {property.ownerId}</div>
         </div>
       )
     },
@@ -119,7 +125,7 @@ export default function PropertiesPage() {
       render: (value: string, property: PropertyModerationItem) => (
         <div className="text-sm">
           <div>{value}</div>
-          <div className="text-gray-500">{property.city}</div>
+          <div className="text-gray-500">{property.district}</div>
         </div>
       )
     },
@@ -156,7 +162,7 @@ export default function PropertiesPage() {
       key: 'viewsCount' as keyof PropertyModerationItem,
       label: 'Views',
       sortable: true,
-      render: (value: number) => value.toLocaleString()
+      render: (value: number) => (value ?? 0).toLocaleString()
     },
     {
       key: 'reportCount' as keyof PropertyModerationItem,
@@ -183,16 +189,30 @@ export default function PropertiesPage() {
       onClick: handleViewProperty,
       variant: 'primary' as const
     },
-    ...(canModerateProperties ? [{
-      label: 'Moderate',
-      onClick: handleModerateProperty,
-      variant: 'secondary' as const
-    }] : []),
-    ...(canFeatureProperties ? [{
-      label: property => property.isFeatured ? 'Unfeature' : 'Feature',
-      onClick: handleToggleFeatured,
-      variant: 'secondary' as const
-    }] : [])
+    ...(canModerateProperties ? [
+      {
+        label: 'Approve',
+        onClick: (property: PropertyModerationItem) => handleModerateProperty(property, 'APPROVE'),
+        variant: 'primary' as const
+      },
+      {
+        label: 'Reject',
+        onClick: (property: PropertyModerationItem) => handleModerateProperty(property, 'REJECT'),
+        variant: 'secondary' as const
+      },
+      {
+        label: 'Suspend',
+        onClick: (property: PropertyModerationItem) => handleModerateProperty(property, 'SUSPEND'),
+        variant: 'secondary' as const
+      }
+    ] : []),
+    ...(canFeatureProperties ? [
+      {
+        label: 'Toggle Featured',
+        onClick: handleToggleFeatured,
+        variant: 'secondary' as const
+      }
+    ] : [])
   ];
 
   // Filter options
@@ -249,7 +269,7 @@ export default function PropertiesPage() {
         data={propertiesData?.content || []}
         columns={columns}
         loading={isLoading}
-        error={error}
+        error={error?.message || undefined}
         actions={actions}
         selection={{
           selectedItems: selectedProperties,
@@ -290,7 +310,6 @@ export default function PropertiesPage() {
                   <div><strong>Slug:</strong> {selectedProperty.slug}</div>
                   <div><strong>Price:</strong> ${selectedProperty.price.toLocaleString()}</div>
                   <div><strong>District:</strong> {selectedProperty.district}</div>
-                  <div><strong>City:</strong> {selectedProperty.city}</div>
                   <div><strong>Status:</strong> 
                     <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
                       selectedProperty.status === 'PUBLISHED' ? 'bg-green-100 text-green-800' :
@@ -314,18 +333,16 @@ export default function PropertiesPage() {
 
               {/* Owner Information */}
               <div>
-                <h4 className="font-medium text-gray-900 mb-3">Owner Information</h4>
-                <div className="space-y-2">
-                  <div><strong>Name:</strong> {selectedProperty.ownerName}</div>
-                  <div><strong>Email:</strong> {selectedProperty.ownerEmail}</div>
-                  <div><strong>Owner ID:</strong> {selectedProperty.ownerId}</div>
-                  <div><strong>Properties:</strong> {selectedProperty.publishedPropertiesCount}</div>
                 </div>
               </div>
             </div>
 
-            {/* Statistics */}
-            <div className="mt-6 pt-6 border-t">
+            {/* Owner Information */}
+            <div>
+              <h4 className="font-medium text-gray-900 mb-3">Owner Information</h4>
+              <div className="space-y-2">
+                <div><strong>Name:</strong> {selectedProperty.ownerName}</div>
+                <div><strong>Email:</strong> {selectedProperty.ownerEmail}</div>
               <h4 className="font-medium text-gray-900 mb-3">Statistics</h4>
               <div className="grid grid-cols-4 gap-6">
                 <div>

@@ -320,6 +320,7 @@ function DiscountCodeModal({ isOpen, onClose, onSubmit, title, discount }: Disco
               <option value="USER_SPECIFIC">User Specific</option>
               <option value="AGENCY_SPECIFIC">Agency Specific</option>
               <option value="PLAN_SPECIFIC">Plan Specific</option>
+              <option value="PROJECT_SPECIFIC">Project Specific</option>
             </select>
           </div>
 

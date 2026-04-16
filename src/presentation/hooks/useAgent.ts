@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AgentRepository } from '@/infrastructure/repositories/AgentRepository';
-import { UpdateAgentProfileRequest } from '@/core/domain/entities/Agent';
+import { UpdateAgentProfileRequest, Agent } from '@/core/domain/entities/Agent';
 import { useAuthStore } from '../store/authStore';
 import { toast } from 'sonner';
 
@@ -54,3 +54,6 @@ export function usePublicAgentProfile(slug: string) {
     enabled: !!slug,
   });
 }
+
+// Re-export Agent type for use in components
+export type { Agent };
