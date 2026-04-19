@@ -21,6 +21,7 @@ export const RegisterDeveloperForm: React.FC = () => {
     });
     const [isDniValidated, setIsDniValidated] = useState(false);
     const [isRucValidated, setIsRucValidated] = useState(false);
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     // Detectar error de email ya registrado y mostrar modal
@@ -47,37 +48,41 @@ export const RegisterDeveloperForm: React.FC = () => {
         }
     };
 
-    const validateForm = () => {
+    const validateForm = (): Record<string, string> => {
         const newErrors: Record<string, string> = {};
 
-        if (!formData.email) newErrors.email = 'Email requerido';
-        if (!formData.password || formData.password.length < 6) newErrors.password = 'Mínimo 6 caracteres';
-        if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
-        if (!formData.firstName) newErrors.firstName = 'Nombre requerido';
-        if (!formData.lastName) newErrors.lastName = 'Apellidos requeridos';
-        if (!formData.dni || formData.dni.length !== 8) newErrors.dni = 'DNI inválido';
-        if (!isDniValidated) newErrors.dni = 'Debes validar tu DNI';
-        
-        // RUC obligatorio para empresas, pero flexible si la API falla
+        if (!formData.email) newErrors.email = 'El correo electrónico es obligatorio';
+        if (!formData.password) newErrors.password = 'La contraseña es obligatoria';
+        if (formData.password && formData.password.length < 6) newErrors.password = 'La contraseña debe tener mínimo 6 caracteres';
+        if (formData.password && formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
+        if (!formData.firstName) newErrors.firstName = 'El nombre es obligatorio';
+        if (!formData.lastName) newErrors.lastName = 'Los apellidos son obligatorios';
+        if (!formData.dni || formData.dni.length !== 8) newErrors.dni = 'El DNI debe tener 8 dígitos';
+        if (!isDniValidated) newErrors.dni = 'Debes validar tu DNI primero';
+
         if (!formData.ruc) {
-            newErrors.ruc = 'RUC requerido para empresa inmobiliaria';
+            newErrors.ruc = 'El RUC de la empresa es obligatorio';
         } else if (formData.ruc.length !== 11) {
-            newErrors.ruc = 'RUC debe tener 11 dígitos';
+            newErrors.ruc = 'El RUC debe tener 11 dígitos';
         }
 
-        // Validar teléfono: 9 dígitos empezando con 9
         const phoneRegex = /^9\d{8}$/;
-        if (!formData.phone || !phoneRegex.test(formData.phone.trim())) {
-            newErrors.phone = 'Teléfono inválido. Debe tener 9 dígitos y empezar con 9';
+        if (!formData.phone) {
+            newErrors.phone = 'El teléfono es obligatorio';
+        } else if (!phoneRegex.test(formData.phone.trim())) {
+            newErrors.phone = 'Teléfono inválido: 9 dígitos empezando con 9';
         }
-        
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+
+        if (!acceptedTerms) newErrors.terms = 'Debes aceptar los términos y condiciones';
+
+        return newErrors;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!validateForm()) return;
+        const newErrors = validateForm();
+        setErrors(newErrors);
+        if (Object.keys(newErrors).length > 0) return;
 
         await register({
             email: formData.email,
@@ -127,6 +132,7 @@ export const RegisterDeveloperForm: React.FC = () => {
                         <p className="text-gray-600 mb-6">Este email ya esta registrado. Intenta iniciar sesion.</p>
                         <div className="flex gap-3">
                             <button
+                                type="button"
                                 onClick={handleCloseModal}
                                 className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
                             >
@@ -163,16 +169,20 @@ export const RegisterDeveloperForm: React.FC = () => {
                 <p className="text-gray-600">Publica proyectos inmobiliarios ilimitados</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5" noValidate>
                 {/* DNI PRIMERO */}
                 <DniInput
                     value={formData.dni}
-                    onChange={(val) => setFormData(prev => ({ ...prev, dni: val }))}
+                    onChange={(val) => {
+                        setFormData(prev => ({ ...prev, dni: val }));
+                        if (errors.dni) setErrors(prev => { const n = { ...prev }; delete n.dni; return n; });
+                    }}
                     onValidated={handleDniValidated}
                     leftIcon={<Hash className="w-5 h-5 text-gray-400" />}
                     placeholder="Ingresa tu DNI"
                     required
                     disabled={isDniValidated}
+                    externalError={errors.dni}
                 />
 
                 {/* NOMBRES DESPUÉS DE VALIDAR DNI */}
@@ -211,15 +221,18 @@ export const RegisterDeveloperForm: React.FC = () => {
 
                     <RucInput
                         value={formData.ruc}
-                        onChange={(val) => setFormData(prev => ({ ...prev, ruc: val }))}
+                        onChange={(val) => {
+                            setFormData(prev => ({ ...prev, ruc: val }));
+                            if (errors.ruc) setErrors(prev => { const n = { ...prev }; delete n.ruc; return n; });
+                        }}
                         onValidated={(data) => {
                             setIsRucValidated(true);
-                            // Si la API devuelve el nombre, lo usa, pero no bloquea el campo
                             if (data.companyName) {
                                 setFormData(prev => ({ ...prev, companyName: data.companyName }));
                             }
                         }}
                         required
+                        externalError={errors.ruc}
                     />
 
                     <Input
@@ -317,11 +330,29 @@ export const RegisterDeveloperForm: React.FC = () => {
                 {/* TÉRMINOS */}
                 <div className="bg-gray-50 rounded-lg p-4">
                     <label className="flex items-start gap-3 cursor-pointer">
-                        <input type="checkbox" className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500" required />
+                        <input
+                            type="checkbox"
+                            checked={acceptedTerms}
+                            onChange={(e) => {
+                                setAcceptedTerms(e.target.checked);
+                                if (e.target.checked && errors.terms) {
+                                    setErrors(prev => { const n = { ...prev }; delete n.terms; return n; });
+                                }
+                            }}
+                            className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
                         <div className="text-sm text-gray-600">
                             Acepto los <a href="/terminos" className="text-blue-600 hover:underline">Términos y Condiciones</a> y la <a href="/privacidad" className="text-blue-600 hover:underline">Política de Privacidad</a> de TIYUY
                         </div>
                     </label>
+                    {errors.terms && (
+                        <p className="mt-1 text-sm text-red-600 flex items-center gap-1 ml-7">
+                            <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            {errors.terms}
+                        </p>
+                    )}
                 </div>
 
                 {/* BOTÓN PRINCIPAL */}
@@ -333,7 +364,7 @@ export const RegisterDeveloperForm: React.FC = () => {
                     isLoading={isLoading}
                     className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold transition-colors"
                 >
-                    🏗️ Crear Cuenta y Publicar Mi Proyecto
+                    Crear Cuenta y Publicar Mi Proyecto
                 </Button>
 
                 {/* ENLACE A LOGIN */}

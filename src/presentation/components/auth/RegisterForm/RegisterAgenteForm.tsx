@@ -42,30 +42,32 @@ export const RegisterAgenteForm: React.FC = () => {
     }
   };
 
-  const validateForm = () => {
+  const validateForm = (): Record<string, string> => {
     const newErrors: Record<string, string> = {};
-    if (!formData.email) newErrors.email = 'Email requerido';
-    if (!formData.password || formData.password.length < 6) newErrors.password = 'Mínimo 6 caracteres';
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
-    if (!formData.firstName) newErrors.firstName = 'Nombre requerido';
-    if (!formData.lastName) newErrors.lastName = 'Apellidos requeridos';
-    if (!formData.dni || formData.dni.length !== 8) newErrors.dni = 'DNI inválido';
-    if (!isDniValidated) newErrors.dni = 'Debes validar tu DNI';
-    if (!formData.licenseNumber) newErrors.licenseNumber = 'Licencia requerida';
-    
-    // Validar teléfono: 9 dígitos empezando con 9
+    if (!formData.email) newErrors.email = 'El correo electrónico es obligatorio';
+    if (!formData.password) newErrors.password = 'La contraseña es obligatoria';
+    if (formData.password && formData.password.length < 6) newErrors.password = 'La contraseña debe tener mínimo 6 caracteres';
+    if (formData.password && formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    if (!formData.dni || formData.dni.length !== 8) newErrors.dni = 'El DNI debe tener 8 dígitos';
+    if (!isDniValidated) newErrors.dni = 'Debes validar tu DNI primero';
+    if (!formData.firstName) newErrors.firstName = 'El nombre es obligatorio';
+    if (!formData.lastName) newErrors.lastName = 'Los apellidos son obligatorios';
+
     const phoneRegex = /^9\d{8}$/;
-    if (!formData.phone || !phoneRegex.test(formData.phone.trim())) {
-      newErrors.phone = 'Teléfono inválido. Debe tener 9 dígitos y empezar con 9';
+    if (!formData.phone) {
+      newErrors.phone = 'El teléfono es obligatorio';
+    } else if (!phoneRegex.test(formData.phone.trim())) {
+      newErrors.phone = 'Teléfono inválido: 9 dígitos empezando con 9';
     }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    return newErrors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    const newErrors = validateForm();
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
 
     try {
       await register({
@@ -126,16 +128,20 @@ export const RegisterAgenteForm: React.FC = () => {
         <p className="text-gray-600">Completa tus datos profesionales</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         {/* DNI PRIMERO */}
         <DniInput
           value={formData.dni}
-          onChange={(val) => setFormData(prev => ({ ...prev, dni: val }))}
+          onChange={(val) => {
+            setFormData(prev => ({ ...prev, dni: val }));
+            if (errors.dni) setErrors(prev => { const n = { ...prev }; delete n.dni; return n; });
+          }}
           onValidated={handleDniValidated}
           leftIcon={<Hash className="w-5 h-5 text-gray-400" />}
           placeholder="Ingresa tu DNI"
           required
           disabled={isDniValidated}
+          externalError={errors.dni}
         />
 
         {/* NOMBRES DESPUÉS DE VALIDAR DNI */}
@@ -169,7 +175,7 @@ export const RegisterAgenteForm: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             name="licenseNumber"
-            label="Número de Licencia"
+            label="Número de Licencia (opcional)"
             leftIcon={<Briefcase className="w-5 h-5 text-gray-400" />}
             value={formData.licenseNumber}
             onChange={handleChange}

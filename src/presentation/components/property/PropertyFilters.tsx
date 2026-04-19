@@ -50,13 +50,13 @@ export function PropertyFilters({ initialFilters, onFilterChange, propertyType }
           <input 
             type="number" 
             placeholder="Desde" 
-            className="p-3 border rounded-lg focus:ring-2 focus:ring-green-500"
+            className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             onChange={(e) => setFilters({...filters, minPrice: e.target.value})}
           />
           <input 
             type="number" 
             placeholder="Hasta" 
-            className="p-3 border rounded-lg focus:ring-2 focus:ring-green-500"
+            className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
           />
         </div>
@@ -75,7 +75,7 @@ export function PropertyFilters({ initialFilters, onFilterChange, propertyType }
       {visibleFilters.includes('DORMITORIOS') && (
         <div>
           <label className="block text-sm font-semibold mb-2">Dormitorios</label>
-          <select className="w-full p-3 border rounded-lg">
+          <select className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
             <option>1+</option><option>2+</option><option>3+</option>
           </select>
         </div>
@@ -84,7 +84,7 @@ export function PropertyFilters({ initialFilters, onFilterChange, propertyType }
       {visibleFilters.includes('BAÑOS') && (
         <div>
           <label className="block text-sm font-semibold mb-2">Baños</label>
-          <select className="w-full p-3 border rounded-lg">
+          <select className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
             <option>1+</option><option>2+</option><option>3+</option>
           </select>
         </div>
@@ -97,13 +97,13 @@ export function PropertyFilters({ initialFilters, onFilterChange, propertyType }
             <input 
               type="number" 
               placeholder="Desde" 
-              className="p-3 border rounded-lg focus:ring-2 focus:ring-green-500"
+              className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               onChange={(e) => setFilters({...filters, minArea: e.target.value})}
             />
             <input 
               type="number" 
               placeholder="Hasta" 
-              className="p-3 border rounded-lg focus:ring-2 focus:ring-green-500"
+              className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               onChange={(e) => setFilters({...filters, maxArea: e.target.value})}
             />
           </div>
@@ -113,7 +113,7 @@ export function PropertyFilters({ initialFilters, onFilterChange, propertyType }
       {visibleFilters.includes('ESTACIONAMIENTO') && (
         <div>
           <label className="block text-sm font-semibold mb-2">Estacionamiento</label>
-          <select className="w-full p-3 border rounded-lg">
+          <select className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
             <option>Sin preferencia</option>
             <option>1+</option>
             <option>2+</option>
@@ -128,12 +128,12 @@ export function PropertyFilters({ initialFilters, onFilterChange, propertyType }
             <input 
               type="number" 
               placeholder="Desde" 
-              className="p-3 border rounded-lg focus:ring-2 focus:ring-green-500"
+              className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
             <input 
               type="number" 
               placeholder="Hasta" 
-              className="p-3 border rounded-lg focus:ring-2 focus:ring-green-500"
+              className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -145,7 +145,7 @@ export function PropertyFilters({ initialFilters, onFilterChange, propertyType }
           <input 
             type="number" 
             placeholder="Mínimo" 
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
         </div>
       )}

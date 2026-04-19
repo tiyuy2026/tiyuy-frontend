@@ -156,29 +156,35 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
         {/* Ubicación */}
         <p className="text-sm text-gray-600 mb-4 flex items-center gap-2">
-          <span className="text-red-500">📍</span>
+          <svg className="w-4 h-4 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           <span className="font-medium">{'location' in property ? property.location?.district : property.district || 'N/A'}</span>
           <span className="text-gray-400">•</span>
           <span>{'location' in property ? property.location?.province : property.province || 'N/A'}</span>
         </p>
 
         {/* Características */}
-        <div className="flex items-center gap-4 mb-4 text-sm">
+        <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
           {property.bedrooms && (
-            <div className="flex items-center gap-1.5 text-gray-700">
-              <span className="text-lg">🛏️</span>
+            <div className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M3 12h18M3 12v5h18v-5M7 12V9h4v3M13 12V9h4v3" />
+              </svg>
               <span className="font-medium">{property.bedrooms}</span>
             </div>
           )}
           {property.bathrooms && (
-            <div className="flex items-center gap-1.5 text-gray-700">
-              <span className="text-lg">🚿</span>
+            <div className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 12h16M4 12a2 2 0 01-2-2V7h4v3M4 12v5a2 2 0 002 2h12a2 2 0 002-2v-5M8 7V5a2 2 0 114 0v2" />
+              </svg>
               <span className="font-medium">{property.bathrooms}</span>
             </div>
           )}
           {property.totalArea && (
-            <div className="flex items-center gap-1.5 text-gray-700">
-              <span className="text-lg">📐</span>
+            <div className="flex items-center gap-1.5">
+              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
               <span className="font-medium">{property.totalArea}m²</span>
             </div>
           )}
@@ -195,7 +201,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
             </span>
           </div>
           <div className="flex items-center gap-1 text-xs text-gray-500">
-            <span>👁️</span>
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
             <span>{property.viewsCount}</span>
           </div>
         </div>

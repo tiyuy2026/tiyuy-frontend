@@ -27,39 +27,34 @@ export const LoginForm: React.FC = () => {
   }, [error, clearError]);
   const [infoDialog, setInfoDialog] = useState<{ isOpen: boolean; message: string }>({ isOpen: false, message: '' });
 
-  const validateForm = () => {
-    console.log('LoginForm: validateForm llamado');
+  const validateForm = (): Record<string, string> => {
     const errors: Record<string, string> = {};
 
     if (!formData.email) {
-      errors.email = 'El email es requerido';
+      errors.email = 'El correo electrónico es obligatorio';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Email invalido';
+      errors.email = 'El correo electrónico no es válido';
     }
 
     if (!formData.password) {
-      errors.password = 'La contrasena es requerida';
+      errors.password = 'La contraseña es obligatoria';
     } else if (formData.password.length < 6) {
-      errors.password = 'Minimo 6 caracteres';
+      errors.password = 'La contraseña debe tener mínimo 6 caracteres';
     }
 
-    console.log('LoginForm: errores de validacion:', errors);
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
+    return errors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('LoginForm: Intentando iniciar sesión con:', formData.email);
     clearError();
-
-    if (!validateForm()) return;
+    const newErrors = validateForm();
+    setValidationErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
 
     try {
       await login(formData.email, formData.password);
-      console.log('LoginForm: Login exitoso, redirigiendo al dashboard');
     } catch (err) {
-      console.log('LoginForm: Error en login:', err);
       // Error manejado por el hook
     }
   };
@@ -113,7 +108,7 @@ export const LoginForm: React.FC = () => {
         <p className="text-gray-600">Inicia sesion en tu cuenta</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         {error && (
           <div className="relative animate-in slide-in-from-top-2 fade-in-0 duration-300">
             <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-start gap-3 shadow-sm">
@@ -127,6 +122,7 @@ export const LoginForm: React.FC = () => {
                 <p className="text-xs text-red-600 mt-1 opacity-75">Este mensaje desaparecerá en 5 segundos</p>
               </div>
               <button
+                type="button"
                 onClick={clearError}
                 className="flex-shrink-0 text-red-400 hover:text-red-600 transition-colors p-1 rounded-md hover:bg-red-100"
                 title="Cerrar mensaje"
@@ -147,7 +143,6 @@ export const LoginForm: React.FC = () => {
           value={formData.email}
           onChange={handleChange}
           error={validationErrors.email}
-          required
           leftIcon={
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
@@ -163,7 +158,6 @@ export const LoginForm: React.FC = () => {
           value={formData.password}
           onChange={handleChange}
           error={validationErrors.password}
-          required
           leftIcon={
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -181,18 +175,15 @@ export const LoginForm: React.FC = () => {
           </Link>
         </div>
 
-        <Button 
-  type="submit" 
-  variant="primary" 
-  size="lg" 
-  fullWidth 
-  isLoading={isLoading}
-  onClick={(e) => {
-    console.log('LoginForm: Boton Iniciar Sesion clickeado');
-  }}
->
-  Iniciar Sesion
-</Button>
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          fullWidth
+          isLoading={isLoading}
+        >
+          Iniciar Sesion
+        </Button>
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
@@ -237,7 +228,8 @@ export const LoginForm: React.FC = () => {
           
           <p className="text-sm text-gray-600">
             No tienes cuenta?{' '}
-            <button 
+            <button
+              type="button"
               onClick={handleRegisterClick}
               className="text-blue-600 hover:text-blue-700 font-semibold underline bg-transparent border-none cursor-pointer"
             >
