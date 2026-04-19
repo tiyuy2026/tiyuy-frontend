@@ -13,6 +13,7 @@ interface DniInputProps {
   leftIcon?: React.ReactNode;
   placeholder?: string;
   disabled?: boolean;
+  externalError?: string;
 }
 
 export const DniInput: React.FC<DniInputProps> = ({
@@ -22,9 +23,11 @@ export const DniInput: React.FC<DniInputProps> = ({
   required = false,
   disabled = false,
   helperText,
+  externalError,
 }) => {
   const { validateDni, isValidating, dniValidation } = useKyc();
   const [error, setError] = useState<string>('');
+  const displayError = error || externalError || '';
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('Su DNI no puede ser validado. Corrobore los digitos.');
 
@@ -76,8 +79,7 @@ export const DniInput: React.FC<DniInputProps> = ({
             placeholder="12345678"
             value={value}
             onChange={handleChange}
-            error={error}
-            required={required}
+            error={displayError}
             maxLength={8}
             disabled={disabled}
             leftIcon={
@@ -117,6 +119,7 @@ export const DniInput: React.FC<DniInputProps> = ({
             <h3 className="text-lg font-bold text-gray-900 mb-2">Validacion de DNI</h3>
             <p className="text-gray-600 mb-6">{modalMessage}</p>
             <button
+              type="button"
               onClick={() => setShowErrorModal(false)}
               className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
             >

@@ -21,22 +21,24 @@ export const RegisterAdminForm: React.FC = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.email) newErrors.email = 'Email requerido';
-    if (!formData.password || formData.password.length < 6) newErrors.password = 'Mínimo 6 caracteres';
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
-    if (!formData.firstName) newErrors.firstName = 'Nombre requerido';
-    if (!formData.lastName) newErrors.lastName = 'Apellidos requeridos';
-    if (!formData.dni || formData.dni.length !== 8) newErrors.dni = 'DNI inválido';
-    if (!isDniValidated) newErrors.dni = 'Valida tu DNI';
-    if (!formData.adminCode) newErrors.adminCode = 'Código admin requerido';
+    if (!formData.email) newErrors.email = 'El correo electrónico es obligatorio';
+    if (!formData.password) newErrors.password = 'La contraseña es obligatoria';
+    if (formData.password && formData.password.length < 6) newErrors.password = 'La contraseña debe tener mínimo 6 caracteres';
+    if (formData.password && formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    if (!formData.firstName) newErrors.firstName = 'El nombre es obligatorio';
+    if (!formData.lastName) newErrors.lastName = 'Los apellidos son obligatorios';
+    if (!formData.dni || formData.dni.length !== 8) newErrors.dni = 'El DNI debe tener 8 dígitos';
+    if (!isDniValidated) newErrors.dni = 'Debes validar tu DNI primero';
+    if (!formData.adminCode) newErrors.adminCode = 'El código de administrador es obligatorio';
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return newErrors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    const newErrors = validateForm();
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
 
     try {
       await register({
@@ -66,7 +68,7 @@ export const RegisterAdminForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
           {error}
@@ -80,15 +82,19 @@ export const RegisterAdminForm: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input name="firstName" label="Nombres" value={formData.firstName} onChange={handleChange} error={errors.firstName} required />
-        <Input name="lastName" label="Apellidos" value={formData.lastName} onChange={handleChange} error={errors.lastName} required />
+        <Input name="firstName" label="Nombres" value={formData.firstName} onChange={handleChange} error={errors.firstName} />
+        <Input name="lastName" label="Apellidos" value={formData.lastName} onChange={handleChange} error={errors.lastName} />
       </div>
 
-      <DniInput 
+      <DniInput
         value={formData.dni}
-        onChange={(val) => setFormData(prev => ({ ...prev, dni: val }))}
+        onChange={(val) => {
+          setFormData(prev => ({ ...prev, dni: val }));
+          if (errors.dni) setErrors(prev => { const n = { ...prev }; delete n.dni; return n; });
+        }}
         onValidated={() => setIsDniValidated(true)}
-        required 
+        required
+        externalError={errors.dni}
       />
 
       <Input 
@@ -97,16 +103,15 @@ export const RegisterAdminForm: React.FC = () => {
         value={formData.adminCode} 
         onChange={handleChange} 
         error={errors.adminCode} 
-        type="password" 
-        required 
+        type="password"
         helperText="Código proporcionado por TIYUY" 
       />
 
-      <Input type="email" name="email" label="Correo corporativo" value={formData.email} onChange={handleChange} error={errors.email} required />
+      <Input type="email" name="email" label="Correo corporativo" value={formData.email} onChange={handleChange} error={errors.email} />
 
-      <Input type="password" name="password" label="Contraseña" value={formData.password} onChange={handleChange} error={errors.password} required />
+      <Input type="password" name="password" label="Contraseña" value={formData.password} onChange={handleChange} error={errors.password} />
 
-      <Input type="password" name="confirmPassword" label="Confirmar contraseña" value={formData.confirmPassword} onChange={handleChange} error={errors.confirmPassword} required />
+      <Input type="password" name="confirmPassword" label="Confirmar contraseña" value={formData.confirmPassword} onChange={handleChange} error={errors.confirmPassword} />
 
       <Button type="submit" variant="danger" size="lg" fullWidth isLoading={isLoading}>
         Crear Cuenta Admin

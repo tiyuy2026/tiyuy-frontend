@@ -81,7 +81,7 @@ export function WhatsAppButton({ property, className = '' }: WhatsAppButtonProps
             <textarea
               value={customMessage}
               onChange={(e) => setCustomMessage(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none bg-gray-50 text-gray-700 placeholder:text-gray-400"
               rows={3}
               placeholder="Escribe tu mensaje personalizado..."
             />

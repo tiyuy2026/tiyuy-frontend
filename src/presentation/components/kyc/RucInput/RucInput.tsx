@@ -10,6 +10,7 @@ interface RucInputProps {
   required?: boolean;
   helperText?: string;
   disabled?: boolean;
+  externalError?: string;
 }
 
 export const RucInput: React.FC<RucInputProps> = ({
@@ -19,10 +20,11 @@ export const RucInput: React.FC<RucInputProps> = ({
   required = false,
   helperText,
   disabled = false,
+  externalError,
 }) => {
-  // Se cambia isValidatingRuc por isValidating que es lo que devuelve el hook
   const { validateRuc, isValidating, rucValidation } = useKyc();
   const [error, setError] = useState<string>('');
+  const displayError = error || externalError || '';
 
   const handleValidate = async () => {
     if (value.length !== 11) {
@@ -75,8 +77,7 @@ export const RucInput: React.FC<RucInputProps> = ({
             placeholder="12345678901"
             value={value}
             onChange={handleChange}
-            error={error}
-            required={required}
+            error={displayError}
             maxLength={11}
             disabled={disabled}
             leftIcon={

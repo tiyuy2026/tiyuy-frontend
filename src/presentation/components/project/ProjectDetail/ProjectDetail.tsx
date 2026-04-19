@@ -200,8 +200,9 @@ const unitsByBedrooms = useMemo(() => {
                   </div>
                 )}
 
-                <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
-                  📹 VIDEO 360°
+                <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10 flex items-center gap-1">
+                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+                  VIDEO 360°
                 </span>
               </>
             ) : galleryImagesOnly[0] ? (
@@ -212,7 +213,7 @@ const unitsByBedrooms = useMemo(() => {
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-green-100 to-teal-200 flex items-center justify-center">
-                <span className="text-gray-400 text-5xl">🏢</span>
+                <svg className="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4h4v4H9z" /></svg>
               </div>
             )}
             {/* Label nombre proyecto */}
@@ -255,7 +256,7 @@ const unitsByBedrooms = useMemo(() => {
               <span className="bg-gray-100 text-gray-600 rounded-full px-2 py-0.5">{galleryImagesOnly.length}</span>
             )}
             {blueprints.length > 0 && (
-              <span className="bg-gray-100 text-gray-600 rounded-full px-2 py-0.5">📐 {blueprints.length}</span>
+              <span className="bg-gray-100 text-gray-600 rounded-full px-2 py-0.5">Planos: {blueprints.length}</span>
             )}
           </button>
         </div>
@@ -307,7 +308,7 @@ const unitsByBedrooms = useMemo(() => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-b border-gray-100 py-6">
               {currentProject.totalUnits > 0 && (
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">🏢</span>
+                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4h4v4H9z" /></svg>
                   <div>
                     <p className="text-sm font-semibold text-gray-800">{currentProject.totalUnits} unidades</p>
                   </div>
@@ -315,7 +316,7 @@ const unitsByBedrooms = useMemo(() => {
               )}
               {currentProject.areaFrom && (
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">📐</span>
+                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
                   <div>
                     <p className="text-sm font-semibold text-gray-800">
                       {currentProject.areaFrom}{currentProject.areaTo ? ` a ${currentProject.areaTo}` : ''} m² tot.
@@ -325,7 +326,7 @@ const unitsByBedrooms = useMemo(() => {
               )}
               {currentProject.floors && (
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">🏗️</span>
+                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4z" /></svg>
                   <div>
                     <p className="text-sm font-semibold text-gray-800">{currentProject.floors} pisos</p>
                   </div>
@@ -333,7 +334,7 @@ const unitsByBedrooms = useMemo(() => {
               )}
               {bedroomGroups.length > 0 && (
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">🛏️</span>
+                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M3 12h18M3 12v5h18v-5M7 12V9h4v3M13 12V9h4v3" /></svg>
                   <div>
                     <p className="text-sm font-semibold text-gray-800">
                       {bedroomGroups[0] === 0
@@ -407,7 +408,7 @@ const unitsByBedrooms = useMemo(() => {
                           {/* Placeholder del plano (el backend no devuelve blueprintImage aún) */}
                           <div className="relative h-40 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center border-b border-gray-100">
                             <div className="text-center">
-                              <p className="text-4xl mb-1">🏠</p>
+                              <svg className="w-10 h-10 text-gray-300 mx-auto mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9 22V12h6v10"/></svg>
                               <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
                                 {sample.type === 'APARTMENT' ? 'Departamento' :
                                  sample.type === 'PENTHOUSE' ? 'Penthouse' :
@@ -447,15 +448,15 @@ const unitsByBedrooms = useMemo(() => {
                             {/* Características */}
                             <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500 mb-3">
                               {(sample.bedrooms ?? 0) > 0 && (
-                                <span>🛏 {sample.bedrooms} dorm.</span>
+                                <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M3 12h18M3 12v5h18v-5M7 12V9h4v3M13 12V9h4v3"/></svg>{sample.bedrooms} dorm.</span>
                               )}
-                              <span>🚿 {sample.bathrooms} baños</span>
-                              <span>📐 {sample.area} m²</span>
+                              <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 12h16M4 12a2 2 0 01-2-2V7h4v3M4 12v5a2 2 0 002 2h12a2 2 0 002-2v-5M8 7V5a2 2 0 114 0v2"/></svg>{sample.bathrooms} baños</span>
+                              <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>{sample.area} m²</span>
                               {sample.parkingSpots > 0 && (
-                                <span>🚗 {sample.parkingSpots} est.</span>
+                                <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zm10 0a2 2 0 11-4 0 2 2 0 014 0zM4 9l2-5h12l2 5M4 9h16M4 9H2m18 0h2"/></svg>{sample.parkingSpots} est.</span>
                               )}
                               {sample.view && (
-                                <span>🪟 {sample.view}</span>
+                                <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7"/></svg>{sample.view}</span>
                               )}
                             </div>
 
@@ -643,7 +644,7 @@ const unitsByBedrooms = useMemo(() => {
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
-                        📍 Sin coordenadas ni dirección
+                        Sin coordenadas ni dirección
                       </div>
                     )}
                   </>
@@ -675,18 +676,18 @@ const unitsByBedrooms = useMemo(() => {
 
               <div className="space-y-3 mb-4">
                 <input type="email" placeholder="Email" defaultValue={currentProject.developer?.email || ''}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
                 <div className="grid grid-cols-2 gap-2">
                   <input type="text" placeholder="Nombre"
-                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                    className="border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
                   <input type="tel" placeholder="Teléfono"
-                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                    className="border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
                 </div>
                 <input type="text" placeholder="DNI"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
 
                 {units.length > 0 && (
-                  <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                  <select className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="">Selecciona la unidad de interés</option>
                     {units.filter(u => u.status === 'AVAILABLE').map((unit) => (
                       <option key={unit.id} value={unit.id}>
@@ -697,7 +698,7 @@ const unitsByBedrooms = useMemo(() => {
                 )}
 
                 <textarea rows={3} placeholder="¡Hola! Quiero que se comuniquen conmigo por este proyecto..."
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none" />
+                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none" />
               </div>
 
               <div className="space-y-2 mb-4 text-xs text-gray-500">
@@ -722,10 +723,16 @@ const unitsByBedrooms = useMemo(() => {
               {currentProject.developer?.companyName && (
                 <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500 space-y-1">
                   {currentProject.developer.phone && (
-                    <p className="flex items-center gap-1">📞 {currentProject.developer.phone}</p>
+                    <p className="flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                      {currentProject.developer.phone}
+                    </p>
                   )}
                   {currentProject.developer.ruc && (
-                    <p className="flex items-center gap-1">🏢 RUC: {currentProject.developer.ruc}</p>
+                    <p className="flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4h4v4H9z"/></svg>
+                      RUC: {currentProject.developer.ruc}
+                    </p>
                   )}
                 </div>
               )}
@@ -843,19 +850,19 @@ const unitsByBedrooms = useMemo(() => {
               <div className="px-6 py-4 space-y-4">
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { icon: '🏢', label: 'Piso', value: selectedUnit.floor },
-                    { icon: '📐', label: 'Área', value: `${selectedUnit.area} m²` },
-                    { icon: '🏷️', label: 'Tipo', value:
+                    { icon: <svg className="w-5 h-5 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4h4v4H9z" /></svg>, label: 'Piso', value: selectedUnit.floor },
+                    { icon: <svg className="w-5 h-5 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>, label: 'Área', value: `${selectedUnit.area} m²` },
+                    { icon: <svg className="w-5 h-5 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>, label: 'Tipo', value:
                       selectedUnit.type === 'APARTMENT' ? 'Depto' :
                       selectedUnit.type === 'PENTHOUSE' ? 'PH' :
                       selectedUnit.type === 'DUPLEX' ? 'Dúplex' :
                       selectedUnit.type === 'OFFICE' ? 'Oficina' : selectedUnit.type },
-                    { icon: '🛏', label: 'Dormitorios', value: selectedUnit.bedrooms ?? '-' },
-                    { icon: '🚿', label: 'Baños', value: selectedUnit.bathrooms },
-                    { icon: '🚗', label: 'Estac.', value: selectedUnit.parkingSpots },
+                    { icon: <svg className="w-5 h-5 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M3 12h18M3 12v5h18v-5M7 12V9h4v3M13 12V9h4v3" /></svg>, label: 'Dormitorios', value: selectedUnit.bedrooms ?? '-' },
+                    { icon: <svg className="w-5 h-5 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 12h16M4 12a2 2 0 01-2-2V7h4v3M4 12v5a2 2 0 002 2h12a2 2 0 002-2v-5M8 7V5a2 2 0 114 0v2" /></svg>, label: 'Baños', value: selectedUnit.bathrooms },
+                    { icon: <svg className="w-5 h-5 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zm10 0a2 2 0 11-4 0 2 2 0 014 0zM4 9l2-5h12l2 5M4 9h16M4 9H2m18 0h2" /></svg>, label: 'Estac.', value: selectedUnit.parkingSpots },
                   ].map(({ icon, label, value }) => (
                     <div key={label} className="bg-gray-50 rounded-xl p-3 text-center">
-                      <p className="text-lg">{icon}</p>
+                      <div className="mb-1">{icon}</div>
                       <p className="text-xs text-gray-400 mt-0.5">{label}</p>
                       <p className="font-bold text-gray-800 text-sm">{value}</p>
                     </div>
@@ -865,7 +872,7 @@ const unitsByBedrooms = useMemo(() => {
                 {/* Vista */}
                 {selectedUnit.view && (
                   <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
-                    <span>🪟</span>
+                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" /></svg>
                     <span>Vista: <strong>{selectedUnit.view}</strong></span>
                   </div>
                 )}
