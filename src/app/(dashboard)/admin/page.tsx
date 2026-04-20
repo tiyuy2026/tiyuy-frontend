@@ -9,7 +9,6 @@
 import React, { useMemo, useState } from 'react';
 import { useDashboardStats, useUserStats, useUserRegistrationHistory, useFinanceStats, useCampaigns, useDiscountCodes } from '@/presentation/hooks/useAdmin';
 import { DashboardStats } from '@/core/domain/entities/Admin';
-import { useDashboardMetrics } from '@/presentation/hooks/useAnalytics';
 import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { useUnifiedNotifications } from '@/presentation/hooks/useUnifiedNotifications';
 import { Card } from '@/presentation/components/ui/Card';
@@ -30,7 +29,6 @@ export default function AdminDashboardPage() {
   const { data: registrationHistory, isLoading: historyLoading } = useUserRegistrationHistory(timePeriod);
   const { data: campaigns } = useCampaigns({ page: 0, size: 10 });
   const { data: discountCodes } = useDiscountCodes({ page: 0, size: 50 });
-  const { data: dashboardMetrics } = useDashboardMetrics();
   const { notifications: recentAlerts } = useUnifiedNotifications('general');
 
   // Todos los datos vienen del backend - DashboardStats interface confirma estos campos

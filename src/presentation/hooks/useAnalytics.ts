@@ -1,8 +1,9 @@
 'use client';
 
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { AnalyticsRepository } from '@/infrastructure/repositories/AnalyticsRepository';
+import { authStorage } from '@/infrastructure/storage/auth-storage';
 import { 
   PropertyViewEvent, 
   PropertyStats, 
@@ -15,7 +16,10 @@ import {
   AdminNotification,
   NotificationPreference,
   SystemAlert,
-  DashboardMetrics
+  DashboardMetrics,
+  AdminAlert,
+  AlertStats,
+  AlertFilters
 } from '@/core/domain/entities/Analytics';
 
 const analyticsRepo = new AnalyticsRepository();
@@ -130,15 +134,19 @@ export function useNotificationPreferences() {
 }
 
 export function useUpdateNotificationPreferences() {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (preferences: NotificationPreference) => 
+    mutationFn: (preferences: NotificationPreference) =>
       analyticsRepo.updateNotificationPreferences(preferences),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'preferences'] });
+    },
   });
 }
 
 export function useSendNotification() {
   return useMutation({
-    mutationFn: (notification: Omit<AdminNotification, 'id' | 'createdBy'>) => 
+    mutationFn: (notification: Omit<AdminNotification, 'id'>) =>
       analyticsRepo.sendNotification(notification),
   });
 }
@@ -172,26 +180,197 @@ export function useTriggerReactivationNotifications() {
   });
 }
 
-// Real-time hooks
+// Admin Alerts hooks - matches backend AdminAlertController
+export function useAdminAlerts(filters: AlertFilters = {}) {
+  return useQuery({
+    queryKey: ['admin', 'alerts', filters],
+    queryFn: () => analyticsRepo.getAdminAlerts(filters),
+  });
+}
+
+// Notification History hook - matches backend /admin/notifications/history
+export function useNotificationHistory(daysBack: number = 30, type?: string, page: number = 0, size: number = 10) {
+  return useQuery({
+    queryKey: ['admin', 'notifications', 'history', daysBack, type, page, size],
+    queryFn: () => analyticsRepo.getNotificationHistory(daysBack, type, page, size),
+    placeholderData: (previousData) => previousData,
+  });
+}
+
+// Notification Types hook
+export function useNotificationTypes() {
+  return useQuery({
+    queryKey: ['admin', 'notifications', 'types'],
+    queryFn: () => analyticsRepo.getNotificationTypes(),
+  });
+}
+
+export function useAdminAlertStats() {
+  return useQuery({
+    queryKey: ['admin', 'alerts', 'stats'],
+    queryFn: () => analyticsRepo.getAdminAlertStats(),
+  });
+}
+
 export function useDashboardMetrics() {
   return useQuery({
-    queryKey: ['dashboard', 'metrics'],
+    queryKey: ['admin', 'metrics', 'dashboard'],
     queryFn: () => analyticsRepo.getDashboardMetrics(),
-    refetchInterval: 30000, // Refresh every 30 seconds for real-time data
   });
 }
 
-// System alerts hooks
-export function useSystemAlerts() {
-  return useQuery({
-    queryKey: ['alerts', 'system'],
-    queryFn: () => analyticsRepo.getSystemAlerts(),
-    refetchInterval: 60000, // Refresh every minute for alerts
-  });
-}
-
-export function useResolveSystemAlert() {
+export function useCreateAdminAlert() {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (alertId: string) => analyticsRepo.resolveSystemAlert(alertId),
+    mutationFn: (alert: Omit<AdminAlert, 'id' | 'createdAt'>) => 
+      analyticsRepo.createAdminAlert(alert),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'alerts'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'alerts', 'stats'] });
+    },
+  });
+}
+
+export function useSendAdminAlertNow() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (alertId: number) => analyticsRepo.sendAdminAlertNow(alertId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'alerts'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'alerts', 'stats'] });
+    },
+  });
+}
+
+export function useDeleteAdminAlert() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (alertId: number) => analyticsRepo.deleteAdminAlert(alertId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'alerts'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'alerts', 'stats'] });
+    },
+  });
+}
+
+export function useSearchAdminAlerts(query: string) {
+  return useQuery({
+    queryKey: ['admin', 'alerts', 'search', query],
+    queryFn: () => analyticsRepo.searchAdminAlerts(query),
+    enabled: query.length > 2,
+  });
+}
+
+// Admin alert by type hooks
+export function useSendSystemAlert() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (alert: { subject: string; message: string; userIds?: number[]; roles?: string[]; agencyIds?: string[]; agentIds?: number[]; sendToAll?: boolean; sendEmail?: boolean; sendInApp?: boolean; sendPush?: boolean }) => 
+      analyticsRepo.sendSystemAlert(alert),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'alerts'] });
+    },
+  });
+}
+
+export function useSendPropertyAlert() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (alert: { subject: string; message: string; propertyId: number; userIds?: number[]; roles?: string[]; agencyIds?: string[]; agentIds?: number[]; sendToAll?: boolean; sendEmail?: boolean; sendInApp?: boolean; sendPush?: boolean }) => 
+      analyticsRepo.sendPropertyAlert(alert),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'alerts'] });
+    },
+  });
+}
+
+export function useSendMessageAlert() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (alert: { subject: string; message: string; userIds?: number[]; roles?: string[]; agencyIds?: string[]; agentIds?: number[]; sendToAll?: boolean; sendEmail?: boolean; sendInApp?: boolean; sendPush?: boolean }) => 
+      analyticsRepo.sendMessageAlert(alert),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'alerts'] });
+    },
+  });
+}
+
+export function useSendAnnouncement() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (alert: { subject: string; message: string; userIds?: number[]; roles?: string[]; agencyIds?: string[]; agentIds?: number[]; sendToAll?: boolean; sendEmail?: boolean; sendInApp?: boolean; sendPush?: boolean }) => 
+      analyticsRepo.sendAnnouncement(alert),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'alerts'] });
+    },
+  });
+}
+
+export function useSendEmergencyAlert() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (alert: { subject: string; message: string; userIds?: number[]; roles?: string[]; agencyIds?: string[]; agentIds?: number[]; sendToAll?: boolean; sendEmail?: boolean; sendInApp?: boolean; sendPush?: boolean }) => 
+      analyticsRepo.sendEmergencyAlert(alert),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'alerts'] });
+    },
+  });
+}
+
+// Push notifications hooks
+export interface PushSubscription {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  userAgent?: string;
+}
+
+export function usePushSubscribe() {
+  return useMutation({
+    mutationFn: async (subscription: PushSubscription) => {
+      const token = authStorage.getToken();
+      const response = await fetch('/api/notifications/push/subscribe', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(subscription),
+      });
+      if (!response.ok) throw new Error('Failed to subscribe');
+      return response.json();
+    },
+  });
+}
+
+export function usePushUnsubscribe() {
+  return useMutation({
+    mutationFn: async (endpoint: string) => {
+      const token = authStorage.getToken();
+      const response = await fetch('/api/notifications/push/unsubscribe', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ endpoint }),
+      });
+      if (!response.ok) throw new Error('Failed to unsubscribe');
+      return response.json();
+    },
+  });
+}
+
+export function usePushStatus() {
+  return useQuery({
+    queryKey: ['push', 'status'],
+    queryFn: async () => {
+      const token = authStorage.getToken();
+      const response = await fetch('/api/notifications/push/status', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!response.ok) throw new Error('Failed to get push status');
+      return response.json();
+    },
   });
 }

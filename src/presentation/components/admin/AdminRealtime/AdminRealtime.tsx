@@ -23,6 +23,7 @@ interface WebSocketMessage {
   chatId?: number;
   message?: any;
   error?: string;
+  data?: any;
 }
 
 export function AdminRealtime() {
@@ -35,11 +36,11 @@ export function AdminRealtime() {
   
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { user } = useAuthStore();
+  const { user, token } = useAuthStore();
 
   // WebSocket connection
   const connectWebSocket = () => {
-    if (!user?.token) return;
+    if (!token) return;
 
     setConnectionStatus('connecting');
     
@@ -57,13 +58,13 @@ export function AdminRealtime() {
         // Authenticate with JWT token
         ws.send(JSON.stringify({
           type: 'auth',
-          token: user.token
+          token: token
         }));
 
         addEvent({
           type: 'connection_established',
           timestamp: new Date().toISOString(),
-          data: { userId: user.id }
+          data: { userId: user?.id }
         });
       };
 
@@ -243,7 +244,7 @@ export function AdminRealtime() {
         wsRef.current.close();
       }
     };
-  }, [user?.token]);
+  }, [token]);
 
   // Get connection status color
   const getStatusColor = () => {

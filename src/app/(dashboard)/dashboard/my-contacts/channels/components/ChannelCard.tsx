@@ -4,7 +4,7 @@
 'use client';
 
 import React from 'react';
-import { useSubscribeToChannel, useUnsubscribeFromChannel } from '@/presentation/hooks/useContacts';
+import { useChannels } from '@/presentation/hooks/useChannels';
 import { Users, MessageCircle, Calendar, UserPlus, UserMinus, Bell, BellOff } from 'lucide-react';
 
 interface ChannelCardProps {
@@ -13,14 +13,13 @@ interface ChannelCardProps {
 }
 
 export function ChannelCard({ channel, currentUserId }: ChannelCardProps) {
-  const subscribeMutation = useSubscribeToChannel();
-  const unsubscribeMutation = useUnsubscribeFromChannel();
+  const { subscribeToChannel, unsubscribeFromChannel, isSubscribing, isUnsubscribing } = useChannels(currentUserId);
 
   const handleSubscribeUnsubscribe = () => {
     if (channel.isSubscribed) {
-      unsubscribeMutation.mutate(channel.id);
+      unsubscribeFromChannel(channel.id);
     } else {
-      subscribeMutation.mutate(channel.id);
+      subscribeToChannel(channel.id);
     }
   };
 
@@ -126,14 +125,14 @@ export function ChannelCard({ channel, currentUserId }: ChannelCardProps) {
       {/* Boton de accion */}
       <button
         onClick={handleSubscribeUnsubscribe}
-        disabled={subscribeMutation.isPending || unsubscribeMutation.isPending}
+        disabled={isSubscribing || isUnsubscribing}
         className={`w-full py-2 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 ${
           channel.isSubscribed
             ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50'
             : 'bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50'
         }`}
       >
-        {subscribeMutation.isPending || unsubscribeMutation.isPending ? (
+        {isSubscribing || isUnsubscribing ? (
           <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent animate-spin" />
         ) : channel.isSubscribed ? (
           <>

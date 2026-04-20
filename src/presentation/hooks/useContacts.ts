@@ -926,618 +926,11 @@ export function useUnlikeComment() {
     },
 
   });
-
 }
 
-
-
-// Channels
-
-export function useGetChannels(userId?: number, page = 0, size = 10) {
-
-  return useQuery({
-
-    queryKey: ['channels', userId, page, size],
-
-    queryFn: async () => {
-
-      const data = await apiCall(`/contacts/extended/channels?page=${page}&size=${size}&sort=subscriberCount,desc`);
-
-      // Backend devuelve Page<ChannelResponse> → usar .content
-
-      return Array.isArray(data) ? data : (data?.content ?? []);
-
-    },
-
-    staleTime: 1000 * 60,
-
-  });
-
-}
-
-
-
-export function useSubscribeToChannel() {
-
-  const queryClient = useQueryClient();
-
-  
-
-  return useMutation({
-
-    mutationFn: (channelId: number) =>
-
-      apiCall(`/contacts/extended/channels/${channelId}/subscribe`, { method: 'POST' }),
-
-    onSuccess: () => {
-
-      queryClient.invalidateQueries({ queryKey: ['channels'] });
-
-      toast.success('Suscrito al canal');
-
-    },
-
-    onError: (error: any) => {
-
-      // Don't show error if already subscribed - component handles retry
-
-      if (!error.message?.includes('already subscribed') && 
-
-          !error.message?.includes('ya estás suscrito') &&
-
-          !error.message?.includes('ya eres miembro')) {
-
-        toast.error('Error al suscribirse');
-
-      }
-
-    },
-
-  });
-
-}
-
-
-
-export function useUnsubscribeFromChannel() {
-
-  const queryClient = useQueryClient();
-
-  
-
-  return useMutation({
-
-    mutationFn: (channelId: number) =>
-
-      apiCall(`/contacts/extended/channels/${channelId}/subscribe`, { method: 'DELETE' }),
-
-    onSuccess: () => {
-
-      queryClient.invalidateQueries({ queryKey: ['channels'] });
-
-      toast.success('Suscripción cancelada');
-
-    },
-
-  });
-
-}
-
-
-
-// Groups
-
-export function useGetGroups(page = 0, size = 10) {
-
-  return useQuery({
-
-    queryKey: ['groups', page, size],
-
-    queryFn: async () => {
-
-      const data = await apiCall(`/contacts/extended/groups?page=${page}&size=${size}`);
-
-      const groups = Array.isArray(data) ? data : (data?.content ?? []);
-
-      return groups;
-
-    },
-
-    staleTime: 30 * 1000,
-
-    retry: (failureCount, error: any) => {
-
-      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-
-        return false;
-
-      }
-
-      return failureCount < 3;
-
-    },
-
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
-
-  });
-
-}
-
-
-
-export function useCreateGroup() {
-
-  const queryClient = useQueryClient();
-
-  
-
-  return useMutation({
-
-    mutationFn: (data: { name: string; description: string; isRestrictedByEmail: boolean }) =>
-
-      apiCall('/contacts/extended/groups', {
-
-        method: 'POST',
-
-        body: JSON.stringify(data),
-
-      }),
-
-    onSuccess: () => {
-
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
-
-      toast.success('Grupo creado');
-
-    },
-
-    onError: () => {
-
-      toast.error('Error al crear grupo');
-
-    },
-
-  });
-
-}
-
-
-
-export function useJoinGroup() {
-
-  const queryClient = useQueryClient();
-
-  
-
-  return useMutation({
-
-    mutationFn: async (groupId: number) => {
-
-      const response = await axiosClient.post(`/contacts/extended/groups/${groupId}/join`);
-
-      return response.data;
-
-    },
-
-    onSuccess: (_, groupId) => {
-
-      queryClient.refetchQueries({ queryKey: ['groups'] });
-
-      queryClient.refetchQueries({ queryKey: ['group-posts', groupId] });
-
-      toast.success('Te has unido al grupo');
-
-    },
-
-    onError: (error: any) => {
-
-      if (error.message.includes('Failed to fetch')) {
-
-        toast.error('No se puede conectar al servidor. Verifica que el backend este corriendo.');
-
-      } else {
-
-        toast.error(error.message || 'Error al unirse al grupo');
-
-      }
-
-    },
-
-  });
-
-}
-
-
-
-// Channel Posts and Interactions
-
-export function useChannelPosts(channelId: number) {
-
-  return useQuery({
-
-    queryKey: ['channel-posts', channelId],
-
-    queryFn: async () => {
-
-      const data = await apiCall(`/contacts/extended/channels/${channelId}/posts?page=0&size=20`);
-
-      return Array.isArray(data) ? data : (data?.content ?? []);
-
-    },
-
-    staleTime: 30 * 1000,
-
-    enabled: !!channelId,
-
-  });
-
-}
-
-
-
-export function useChannelInteractions(channelId: number, currentUserId?: number) {
-
-  const queryClient = useQueryClient();
-
-  
-
-  const likePost = useMutation({
-
-    mutationFn: (postId: number) =>
-
-      apiCall(`/contacts/extended/channels/${channelId}/posts/${postId}/like`, { method: 'POST' }),
-
-    onSuccess: () => {
-
-      queryClient.invalidateQueries({ queryKey: ['channel-posts'] });
-
-    },
-
-    onError: () => {
-
-      toast.error('Error al dar like');
-
-    },
-
-  });
-
-
-
-  const sharePost = useMutation({
-
-    mutationFn: ({ postId, message }: { postId: number; message?: string }) =>
-
-      apiCall(`/contacts/extended/channels/${channelId}/posts/${postId}/share`, {
-
-        method: 'POST',
-
-        body: JSON.stringify({ shareMessage: message }),
-
-      }),
-
-    onSuccess: () => {
-
-      queryClient.invalidateQueries({ queryKey: ['channel-posts'] });
-
-      toast.success('Post compartido');
-
-    },
-
-    onError: () => {
-
-      toast.error('Error al compartir post');
-
-    },
-
-  });
-
-
-
-  return {
-
-    likePost: likePost.mutate,
-
-    sharePost: sharePost.mutate,
-
-    isLikingPost: likePost.isPending,
-
-    isSharingPost: sharePost.isPending,
-
-  };
-
-}
-
-
-
-export function useCreateChannelPost() {
-
-  const queryClient = useQueryClient();
-
-  
-
-  return useMutation({
-
-    mutationFn: async ({ channelId, postData }: { channelId: number; postData: any }) => {
-
-      return await apiCall(`/contacts/extended/channels/${channelId}/posts`, {
-
-        method: 'POST',
-
-        body: JSON.stringify(postData),
-
-      });
-
-    },
-
-    onSuccess: () => {
-
-      queryClient.invalidateQueries({ queryKey: ['channel-posts'] });
-
-      toast.success('Post creado exitosamente');
-
-    },
-
-    onError: (error: any) => {
-
-      toast.error(error.message || 'Error al crear post');
-
-    },
-
-  });
-
-}
-
-
-
-export function useCreateChannel() {
-
-  const queryClient = useQueryClient();
-
-  
-
-  return useMutation({
-
-    mutationFn: async (data: { name: string; city: string; description: string; avatar?: string }) =>
-
-      apiCall('/contacts/extended/channels', {
-
-        method: 'POST',
-
-        body: JSON.stringify(data),
-
-      }),
-
-    onSuccess: () => {
-
-      queryClient.invalidateQueries({ queryKey: ['channels'] });
-
-    },
-
-    onError: (error: any) => {
-
-      if (error.message.includes('403')) {
-
-        toast.error('No tienes permiso para crear canales');
-
-      } else {
-
-        toast.error(error.message || 'Error al crear canal');
-
-      }
-
-    },
-
-  });
-
-}
-
-
-
-export function useLeaveGroup() {
-
-  const queryClient = useQueryClient();
-
-  
-
-  return useMutation({
-
-    mutationFn: async (groupId: number) => {
-
-      const response = await axiosClient.post(`/contacts/extended/groups/${groupId}/leave`);
-
-      return response.data;
-
-    },
-
-    onSuccess: () => {
-
-      queryClient.invalidateQueries({ queryKey: ['groups'] });
-
-      toast.success('Has abandonado el grupo');
-
-    },
-
-    onError: (error: any) => {
-
-      if (error.message.includes('Failed to fetch')) {
-
-        toast.error('No se puede conectar al servidor. Verifica que el backend este corriendo.');
-
-      } else {
-
-        toast.error(error.message || 'Error al abandonar el grupo');
-
-      }
-
-    },
-
-  });
-
-}
-
-
-
-// ==================== CHANNEL EVENTS ====================
-
-
-
-// ==================== CHANNEL EVENTS WITH DYNAMIC FILTERS ====================
-
-
-
-export function useChannelEventsWithFilters(
-
-  channelId: number, 
-
-  filters: {
-
-    eventType?: string;
-
-    city?: string;
-
-    featured?: boolean;
-
-    dateFilter?: string;
-
-    location?: string;
-
-  } = {},
-
-  page = 0, 
-
-  size = 9
-
-) {
-
-  // Build query string from filters
-
-  const params = new URLSearchParams();
-
-  if (filters.eventType) params.append('eventType', filters.eventType);
-
-  if (filters.city) params.append('city', filters.city);
-
-  if (filters.featured !== undefined) params.append('featured', filters.featured.toString());
-
-  if (filters.dateFilter) params.append('dateFilter', filters.dateFilter);
-
-  if (filters.location) params.append('location', filters.location);
-
-  params.append('page', page.toString());
-
-  params.append('size', size.toString());
-
-  
-
-  const queryString = params.toString();
-
-  
-
-  return useQuery({
-
-    queryKey: ['channelEvents', channelId, filters, page, size],
-
-    queryFn: async () => {
-
-      const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/events?${queryString}`);
-
-      
-
-      // Spring Data Page devuelve los datos en .content
-
-      if (response.data && typeof response.data === 'object' && 'content' in response.data) {
-
-        return response.data;
-
-      }
-
-      
-
-      return response.data;
-
-    },
-
-    enabled: !!channelId,
-
-    staleTime: 1000 * 30, // 30 seconds
-
-  });
-
-}
-
-
-
-export function useChannelEventsForSubscribedUser(channelId: number, page = 0, size = 9) {
-
-  return useQuery({
-
-    queryKey: ['channelEventsSubscribed', channelId, page, size],
-
-    queryFn: async () => {
-
-      const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/events/subscribed?page=${page}&size=${size}`);
-
-      
-
-      // Spring Data Page devuelve los datos en .content
-
-      if (response.data && typeof response.data === 'object' && 'content' in response.data) {
-
-        return response.data;
-
-      }
-
-      
-
-      return response.data;
-
-    },
-
-    enabled: !!channelId,
-
-    staleTime: 1000 * 30, // 30 seconds
-
-  });
-
-}
-
-
-
-export function useChannelEventsBySubscriberCount(channelId: number, page = 0, size = 9) {
-
-  return useQuery({
-
-    queryKey: ['channelEventsFeatured', channelId, page, size],
-
-    queryFn: async () => {
-
-      const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/events/featured?page=${page}&size=${size}`);
-
-      
-
-      // Spring Data Page devuelve los datos en .content
-
-      if (response.data && typeof response.data === 'object' && 'content' in response.data) {
-
-        return response.data;
-
-      }
-
-      
-
-      return response.data;
-
-    },
-
-    enabled: !!channelId,
-
-    staleTime: 1000 * 30, // 30 seconds
-
-  });
-
-}
-
-
+// NOTA: Toda la lógica de channels ha sido movida a useChannels.ts
+// para mantener la arquitectura independiente y limpia.
+// Importar desde useChannels.ts para funcionalidad de channels.
 
 export function useUserSubscribedEvents(userId: number) {
 
@@ -1729,7 +1122,7 @@ export function useChannelEvents(channelId: number, page = 0, size = 9) {
 
       const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/events?page=${page}&size=${size}`);
 
-      return response.data;
+      return response.data?.content || [];
 
     },
 
@@ -1751,7 +1144,7 @@ export function useChannelUpcomingEvents(channelId: number) {
 
       const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/events/upcoming`);
 
-      return response.data;
+      return response.data || [];
 
     },
 
@@ -1971,7 +1364,7 @@ export function useChannelSubscribers(channelId: number) {
 
       const response = await axiosClient.get(`/contacts/extended/channels/${channelId}/subscribers?size=5`);
 
-      return response.data;
+      return response.data || [];
 
     },
 
@@ -2497,11 +1890,55 @@ export function useLikeChannelComment() {
 
     },
 
-    onSuccess: () => {
+    onSuccess: (data, commentId) => {
+
+      // Actualización optimista del contador en la caché
+
+      queryClient.setQueryData(['channel-comments'], (old: any) => {
+
+        if (!Array.isArray(old)) return old;
+
+        
+
+        return old.map((comment: any) => {
+
+          if (comment.id === commentId) {
+
+            return {
+
+              ...comment,
+
+              likeCount: data.likeCount,
+
+              hasUserLiked: data.isCurrentlyActive,
+
+              isLiked: data.isCurrentlyActive
+
+            };
+
+          }
+
+          return comment;
+
+        });
+
+      });
+
+      
 
       queryClient.invalidateQueries({ queryKey: ['channel-comments'] });
 
+      
+
+      toast.success(data.isCurrentlyActive ? 'Like al comentario!' : 'Like eliminado');
+
     },
+
+    onError: (error) => {
+
+      toast.error('Error al dar like al comentario');
+
+    }
 
   });
 
@@ -2806,6 +2243,216 @@ export function useChannelStatistics(channelId: number) {
     staleTime: 60 * 1000,
 
     enabled: !!channelId,
+
+  });
+
+}
+
+
+
+// ==================== CANALES ====================
+
+// Hook para obtener canales
+export function useGetChannels(userId?: number, page = 0, size = 10) {
+  return useQuery({
+    queryKey: ['channels', userId, page, size],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/extended/channels?page=${page}&size=${size}`);
+      return response.data?.content || []; // Return array from Spring Page
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+// Hook para suscribirse a canal
+export function useSubscribeToChannel() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (channelId: number) => {
+      const response = await axiosClient.post(`/contacts/extended/channels/${channelId}/subscribe`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channels'] });
+      toast.success('Suscrito al canal correctamente');
+    },
+    onError: (error) => {
+      console.error('Error al suscribirse al canal:', error);
+      toast.error('Error al suscribirse al canal');
+    },
+  });
+}
+
+// Hook para desuscribirse de canal
+export function useUnsubscribeFromChannel() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (channelId: number) => {
+      const response = await axiosClient.delete(`/contacts/extended/channels/${channelId}/subscribe`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channels'] });
+      toast.success('Desuscrito del canal correctamente');
+    },
+    onError: (error) => {
+      console.error('Error al desuscribirse del canal:', error);
+      toast.error('Error al desuscribirse del canal');
+    },
+  });
+}
+
+// ==================== GRUPOS ====================
+
+
+
+// Hook para obtener grupos
+
+export function useGetGroups(page = 0, size = 20) {
+
+  return useQuery({
+
+    queryKey: ['groups', page, size],
+
+    queryFn: async () => {
+
+      const response = await axiosClient.get(`/contacts/extended/groups?page=${page}&size=${size}`);
+
+      return response.data?.content || []; // Return array from Spring Page
+
+    },
+
+    staleTime: 5 * 60 * 1000,
+
+  });
+
+}
+
+
+
+// Hook para crear grupo
+
+export function useCreateGroup() {
+
+  const queryClient = useQueryClient();
+
+  
+
+  return useMutation({
+
+    mutationFn: async (data: {
+
+      name: string;
+
+      description: string;
+
+      isRestrictedByEmail?: boolean;
+
+    }) => {
+
+      const response = await axiosClient.post('/contacts/extended/groups', data);
+
+      return response.data;
+
+    },
+
+    onSuccess: () => {
+
+      queryClient.invalidateQueries({ queryKey: ['groups'] });
+
+      toast.success('Grupo creado correctamente');
+
+    },
+
+    onError: (error) => {
+
+      console.error('Error al crear grupo:', error);
+
+      toast.error('Error al crear el grupo');
+
+    },
+
+  });
+
+}
+
+
+
+// Hook para unirse a grupo
+
+export function useJoinGroup() {
+
+  const queryClient = useQueryClient();
+
+  
+
+  return useMutation({
+
+    mutationFn: async (groupId: number) => {
+
+      const response = await axiosClient.post(`/contacts/extended/groups/${groupId}/join`);
+
+      return response.data;
+
+    },
+
+    onSuccess: () => {
+
+      queryClient.invalidateQueries({ queryKey: ['groups'] });
+
+      toast.success('Te has unido al grupo correctamente');
+
+    },
+
+    onError: (error) => {
+
+      console.error('Error al unirse al grupo:', error);
+
+      toast.error('Error al unirse al grupo');
+
+    },
+
+  });
+
+}
+
+
+
+// Hook para salir de grupo
+
+export function useLeaveGroup() {
+
+  const queryClient = useQueryClient();
+
+  
+
+  return useMutation({
+
+    mutationFn: async (groupId: number) => {
+
+      const response = await axiosClient.post(`/contacts/extended/groups/${groupId}/leave`);
+
+      return response.data;
+
+    },
+
+    onSuccess: () => {
+
+      queryClient.invalidateQueries({ queryKey: ['groups'] });
+
+      toast.success('Has salido del grupo correctamente');
+
+    },
+
+    onError: (error) => {
+
+      console.error('Error al salir del grupo:', error);
+
+      toast.error('Error al salir del grupo');
+
+    },
 
   });
 

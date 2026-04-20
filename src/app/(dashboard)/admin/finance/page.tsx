@@ -386,8 +386,8 @@ export default function FinancePage() {
                     </div>
                     <div className="text-2xl font-bold text-gray-900 mb-2">${plan.priceInPen}</div>
                     <div className="text-sm text-gray-600 space-y-1">
-                      <div>Properties: {plan.limits.properties}</div>
-                      <div>Projects: {plan.limits.projects}</div>
+                      <div>Properties: {plan.limits?.properties ?? 0}</div>
+                      <div>Projects: {plan.limits?.projects ?? 0}</div>
                       <div>Features: {plan.features.length}</div>
                     </div>
                   </div>

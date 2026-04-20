@@ -320,14 +320,13 @@ export function GitHubShell({ children }: GitHubShellProps) {
       {/* Header fijo */}
       <AdminHeader onToggleSidebar={() => setCollapsed((v) => !v)} />
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
+      <div className="flex h-[calc(100vh-56px)] overflow-hidden">
+        {/* Sidebar - full height, dark background */}
         <aside
           className={`
-            flex flex-col bg-[#1a2030] shrink-0 transition-all duration-200 ease-in-out
+            h-full bg-[#1a2030] shrink-0 transition-all duration-200 ease-in-out overflow-y-auto
             ${collapsed ? 'w-[60px]' : 'w-[240px]'}
           `}
-          style={{ minHeight: 'calc(100vh - 56px)' }}
         >
           <Sidebar
             collapsed={collapsed}
@@ -336,8 +335,8 @@ export function GitHubShell({ children }: GitHubShellProps) {
           />
         </aside>
 
-        {/* Contenido principal */}
-        <main className="flex-1 overflow-auto">
+        {/* Contenido principal - scrollable */}
+        <main className="flex-1 h-full overflow-y-auto bg-gray-50">
           {children}
         </main>
       </div>

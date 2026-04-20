@@ -146,30 +146,109 @@ export interface CommunicationStats {
   byStatus: Record<string, number>;
 }
 
-// Notifications entities
+// Notifications entities - Matches backend SendNotificationRequest DTO
 export interface AdminNotification {
-  id: string;
-  type: 'alert' | 'info' | 'warning' | 'success' | 'error';
-  title: string;
+  id?: string;
+  subject: string;
   message: string;
-  recipients: string[];
-  channels: ('email' | 'in_app' | 'push')[];
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  status: 'draft' | 'scheduled' | 'sent' | 'delivered' | 'failed';
+  userIds?: number[];
+  roles?: string[];
+  agencyIds?: string[];  // RUCs de inmobiliarias
+  agentIds?: number[];   // User IDs de agentes específicos
+  sendToAll?: boolean;
+  sendEmail?: boolean;
+  sendInApp?: boolean;
+  sendPush?: boolean;
+  scheduledFor?: string; // ISO date string
+  alertType?: 'SYSTEM' | 'PROPERTY' | 'MESSAGE' | 'MARKETING' | 'ANNOUNCEMENT' | 'EMERGENCY';
+  propertyId?: number;
+}
+
+// AdminAlert entities - matches backend AdminAlertResponse DTO
+export interface AdminAlert {
+  id: number;
+  subject: string;
+  message: string;
+  alertType: 'SYSTEM' | 'PROPERTY' | 'MESSAGE' | 'MARKETING' | 'ANNOUNCEMENT' | 'EMERGENCY';
+  status: 'DRAFT' | 'SCHEDULED' | 'SENDING' | 'SENT' | 'FAILED' | 'CANCELLED';
+  sendEmail: boolean;
+  sendInApp: boolean;
+  sendPush: boolean;
+  targetUserCount?: number;
+  sentCount?: number;
+  readCount?: number;
+  readRate?: number;
+  scheduledFor?: string;
   sentAt?: string;
-  scheduledAt?: string;
-  metadata?: Record<string, any>;
-  createdBy: number;
+  createdAt: string;
+  sendToAll?: boolean;
+  propertyId?: number;
+  createdBy?: AdminSummary;
+}
+
+export interface AdminSummary {
+  id: number;
+  username: string;
+  email: string;
+  fullName?: string;
+}
+
+export interface AlertStats {
+  totalAlerts: number;
+  totalSent: number;
+  totalRead: number;
+  averageReadRate: number;
+  alertsByStatus: Record<string, number>;
+  alertsByType: Record<string, number>;
+  sentByEmail: number;
+  sentByInApp: number;
+  sentByPush: number;
+  periodStart: string;
+  periodEnd: string;
+  alertsLast24h: number;
+  alertsLast7d: number;
+  alertsLast30d: number;
+  topPerformingAlerts: AlertPerformance[];
+}
+
+export interface AlertPerformance {
+  alertId: number;
+  subject: string;
+  sentCount: number;
+  readCount: number;
+  readRate: number;
+  alertType: string;
+  sentAt: string;
+}
+
+export interface AlertFilters {
+  status?: string;
+  type?: string;
+  page?: number;
+  size?: number;
 }
 
 export interface NotificationPreference {
-  emailNotifications: boolean;
-  pushNotifications: boolean;
-  marketingEmails: boolean;
-  propertyAlerts: boolean;
-  messageAlerts: boolean;
-  systemAlerts: boolean;
-  frequency: 'immediate' | 'daily' | 'weekly' | 'never';
+  // Email preferences - matches backend NotificationPreferenceResponse exactly
+  emailOnContact: boolean;
+  emailOnFavorite: boolean;
+  emailOnPropertyPublished: boolean;
+  emailOnSubscriptionExpiring: boolean;
+  emailMarketing: boolean;
+
+  // Push notifications
+  pushEnabled: boolean;
+  pushOnMessage: boolean;
+  pushOnPropertyMatch: boolean;
+  pushOnSystemAlert: boolean;
+
+  // Notification frequency: IMMEDIATE, DAILY, WEEKLY
+  notificationFrequency: string;
+
+  // Specific alert types
+  propertyAlertsEnabled: boolean;
+  messageAlertsEnabled: boolean;
+  systemAlertsEnabled: boolean;
 }
 
 export interface SystemAlert {

@@ -1,8 +1,8 @@
 import { axiosClient } from '../api/axios-client';
 import { IAnalyticsRepository } from '@/core/domain/repositories/IAnalyticsRepository';
-import { 
-  PropertyViewEvent, 
-  PropertyStats, 
+import {
+  PropertyViewEvent,
+  PropertyStats,
   DashboardStats,
   AuditLogEntry,
   AuditLogFilters,
@@ -14,8 +14,18 @@ import {
   NotificationPreference,
   SystemAlert,
   RealtimeEvent,
-  DashboardMetrics
+  DashboardMetrics,
+  AdminAlert,
+  AlertStats,
+  AlertFilters
 } from '@/core/domain/entities/Analytics';
+
+// Type for paginated admin alerts response
+export type PaginatedAdminAlerts = {
+  content: AdminAlert[];
+  totalElements: number;
+  totalPages: number;
+};
 
 export class AnalyticsRepository implements IAnalyticsRepository {
   async trackPropertyView(event: PropertyViewEvent): Promise<void> {
@@ -122,8 +132,42 @@ export class AnalyticsRepository implements IAnalyticsRepository {
     return response.data;
   }
 
-  async sendNotification(notification: Omit<AdminNotification, 'id' | 'createdBy'>): Promise<void> {
+  async sendNotification(notification: Omit<AdminNotification, 'id'>): Promise<void> {
     await axiosClient.post('/admin/notifications/send', notification);
+  }
+
+  async getNotificationHistory(
+    daysBack: number = 30,
+    type?: string,
+    page: number = 0,
+    size: number = 10
+  ): Promise<{
+    content: Array<{
+      id: number;
+      title: string;
+      message: string;
+      type: string;
+      createdAt: string;
+      recipientCount: number;
+    }>;
+    totalElements: number;
+    totalPages: number;
+    number: number;
+    size: number;
+  }> {
+    const params = new URLSearchParams();
+    params.append('daysBack', daysBack.toString());
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    if (type) params.append('type', type);
+    
+    const response = await axiosClient.get(`/admin/notifications/history?${params.toString()}`);
+    return response.data;
+  }
+
+  async getNotificationTypes(): Promise<Array<{ value: string; label: string }>> {
+    const response = await axiosClient.get('/admin/notifications/types');
+    return response.data;
   }
 
   async sendNewPropertyNotification(propertyId: number, userIds?: number[]): Promise<string> {
@@ -151,40 +195,74 @@ export class AnalyticsRepository implements IAnalyticsRepository {
     return response.data;
   }
 
-  // Real-time endpoints (mock for now)
+  // Admin Alerts endpoints - matches backend AdminAlertController
+  async createAdminAlert(alert: Omit<AdminAlert, 'id' | 'createdAt'>): Promise<AdminAlert> {
+    const response = await axiosClient.post('/admin/alerts', alert);
+    return response.data;
+  }
+
+  async sendAdminAlertNow(alertId: number): Promise<void> {
+    await axiosClient.post(`/admin/alerts/${alertId}/send`);
+  }
+
+  async getAdminAlerts(filters: AlertFilters = {}): Promise<PaginatedAdminAlerts> {
+    const params = new URLSearchParams();
+    if (filters.status) params.append('status', filters.status);
+    if (filters.type) params.append('type', filters.type);
+    if (filters.page !== undefined) params.append('page', filters.page.toString());
+    if (filters.size !== undefined) params.append('size', filters.size.toString());
+    
+    const response = await axiosClient.get(`/admin/alerts?${params.toString()}`);
+    return response.data;
+  }
+
+  async getAdminAlertById(alertId: number): Promise<AdminAlert> {
+    const response = await axiosClient.get(`/admin/alerts/${alertId}`);
+    return response.data;
+  }
+
+  async deleteAdminAlert(alertId: number): Promise<void> {
+    await axiosClient.delete(`/admin/alerts/${alertId}`);
+  }
+
+  async searchAdminAlerts(query: string): Promise<AdminAlert[]> {
+    const response = await axiosClient.get(`/admin/alerts/search?query=${encodeURIComponent(query)}`);
+    return response.data;
+  }
+
+  async getAdminAlertStats(): Promise<AlertStats> {
+    const response = await axiosClient.get('/admin/notifications/stats');
+    return response.data;
+  }
+
   async getDashboardMetrics(): Promise<DashboardMetrics> {
-    // Mock implementation - backend doesn't have this endpoint yet
-    return {
-      activeUsers: 0,
-      inactiveUsers: 0,
-      onlineUsers: 0,
-      chatUsage: {
-        totalMessages: 0,
-        activeChats: 0,
-        averageResponseTime: 0
-      },
-      eventsGenerated: 0,
-      revenue: {
-        totalRevenue: 0,
-        monthlyRevenue: 0,
-        averageOrderValue: 0
-      },
-      propertyMetrics: {
-        mostViewed: [],
-        conversionRates: {}
-      },
-      departmentPerformance: {}
-    };
+    const response = await axiosClient.get('/admin/metrics/dashboard');
+    return response.data;
   }
 
-  // System alerts (mock for now)
-  async getSystemAlerts(): Promise<SystemAlert[]> {
-    // Mock implementation - backend doesn't have this endpoint yet
-    return [];
+  // Admin alert by type endpoints
+  async sendSystemAlert(alert: { subject: string; message: string; userIds?: number[]; roles?: string[]; agencyIds?: string[]; agentIds?: number[]; sendToAll?: boolean; sendEmail?: boolean; sendInApp?: boolean; sendPush?: boolean; }): Promise<AdminAlert> {
+    const response = await axiosClient.post('/admin/alerts/system', alert);
+    return response.data;
   }
 
-  async resolveSystemAlert(alertId: string): Promise<void> {
-    // Mock implementation - backend doesn't have this endpoint yet
-    console.log('Resolving alert:', alertId);
+  async sendPropertyAlert(alert: { subject: string; message: string; propertyId: number; userIds?: number[]; roles?: string[]; agencyIds?: string[]; agentIds?: number[]; sendToAll?: boolean; sendEmail?: boolean; sendInApp?: boolean; sendPush?: boolean; }): Promise<AdminAlert> {
+    const response = await axiosClient.post('/admin/alerts/property', alert);
+    return response.data;
+  }
+
+  async sendMessageAlert(alert: { subject: string; message: string; userIds?: number[]; roles?: string[]; agencyIds?: string[]; agentIds?: number[]; sendToAll?: boolean; sendEmail?: boolean; sendInApp?: boolean; sendPush?: boolean; }): Promise<AdminAlert> {
+    const response = await axiosClient.post('/admin/alerts/message', alert);
+    return response.data;
+  }
+
+  async sendAnnouncement(alert: { subject: string; message: string; userIds?: number[]; roles?: string[]; agencyIds?: string[]; agentIds?: number[]; sendToAll?: boolean; sendEmail?: boolean; sendInApp?: boolean; sendPush?: boolean; }): Promise<AdminAlert> {
+    const response = await axiosClient.post('/admin/alerts/announcement', alert);
+    return response.data;
+  }
+
+  async sendEmergencyAlert(alert: { subject: string; message: string; userIds?: number[]; roles?: string[]; agencyIds?: string[]; agentIds?: number[]; sendToAll?: boolean; sendEmail?: boolean; sendInApp?: boolean; sendPush?: boolean; }): Promise<AdminAlert> {
+    const response = await axiosClient.post('/admin/alerts/emergency', alert);
+    return response.data;
   }
 }
