@@ -5,11 +5,15 @@ import Link from 'next/link';
 import { useAuth } from '@/presentation/hooks';
 import { useGoogleAuth } from '@/presentation/hooks/useGoogleAuth';
 import { Button, Input, InfoDialog } from '@/presentation/components/ui';
+import { User } from '@/core/domain/entities';
+import { authStorage } from '@/infrastructure/storage';
+import { useAuthStore } from '@/presentation/store/authStore';
 
 export const LoginForm: React.FC = () => {
   const router = useRouter();
   const { login, isLoading, error, clearError } = useAuth();
-  const { signInWithGoogle, loading: googleLoading, error: googleError } = useGoogleAuth();
+  const { signInWithGoogleComplete, loading: googleLoading, error: googleError } = useGoogleAuth();
+  const { setAuth } = useAuthStore();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -25,7 +29,12 @@ export const LoginForm: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [error, clearError]);
-  const [infoDialog, setInfoDialog] = useState<{ isOpen: boolean; message: string }>({ isOpen: false, message: '' });
+  const [infoDialog, setInfoDialog] = useState<{ 
+    isOpen: boolean; 
+    message: string; 
+    showRegisterButton?: boolean;
+    googleData?: any;
+  }>({ isOpen: false, message: '' });
 
   const validateForm = (): Record<string, string> => {
     const errors: Record<string, string> = {};
@@ -78,13 +87,67 @@ export const LoginForm: React.FC = () => {
     router.push('/profile-selector');
   };
 
+  const handleRegisterFromGoogle = () => {
+    if (infoDialog.googleData) {
+      // Guardar datos en sessionStorage para precargar en formulario de registro
+      sessionStorage.setItem('googleRegistrationData', JSON.stringify(infoDialog.googleData));
+    }
+    // Cerrar diálogo y redirigir a registro
+    setInfoDialog({ isOpen: false, message: '' });
+    router.push('/profile-selector');
+  };
+
   const handleGoogleSignIn = async () => {
     try {
-      const googleUserData = await signInWithGoogle();
+      const result = await signInWithGoogleComplete();
       
-      if (googleUserData) {
-        setInfoDialog({ isOpen: true, message: 'Registrate primero con Google para continuar' });
-        console.log('LoginForm: Datos de Google obtenidos:', googleUserData);
+      if (result.exists && result.authResponse) {
+        // Usuario existe y se logueó exitosamente
+        // Crear User desde AuthResponse del backend
+        const userData: User = {
+          id: result.authResponse.userId,
+          email: result.authResponse.email,
+          phone: '',
+          firstName: result.authResponse.firstName,
+          lastName: result.authResponse.lastName,
+          dni: '',
+          role: result.authResponse.role,
+          emailVerified: false,
+          phoneVerified: false,
+          publishedPropertiesCount: 0,
+          createdAt: new Date(),
+        };
+
+        // Extract admin data if present
+        const adminData = result.authResponse.adminRoleType ? {
+          adminRoleType: result.authResponse.adminRoleType,
+          permissions: result.authResponse.permissions,
+          departments: result.authResponse.departments,
+          isActive: result.authResponse.isActive,
+        } : undefined;
+
+        // Guardar en storage y store
+        authStorage.setToken(result.authResponse.token);
+        authStorage.setUser(userData);
+        setAuth(result.authResponse.token, userData, adminData);
+        
+        // Redirigir según el rol
+        const targetRoute = (result.authResponse.role === 'ADMIN' || result.authResponse.adminRoleType === 'SUPER_ADMIN') ? '/admin' : '/';
+        router.replace(targetRoute);
+        setTimeout(() => {
+          window.location.assign(targetRoute);
+        }, 100);
+        
+      } else if (result.userData) {
+        // Usuario no existe, mostrar diálogo de registro con datos precargados
+        setInfoDialog({ 
+          isOpen: true, 
+          message: `El correo ${result.userData.email} no está registrado. ¿Deseas registrarte ahora?`,
+          showRegisterButton: true,
+          googleData: result.userData
+        });
+        
+        console.log('LoginForm: Datos de Google para registro:', result.userData);
       }
     } catch (error) {
       console.error('LoginForm: Error en login con Google:', error);
@@ -99,7 +162,18 @@ export const LoginForm: React.FC = () => {
       title="Registro Requerido"
       message={infoDialog.message}
       variant="info"
-    />
+      showRegisterButton={infoDialog.showRegisterButton}
+      onRegister={() => {
+        // Guardar datos de Google en sessionStorage para pre-llenar el registro
+        if (infoDialog.googleData) {
+          sessionStorage.setItem('googleRegistrationData', JSON.stringify(infoDialog.googleData));
+          console.log('LoginForm: Datos de Google guardados para registro:', infoDialog.googleData);
+        }
+        // Cerrar diálogo y redirigir a selección de perfil primero
+        setInfoDialog({ isOpen: false, message: '' });
+        router.push('/select-profile');
+      }}
+          />
     <div className="w-full max-w-md">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3">

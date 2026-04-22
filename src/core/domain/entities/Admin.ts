@@ -184,8 +184,10 @@ export interface UserListItem {
   emailVerified: boolean;
   phoneVerified: boolean;
   publishedPropertiesCount: number;
+  publishedProjectsCount: number;
   city?: string;
   country?: string;
+  profilePhotoUrl?: string;
   lastLoginAt?: Date;
   createdAt: Date;
 }
@@ -194,6 +196,61 @@ export interface UserListItem {
 export interface ChangeUserRoleRequest {
   newRole: 'USER' | 'AGENT' | 'DEVELOPER' | 'ADMIN';
   reason?: string;
+}
+
+// User properties response from admin endpoint
+export interface UserPropertiesResponse {
+  userId: number;
+  userEmail: string;
+  userName: string;
+  totalProperties: number;
+  properties: UserPropertySummary[];
+}
+
+export interface UserPropertySummary {
+  id: number;
+  title: string;
+  slug: string;
+  status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'SUSPENDED';
+  price: number;
+  district: string;
+  city: string;
+  thumbnailUrl?: string;
+  isFeatured: boolean;
+  viewsCount: number;
+  createdAt: Date;
+  publishedAt?: Date;
+  bedrooms?: number;
+  bathrooms?: number;
+  totalArea?: number;
+  description?: string;
+}
+
+// User projects response from admin endpoint
+export interface UserProjectsResponse {
+  userId: number;
+  userEmail: string;
+  userName: string;
+  totalProjects: number;
+  projects: UserProjectSummary[];
+}
+
+export interface UserProjectSummary {
+  id: number;
+  name: string;
+  slug: string;
+  status: 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'COMPLETED' | 'SUSPENDED' | 'CANCELLED';
+  phase: 'PLANNING' | 'CONSTRUCTION' | 'PRE_SALE' | 'SALE' | 'COMPLETED';
+  district: string;
+  city: string;
+  coverImageUrl?: string;
+  totalUnits: number;
+  availableUnits: number;
+  soldUnits: number;
+  constructionProgress: number;
+  estimatedDeliveryDate?: Date;
+  createdAt: Date;
+  publishedAt?: Date;
 }
 
 

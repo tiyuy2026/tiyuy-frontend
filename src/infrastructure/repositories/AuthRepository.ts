@@ -114,4 +114,42 @@ export class AuthRepository implements IAuthRepository {
       throw new Error(error.response?.data?.message || 'Error al obtener usuario');
     }
   }
+
+  async checkGoogleEmailExists(email: string): Promise<{ exists: boolean }> {
+    try {
+      const response = await axiosClient.post<{ exists: boolean }>(AUTH_ENDPOINTS.GOOGLE_CHECK_EMAIL, { email });
+      return response.data;
+    } catch (error: any) {
+      const status = error.response?.status;
+      if (status === 404) {
+        return { exists: false };
+      }
+      throw new Error('Error al verificar email con Google');
+    }
+  }
+
+  async loginWithGoogle(email: string, firstName: string, lastName: string, uid: string): Promise<AuthResponse> {
+    try {
+      const response = await axiosClient.post<AuthResponse>(AUTH_ENDPOINTS.GOOGLE_LOGIN, {
+        email,
+        firstName,
+        lastName,
+        uid,
+      });
+      return response.data;
+    } catch (error: any) {
+      const status = error.response?.status;
+      const data = error.response?.data;
+      
+      if (status === 401) {
+        throw new Error('No se pudo autenticar con Google. Por favor, regístrate primero.');
+      }
+      
+      if (status === 404) {
+        throw new Error('Usuario no encontrado. Por favor, regístrate primero.');
+      }
+      
+      throw new Error(data?.message || 'Error al iniciar sesión con Google');
+    }
+  }
 }

@@ -33,6 +33,8 @@ import {
   Permission,
   SubscriptionPlan,
   AgencyPlanDiscount,
+  UserPropertiesResponse,
+  UserProjectsResponse,
 } from '@/core/domain/entities/Admin';
 import {
   AgentDiscount,
@@ -114,15 +116,15 @@ export class AdminRepository implements IAdminRepository {
     keyword?: string,
     params?: PaginationParams
   ): Promise<PaginatedResponse<UserListItem>> {
-    const searchParams = new URLSearchParams();
-    if (role) searchParams.append('role', role);
-    if (enabled !== undefined) searchParams.append('enabled', enabled.toString());
-    if (keyword) searchParams.append('keyword', keyword);
-    if (params?.page !== undefined) searchParams.append('page', params.page.toString());
-    if (params?.size !== undefined) searchParams.append('size', params.size.toString());
-    if (params?.sort) searchParams.append('sort', params.sort);
+    const queryParams = new URLSearchParams();
+    if (role) queryParams.set('role', role);
+    if (enabled !== undefined) queryParams.set('enabled', enabled.toString());
+    if (keyword) queryParams.set('keyword', keyword);
+    if (params?.page !== undefined) queryParams.set('page', params.page.toString());
+    if (params?.size !== undefined) queryParams.set('size', params.size.toString());
+    if (params?.sort) queryParams.set('sort', params.sort);
 
-    const response = await axiosClient.get(`${this.basePath}/users?${searchParams.toString()}`);
+    const response = await axiosClient.get(`${this.basePath}/users?${queryParams.toString()}`);
     return response.data;
   }
 
@@ -144,6 +146,20 @@ export class AdminRepository implements IAdminRepository {
 
   async verifyUserEmail(userId: number): Promise<void> {
     await axiosClient.put(`${this.basePath}/users/${userId}/verify-email`);
+  }
+
+  async verifyUserPhone(userId: number): Promise<void> {
+    await axiosClient.put(`${this.basePath}/users/${userId}/verify-phone`);
+  }
+
+  async getUserProperties(userId: number): Promise<UserPropertiesResponse> {
+    const response = await axiosClient.get(`${this.basePath}/users/${userId}/properties`);
+    return response.data;
+  }
+
+  async getUserProjects(userId: number): Promise<UserProjectsResponse> {
+    const response = await axiosClient.get(`${this.basePath}/users/${userId}/projects`);
+    return response.data;
   }
 
   // Discount Codes

@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useSendNotification,
@@ -16,12 +16,15 @@ import {
   useCreateAdminAlert,
   useAdminAlerts,
   useSendAdminAlertNow,
-  useDeleteAdminAlert
+  useDeleteAdminAlert,
+  useDeleteNotificationHistory
 } from '@/presentation/hooks/useAnalytics';
 import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { useUserSearch } from '@/presentation/hooks/useUserSearch';
 import { Card } from '@/presentation/components/ui/Card';
 import { Spinner } from '@/presentation/components/ui/Spinner';
+import { NotificationsHeaderStats } from '@/presentation/components/admin/NotificationsHeaderStats/NotificationsHeaderStats';
+import { NotificationsChart } from '@/presentation/components/admin/NotificationsChart/NotificationsChart';
 import { format } from 'date-fns';
 import {
   Send,
@@ -59,23 +62,27 @@ export default function NotificationsPage() {
 
   // Pagination and filter state
   const [historyPage, setHistoryPage] = useState(0);
-  const [historySize] = useState(10);
+  const [historySize] = useState(5);
   const [historyTypeFilter, setHistoryTypeFilter] = useState<string>('');
 
   // Notification hooks
   const { data: notificationHistory, isLoading: isLoadingHistory } = useNotificationHistory(30, historyTypeFilter || undefined, historyPage, historySize);
+  const { data: notificationHistoryAll, isLoading: isLoadingHistoryAll } = useNotificationHistory(30, historyTypeFilter || undefined, 0, 1000); // Get all data for chart
   const { data: notificationTypes, isLoading: isLoadingTypes } = useNotificationTypes();
   const { data: alertStats } = useAdminAlertStats();
 
   // Admin Alerts pagination state
   const [alertsPage, setAlertsPage] = useState(0);
-  const [alertsSize] = useState(10);
+  const [alertsSize] = useState(5);
 
   // Admin Alerts hooks with pagination
   const { data: adminAlerts, isLoading: isLoadingAdminAlerts } = useAdminAlerts({ page: alertsPage, size: alertsSize });
   const createAdminAlert = useCreateAdminAlert();
   const sendAdminAlertNow = useSendAdminAlertNow();
   const deleteAdminAlert = useDeleteAdminAlert();
+
+  // Notification history delete hook
+  const deleteNotificationHistory = useDeleteNotificationHistory();
 
   // Alert filter state
   const [alertFilter, setAlertFilter] = useState<{ status?: string; type?: string }>({});
@@ -185,40 +192,39 @@ export default function NotificationsPage() {
     }
   };
 
+  // Process notification history data for chart
+  const chartData = useMemo(() => {
+    if (!notificationHistoryAll?.content || notificationHistoryAll.content.length === 0) {
+      return [];
+    }
+
+    const dateMap = new Map<string, number>();
+    
+    notificationHistoryAll.content.forEach((notification: any) => {
+      const date = new Date(notification.createdAt).toISOString().split('T')[0];
+      dateMap.set(date, (dateMap.get(date) || 0) + 1);
+    });
+
+    // Convert to array and sort by date (oldest to newest)
+    const sortedData = Array.from(dateMap.entries())
+      .map(([date, count]) => ({ date, count }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    // Get last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const recentData = sortedData.filter(item => new Date(item.date) >= sevenDaysAgo);
+
+    return recentData;
+  }, [notificationHistoryAll]);
+
   return (
-    <div className="max-w-6xl mx-auto px-8 py-8">
-      {/* Header - Clean and modern */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Notificaciones y Alertas</h1>
-        <p className="text-gray-500 mt-2 text-lg">Gestiona tus preferencias y comunicaciones del sistema</p>
-      </div>
+    <div className="max-w-6xl mx-auto px-6 py-4">
+      {/* Header - 4 tarjetas en fila */}
+      <NotificationsHeaderStats activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* Tabs - Pill style */}
-      <div className="mb-8">
-        <nav className="flex space-x-1 bg-gray-100/80 p-1 rounded-xl w-fit">
-          {[
-            { id: 'send', label: 'Enviar', icon: Send },
-            { id: 'history', label: 'Historial', icon: History },
-            { id: 'alerts', label: 'Alertas', icon: Bell },
-            { id: 'stats', label: 'Estadísticas', icon: BarChart3 }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
-                activeTab === tab.id
-                  ? 'bg-gradient-to-r from-blue-600 to-teal-500 text-white shadow-md transform scale-105'
-                  : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
-              }`}
-            >
-              <tab.icon className="w-4 h-4 mr-2" />
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      </div>
-
-        {/* Send Notification Tab */}
+        {/* Send Notification Section */}
         {activeTab === 'send' && (
           <div className="space-y-6">
             <Card className="p-6">
@@ -500,7 +506,7 @@ export default function NotificationsPage() {
           </div>
         )}
 
-        {/* History Tab - Admin Alerts History */}
+        {/* History Section - Admin Alerts History */}
         {activeTab === 'history' && (
           <div className="space-y-6">
             {/* Modern History Design */}
@@ -620,12 +626,26 @@ export default function NotificationsPage() {
                                   <h3 className="text-lg font-semibold text-gray-900">{notification.title}</h3>
                                   <p className="text-gray-600 mt-1 line-clamp-2">{notification.message}</p>
                                 </div>
-                                <span className="flex-shrink-0 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                  </svg>
-                                  Enviado
-                                </span>
+                                <div className="flex items-center gap-2">
+                                  <span className="flex-shrink-0 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                    Enviado
+                                  </span>
+                                  <button
+                                    onClick={() => {
+                                      if (confirm('¿Eliminar esta notificación del historial?')) {
+                                        deleteNotificationHistory.mutate(notification.id);
+                                      }
+                                    }}
+                                    disabled={deleteNotificationHistory.isPending}
+                                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                                    title="Eliminar del historial"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
                               </div>
 
                               <div className="mt-3 flex items-center gap-6 text-sm text-gray-500">
@@ -657,11 +677,11 @@ export default function NotificationsPage() {
                 )}
 
                 {/* Pagination Controls */}
-                {notificationHistory && notificationHistory.totalPages > 1 && (
+                {notificationHistory && notificationHistory.totalElements > 0 && (
                   <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
                     <div className="flex items-center justify-between">
                       <div className="text-sm text-gray-600">
-                        Mostrando {notificationHistory.number * notificationHistory.size + 1} - {Math.min((notificationHistory.number + 1) * notificationHistory.size, notificationHistory.totalElements)} de {notificationHistory.totalElements} notificaciones
+                        Mostrando {historyPage * historySize + 1} - {Math.min((historyPage + 1) * historySize, notificationHistory.totalElements)} de {notificationHistory.totalElements} notificaciones
                       </div>
                       <div className="flex items-center gap-2">
                         <button
@@ -675,12 +695,12 @@ export default function NotificationsPage() {
                         </button>
                         
                         <span className="text-sm text-gray-600 px-3">
-                          Página {historyPage + 1} de {notificationHistory.totalPages}
+                          Página {historyPage + 1} de {notificationHistory.totalPages || 1}
                         </span>
                         
                         <button
-                          onClick={() => setHistoryPage(prev => Math.min(notificationHistory.totalPages - 1, prev + 1))}
-                          disabled={historyPage >= notificationHistory.totalPages - 1 || isLoadingHistory}
+                          onClick={() => setHistoryPage(prev => Math.min((notificationHistory.totalPages || 1) - 1, prev + 1))}
+                          disabled={historyPage >= (notificationHistory.totalPages || 1) - 1 || isLoadingHistory}
                           className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-white hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -696,7 +716,7 @@ export default function NotificationsPage() {
           </div>
         )}
 
-        {/* Alerts Tab - Emergency Alerts Management */}
+        {/* Alerts Section - Emergency Alerts Management */}
         {activeTab === 'alerts' && (
           <div className="space-y-6">
             {/* Create Emergency Alert Card */}
@@ -1026,7 +1046,7 @@ export default function NotificationsPage() {
               )}
 
               {/* Pagination Controls for Alerts */}
-              {adminAlerts && adminAlerts.totalPages > 1 && (
+              {adminAlerts && adminAlerts.totalElements > 0 && (
                 <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-gray-600">
@@ -1042,12 +1062,12 @@ export default function NotificationsPage() {
                       </button>
 
                       <span className="text-sm text-gray-600 px-3">
-                        Página {alertsPage + 1} de {adminAlerts.totalPages}
+                        Página {alertsPage + 1} de {adminAlerts.totalPages || 1}
                       </span>
 
                       <button
-                        onClick={() => setAlertsPage(prev => Math.min(adminAlerts.totalPages - 1, prev + 1))}
-                        disabled={alertsPage >= adminAlerts.totalPages - 1 || isLoadingAdminAlerts}
+                        onClick={() => setAlertsPage(prev => Math.min((adminAlerts.totalPages || 1) - 1, prev + 1))}
+                        disabled={alertsPage >= (adminAlerts.totalPages || 1) - 1 || isLoadingAdminAlerts}
                         className="p-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-white hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         <ChevronRight className="w-4 h-4" />
@@ -1060,93 +1080,54 @@ export default function NotificationsPage() {
           </div>
         )}
 
-        {/* Stats Tab - Admin Alerts Statistics */}
+        {/* Stats Section - Admin Alerts Statistics */}
         {activeTab === 'stats' && (
           <div className="space-y-6">
-            <Card className="p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Estadisticas de Notificaciones</h2>
-              
-              {alertStats && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-gray-600">Total Alertas</p>
-                    <p className="text-2xl font-bold text-blue-600">{alertStats.totalAlerts}</p>
-                  </div>
-                  <div className="p-4 bg-teal-50 rounded-lg">
-                    <p className="text-sm text-gray-600">Total Enviados</p>
-                    <p className="text-2xl font-bold text-teal-600">{alertStats.totalSent}</p>
-                  </div>
-                  <div className="p-4 bg-cyan-50 rounded-lg">
-                    <p className="text-sm text-gray-600">Total Leidos</p>
-                    <p className="text-2xl font-bold text-cyan-600">{alertStats.totalRead}</p>
-                  </div>
-                </div>
-              )}
-
-              {alertStats && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-5 border border-blue-100">
+                <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-md font-medium text-gray-900 mb-3">Por Estado</h3>
-                    <div className="space-y-2">
-                      {Object.entries(alertStats.alertsByStatus || {}).map(([status, count]) => {
-                        const statusLabels: Record<string, string> = {
-                          'CANCELLED': 'Cancelado',
-                          'SENDING': 'Enviando',
-                          'FAILED': 'Fallido',
-                          'DRAFT': 'Borrador',
-                          'SCHEDULED': 'Programado',
-                          'SENT': 'Enviado',
-                          'PENDING': 'Pendiente'
-                        };
-                        return (
-                          <div key={status} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                            <span className="text-sm text-gray-700">{statusLabels[status] || status}</span>
-                            <span className="text-sm font-medium text-gray-900">{count as number}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <p className="text-blue-600 text-sm font-medium">Total Enviadas</p>
+                    <p className="text-3xl font-bold text-blue-700">{notificationHistoryAll?.totalElements || 0}</p>
                   </div>
-                  
-                  <div>
-                    <h3 className="text-md font-medium text-gray-900 mb-3">Por Tipo</h3>
-                    <div className="space-y-2">
-                      {Object.entries(alertStats.alertsByType || {}).map(([type, count]) => {
-                        const typeLabels: Record<string, string> = {
-                          'SYSTEM': 'Sistema',
-                          'ANNOUNCEMENT': 'Anuncio',
-                          'MESSAGE': 'Mensaje',
-                          'EMERGENCY': 'Emergencia',
-                          'PROPERTY': 'Propiedad',
-                          'MARKETING': 'Marketing',
-                          'ADMIN_NOTIFICATION': 'Notificación Admin',
-                          'CHANNEL_EVENT_CREATED': 'Evento de Canal',
-                          'CHANNEL_POST_CREATED': 'Post de Canal',
-                          'EVENT_REMINDER': 'Recordatorio',
-                          'CHANNEL_SUBSCRIPTION': 'Suscripción'
-                        };
-                        return (
-                          <div key={type} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                            <span className="text-sm text-gray-700">{typeLabels[type] || type}</span>
-                            <span className="text-sm font-medium text-gray-900">{count as number}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                  <div className="p-3 bg-blue-500 rounded-xl">
+                    <Bell className="w-6 h-6 text-white" />
                   </div>
                 </div>
-              )}
+              </div>
 
-              {!alertStats && (
-                <div className="text-center py-8">
-                  <Spinner size="md" />
-                  <p className="text-gray-500 mt-2">Cargando estadisticas...</p>
+              <div className="bg-gradient-to-br from-green-50 to-green-100/50 rounded-xl p-5 border border-green-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-green-600 text-sm font-medium">Últimos 7 días</p>
+                    <p className="text-3xl font-bold text-green-700">
+                      {notificationHistoryAll?.content?.filter((n: any) => new Date(n.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length || 0}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-green-500 rounded-xl">
+                    <TrendingUp className="w-6 h-6 text-white" />
+                  </div>
                 </div>
-              )}
-            </Card>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-5 border border-purple-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-purple-600 text-sm font-medium">Total Destinatarios</p>
+                    <p className="text-3xl font-bold text-purple-700">
+                      {notificationHistoryAll?.content?.reduce((acc: number, n: any) => acc + (n.recipientCount || 1), 0) || 0}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-purple-500 rounded-xl">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <NotificationsChart data={chartData} isLoading={isLoadingHistoryAll} />
           </div>
         )}
-
-      </div>
-  )
+    </div>
+  );
 }

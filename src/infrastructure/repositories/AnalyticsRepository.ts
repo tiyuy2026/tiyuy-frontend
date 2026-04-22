@@ -170,6 +170,10 @@ export class AnalyticsRepository implements IAnalyticsRepository {
     return response.data;
   }
 
+  async deleteNotificationHistory(notificationId: number): Promise<void> {
+    await axiosClient.delete(`/admin/notifications/history/${notificationId}`);
+  }
+
   async sendNewPropertyNotification(propertyId: number, userIds?: number[]): Promise<string> {
     const params = userIds ? `?userIds=${userIds.join(',')}` : '';
     const response = await axiosClient.post(`/notifications/new-property${propertyId}${params}`);

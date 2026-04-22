@@ -253,6 +253,16 @@ export function useDeleteAdminAlert() {
   });
 }
 
+export function useDeleteNotificationHistory() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (notificationId: number) => analyticsRepo.deleteNotificationHistory(notificationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'notifications', 'history'] });
+    },
+  });
+}
+
 export function useSearchAdminAlerts(query: string) {
   return useQuery({
     queryKey: ['admin', 'alerts', 'search', query],

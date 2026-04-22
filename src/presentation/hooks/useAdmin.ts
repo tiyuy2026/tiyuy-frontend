@@ -28,6 +28,8 @@ import {
   Permission,
   SubscriptionPlan,
   AgencyPlanDiscount,
+  UserPropertiesResponse,
+  UserProjectsResponse,
 } from '@/core/domain/entities/Admin';
 import {
   AgentDiscount,
@@ -255,6 +257,42 @@ export const useChangeUserRole = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'users'] });
     },
+  });
+};
+
+export const useVerifyUserEmail = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: number) => adminRepository.verifyUserEmail(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'users'] });
+    },
+  });
+};
+
+export const useVerifyUserPhone = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: number) => adminRepository.verifyUserPhone(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'users'] });
+    },
+  });
+};
+
+export const useUserProperties = (userId: number | null) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'users', userId, 'properties'],
+    queryFn: () => adminRepository.getUserProperties(userId!),
+    enabled: !!userId,
+  });
+};
+
+export const useUserProjects = (userId: number | null) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'users', userId, 'projects'],
+    queryFn: () => adminRepository.getUserProjects(userId!),
+    enabled: !!userId,
   });
 };
 

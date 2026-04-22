@@ -25,6 +25,27 @@ export const RegisterUsuarioForm: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [emailExists, setEmailExists] = useState(false);
 
+  // Auto-fill Google data if coming from login dialog
+  useEffect(() => {
+    const googleData = sessionStorage.getItem('googleRegistrationData');
+    if (googleData) {
+      try {
+        const parsedData = JSON.parse(googleData);
+        setFormData(prev => ({
+          ...prev,
+          email: parsedData.email,
+          firstName: parsedData.firstName,
+          lastName: parsedData.lastName,
+        }));
+        // Clear the session storage after using it
+        sessionStorage.removeItem('googleRegistrationData');
+        console.log('RegisterUsuarioForm: Datos de Google auto-llenados desde login:', parsedData);
+      } catch (error) {
+        console.error('Error parsing Google data from sessionStorage:', error);
+      }
+    }
+  }, []);
+
   // Validar email en tiempo real
   useEffect(() => {
     const validateEmailField = async () => {
