@@ -25,6 +25,8 @@ export type PaginatedAdminAlerts = {
   content: AdminAlert[];
   totalElements: number;
   totalPages: number;
+  number: number;
+  size: number;
 };
 
 export class AnalyticsRepository implements IAnalyticsRepository {

@@ -4,13 +4,6 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { LocationSearch } from '@/presentation/components/forms/LocationSearch/LocationSearch';
 import { useGooglePlaces } from '@/presentation/hooks/useGooglePlaces';
 
-declare global {
-  interface Window {
-    google: any;
-    initMap: () => void;
-  }
-}
-
 interface LocationStepProps {
   formData: any;
   onChange: (field: string, value: any) => void;

@@ -30,7 +30,10 @@ import {
   AgencyPlanDiscount,
   UserPropertiesResponse,
   UserProjectsResponse,
+  PropertyComment,
+  NotifyOwnerRequest,
 } from '@/core/domain/entities/Admin';
+import { PropertyReport } from '@/core/domain/entities/Moderation';
 import {
   AgentDiscount,
   AgentDiscountFilters,
@@ -532,6 +535,69 @@ export const useToggleFeaturedProperty = () => {
   return useMutation({
     mutationFn: ({ propertyId, featured }: { propertyId: number; featured: boolean }) =>
       adminRepository.toggleFeaturedProperty(propertyId, featured),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'properties'] });
+    },
+  });
+};
+
+// Property reports and comments hooks
+export const usePropertyReports = (propertyId: number | null) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'properties', propertyId, 'reports'],
+    queryFn: () => adminRepository.getPropertyReports(propertyId!),
+    enabled: !!propertyId,
+    staleTime: 30 * 1000,
+  });
+};
+
+export const usePropertyComments = (propertyId: number | null) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'properties', propertyId, 'comments'],
+    queryFn: () => adminRepository.getPropertyComments(propertyId!),
+    enabled: !!propertyId,
+    staleTime: 30 * 1000,
+  });
+};
+
+export const useDeletePropertyComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ propertyId, commentId }: { propertyId: number; commentId: number }) =>
+      adminRepository.deletePropertyComment(propertyId, commentId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'properties', variables.propertyId, 'comments'] });
+    },
+  });
+};
+
+export const useNotifyPropertyOwner = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ propertyId, request }: { propertyId: number; request: NotifyOwnerRequest }) =>
+      adminRepository.notifyPropertyOwner(propertyId, request),
+    onSuccess: () => {
+      // No need to invalidate queries, just notification sent
+    },
+  });
+};
+
+export const useDisablePropertyByAdmin = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ propertyId, reason, notifyOwner }: { propertyId: number; reason?: string; notifyOwner?: boolean }) =>
+      adminRepository.disablePropertyByAdmin(propertyId, reason, notifyOwner),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'properties'] });
+    },
+  });
+};
+
+export const useEnablePropertyByAdmin = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ propertyId, reason, notifyOwner }: { propertyId: number; reason?: string; notifyOwner?: boolean }) =>
+      adminRepository.enablePropertyByAdmin(propertyId, reason, notifyOwner),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'properties'] });
     },

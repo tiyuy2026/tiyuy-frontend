@@ -87,7 +87,12 @@ export default function NotificationsPage() {
   // Alert filter state
   const [alertFilter, setAlertFilter] = useState<{ status?: string; type?: string }>({});
 
-  const [activeTab, setActiveTab] = useState<'send' | 'history' | 'stats' | 'alerts'>('send');
+  // Unified history filter state
+  const [historyViewMode, setHistoryViewMode] = useState<'notifications' | 'alerts' | 'all'>('all');
+  const [selectedNotifications, setSelectedNotifications] = useState<number[]>([]);
+  const [selectedAlerts, setSelectedAlerts] = useState<number[]>([]);
+
+  const [activeTab, setActiveTab] = useState<'send' | 'history' | 'stats'>('send');
 
   // New Alert state
   const [newAlert, setNewAlert] = useState({
@@ -180,6 +185,53 @@ export default function NotificationsPage() {
     }));
   };
 
+  // Selection handlers for unified history
+  const toggleNotificationSelection = (id: number) => {
+    setSelectedNotifications(prev =>
+      prev.includes(id) ? prev.filter(nid => nid !== id) : [...prev, id]
+    );
+  };
+
+  const toggleAlertSelection = (id: number) => {
+    setSelectedAlerts(prev =>
+      prev.includes(id) ? prev.filter(aid => aid !== id) : [...prev, id]
+    );
+  };
+
+  const selectAllNotifications = () => {
+    if (notificationHistory?.content) {
+      const allIds = notificationHistory.content.map((n: any) => n.id);
+      setSelectedNotifications(allIds);
+    }
+  };
+
+  const selectAllAlerts = () => {
+    if (adminAlerts?.content) {
+      const allIds = adminAlerts.content.map((a: any) => a.id);
+      setSelectedAlerts(allIds);
+    }
+  };
+
+  const deselectAllNotifications = () => setSelectedNotifications([]);
+  const deselectAllAlerts = () => setSelectedAlerts([]);
+
+  const deleteSelectedNotifications = async () => {
+    if (!confirm(`¿Eliminar ${selectedNotifications.length} notificaciones seleccionadas?`)) return;
+    
+    for (const id of selectedNotifications) {
+      await deleteNotificationHistory.mutateAsync(id);
+    }
+    setSelectedNotifications([]);
+  };
+
+  const deleteSelectedAlerts = async () => {
+    if (!confirm(`¿Eliminar ${selectedAlerts.length} alertas seleccionadas?`)) return;
+    
+    for (const id of selectedAlerts) {
+      await deleteAdminAlert.mutateAsync(id);
+    }
+    setSelectedAlerts([]);
+  };
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -238,7 +290,7 @@ export default function NotificationsPage() {
                     type="text"
                     value={newNotification.subject}
                     onChange={(e) => setNewNotification(prev => ({ ...prev, subject: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all"
                     placeholder="Ingresa el asunto del email"
                   />
                 </div>
@@ -250,7 +302,7 @@ export default function NotificationsPage() {
                     value={newNotification.message}
                     onChange={(e) => setNewNotification(prev => ({ ...prev, message: e.target.value }))}
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all"
                     placeholder="Ingresa el mensaje de la notificación"
                   />
                 </div>
@@ -288,7 +340,7 @@ export default function NotificationsPage() {
                             onClick={() => toggleRoleSelection(role)}
                             className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                               newNotification.roles.includes(role)
-                                ? 'bg-blue-600 text-white'
+                                ? 'bg-gradient-to-r from-teal-600 to-teal-700 text-white shadow-lg shadow-teal-500/30'
                                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                             }`}
                           >
@@ -310,7 +362,7 @@ export default function NotificationsPage() {
                           value={userSearch.searchQuery}
                           onChange={(e) => userSearch.setSearchQuery(e.target.value)}
                           placeholder="Buscar por nombre, email o DNI (mín. 2 caracteres)..."
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-all"
                         />
                       </div>
                       {/* Loading state */}
@@ -373,7 +425,7 @@ export default function NotificationsPage() {
                               input.value = '';
                             }
                           }}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                          className="px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-lg shadow-teal-500/30"
                         >
                           Agregar
                         </button>
@@ -410,7 +462,7 @@ export default function NotificationsPage() {
                           value={agentSearch.searchQuery}
                           onChange={(e) => agentSearch.setSearchQuery(e.target.value)}
                           placeholder="Buscar agente por nombre, email o DNI (mín. 2 caracteres)..."
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-all"
                         />
                       </div>
                       {/* Loading state */}
@@ -474,8 +526,8 @@ export default function NotificationsPage() {
                 </div>
 
                 {/* Summary */}
-                <div className="p-3 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-blue-800">
+                <div className="p-3 bg-teal-50 rounded-lg border border-teal-100">
+                  <p className="text-sm text-teal-800">
                     <strong>Resumen:</strong>
                     {newNotification.sendToAll
                       ? ' Enviar a todos los usuarios'
@@ -496,7 +548,7 @@ export default function NotificationsPage() {
                   <button
                     onClick={handleSendNotification}
                     disabled={!newNotification.subject || !newNotification.message || sendNotification.isPending}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-lg hover:from-teal-700 hover:to-teal-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-teal-500/30"
                   >
                     {sendNotification.isPending ? 'Enviando...' : 'Enviar Notificación'}
                   </button>
@@ -506,220 +558,10 @@ export default function NotificationsPage() {
           </div>
         )}
 
-        {/* History Section - Admin Alerts History */}
+        {/* History Section - Unified Notifications & Alerts History */}
         {activeTab === 'history' && (
           <div className="space-y-6">
-            {/* Modern History Design */}
-            <div className="space-y-6">
-              {/* Stats Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white shadow-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-blue-100 text-sm">Total Notificaciones</p>
-                      <p className="text-3xl font-bold">{notificationHistory?.content?.length || 0}</p>
-                    </div>
-                    <div className="p-3 bg-white/20 rounded-lg">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-5 text-white shadow-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-green-100 text-sm">Últimos 7 días</p>
-                      <p className="text-3xl font-bold">
-                        {notificationHistory?.content?.filter((n: any) => new Date(n.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length || 0}
-                      </p>
-                    </div>
-                    <div className="p-3 bg-white/20 rounded-lg">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-5 text-white shadow-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-purple-100 text-sm">Total Destinatarios</p>
-                      <p className="text-3xl font-bold">
-                        {notificationHistory?.content?.reduce((acc: number, n: any) => acc + (n.recipientCount || 1), 0) || 0}
-                      </p>
-                    </div>
-                    <div className="p-3 bg-white/20 rounded-lg">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Notifications List with Filter */}
-              <Card className="overflow-hidden">
-                <div className="p-6 border-b border-gray-100">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-900">Historial de Notificaciones Enviadas</h2>
-                      <p className="text-sm text-gray-500 mt-1">Últimas 30 días de notificaciones enviadas a usuarios</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm font-medium text-gray-700">Filtrar por tipo:</label>
-                      <select
-                        value={historyTypeFilter}
-                        onChange={(e) => {
-                          setHistoryTypeFilter(e.target.value);
-                          setHistoryPage(0); // Reset to first page on filter change
-                        }}
-                        disabled={isLoadingTypes}
-                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-                      >
-                        <option value="">Todos los tipos</option>
-                        {notificationTypes?.map((t: any) => (
-                          <option key={t.value} value={t.value}>{t.label}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {isLoadingHistory ? (
-                  <div className="p-12 flex items-center justify-center">
-                    <Spinner size="lg" />
-                  </div>
-                ) : (
-                  <div className="divide-y divide-gray-100">
-                    {notificationHistory?.content?.length === 0 ? (
-                      <div className="p-12 text-center">
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                          </svg>
-                        </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No hay notificaciones</h3>
-                        <p className="text-gray-500 max-w-sm mx-auto">Las notificaciones que envíes aparecerán aquí. Usa la pestaña "Enviar" para crear nuevas notificaciones.</p>
-                      </div>
-                    ) : (
-                      notificationHistory?.content?.map((notification: any, index: number) => (
-                        <div key={notification.id} className="p-5 hover:bg-gray-50 transition-colors">
-                          <div className="flex items-start gap-4">
-                            {/* Icon */}
-                            <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${
-                              notification.type === 'ADMIN_NOTIFICATION' 
-                                ? 'bg-red-100 text-red-600' 
-                                : notification.type === 'EVENT_CREATED' || notification.type === 'EVENT_REMINDER'
-                                  ? 'bg-blue-100 text-blue-600'
-                                  : 'bg-teal-100 text-teal-600'
-                            }`}>
-                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                              </svg>
-                            </div>
-
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between gap-4">
-                                <div>
-                                  <h3 className="text-lg font-semibold text-gray-900">{notification.title}</h3>
-                                  <p className="text-gray-600 mt-1 line-clamp-2">{notification.message}</p>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <span className="flex-shrink-0 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
-                                    Enviado
-                                  </span>
-                                  <button
-                                    onClick={() => {
-                                      if (confirm('¿Eliminar esta notificación del historial?')) {
-                                        deleteNotificationHistory.mutate(notification.id);
-                                      }
-                                    }}
-                                    disabled={deleteNotificationHistory.isPending}
-                                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                                    title="Eliminar del historial"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              </div>
-
-                              <div className="mt-3 flex items-center gap-6 text-sm text-gray-500">
-                                <span className="flex items-center gap-1">
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                  </svg>
-                                  {format(new Date(notification.createdAt), 'dd MMM yyyy, HH:mm')}
-                                </span>
-                                <span className="flex items-center gap-1">
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                  </svg>
-                                  {notification.recipientCount || 1} {notification.recipientCount === 1 ? 'destinatario' : 'destinatarios'}
-                                </span>
-                                <span className="flex items-center gap-1">
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                  </svg>
-                                  {notification.type || 'GENERAL'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
-
-                {/* Pagination Controls */}
-                {notificationHistory && notificationHistory.totalElements > 0 && (
-                  <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm text-gray-600">
-                        Mostrando {historyPage * historySize + 1} - {Math.min((historyPage + 1) * historySize, notificationHistory.totalElements)} de {notificationHistory.totalElements} notificaciones
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setHistoryPage(prev => Math.max(0, prev - 1))}
-                          disabled={historyPage === 0 || isLoadingHistory}
-                          className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-white hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                          </svg>
-                        </button>
-                        
-                        <span className="text-sm text-gray-600 px-3">
-                          Página {historyPage + 1} de {notificationHistory.totalPages || 1}
-                        </span>
-                        
-                        <button
-                          onClick={() => setHistoryPage(prev => Math.min((notificationHistory.totalPages || 1) - 1, prev + 1))}
-                          disabled={historyPage >= (notificationHistory.totalPages || 1) - 1 || isLoadingHistory}
-                          className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-white hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </Card>
-            </div>
-          </div>
-        )}
-
-        {/* Alerts Section - Emergency Alerts Management */}
-        {activeTab === 'alerts' && (
-          <div className="space-y-6">
-            {/* Create Emergency Alert Card */}
+            {/* Create Alert Card - Now in History Tab */}
             <Card className="overflow-hidden border-red-200">
               <div className="bg-gradient-to-r from-red-50 to-red-100/50 p-6 border-b border-red-100">
                 <div className="flex items-center gap-3">
@@ -798,7 +640,6 @@ export default function NotificationsPage() {
                       checked={!!newAlert.scheduledFor}
                       onChange={(e) => {
                         if (e.target.checked) {
-                          // Set default to 1 hour from now
                           const oneHourFromNow = new Date(Date.now() + 60 * 60 * 1000).toISOString().slice(0, 16);
                           setNewAlert(prev => ({ ...prev, scheduledFor: oneHourFromNow, status: 'SCHEDULED' }));
                         } else {
@@ -820,7 +661,6 @@ export default function NotificationsPage() {
                         type="datetime-local"
                         value={newAlert.scheduledFor}
                         onChange={(e) => {
-                          // Convert local datetime to UTC ISO string for backend
                           const localDate = new Date(e.target.value);
                           const utcISO = localDate.toISOString();
                           setNewAlert(prev => ({ ...prev, scheduledFor: utcISO }));
@@ -929,156 +769,434 @@ export default function NotificationsPage() {
               </div>
             </Card>
 
-            {/* Alerts List */}
-            <Card className="overflow-hidden">
-              <div className="p-6 border-b border-gray-100">
-                <h2 className="text-xl font-bold text-gray-900">Alertas Programadas y Borradores</h2>
-              </div>
-
-              {isLoadingAdminAlerts ? (
-                <div className="p-12 flex items-center justify-center">
-                  <Spinner size="lg" />
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-100">
-                  {adminAlerts?.content?.length === 0 ? (
-                    <div className="p-12 text-center">
-                      <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                        </svg>
-                      </div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">No hay alertas</h3>
-                      <p className="text-gray-500">Las alertas programadas o borradores aparecerán aquí</p>
-                    </div>
-                  ) : (
-                    adminAlerts?.content?.map((alert: any) => (
-                      <div key={alert.id} className={`p-5 hover:bg-gray-50 transition-colors ${
-                        alert.alertType === 'EMERGENCY' ? 'bg-red-50/30' : ''
-                      }`}>
-                        <div className="flex items-start gap-4">
-                          {/* Icon based on type */}
-                          <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${
-                            alert.alertType === 'EMERGENCY' 
-                              ? 'bg-red-100 text-red-600' 
-                              : alert.alertType === 'SYSTEM'
-                                ? 'bg-blue-100 text-blue-600'
-                                : alert.alertType === 'ANNOUNCEMENT'
-                                  ? 'bg-teal-100 text-teal-600'
-                                  : 'bg-cyan-100 text-cyan-600'
-                          }`}>
-                            {alert.alertType === 'EMERGENCY' && <AlertTriangle className="w-6 h-6" />}
-                            {alert.alertType === 'SYSTEM' && <Settings className="w-6 h-6" />}
-                            {alert.alertType === 'ANNOUNCEMENT' && <Megaphone className="w-6 h-6" />}
-                            {alert.alertType === 'MARKETING' && <TrendingUp className="w-6 h-6" />}
-                          </div>
-
-                          {/* Content */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-4">
-                              <div>
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                    alert.status === 'SENT' ? 'bg-green-100 text-green-800' :
-                                    alert.status === 'FAILED' ? 'bg-red-100 text-red-800' :
-                                    alert.status === 'SCHEDULED' ? 'bg-yellow-100 text-yellow-800' :
-                                    alert.status === 'DRAFT' ? 'bg-gray-100 text-gray-800' :
-                                    'bg-blue-100 text-blue-800'
-                                  }`}>
-                                    {alert.status}
-                                  </span>
-                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                                    {alert.alertType}
-                                  </span>
-                                </div>
-                                <h3 className="text-lg font-semibold text-gray-900">{alert.subject}</h3>
-                                <p className="text-gray-600 mt-1 line-clamp-2">{alert.message}</p>
-                              </div>
-
-                              {/* Actions */}
-                              <div className="flex gap-2">
-                                {alert.status === 'DRAFT' && (
-                                  <button
-                                    onClick={() => sendAdminAlertNow.mutate(alert.id)}
-                                    disabled={sendAdminAlertNow.isPending}
-                                    className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
-                                  >
-                                    Enviar
-                                  </button>
-                                )}
-                                {(alert.status === 'DRAFT' || alert.status === 'SCHEDULED') && (
-                                  <button
-                                    onClick={() => deleteAdminAlert.mutate(alert.id)}
-                                    disabled={deleteAdminAlert.isPending}
-                                    className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:opacity-50"
-                                  >
-                                    Eliminar
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="mt-3 flex items-center gap-4 text-sm text-gray-500">
-                              <span className="flex items-center gap-1">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                {format(new Date(alert.createdAt), 'dd MMM yyyy, HH:mm')}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                                {alert.targetUserCount || 0} destinatarios
-                              </span>
-                              <span className="flex items-center gap-1">
-                                {alert.sendEmail && <Mail className="w-4 h-4 text-blue-500" />}
-                                {alert.sendInApp && <Smartphone className="w-4 h-4 text-teal-500" />}
-                                {alert.sendPush && <BellRing className="w-4 h-4 text-cyan-500" />}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-
-              {/* Pagination Controls for Alerts */}
-              {adminAlerts && adminAlerts.totalElements > 0 && (
-                <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
+            {/* Modern History Design */}
+            <div className="space-y-6">
+              {/* Stats Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl p-5 text-white shadow-lg">
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600">
-                      Mostrando {alertsPage * alertsSize + 1} - {Math.min((alertsPage + 1) * alertsSize, adminAlerts.totalElements)} de {adminAlerts.totalElements} alertas
+                    <div>
+                      <p className="text-teal-100 text-sm">Total Notificaciones</p>
+                      <p className="text-3xl font-bold">{notificationHistory?.totalElements || 0}</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setAlertsPage(prev => Math.max(0, prev - 1))}
-                        disabled={alertsPage === 0 || isLoadingAdminAlerts}
-                        className="p-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-white hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                      </button>
-
-                      <span className="text-sm text-gray-600 px-3">
-                        Página {alertsPage + 1} de {adminAlerts.totalPages || 1}
-                      </span>
-
-                      <button
-                        onClick={() => setAlertsPage(prev => Math.min((adminAlerts.totalPages || 1) - 1, prev + 1))}
-                        disabled={alertsPage >= (adminAlerts.totalPages || 1) - 1 || isLoadingAdminAlerts}
-                        className="p-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-white hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
+                    <div className="p-3 bg-white/20 rounded-lg">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                      </svg>
                     </div>
                   </div>
                 </div>
-              )}
-            </Card>
+                <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-5 text-white shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-red-100 text-sm">Total Alertas</p>
+                      <p className="text-3xl font-bold">{adminAlerts?.totalElements || 0}</p>
+                    </div>
+                    <div className="p-3 bg-white/20 rounded-lg">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-5 text-white shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-green-100 text-sm">Últimos 7 días</p>
+                      <p className="text-3xl font-bold">
+                        {(notificationHistory?.content?.filter((n: any) => new Date(n.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length || 0) +
+                         (adminAlerts?.content?.filter((a: any) => new Date(a.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length || 0)}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-white/20 rounded-lg">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-5 text-white shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-purple-100 text-sm">Total Destinatarios</p>
+                      <p className="text-3xl font-bold">
+                        {(notificationHistory?.content?.reduce((acc: number, n: any) => acc + (n.recipientCount || 1), 0) || 0) +
+                         (adminAlerts?.content?.reduce((acc: number, a: any) => acc + (a.targetUserCount || 0), 0) || 0)}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-white/20 rounded-lg">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Unified History List with Filter */}
+              <Card className="overflow-hidden">
+                <div className="p-6 border-b border-gray-100">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900">Historial de Envíos</h2>
+                      <p className="text-sm text-gray-500 mt-1">Notificaciones y alertas enviadas</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium text-gray-700">Ver:</label>
+                      <select
+                        value={historyViewMode}
+                        onChange={(e) => {
+                          setHistoryViewMode(e.target.value as any);
+                          setHistoryPage(0);
+                          setAlertsPage(0);
+                          setSelectedNotifications([]);
+                          setSelectedAlerts([]);
+                        }}
+                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all"
+                      >
+                        <option value="all">Todas</option>
+                        <option value="notifications">Notificaciones</option>
+                        <option value="alerts">Alertas</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Selection Controls */}
+                  {(historyViewMode === 'notifications' || historyViewMode === 'all') && selectedNotifications.length > 0 && (
+                    <div className="flex items-center gap-2 mb-3 p-2 bg-teal-50 rounded-lg">
+                      <span className="text-sm text-teal-700 font-medium">{selectedNotifications.length} notificaciones seleccionadas</span>
+                      <button
+                        onClick={deleteSelectedNotifications}
+                        disabled={deleteNotificationHistory.isPending}
+                        className="px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-1"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Eliminar
+                      </button>
+                      <button
+                        onClick={deselectAllNotifications}
+                        className="px-3 py-1.5 text-gray-600 text-sm hover:bg-gray-200 rounded-lg"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
+                  {(historyViewMode === 'alerts' || historyViewMode === 'all') && selectedAlerts.length > 0 && (
+                    <div className="flex items-center gap-2 mb-3 p-2 bg-red-50 rounded-lg">
+                      <span className="text-sm text-red-700 font-medium">{selectedAlerts.length} alertas seleccionadas</span>
+                      <button
+                        onClick={deleteSelectedAlerts}
+                        disabled={deleteAdminAlert.isPending}
+                        className="px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-1"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Eliminar
+                      </button>
+                      <button
+                        onClick={deselectAllAlerts}
+                        className="px-3 py-1.5 text-gray-600 text-sm hover:bg-gray-200 rounded-lg"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {(isLoadingHistory || isLoadingAdminAlerts) ? (
+                  <div className="p-12 flex items-center justify-center">
+                    <Spinner size="lg" />
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-100">
+                    {/* Show Notifications */}
+                    {(historyViewMode === 'notifications' || historyViewMode === 'all') && (
+                      <>
+                        {notificationHistory?.content?.length === 0 ? (
+                          historyViewMode === 'notifications' && (
+                            <div className="p-12 text-center">
+                              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                </svg>
+                              </div>
+                              <h3 className="text-lg font-medium text-gray-900 mb-2">No hay notificaciones</h3>
+                            </div>
+                          )
+                        ) : (
+                          notificationHistory?.content?.map((notification: any) => (
+                            <div key={`notif-${notification.id}`} className="p-5 hover:bg-gray-50 transition-colors">
+                              <div className="flex items-start gap-4">
+                                {/* Checkbox */}
+                                <input
+                                  type="checkbox"
+                                  checked={selectedNotifications.includes(notification.id)}
+                                  onChange={() => toggleNotificationSelection(notification.id)}
+                                  className="mt-3 w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
+                                />
+                                {/* Icon */}
+                                <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${
+                                  notification.type === 'ADMIN_NOTIFICATION'
+                                    ? 'bg-red-100 text-red-600'
+                                    : notification.type === 'EVENT_CREATED' || notification.type === 'EVENT_REMINDER'
+                                      ? 'bg-blue-100 text-blue-600'
+                                      : 'bg-teal-100 text-teal-600'
+                                }`}>
+                                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                  </svg>
+                                </div>
+
+                                {/* Content */}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-start justify-between gap-4">
+                                    <div>
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-teal-100 text-teal-700 mb-1">
+                                        NOTIFICACIÓN
+                                      </span>
+                                      <h3 className="text-lg font-semibold text-gray-900">{notification.title}</h3>
+                                      <p className="text-gray-600 mt-1 line-clamp-2">{notification.message}</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="flex-shrink-0 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                        Enviado
+                                      </span>
+                                      <button
+                                        onClick={() => {
+                                          if (confirm('¿Eliminar esta notificación del historial?')) {
+                                            deleteNotificationHistory.mutate(notification.id);
+                                          }
+                                        }}
+                                        disabled={deleteNotificationHistory.isPending}
+                                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                                        title="Eliminar del historial"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <div className="mt-3 flex items-center gap-6 text-sm text-gray-500">
+                                    <span className="flex items-center gap-1">
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                      </svg>
+                                      {format(new Date(notification.createdAt), 'dd MMM yyyy, HH:mm')}
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                      </svg>
+                                      {notification.recipientCount || 1} {notification.recipientCount === 1 ? 'destinatario' : 'destinatarios'}
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                      </svg>
+                                      {notification.type || 'GENERAL'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </>
+                    )}
+
+                    {/* Show Alerts */}
+                    {(historyViewMode === 'alerts' || historyViewMode === 'all') && (
+                      <>
+                        {adminAlerts?.content?.length === 0 ? (
+                          historyViewMode === 'alerts' && (
+                            <div className="p-12 text-center">
+                              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                              </div>
+                              <h3 className="text-lg font-medium text-gray-900 mb-2">No hay alertas</h3>
+                            </div>
+                          )
+                        ) : (
+                          adminAlerts?.content?.map((alert: any) => (
+                            <div key={`alert-${alert.id}`} className={`p-5 hover:bg-gray-50 transition-colors ${alert.alertType === 'EMERGENCY' ? 'bg-red-50/30' : ''}`}>
+                              <div className="flex items-start gap-4">
+                                {/* Checkbox */}
+                                <input
+                                  type="checkbox"
+                                  checked={selectedAlerts.includes(alert.id)}
+                                  onChange={() => toggleAlertSelection(alert.id)}
+                                  className="mt-3 w-4 h-4 text-red-600 rounded focus:ring-red-500"
+                                />
+                                {/* Icon */}
+                                <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${
+                                  alert.alertType === 'EMERGENCY'
+                                    ? 'bg-red-100 text-red-600'
+                                    : alert.alertType === 'SYSTEM'
+                                      ? 'bg-blue-100 text-blue-600'
+                                      : alert.alertType === 'ANNOUNCEMENT'
+                                        ? 'bg-teal-100 text-teal-600'
+                                        : 'bg-cyan-100 text-cyan-600'
+                                }`}>
+                                  {alert.alertType === 'EMERGENCY' && <AlertTriangle className="w-6 h-6" />}
+                                  {alert.alertType === 'SYSTEM' && <Settings className="w-6 h-6" />}
+                                  {alert.alertType === 'ANNOUNCEMENT' && <Megaphone className="w-6 h-6" />}
+                                  {alert.alertType === 'MARKETING' && <TrendingUp className="w-6 h-6" />}
+                                </div>
+
+                                {/* Content */}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-start justify-between gap-4">
+                                    <div>
+                                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mb-1 ${
+                                        alert.status === 'SENT' ? 'bg-green-100 text-green-700' :
+                                        alert.status === 'FAILED' ? 'bg-red-100 text-red-700' :
+                                        alert.status === 'SCHEDULED' ? 'bg-yellow-100 text-yellow-700' :
+                                        alert.status === 'DRAFT' ? 'bg-gray-100 text-gray-700' :
+                                        'bg-blue-100 text-blue-700'
+                                      }`}>
+                                        {alert.status}
+                                      </span>
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 ml-1">
+                                        ALERTA: {alert.alertType}
+                                      </span>
+                                      <h3 className="text-lg font-semibold text-gray-900">{alert.subject}</h3>
+                                      <p className="text-gray-600 mt-1 line-clamp-2">{alert.message}</p>
+                                    </div>
+                                    <div className="flex gap-2">
+                                      {alert.status === 'DRAFT' && (
+                                        <button
+                                          onClick={() => sendAdminAlertNow.mutate(alert.id)}
+                                          disabled={sendAdminAlertNow.isPending}
+                                          className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+                                        >
+                                          Enviar
+                                        </button>
+                                      )}
+                                      {(alert.status === 'DRAFT' || alert.status === 'SCHEDULED') && (
+                                        <button
+                                          onClick={() => {
+                                            if (confirm('¿Eliminar esta alerta?')) {
+                                              deleteAdminAlert.mutate(alert.id);
+                                            }
+                                          }}
+                                          disabled={deleteAdminAlert.isPending}
+                                          className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:opacity-50"
+                                        >
+                                          Eliminar
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="mt-3 flex items-center gap-4 text-sm text-gray-500">
+                                    <span className="flex items-center gap-1">
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                      </svg>
+                                      {format(new Date(alert.createdAt), 'dd MMM yyyy, HH:mm')}
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                      </svg>
+                                      {alert.targetUserCount || 0} destinatarios
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                      {alert.sendEmail && <Mail className="w-4 h-4 text-blue-500" />}
+                                      {alert.sendInApp && <Smartphone className="w-4 h-4 text-teal-500" />}
+                                      {alert.sendPush && <BellRing className="w-4 h-4 text-cyan-500" />}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {/* Pagination Controls */}
+                {(historyViewMode === 'notifications' || historyViewMode === 'all') && notificationHistory && notificationHistory.totalElements > 0 && (
+                  <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-gray-600">
+                        Notificaciones: Mostrando {historyPage * historySize + 1} - {Math.min((historyPage + 1) * historySize, notificationHistory.totalElements)} de {notificationHistory.totalElements}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setHistoryPage(prev => Math.max(0, prev - 1))}
+                          disabled={historyPage === 0 || isLoadingHistory}
+                          className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-white hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                        </button>
+                        
+                        <span className="text-sm text-gray-600 px-3">
+                          Página {historyPage + 1} de {notificationHistory.totalPages || 1}
+                        </span>
+                        
+                        <button
+                          onClick={() => setHistoryPage(prev => Math.min((notificationHistory.totalPages || 1) - 1, prev + 1))}
+                          disabled={historyPage >= (notificationHistory.totalPages || 1) - 1 || isLoadingHistory}
+                          className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-white hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Alerts Pagination */}
+                {(historyViewMode === 'alerts' || historyViewMode === 'all') && adminAlerts && adminAlerts.totalElements > 0 && (
+                  <div className="px-6 py-4 border-t border-gray-100 bg-red-50">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-gray-600">
+                        Alertas: Mostrando {alertsPage * alertsSize + 1} - {Math.min((alertsPage + 1) * alertsSize, adminAlerts.totalElements)} de {adminAlerts.totalElements}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setAlertsPage(prev => Math.max(0, prev - 1))}
+                          disabled={alertsPage === 0 || isLoadingAdminAlerts}
+                          className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-white hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                        </button>
+                        
+                        <span className="text-sm text-gray-600 px-3">
+                          Página {alertsPage + 1} de {adminAlerts.totalPages || 1}
+                        </span>
+                        
+                        <button
+                          onClick={() => setAlertsPage(prev => Math.min((adminAlerts.totalPages || 1) - 1, prev + 1))}
+                          disabled={alertsPage >= (adminAlerts.totalPages || 1) - 1 || isLoadingAdminAlerts}
+                          className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-white hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </Card>
+            </div>
           </div>
         )}
+
 
         {/* Stats Section - Admin Alerts Statistics */}
         {activeTab === 'stats' && (

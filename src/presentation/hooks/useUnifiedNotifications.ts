@@ -71,7 +71,7 @@ export const useUnifiedNotifications = (type?: 'all' | 'general' | 'events') => 
       if (!isAuthenticated || !user) return [];
       
       try {
-        const { data } = await apiClient.get<{content: EventNotification[]}>('/notifications/events');
+        const { data } = await apiClient.get<{content: EventNotification[]}>('/channel-events');
         return data.content || [];
       } catch (error) {
         // Sin fallback - si el API falla, devuelve array vacío
@@ -103,8 +103,8 @@ export const useUnifiedNotifications = (type?: 'all' | 'general' | 'events') => 
   const markAsReadMutation = useMutation({
     mutationFn: async (notificationId: string) => {
       try {
-        // Backend usa PATCH /notifications/{id}/read
-        await apiClient.patch(`/notifications/${notificationId}/read`);
+        // Backend usa POST /notifications/{id}/read (NotificationController)
+        await apiClient.post(`/notifications/${notificationId}/read`);
       } catch (error) {
         console.error('Error marking notification as read:', error);
         throw error;
@@ -119,8 +119,8 @@ export const useUnifiedNotifications = (type?: 'all' | 'general' | 'events') => 
   const markAllAsReadMutation = useMutation({
     mutationFn: async () => {
       try {
-        // Backend usa PATCH /notifications/read-all
-        await apiClient.patch('/notifications/read-all');
+        // Backend usa POST /notifications/read-all (NotificationController)
+        await apiClient.post('/notifications/read-all');
       } catch (error) {
         console.error('Error marking all notifications as read:', error);
         throw error;

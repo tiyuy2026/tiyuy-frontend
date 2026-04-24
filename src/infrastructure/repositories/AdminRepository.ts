@@ -35,7 +35,10 @@ import {
   AgencyPlanDiscount,
   UserPropertiesResponse,
   UserProjectsResponse,
+  PropertyComment,
+  NotifyOwnerRequest,
 } from '@/core/domain/entities/Admin';
+import { PropertyReport } from '@/core/domain/entities/Moderation';
 import {
   AgentDiscount,
   AgentDiscountFilters,
@@ -274,6 +277,38 @@ export class AdminRepository implements IAdminRepository {
     const params = new URLSearchParams();
     if (reason) params.append('reason', reason);
     await axiosClient.delete(`${this.basePath}/properties/${propertyId}?${params.toString()}`);
+  }
+
+  async getPropertyReports(propertyId: number): Promise<PropertyReport[]> {
+    const response = await axiosClient.get(`${this.basePath}/properties/${propertyId}/reports`);
+    return response.data;
+  }
+
+  async getPropertyComments(propertyId: number): Promise<PropertyComment[]> {
+    const response = await axiosClient.get(`${this.basePath}/properties/${propertyId}/comments`);
+    return response.data;
+  }
+
+  async deletePropertyComment(propertyId: number, commentId: number): Promise<void> {
+    await axiosClient.delete(`${this.basePath}/properties/${propertyId}/comments/${commentId}`);
+  }
+
+  async notifyPropertyOwner(propertyId: number, request: NotifyOwnerRequest): Promise<void> {
+    await axiosClient.post(`${this.basePath}/properties/${propertyId}/notify-owner`, request);
+  }
+
+  async disablePropertyByAdmin(propertyId: number, reason?: string, notifyOwner: boolean = true): Promise<void> {
+    const params = new URLSearchParams();
+    if (reason) params.append('reason', reason);
+    params.append('notifyOwner', notifyOwner.toString());
+    await axiosClient.post(`${this.basePath}/properties/${propertyId}/disable?${params.toString()}`);
+  }
+
+  async enablePropertyByAdmin(propertyId: number, reason?: string, notifyOwner: boolean = true): Promise<void> {
+    const params = new URLSearchParams();
+    if (reason) params.append('reason', reason);
+    params.append('notifyOwner', notifyOwner.toString());
+    await axiosClient.post(`${this.basePath}/properties/${propertyId}/enable?${params.toString()}`);
   }
 
   // Agent Management

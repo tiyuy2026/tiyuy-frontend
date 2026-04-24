@@ -158,16 +158,16 @@ export function AdminTable<T extends Record<string, any>>({
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-100">
-            <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+            <thead className="bg-white border-b border-gray-200">
               <tr>
                 {/* Selection column */}
                 {selection && (
-                  <th className="px-6 py-4 text-left">
+                  <th className="px-6 py-4 text-left bg-gray-50/50">
                     <input
                       type="checkbox"
                       checked={isAllSelected}
                       onChange={(e) => handleSelectAll(e.target.checked)}
-                      className="h-5 w-5 text-blue-600 focus:ring-blue-500 focus:ring-offset-2 border-gray-300 rounded-lg"
+                      className="h-4 w-4 text-teal-600 focus:ring-teal-500 focus:ring-offset-2 border-gray-300 rounded"
                     />
                   </th>
                 )}
@@ -176,39 +176,37 @@ export function AdminTable<T extends Record<string, any>>({
                 {columns.map((column) => (
                   <th
                     key={String(column.key)}
-                    className={`px-4 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap ${
-                      column.sortable ? 'cursor-pointer hover:bg-gray-200/50 transition-colors' : ''
+                    className={`px-4 py-3.5 text-left text-xs font-bold text-gray-700 uppercase tracking-wide whitespace-nowrap bg-gray-50/50 border-b-2 border-transparent hover:border-teal-500 transition-colors ${
+                      column.sortable ? 'cursor-pointer hover:bg-gray-100' : ''
                     }`}
                     style={{ width: column.width, minWidth: column.width }}
                     onClick={() => column.sortable && handleSort(column.key)}
                   >
                     <div className="flex items-center gap-2">
-                      {column.label}
+                      <span className="text-gray-800">{column.label}</span>
                       {column.sortable && (
-                        <div className="flex flex-col">
+                        <div className="flex flex-col gap-0.5">
                           <svg
-                            className={`w-3 h-3 ${
+                            className={`w-3 h-3 transition-colors ${
                               sortConfig.key === column.key && sortConfig.direction === 'asc'
-                                ? 'text-blue-600'
-                                : 'text-gray-400'
+                                ? 'text-teal-600'
+                                : 'text-gray-400 hover:text-gray-600'
                             }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
                           >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                            <path d="M5 10l5-5 5 5H5z" />
                           </svg>
                           <svg
-                            className={`w-3 h-3 -mt-1 ${
+                            className={`w-3 h-3 transition-colors ${
                               sortConfig.key === column.key && sortConfig.direction === 'desc'
-                                ? 'text-blue-600'
-                                : 'text-gray-400'
+                                ? 'text-teal-600'
+                                : 'text-gray-400 hover:text-gray-600'
                             }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
                           >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7 7" />
+                            <path d="M5 10l5 5 5-5H5z" />
                           </svg>
                         </div>
                       )}

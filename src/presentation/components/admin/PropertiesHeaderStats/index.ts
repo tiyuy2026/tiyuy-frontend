@@ -1,0 +1,1 @@
+export { PropertiesHeaderStats } from './PropertiesHeaderStats';

@@ -31,12 +31,6 @@ const VISIBILITY_TYPES = [
 const MAX_IMAGES = 5;
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
-declare global {
-  interface Window {
-    google: any;
-  }
-}
-
 export default function CreateEventModal({ isOpen, onClose, channelId, onSuccess }: CreateEventModalProps) {
   const queryClient = useQueryClient();
   const createEventMutation = useCreateChannelEvent();
