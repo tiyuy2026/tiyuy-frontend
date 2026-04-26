@@ -39,10 +39,11 @@ export const useEventNotifications = () => {
   const markAsReadMutation = useMutation({
     mutationFn: async (notificationId: string) => {
       try {
+        // Backend de eventos espera PUT (no PATCH como las notificaciones generales)
         await apiClient.put(`/notifications/events/${notificationId}/read`);
       } catch (error) {
-        // Si el endpoint no existe, simulamos éxito
-        console.log('Marking notification as read:', notificationId);
+        console.error('Error marking event notification as read:', error);
+        throw error;
       }
     },
     onSuccess: () => {
@@ -53,10 +54,11 @@ export const useEventNotifications = () => {
   const markAllAsReadMutation = useMutation({
     mutationFn: async () => {
       try {
+        // Backend de eventos espera PUT
         await apiClient.put('/notifications/events/mark-all-read');
       } catch (error) {
-        // Si el endpoint no existe, simulamos éxito
-        console.log('Marking all event notifications as read');
+        console.error('Error marking all event notifications as read:', error);
+        throw error;
       }
     },
     onSuccess: () => {

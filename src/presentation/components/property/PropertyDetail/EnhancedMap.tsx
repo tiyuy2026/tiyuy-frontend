@@ -8,13 +8,6 @@ interface EnhancedMapProps {
   propertyId: number;
 }
 
-declare global {
-  interface Window {
-    google: any;
-    initMap: () => void;
-  }
-}
-
 export function EnhancedMap({ location, propertyId }: EnhancedMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapReady, setMapReady] = useState(false);

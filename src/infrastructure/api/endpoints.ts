@@ -4,6 +4,8 @@ export const ENDPOINTS = {
     REGISTER: '/auth/register',
     ME: '/auth/me',
     UPDATE_PROFILE: '/auth/update-profile',
+    GOOGLE_CHECK_EMAIL: '/auth/google-check-email',
+    GOOGLE_LOGIN: '/auth/google-login',
   },
   
   KYC: {  // ← Cambiado de KYC_ENDPOINTS a KYC (nested)

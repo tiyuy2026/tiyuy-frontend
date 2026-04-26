@@ -10,12 +10,6 @@ interface LocationAutocompleteProps {
   className?: string;
 }
 
-declare global {
-  interface Window {
-    google: any;
-  }
-}
-
 export default function LocationAutocomplete({ 
   value, 
   onChange, 

@@ -11,6 +11,7 @@ import {
   ChevronDown, LogOut, Building
 } from 'lucide-react';
 import { useActiveSubscription } from '@/presentation/hooks/useFinance';
+import { DashboardHeader } from '@/presentation/components/dashboard/DashboardHeader';
 
 // Type for dashboard sections
 type DashboardSection = 'dashboard' | 'crm-leads';
@@ -487,6 +488,7 @@ export default function DashboardPage() {
         />
         
         <main className="flex-1 overflow-auto">
+          <DashboardHeader />
           {renderContent()}
         </main>
       </div>

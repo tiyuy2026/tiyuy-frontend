@@ -4,7 +4,7 @@ import { Hind } from 'next/font/google';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import './globals.css';
-import { Header } from '@/presentation/components/layout/Header/Header';
+import { ConditionalHeader } from '@/presentation/components/layout/ConditionalHeader/ConditionalHeader';
 
 const hind = Hind({ 
   weight: ['300', '400', '500', '600', '700'],
@@ -33,7 +33,7 @@ export default function RootLayout({
           <script src="https://sdk.mercadopago.com/js/v2" async />
         </head>
         <body className={hind.className} suppressHydrationWarning>
-          <Header />
+          <ConditionalHeader />
           <Toaster richColors position="top-right" />
           {children}
         </body>

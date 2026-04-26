@@ -2,14 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { authStorage } from '@/infrastructure/storage/auth-storage';
 
 interface PropertyComment {
   id: number;
-  text: string;
-  author: string;
+  content: string;
+  userName: string;
+  userEmail?: string;
   createdAt: string;
-  lat?: number;
-  lng?: number;
+  rating?: number;
 }
 
 interface PropertyCommentsProps {
@@ -18,10 +20,18 @@ interface PropertyCommentsProps {
 }
 
 export function PropertyComments({ propertyId, location }: PropertyCommentsProps) {
+  const router = useRouter();
   const [comments, setComments] = useState<PropertyComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [newComment, setNewComment] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Verificar si el usuario está autenticado
+  useEffect(() => {
+    const token = authStorage.getToken();
+    setIsAuthenticated(!!token);
+  }, []);
 
   // Cargar comentarios desde el backend
   useEffect(() => {
@@ -53,13 +63,11 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('tiyuy-auth-token')}`
+          'Authorization': `Bearer ${authStorage.getToken()}`
         },
         body: JSON.stringify({
-          text: newComment.trim(),
-          // Opcional: si el usuario quiere compartir su ubicación
-          latitude: location.latitude,
-          longitude: location.longitude
+          content: newComment.trim(),
+          rating: null // rating es opcional (1-5), se puede agregar UI después
         })
       });
 
@@ -70,11 +78,14 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
         setShowForm(false);
         toast.success('Comentario agregado exitosamente');
       } else {
-        toast.error('No se pudo agregar el comentario');
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData?.message || `Error ${response.status}: No se pudo agregar el comentario`;
+        console.error('Error del servidor:', errorData);
+        toast.error(errorMessage);
       }
     } catch (error) {
       console.error('Error agregando comentario:', error);
-      toast.error('Error al agregar comentario');
+      toast.error('Error de conexión al agregar comentario');
     }
   };
 
@@ -95,15 +106,32 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
       <div className="bg-blue-50 rounded-lg p-4">
         <div className="flex items-center justify-between mb-3">
           <h4 className="font-semibold text-blue-800">Comentarios de la zona</h4>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-          >
-            {showForm ? 'Cancelar' : 'Agregar Comentario'}
-          </button>
+          {isAuthenticated ? (
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+            >
+              {showForm ? 'Cancelar' : 'Agregar Comentario'}
+            </button>
+          ) : (
+            <button
+              onClick={() => router.push('/register')}
+              className="text-sm bg-teal-600 text-white px-3 py-1 rounded hover:bg-teal-700"
+            >
+              Inicia sesión para comentar
+            </button>
+          )}
         </div>
-        
-        {showForm && (
+
+        {!isAuthenticated && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-3">
+            <p className="text-sm text-amber-800">
+              🔒 Solo los usuarios registrados pueden dejar comentarios.
+            </p>
+          </div>
+        )}
+
+        {showForm && isAuthenticated && (
           <form onSubmit={handleSubmitComment} className="space-y-3">
             <textarea
               value={newComment}
@@ -134,7 +162,7 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
             <div key={comment.id || `comment-${index}-${comment.createdAt}`} className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <p className="font-semibold text-gray-900">{comment.author}</p>
+                  <p className="font-semibold text-gray-900">{comment.userName}</p>
                   <p className="text-xs text-gray-500">
                     {new Date(comment.createdAt).toLocaleDateString('es-PE', {
                       day: 'numeric',
@@ -145,19 +173,14 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
                     })}
                   </p>
                 </div>
-                {comment.lat && comment.lng && (
-                  <button
-                    onClick={() => {
-                      // Aquí puedes agregar lógica para mostrar en mapa
-                      console.log('Mostrar en mapa:', comment.lat, comment.lng);
-                    }}
-                    className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200"
-                  >
-                    📍 Ver ubicación
-                  </button>
+                {comment.rating && (
+                  <div className="flex items-center gap-1">
+                    <span className="text-yellow-500">{'★'.repeat(comment.rating)}</span>
+                    <span className="text-gray-400">{'☆'.repeat(5 - comment.rating)}</span>
+                  </div>
                 )}
               </div>
-              <p className="text-gray-700 leading-relaxed">{comment.text}</p>
+              <p className="text-gray-700 leading-relaxed">{comment.content}</p>
             </div>
           ))}
         </div>

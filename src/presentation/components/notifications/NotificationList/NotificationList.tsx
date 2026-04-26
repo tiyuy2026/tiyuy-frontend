@@ -1,120 +1,43 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useNotifications } from '../../../hooks/useNotifications';
+import { useUnifiedNotifications } from '../../../hooks/useUnifiedNotifications';
 import { useAuthStore } from '@/presentation/store/authStore';
+import { Bell, MessageCircle, Heart, Home, Clock, Megaphone } from 'lucide-react';
 
 interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'CONTACT' | 'FAVORITE' | 'PROPERTY_PUBLISHED' | 'SUBSCRIPTION_EXPIRING' | 'MARKETING';
+  type: 'CONTACT' | 'FAVORITE' | 'PROPERTY_PUBLISHED' | 'SUBSCRIPTION_EXPIRING' | 'MARKETING' | 'ADMIN_NOTIFICATION' | 'EVENT_CREATED' | 'EVENT_UPDATED' | 'EVENT_REMINDER' | 'EVENT_JOINED';
   read: boolean;
   createdAt: string;
 }
 
 export function NotificationList() {
-  const { preferences } = useNotifications();
+  const { notifications, isLoading, markAsRead } = useUnifiedNotifications('all');
   const { user, isAuthenticated } = useAuthStore();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Solo cargar notificaciones si el usuario está autenticado
-    if (!isAuthenticated || !user) {
-      setNotifications([]);
-      setIsLoading(false);
-      return;
-    }
-
-    // Aquí deberías llamar a la API real para obtener las notificaciones del usuario
-    // Por ahora, usamos datos mock pero filtrados por usuario y contexto
-    const mockNotifications: Notification[] = [];
-
-    // Notificación de bienvenida - solo para nuevos usuarios
-    mockNotifications.push({
-      id: `user-${user.id}-welcome`,
-      title: '¡Bienvenido a TIYUY!',
-      message: `Gracias por unirte a nuestra plataforma, ${user.firstName}. Encuentra la propiedad de tus sueños.`,
-      type: 'MARKETING',
-      read: false,
-      createdAt: new Date().toISOString()
-    });
-
-    // Notificación de nuevas propiedades - SOLO si tiene búsquedas guardadas REALES
-    if (user.role === 'USER' || user.role === 'AGENT') {
-      // En la app real, esto vendría de las búsquedas guardadas del usuario
-      // Por ahora, mostramos mensaje explicativo hasta que se conecte con la API real
-      mockNotifications.push({
-        id: `user-${user.id}-no-searches`,
-        title: 'Activa tus búsquedas guardadas',
-        message: 'Guarda tus búsquedas en el mapa para recibir notificaciones de nuevas propiedades en tus zonas de interés.',
-        type: 'MARKETING',
-        read: false,
-        createdAt: new Date(Date.now() - 1800000).toISOString()
-      });
-    }
-
-    // Notificación de suscripción - SOLO si tiene plan con límites y está cerca del límite
-    // NO para usuarios que solo buscan o tienen planes ilimitados
-    if ((user.role === 'AGENT' || user.role === 'DEVELOPER')) {
-      
-      // Simular que tiene propiedades publicadas y está cerca del límite
-      // En la app real, esto vendría de la API: user.publishedPropertiesCount vs user.subscriptionLimit
-      const publishedPropertiesCount = user.publishedPropertiesCount || 0;
-      
-      // Simular límites según el rol (en la app real vendría del backend)
-      let subscriptionLimit = 999; // Default para DEVELOPER (ilimitado)
-      if (user.role === 'AGENT') {
-        subscriptionLimit = 10; // Límite para AGENTES en plan FREE/BASIC
-      }
-      
-      // Solo mostrar alerta si está cerca del límite y no es DEVELOPER con plan ilimitado
-      if (user.role === 'AGENT' && publishedPropertiesCount >= subscriptionLimit - 2) {
-        mockNotifications.push({
-          id: `user-${user.id}-subscription`,
-          title: 'Alcanzando límite de publicaciones',
-          message: `Has publicado ${publishedPropertiesCount} de ${subscriptionLimit} propiedades. Considera actualizar tu plan para más publicaciones.`,
-          type: 'SUBSCRIPTION_EXPIRING',
-          read: false,
-          createdAt: new Date(Date.now() - 7200000).toISOString()
-        });
-      }
-    }
-
-    // Notificaciones de contactos - solo para agentes con propiedades publicadas
-    if (user.role === 'AGENT') {
-      mockNotifications.push({
-        id: `user-${user.id}-contact`,
-        title: 'Nuevo contacto interesado',
-        message: 'María García está interesada en tu departamento en Miraflores. Contáctala pronto.',
-        type: 'CONTACT',
-        read: false,
-        createdAt: new Date(Date.now() - 1800000).toISOString()
-      });
-    }
-
-    // Simular llamada a la API
-    setTimeout(() => {
-      setNotifications(mockNotifications);
-      setIsLoading(false);
-    }, 500);
-  }, [isAuthenticated, user]);
 
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
       case 'CONTACT':
-        return '💬';
+        return <MessageCircle className="w-4 h-4 text-blue-600" />;
       case 'FAVORITE':
-        return '❤️';
+        return <Heart className="w-4 h-4 text-pink-600" />;
       case 'PROPERTY_PUBLISHED':
-        return '🏠';
+        return <Home className="w-4 h-4 text-green-600" />;
       case 'SUBSCRIPTION_EXPIRING':
-        return '⏰';
+        return <Clock className="w-4 h-4 text-orange-600" />;
       case 'MARKETING':
-        return '📢';
+        return <Megaphone className="w-4 h-4 text-purple-600" />;
+      case 'ADMIN_NOTIFICATION':
+        return <Bell className="w-4 h-4 text-red-600" />;
+      case 'EVENT_CREATED':
+      case 'EVENT_UPDATED':
+      case 'EVENT_REMINDER':
+      case 'EVENT_JOINED':
+        return <Bell className="w-4 h-4 text-indigo-600" />;
       default:
-        return '📬';
+        return <Bell className="w-4 h-4 text-gray-600" />;
     }
   };
 
@@ -130,6 +53,13 @@ export function NotificationList() {
         return 'bg-orange-50 border-orange-200';
       case 'MARKETING':
         return 'bg-purple-50 border-purple-200';
+      case 'ADMIN_NOTIFICATION':
+        return 'bg-red-50 border-red-200';
+      case 'EVENT_CREATED':
+      case 'EVENT_UPDATED':
+      case 'EVENT_REMINDER':
+      case 'EVENT_JOINED':
+        return 'bg-indigo-50 border-indigo-200';
       default:
         return 'bg-gray-50 border-gray-200';
     }
@@ -166,7 +96,7 @@ export function NotificationList() {
           <h3 className="font-semibold text-gray-900">Notificaciones</h3>
         </div>
         <div className="p-8 text-center">
-          <div className="text-4xl mb-2">🔒</div>
+          <div className="text-4xl mb-2"></div>
           <p className="text-gray-500 text-sm mb-4">Inicia sesión para ver tus notificaciones</p>
           <button 
             onClick={() => window.location.href = '/login'}
@@ -204,9 +134,10 @@ export function NotificationList() {
                 className={`p-3 rounded-lg border cursor-pointer transition-colors hover:shadow-sm ${
                   notification.read ? 'bg-white border-gray-200' : getNotificationColor(notification.type)
                 }`}
+                onClick={() => !notification.read && markAsRead(notification.id)}
               >
                 <div className="flex items-start gap-3">
-                  <span className="text-xl flex-shrink-0">
+                  <span className="flex-shrink-0">
                     {getNotificationIcon(notification.type)}
                   </span>
                   <div className="flex-1 min-w-0">

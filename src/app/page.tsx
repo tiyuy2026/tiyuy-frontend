@@ -182,7 +182,7 @@ export default function HomePage() {
                       <select 
                         value={selectedPropertyType}
                         onChange={(e) => setSelectedPropertyType(e.target.value)}
-                        className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[180px]"
+                        className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-teal-600 focus:ring-2 focus:ring-teal-600 focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[180px]"
                       >
                         {getPropertyTypes().map(type => (
                           <option key={type.value} value={type.value}>
@@ -196,7 +196,7 @@ export default function HomePage() {
                         <select 
                           value={selectedBedrooms}
                           onChange={(e) => setSelectedBedrooms(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-teal-600 focus:ring-2 focus:ring-teal-600 focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
                         >
                           <option value="">Habitaciones</option>
                           <option value="1">1 habitación</option>
@@ -209,7 +209,7 @@ export default function HomePage() {
                         <select 
                           value={selectedBathrooms}
                           onChange={(e) => setSelectedBathrooms(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-teal-600 focus:ring-2 focus:ring-teal-600 focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
                         >
                           <option value="">Baños</option>
                           <option value="propio">Propio</option>
@@ -221,7 +221,7 @@ export default function HomePage() {
                           placeholder="Área mínima (m²)"
                           value={selectedMinArea}
                           onChange={(e) => setSelectedMinArea(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-teal-600 focus:ring-2 focus:ring-teal-600 focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
                         />
                       ) : selectedPropertyType === 'terrenos' ? (
                         <input
@@ -229,7 +229,7 @@ export default function HomePage() {
                           placeholder="Área mínima (m²)"
                           value={selectedMinArea}
                           onChange={(e) => setSelectedMinArea(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-teal-600 focus:ring-2 focus:ring-teal-600 focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
                         />
                       ) : selectedPropertyType === 'locales' ? (
                         <input
@@ -237,7 +237,7 @@ export default function HomePage() {
                           placeholder="Área mínima (m²)"
                           value={selectedMinArea}
                           onChange={(e) => setSelectedMinArea(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-teal-600 focus:ring-2 focus:ring-teal-600 focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
                         />
                       ) : selectedPropertyType === 'lotes' ? (
                         <input
@@ -245,7 +245,7 @@ export default function HomePage() {
                           placeholder="Área mínima (m²)"
                           value={selectedMinArea}
                           onChange={(e) => setSelectedMinArea(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-lg focus:border-teal-600 focus:ring-1 focus:ring-teal-600 focus:outline-none text-base w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-teal-600 focus:ring-2 focus:ring-teal-600 focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
                         />
                       ) : null}
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useCreateChannel } from '@/presentation/hooks/useContacts';
+import { useChannels } from '@/presentation/hooks/useChannels';
 import { toast } from '@/presentation/store/toastStore';
 
 export default function CreateChannelView({ user, onBack }: { user: any; onBack: () => void }) {
@@ -14,7 +14,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
   const [isCreating, setIsCreating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const createChannel = useCreateChannel();
+  const { createChannel, isCreatingChannel } = useChannels(user?.id);
 
   // Evaluación inicial de permisos
   const canCreateChannel = user?.role === 'AGENT' || user?.role === 'INMOBILIARIA';
@@ -70,7 +70,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
         avatarUrl = `https://api.tiyuy.com/avatars/${Date.now()}_${avatarFile.name}`;
       }
       
-      await createChannel.mutateAsync({
+      await createChannel({
         name: name.trim(),
         city: city.trim(),
         description: description.trim(),

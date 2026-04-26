@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { authStorage } from '@/infrastructure/storage/auth-storage';
 
 // Singleton global para WebSocket - una sola conexión por usuario
 let globalWebSocket: WebSocket | null = null;
@@ -79,10 +80,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     isConnectingRef.current = true;
     
     try {
-      // Obtener token del localStorage o authStore
-      const token = localStorage.getItem('tiyuy-auth-token') || 
-                   localStorage.getItem('token') || 
-                   localStorage.getItem('auth-token');
+      // Obtener token usando auth-storage para consistencia
+      const token = authStorage.getToken();
 
       // Si no hay token, no intentar conectar (usuario no autenticado)
       if (!token) {
@@ -117,6 +116,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         if (globalWebSocket && token) {
           setTimeout(() => {
             if (globalWebSocket && globalWebSocket.readyState === WebSocket.OPEN) {
+              console.log('Enviando token de autenticación WebSocket:', token.substring(0, 20) + '...');
+              console.log('URL WebSocket:', wsUrl);
               globalWebSocket.send(JSON.stringify({
                 type: 'auth',
                 token: token
@@ -160,9 +161,18 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             case 'error':
               // Solo loguear si hay detalles del error
               if (data.message || data.code) {
-                console.error('❌ Error WebSocket:', data.message || data.code);
+                console.error('Error WebSocket:', data.message || data.code);
+                
+                // Si el error es de token inválido, limpiar el token guardado
+                if (data.message?.includes('Token de autenticación inválido') || 
+                    data.code === 'INVALID_TOKEN') {
+                  console.warn('Token JWT inválido detectado, limpiando almacenamiento...');
+                  authStorage.clear();
+                  setConnectionError('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+                } else {
+                  setConnectionError(data.message || 'Error de conexión');
+                }
               }
-              setConnectionError(data.message || 'Error de conexión');
               break;
 
             default:

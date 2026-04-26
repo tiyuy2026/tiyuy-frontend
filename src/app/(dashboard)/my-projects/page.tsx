@@ -12,7 +12,7 @@ import { toast } from '@/presentation/store/toastStore';
 export default function MyProjectsPage() {
   const { user } = useAuthStore();
   const { myProjects, publishProject, featureProject, deleteProject } = useProjects();
-  const [activeTab, setActiveTab] = useState<'ALL' | 'DRAFT' | 'PUBLISHED' | 'COMPLETED'>('ALL');
+  const [activeTab, setActiveTab] = useState<'ALL' | 'DRAFT' | 'PUBLISHED' | 'PAUSED' | 'COMPLETED'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
 
   // Query para obtener proyectos
@@ -67,6 +67,8 @@ export default function MyProjectsPage() {
         return matchesSearch && project.status === 'DRAFT';
       case 'PUBLISHED':
         return matchesSearch && project.status === 'PUBLISHED';
+      case 'PAUSED':
+        return matchesSearch && project.status === 'PAUSED';
       case 'COMPLETED':
         return matchesSearch && project.status === 'COMPLETED';
       default:
@@ -74,19 +76,28 @@ export default function MyProjectsPage() {
     }
   });
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string, lifecycleStatus?: string, remainingGraceDays?: number) => {
+    // Show amber for grace period
+    if (lifecycleStatus === 'GRACE_PERIOD' && remainingGraceDays !== undefined && remainingGraceDays > 0) {
+      return 'bg-amber-100 text-amber-800';
+    }
     switch (status) {
       case 'DRAFT': return 'bg-gray-100 text-gray-800';
       case 'PUBLISHED': return 'bg-green-100 text-green-800';
+      case 'PAUSED': return 'bg-amber-100 text-amber-800';
       case 'COMPLETED': return 'bg-blue-100 text-blue-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusText = (status: string, lifecycleStatus?: string, remainingGraceDays?: number) => {
+    if (lifecycleStatus === 'GRACE_PERIOD' && remainingGraceDays !== undefined && remainingGraceDays > 0) {
+      return `Pausado - ${remainingGraceDays} dias`;
+    }
     switch (status) {
       case 'DRAFT': return 'Borrador';
       case 'PUBLISHED': return 'Publicado';
+      case 'PAUSED': return 'Pausado';
       case 'COMPLETED': return 'Completado';
       default: return status;
     }
@@ -214,6 +225,7 @@ export default function MyProjectsPage() {
                 { key: 'ALL', label: 'Todos', count: projects.length },
                 { key: 'DRAFT', label: 'Borradores', count: projects.filter((p: any) => p.status === 'DRAFT').length },
                 { key: 'PUBLISHED', label: 'Publicados', count: projects.filter((p: any) => p.status === 'PUBLISHED').length },
+                { key: 'PAUSED', label: 'Pausados', count: projects.filter((p: any) => p.status === 'PAUSED').length },
                 { key: 'COMPLETED', label: 'Completados', count: projects.filter((p: any) => p.status === 'COMPLETED').length },
               ].map((tab) => (
                 <button
@@ -273,8 +285,8 @@ export default function MyProjectsPage() {
                     
                     {/* Status and Phase Badges */}
                     <div className="absolute top-2 left-2 flex gap-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
-                        {getStatusText(project.status)}
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status, project.lifecycleStatus, project.remainingGraceDays)}`}>
+                        {getStatusText(project.status, project.lifecycleStatus, project.remainingGraceDays)}
                       </span>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPhaseColor(project.phase)}`}>
                         {getPhaseText(project.phase)}
@@ -348,6 +360,25 @@ export default function MyProjectsPage() {
                             className="flex-1 text-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {publishMutation.isPending ? 'Publicando...' : 'Publicar'}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(project.id)}
+                            disabled={deleteMutation.isPending}
+                            className="flex-1 text-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
+                          </button>
+                        </div>
+                      )}
+                      
+                      {project.status === 'PAUSED' && (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handlePublish(project.id)}
+                            disabled={publishMutation.isPending}
+                            className="flex-1 text-center px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {publishMutation.isPending ? 'Reactivando...' : 'Reactivar'}
                           </button>
                           <button
                             onClick={() => handleDelete(project.id)}

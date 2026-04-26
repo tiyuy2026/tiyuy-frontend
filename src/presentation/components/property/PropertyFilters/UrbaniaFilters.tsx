@@ -90,13 +90,13 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
           <input
             type="number"
             placeholder="Desde"
-            className="p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
           />
           <input
             type="number"
             placeholder="Hasta"
-            className="p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
           />
         </div>
@@ -119,7 +119,7 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
         <div>
           <label className="block text-sm font-semibold text-gray-800 mb-2">Dormitorios</label>
           <select
-            className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             onChange={(e) => setFilters({ ...filters, bedrooms: e.target.value })}
           >
             <option value="">Sin preferencia</option>
@@ -136,7 +136,7 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
         <div>
           <label className="block text-sm font-semibold text-gray-800 mb-2">Baños</label>
           <select
-            className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             onChange={(e) => setFilters({ ...filters, bathrooms: e.target.value })}
           >
             <option value="">Sin preferencia</option>
@@ -186,13 +186,13 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
             <input
               type="number"
               placeholder="Desde"
-              className="p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               onChange={(e) => setFilters({ ...filters, minArea: e.target.value })}
             />
             <input
               type="number"
               placeholder="Hasta"
-              className="p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               onChange={(e) => setFilters({ ...filters, maxArea: e.target.value })}
             />
           </div>
@@ -204,7 +204,7 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
         <div>
           <label className="block text-sm font-semibold text-gray-800 mb-2">Estacionamiento</label>
           <select
-            className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             onChange={(e) => setFilters({ ...filters, parking: e.target.value })}
           >
             <option value="">Sin preferencia</option>
@@ -223,13 +223,13 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
             <input
               type="number"
               placeholder="Desde"
-              className="p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               onChange={(e) => setFilters({ ...filters, minLand: e.target.value })}
             />
             <input
               type="number"
               placeholder="Hasta"
-              className="p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               onChange={(e) => setFilters({ ...filters, maxLand: e.target.value })}
             />
           </div>
@@ -246,13 +246,13 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
               <input
                 type="number"
                 placeholder="Desde"
-                className="p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 onChange={(e) => setFilters({ ...filters, minFrontis: e.target.value })}
               />
               <input
                 type="number"
                 placeholder="Hasta"
-                className="p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 onChange={(e) => setFilters({ ...filters, maxFrontis: e.target.value })}
               />
             </div>

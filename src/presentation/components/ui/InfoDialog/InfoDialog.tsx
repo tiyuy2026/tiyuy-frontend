@@ -9,6 +9,8 @@ interface InfoDialogProps {
   title?: string;
   message: string;
   variant?: InfoDialogVariant;
+  showRegisterButton?: boolean;
+  onRegister?: () => void;
 }
 
 const variantStyles: Record<InfoDialogVariant, { icon: React.ReactNode; iconBg: string; titleColor: string; border: string }> = {
@@ -60,6 +62,8 @@ export const InfoDialog: React.FC<InfoDialogProps> = ({
   title,
   message,
   variant = 'info',
+  showRegisterButton,
+  onRegister,
 }) => {
   const styles = variantStyles[variant];
 
@@ -91,12 +95,22 @@ export const InfoDialog: React.FC<InfoDialogProps> = ({
 
           <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">{message}</p>
 
-          <button
-            onClick={onClose}
-            className="mt-1 w-full py-2.5 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg active:scale-95"
-          >
-            Aceptar
-          </button>
+          <div className="flex flex-col gap-3 w-full">
+            {showRegisterButton && onRegister && (
+              <button
+                onClick={onRegister}
+                className="w-full py-2.5 px-6 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold text-sm hover:from-green-700 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg active:scale-95"
+              >
+                Registrarme ahora
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="w-full py-2.5 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg active:scale-95"
+            >
+              {showRegisterButton ? 'Cancelar' : 'Aceptar'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -27,7 +27,8 @@ export function PersonalizedRecommendations({ title, properties }: Recommendatio
       
       <div className="text-center mt-6">
         <p className="text-gray-500 text-sm">
-          🔄 Cargando recomendaciones...
+          <svg className="animate-spin w-4 h-4 inline-block mr-1 text-gray-400" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+          Cargando recomendaciones...
         </p>
       </div>
     </div>
