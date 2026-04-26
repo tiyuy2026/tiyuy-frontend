@@ -1,28 +1,38 @@
 /**
  * Admin Project Management Page
- * Complete project administration with real backend integration
+ * Complete project administration with backend integration
  */
 
 'use client';
 
 import { useState } from 'react';
-import { 
-  useProjectsForAdmin, 
-  useProjectStats, 
-  useModerateProject, 
-  useToggleFeaturedProject, 
-  useDeleteProject 
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  useProjectsForAdmin,
+  useProjectStats,
+  useToggleFeaturedProject,
+  useDeleteProject,
+  useNotifyProjectDeveloper,
+  useDisableProjectByAdmin,
+  useEnableProjectByAdmin
 } from '@/presentation/hooks/useAdmin';
 import { usePermissions } from '@/presentation/hooks/usePermissions';
-import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/Card';
+import { toast } from 'sonner';
+import { NotificationModal } from '../properties/NotificationModal';
 import { Modal } from '@/presentation/components/ui/Modal';
 import { Button } from '@/presentation/components/ui/Button';
-import { AdminTable } from '@/presentation/components/admin/AdminTable/AdminTable';
-import { AdminFilters } from '@/presentation/components/admin/AdminFilters/AdminFilters';
-import { PaginationParams, PaginatedResponse } from '@/core/domain/repositories/IAdminRepository';
-import { ProjectAdminItem, ModerateProjectRequest } from '@/core/domain/entities/Admin';
+import { ProjectDetailModal } from './ProjectDetailModal';
+import { ProjectsHeaderStats } from '@/presentation/components/admin/ProjectsHeaderStats';
+import { ProjectsFilters } from '@/presentation/components/admin/ProjectsFilters';
+import { ProjectsTable } from '@/presentation/components/admin/ProjectsTable';
+import { BulkActionsBar } from '@/presentation/components/admin/BulkActionsBar';
+import { SalesChart } from '@/presentation/components/admin/SalesChart/SalesChart';
+import { ProjectsByStatusChart } from '@/presentation/components/admin/ProjectsByStatusChart/ProjectsByStatusChart';
+import { ProjectAdminItem } from '@/core/domain/entities/Admin';
+import { ModerationModal, ProjectReportsSection, ProjectCommentsSection } from './components';
 
 export default function ProjectsPage() {
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,315 +40,172 @@ export default function ProjectsPage() {
   const [selectedProjects, setSelectedProjects] = useState<ProjectAdminItem[]>([]);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isModerateModalOpen, setIsModerateModalOpen] = useState(false);
+  const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
+  const [isDisableModalOpen, setIsDisableModalOpen] = useState(false);
+  const [disableReason, setDisableReason] = useState('');
   const [selectedProject, setSelectedProject] = useState<ProjectAdminItem | null>(null);
 
   const { hasPermission } = usePermissions();
   const canModerateProjects = hasPermission('PROJECTS_MODERATE');
   const canDeleteProjects = hasPermission('PROJECTS_DELETE');
 
-  const { data: projectsData, isLoading, error, refetch } = useProjectsForAdmin(
+  const { data: projectsData, isLoading, refetch } = useProjectsForAdmin(
     statusFilter !== 'all' ? statusFilter : undefined,
     searchQuery || undefined,
     { page: currentPage - 1, size: pageSize }
   );
 
-  const { data: projectStats } = useProjectStats();
+  const { data: projectStats, isLoading: statsLoading, error: statsError } = useProjectStats();
 
-  const moderateMutation = useModerateProject();
+  // Debug estadísticas
+  console.log('[ProjectsPage] Stats data:', projectStats);
+  console.log('[ProjectsPage] Stats loading:', statsLoading);
+  console.log('[ProjectsPage] Stats error:', statsError);
+
   const toggleFeaturedMutation = useToggleFeaturedProject();
   const deleteMutation = useDeleteProject();
+  const disableProjectMutation = useDisableProjectByAdmin();
+  const enableProjectMutation = useEnableProjectByAdmin();
+  const notifyDeveloperMutation = useNotifyProjectDeveloper();
+
+  const handleToggleFeatured = async (project: ProjectAdminItem) => {
+    try {
+      await toggleFeaturedMutation.mutateAsync({
+        projectId: project.id,
+        featured: !project.isFeatured
+      });
+      toast.success(project.isFeatured ? 'Destacado removido' : 'Proyecto destacado');
+      refetch();
+    } catch (error: any) {
+      toast.error('Error', { description: error?.message || 'No se pudo actualizar' });
+    }
+  };
+
+  const handleDeleteProject = async (project: ProjectAdminItem) => {
+    if (!confirm(`¿Eliminar "${project.name}"? Esta acción no se puede deshacer.`)) return;
+    try {
+      await deleteMutation.mutateAsync({ projectId: project.id });
+      toast.success('Proyecto eliminado');
+      refetch();
+    } catch (error: any) {
+      toast.error('Error al eliminar', { description: error?.message });
+    }
+  };
+
+  const handleDisableProject = async (project: ProjectAdminItem, reason: string) => {
+    try {
+      await disableProjectMutation.mutateAsync({
+        projectId: project.id,
+        reason,
+        notifyDeveloper: true
+      });
+      toast.success('Proyecto deshabilitado');
+      setIsDisableModalOpen(false);
+      setDisableReason('');
+      refetch();
+    } catch (error: any) {
+      toast.error('Error al deshabilitar', { description: error?.message });
+    }
+  };
+
+  const handleEnableProject = async (project: ProjectAdminItem) => {
+    try {
+      await enableProjectMutation.mutateAsync({
+        projectId: project.id,
+        notifyDeveloper: true
+      });
+      toast.success('Proyecto habilitado');
+      setIsViewModalOpen(false);
+      refetch();
+    } catch (error: any) {
+      toast.error('Error al habilitar', { description: error?.message });
+    }
+  };
 
   const handleViewProject = (project: ProjectAdminItem) => {
     setSelectedProject(project);
     setIsViewModalOpen(true);
   };
 
-  const handleModerateProject = (project: ProjectAdminItem, action: string) => {
-    setSelectedProject(project);
-    setIsModerateModalOpen(true);
-  };
+  const handleExportProjects = () => {
+    const projectsToExport = selectedProjects.length > 0 ? selectedProjects : (projectsData?.content || []);
+    
+    if (projectsToExport.length === 0) {
+      toast.error('No hay proyectos para exportar');
+      return;
+    }
 
-  const confirmModeration = async (action: 'APPROVE' | 'REJECT' | 'SUSPEND' | 'ACTIVATE' | 'DEACTIVATE', reason?: string) => {
-    if (!selectedProject) return;
-
-    await moderateMutation.mutateAsync({
-      projectId: selectedProject.id,
-      request: {
-        action,
-        reason,
-        notes: `Moderated by admin: ${reason || 'No additional notes'}`
+    // Helper para escapar campos CSV correctamente
+    const escapeCsv = (value: any): string => {
+      const str = String(value ?? '');
+      // Si contiene comas, comillas o saltos de línea, envolver en comillas y escapar comillas internas
+      if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+        return '"' + str.replace(/"/g, '""') + '"';
       }
+      return str;
+    };
+
+    // Cabeceras del CSV
+    const headers = [
+      'ID',
+      'Nombre del Proyecto',
+      'Desarrollador',
+      'Email del Desarrollador',
+      'Tipo',
+      'Estado',
+      'Ciclo de Vida',
+      'Fase',
+      'Precio Minimo',
+      'Precio Maximo',
+      'Unidades Totales',
+      'Unidades Vendidas',
+      'Unidades Disponibles',
+      'Avance Construccion',
+      'Vistas',
+      'Destacado',
+      'Fecha de Creacion'
+    ];
+
+    // Filas de datos
+    const rows = projectsToExport.map((p: ProjectAdminItem) => [
+      p.id,
+      p.name,
+      p.developerName,
+      p.developerEmail,
+      p.type,
+      p.status,
+      p.lifecycleStatus,
+      p.phase,
+      p.priceRange?.min ?? 0,
+      p.priceRange?.max ?? 0,
+      p.totalUnits ?? 0,
+      p.soldUnits ?? 0,
+      p.availableUnits ?? 0,
+      `${p.constructionProgress ?? 0}%`,
+      p.viewsCount ?? 0,
+      p.isFeatured ? 'SI' : 'NO',
+      p.createdAt ? new Date(p.createdAt).toLocaleDateString('es-ES') : ''
+    ].map(escapeCsv));
+
+    // Unir todo con separador de líneas CRLF para compatibilidad con Excel
+    const csvContent = [headers.join(','), ...rows].join('\r\n');
+    
+    // Agregar BOM (Byte Order Mark) para UTF-8 - crucial para caracteres especiales en español
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `proyectos_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast.success('Proyectos exportados', {
+      description: `${projectsToExport.length} proyectos descargados en CSV`
     });
-    setIsModerateModalOpen(false);
-    setSelectedProject(null);
-    refetch();
-  };
-
-  const handleToggleFeatured = async (project: ProjectAdminItem) => {
-    const newFeaturedState = !project.isFeatured;
-    await toggleFeaturedMutation.mutateAsync({
-      projectId: project.id,
-      featured: newFeaturedState
-    });
-    refetch();
-  };
-
-  const handleDeleteProject = async (project: ProjectAdminItem, reason?: string) => {
-    if (confirm(`Are you sure you want to delete project "${project.name}"? This action cannot be undone.`)) {
-      await deleteMutation.mutateAsync({
-        projectId: project.id,
-        reason
-      });
-      refetch();
-    }
-  };
-
-  // Table columns
-  const columns = [
-    {
-      key: 'name' as keyof ProjectAdminItem,
-      label: 'Project',
-      sortable: true,
-      render: (value: string, project: ProjectAdminItem) => (
-        <div className="flex items-center gap-3">
-          {project.coverImageUrl && (
-            <img 
-              src={project.coverImageUrl} 
-              alt={project.name}
-              className="w-16 h-16 object-cover rounded"
-            />
-          )}
-          <div>
-            <div className="font-medium text-gray-900">{value}</div>
-            <div className="text-sm text-gray-500">{project.slug}</div>
-          </div>
-        </div>
-      )
-    },
-    {
-      key: 'developerName' as keyof ProjectAdminItem,
-      label: 'Developer',
-      sortable: true,
-      render: (value: string, project: ProjectAdminItem) => (
-        <div>
-          <div className="font-medium text-gray-900">{value}</div>
-          <div className="text-sm text-gray-500">{project.developerEmail}</div>
-        </div>
-      )
-    },
-    {
-      key: 'type' as keyof ProjectAdminItem,
-      label: 'Type',
-      sortable: true,
-      render: (value: string) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          value === 'RESIDENTIAL' ? 'bg-blue-100 text-blue-800' :
-          value === 'COMMERCIAL' ? 'bg-green-100 text-green-800' :
-          value === 'MIXED_USE' ? 'bg-purple-100 text-purple-800' :
-          value === 'INDUSTRIAL' ? 'bg-orange-100 text-orange-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
-          {value}
-        </span>
-      )
-    },
-    {
-      key: 'status' as keyof ProjectAdminItem,
-      label: 'Status',
-      sortable: true,
-      render: (value: string) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          value === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-          value === 'PUBLISHED' ? 'bg-blue-100 text-blue-800' :
-          value === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-          value === 'COMPLETED' ? 'bg-purple-100 text-purple-800' :
-          value === 'SUSPENDED' ? 'bg-red-100 text-red-800' :
-          value === 'CANCELLED' ? 'bg-gray-100 text-gray-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
-          {value}
-        </span>
-      )
-    },
-    {
-      key: 'lifecycleStatus' as keyof ProjectAdminItem,
-      label: 'Lifecycle',
-      sortable: true,
-      render: (value: string) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          value === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-          value === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-          value === 'ENDING_SOON' ? 'bg-orange-100 text-orange-800' :
-          value === 'PAST' ? 'bg-gray-100 text-gray-800' :
-          value === 'COMPLETED' ? 'bg-purple-100 text-purple-800' :
-          value === 'SUSPENDED' ? 'bg-red-100 text-red-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
-          {value?.replace('_', ' ')}
-        </span>
-      )
-    },
-    {
-      key: 'phase' as keyof ProjectAdminItem,
-      label: 'Phase',
-      sortable: true,
-      render: (value: string) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          value === 'PLANNING' ? 'bg-blue-100 text-blue-800' :
-          value === 'CONSTRUCTION' ? 'bg-orange-100 text-orange-800' :
-          value === 'PRE_SALE' ? 'bg-purple-100 text-purple-800' :
-          value === 'SALE' ? 'bg-green-100 text-green-800' :
-          value === 'COMPLETED' ? 'bg-gray-100 text-gray-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
-          {value?.replace('_', ' ')}
-        </span>
-      )
-    },
-    {
-      key: 'priceRange' as keyof ProjectAdminItem,
-      label: 'Price Range',
-      sortable: false,
-      render: (value: { min: number; max: number }) => (
-        <div className="font-medium text-green-600">
-          ${value.min.toLocaleString()} - ${value.max.toLocaleString()}
-        </div>
-      )
-    },
-    {
-      key: 'totalUnits' as keyof ProjectAdminItem,
-      label: 'Units',
-      sortable: true,
-      render: (value: number, project: ProjectAdminItem) => (
-        <div>
-          <div className="font-medium">{value}</div>
-          <div className="text-sm text-gray-500">
-            {project.soldUnits} sold / {project.availableUnits} available
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-            <div 
-              className="bg-green-600 h-2 rounded-full" 
-              style={{ width: `${(project.soldUnits / value) * 100}%` }}
-            />
-          </div>
-        </div>
-      )
-    },
-    {
-      key: 'constructionProgress' as keyof ProjectAdminItem,
-      label: 'Progress',
-      sortable: true,
-      render: (value: number) => (
-        <div>
-          <div className="font-medium">{value}%</div>
-          <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-            <div 
-              className="bg-blue-600 h-2 rounded-full" 
-              style={{ width: `${value}%` }}
-            />
-          </div>
-        </div>
-      )
-    },
-    {
-      key: 'isFeatured' as keyof ProjectAdminItem,
-      label: 'Featured',
-      sortable: true,
-      render: (value: boolean) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          value ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
-        }`}>
-          {value ? 'Featured' : 'Standard'}
-        </span>
-      )
-    },
-    {
-      key: 'viewsCount' as keyof ProjectAdminItem,
-      label: 'Views',
-      sortable: true,
-      render: (value: number) => value.toLocaleString()
-    },
-    {
-      key: 'createdAt' as keyof ProjectAdminItem,
-      label: 'Created',
-      sortable: true,
-      render: (value: string) => new Date(value).toLocaleDateString()
-    }
-  ];
-
-  // Table actions
-  const actions = [
-    {
-      label: 'View Details',
-      onClick: handleViewProject,
-      variant: 'primary' as const
-    },
-    ...(canModerateProjects ? [
-      {
-        label: 'Approve',
-        onClick: (project: ProjectAdminItem) => handleModerateProject(project, 'APPROVE'),
-        variant: 'primary' as const
-      },
-      {
-        label: 'Reject',
-        onClick: (project: ProjectAdminItem) => handleModerateProject(project, 'REJECT'),
-        variant: 'secondary' as const
-      },
-      {
-        label: 'Suspend',
-        onClick: (project: ProjectAdminItem) => handleModerateProject(project, 'SUSPEND'),
-        variant: 'secondary' as const
-      }
-    ] : []),
-    {
-      label: 'Toggle Featured',
-      onClick: handleToggleFeatured,
-      variant: 'secondary' as const
-    },
-    ...(canDeleteProjects ? [{
-      label: 'Delete',
-      onClick: (project: ProjectAdminItem) => handleDeleteProject(project),
-      variant: 'danger' as const
-    }] : [])
-  ];
-
-  // Filter options
-  const filterOptions = [
-    {
-      key: 'status',
-      label: 'Status',
-      type: 'select' as const,
-      options: [
-        { value: 'all', label: 'All Status' },
-        { value: 'DRAFT', label: 'Draft' },
-        { value: 'PUBLISHED', label: 'Published' },
-        { value: 'ACTIVE', label: 'Active' },
-        { value: 'COMPLETED', label: 'Completed' },
-        { value: 'SUSPENDED', label: 'Suspended' },
-        { value: 'CANCELLED', label: 'Cancelled' }
-      ]
-    },
-    {
-      key: 'lifecycle',
-      label: 'Lifecycle',
-      type: 'select' as const,
-      options: [
-        { value: 'all', label: 'All Lifecycle' },
-        { value: 'ACTIVE', label: 'Active' },
-        { value: 'PENDING', label: 'Pending' },
-        { value: 'ENDING_SOON', label: 'Ending Soon' },
-        { value: 'PAST', label: 'Past' },
-        { value: 'COMPLETED', label: 'Completed' },
-        { value: 'SUSPENDED', label: 'Suspended' }
-      ]
-    }
-  ];
-
-  const handleFilterChange = (filters: Record<string, any>) => {
-    if (filters.status !== undefined) {
-      setStatusFilter(filters.status);
-    }
-    setCurrentPage(1);
   };
 
   const handleClearFilters = () => {
@@ -348,193 +215,99 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Project Management</h2>
-          <p className="text-gray-600">Administrate and manage real estate projects</p>
+    <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
+      {/* Header Stats */}
+      <ProjectsHeaderStats stats={projectStats} isLoading={statsLoading} />
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2">
+          <SalesChart />
         </div>
-        
-        {/* Project Stats Cards */}
-        {projectStats && (
-          <div className="grid grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-2xl font-bold text-blue-600">{projectStats.totalProjects}</div>
-                <div className="text-sm text-gray-500">Total Projects</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-2xl font-bold text-green-600">{projectStats.activeProjects}</div>
-                <div className="text-sm text-gray-500">Active Projects</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-2xl font-bold text-purple-600">{projectStats.coveragePercentage}%</div>
-                <div className="text-sm text-gray-500">With Cover Images</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-2xl font-bold text-orange-600">{projectStats.totalUnits}</div>
-                <div className="text-sm text-gray-500">Total Units</div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <div>
+          <ProjectsByStatusChart />
+        </div>
       </div>
 
       {/* Filters */}
-      <AdminFilters
-        searchPlaceholder="Search by name, developer, or location..."
+      <ProjectsFilters
+        searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onFilterChange={handleFilterChange}
-        filters={filterOptions}
-        onClear={handleClearFilters}
+        statusFilter={statusFilter}
+        onStatusChange={setStatusFilter}
+        onClearFilters={handleClearFilters}
       />
 
       {/* Projects Table */}
-      <AdminTable
-        data={projectsData?.content || []}
-        columns={columns}
-        loading={isLoading}
-        error={error?.message || undefined}
-        actions={actions}
-        selection={{
-          selectedItems: selectedProjects,
-          onSelectionChange: setSelectedProjects,
-          getRowId: (project) => project.id
-        }}
-        pagination={
-          projectsData && {
-            page: currentPage,
-            size: pageSize,
-            total: projectsData.totalElements,
-            onPageChange: setCurrentPage,
-            onSizeChange: setPageSize
-          }
-        }
-        emptyState={{
-          title: 'No projects found',
-          description: 'Try adjusting your search or filter criteria.',
-          action: {
-            label: 'Clear Filters',
-            onClick: handleClearFilters
+      <ProjectsTable
+        projects={projectsData?.content || []}
+        selectedProjects={selectedProjects}
+        onSelectProject={(project, selected) => {
+          if (selected) {
+            setSelectedProjects([...selectedProjects, project]);
+          } else {
+            setSelectedProjects(selectedProjects.filter(p => p.id !== project.id));
           }
         }}
+        onSelectAll={(selected) => {
+          if (selected) {
+            setSelectedProjects(projectsData?.content || []);
+          } else {
+            setSelectedProjects([]);
+          }
+        }}
+        onViewProject={(project) => {
+          setSelectedProject(project);
+          setIsViewModalOpen(true);
+        }}
+        onModerateProject={(project) => {
+          setSelectedProject(project);
+          setIsModerateModalOpen(true);
+        }}
+        onToggleFeatured={handleToggleFeatured}
+        onDeleteProject={handleDeleteProject}
+        canModerate={canModerateProjects}
+        canDelete={canDeleteProjects}
+        isLoading={isLoading}
+        currentPage={currentPage}
+        totalPages={projectsData?.totalPages || 1}
+        totalElements={projectsData?.totalElements || 0}
+        numberOfElements={projectsData?.numberOfElements || 0}
+        onPageChange={setCurrentPage}
       />
 
-      {/* Project Details Modal */}
+      {/* Bulk Actions Bar */}
+      <BulkActionsBar
+        selectedCount={selectedProjects.length}
+        onPublish={() => toast.info('Funcionalidad en desarrollo')}
+        onPause={() => toast.info('Funcionalidad en desarrollo')}
+        onDelete={() => toast.info('Funcionalidad en desarrollo')}
+        onExport={handleExportProjects}
+        onClear={() => setSelectedProjects([])}
+        isProcessing={false}
+      />
+
+      {/* Project Detail Modal */}
       {selectedProject && (
-        <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)}>
-          <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">Project Details</h3>
-            
-            <div className="grid grid-cols-2 gap-6">
-              {/* Basic Information */}
-              <div>
-                <h4 className="font-medium text-gray-900 mb-3">Basic Information</h4>
-                <div className="space-y-2">
-                  <div><strong>Name:</strong> {selectedProject.name}</div>
-                  <div><strong>Slug:</strong> {selectedProject.slug}</div>
-                  <div><strong>Type:</strong> {selectedProject.type}</div>
-                  <div><strong>Status:</strong> 
-                    <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                      selectedProject.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                      selectedProject.status === 'PUBLISHED' ? 'bg-blue-100 text-blue-800' :
-                      selectedProject.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800' :
-                      selectedProject.status === 'COMPLETED' ? 'bg-purple-100 text-purple-800' :
-                      selectedProject.status === 'SUSPENDED' ? 'bg-red-100 text-red-800' :
-                      selectedProject.status === 'CANCELLED' ? 'bg-gray-100 text-gray-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {selectedProject.status}
-                    </span>
-                  </div>
-                  <div><strong>Phase:</strong> {selectedProject.phase?.replace('_', ' ')}</div>
-                  <div><strong>Lifecycle:</strong> {selectedProject.lifecycleStatus?.replace('_', ' ')}</div>
-                </div>
-              </div>
-
-              {/* Developer Information */}
-              <div>
-                <h4 className="font-medium text-gray-900 mb-3">Developer Information</h4>
-                <div className="space-y-2">
-                  <div><strong>Name:</strong> {selectedProject.developerName}</div>
-                  <div><strong>Email:</strong> {selectedProject.developerEmail}</div>
-                  <div><strong>ID:</strong> {selectedProject.developerId}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Location */}
-            <div className="mt-6">
-              <h4 className="font-medium text-gray-900 mb-3">Location</h4>
-              <div className="space-y-2">
-                <div><strong>District:</strong> {selectedProject.district}</div>
-                <div><strong>City:</strong> {selectedProject.city}</div>
-                <div><strong>Country:</strong> {selectedProject.country}</div>
-              </div>
-            </div>
-
-            {/* Units and Pricing */}
-            <div className="mt-6">
-              <h4 className="font-medium text-gray-900 mb-3">Units and Pricing</h4>
-              <div className="grid grid-cols-4 gap-6">
-                <div>
-                  <div className="text-2xl font-bold text-blue-600">{selectedProject.totalUnits}</div>
-                  <div className="text-sm text-gray-500">Total Units</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-green-600">{selectedProject.soldUnits}</div>
-                  <div className="text-sm text-gray-500">Sold Units</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-orange-600">{selectedProject.availableUnits}</div>
-                  <div className="text-sm text-gray-500">Available Units</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-purple-600">
-                    ${selectedProject.priceRange.min.toLocaleString()} - ${selectedProject.priceRange.max.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-500">Price Range</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Statistics */}
-            <div className="mt-6">
-              <h4 className="font-medium text-gray-900 mb-3">Statistics</h4>
-              <div className="grid grid-cols-4 gap-6">
-                <div>
-                  <div className="text-2xl font-bold text-blue-600">{selectedProject.viewsCount}</div>
-                  <div className="text-sm text-gray-500">Total Views</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-green-600">{selectedProject.favoritesCount}</div>
-                  <div className="text-sm text-gray-500">Favorites</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-purple-600">{selectedProject.inquiriesCount}</div>
-                  <div className="text-sm text-gray-500">Inquiries</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-orange-600">{selectedProject.constructionProgress}%</div>
-                  <div className="text-sm text-gray-500">Construction Progress</div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-              <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
-                Close
-              </Button>
-            </div>
-          </div>
-        </Modal>
+        <ProjectDetailModal
+          project={selectedProject}
+          isLoading={isLoading}
+          isOpen={isViewModalOpen}
+          onClose={() => setIsViewModalOpen(false)}
+          onEnableProject={handleEnableProject}
+          onDisableProject={(project) => {
+            setSelectedProject(project);
+            setIsDisableModalOpen(true);
+          }}
+          onToggleFeatured={handleToggleFeatured}
+          onNotifyDeveloper={(project) => {
+            setSelectedProject(project);
+            setIsNotifyModalOpen(true);
+          }}
+          isEnabling={enableProjectMutation.isPending}
+          isDisabling={disableProjectMutation.isPending}
+          isTogglingFeatured={toggleFeaturedMutation.isPending}
+        />
       )}
 
       {/* Moderation Modal */}
@@ -542,80 +315,78 @@ export default function ProjectsPage() {
         <Modal isOpen={isModerateModalOpen} onClose={() => setIsModerateModalOpen(false)}>
           <ModerationModal
             project={selectedProject}
-            onConfirm={confirmModeration}
+            onConfirm={async (action, reason) => {
+              try {
+                await toggleFeaturedMutation.mutateAsync({ projectId: selectedProject.id, featured: action === 'APPROVE' });
+                toast.success('Proyecto moderado');
+                setIsModerateModalOpen(false);
+                refetch();
+              } catch (error: any) {
+                toast.error('Error', { description: error?.message });
+              }
+            }}
             onCancel={() => setIsModerateModalOpen(false)}
           />
         </Modal>
       )}
-    </div>
-  );
-}
 
-// Moderation Modal Component
-interface ModerationModalProps {
-  project: ProjectAdminItem;
-  onConfirm: (action: 'APPROVE' | 'REJECT' | 'SUSPEND' | 'ACTIVATE' | 'DEACTIVATE', reason?: string) => void;
-  onCancel: () => void;
-}
+      {/* Notification Modal */}
+      {selectedProject && (
+        <Modal isOpen={isNotifyModalOpen} onClose={() => setIsNotifyModalOpen(false)}>
+          <NotificationModal
+            property={selectedProject as any}
+            onSend={async (subject, message, includeDetails) => {
+              try {
+                await notifyDeveloperMutation.mutateAsync({
+                  projectId: selectedProject.id,
+                  request: { subject, message, includeProjectDetails: includeDetails }
+                });
+                toast.success('Notificación enviada');
+                setIsNotifyModalOpen(false);
+              } catch (error: any) {
+                toast.error('Error', { description: error?.message });
+              }
+            }}
+            onCancel={() => setIsNotifyModalOpen(false)}
+          />
+        </Modal>
+      )}
 
-function ModerationModal({ project, onConfirm, onCancel }: ModerationModalProps) {
-  const [action, setAction] = useState<'APPROVE' | 'REJECT' | 'SUSPEND' | 'ACTIVATE' | 'DEACTIVATE'>('APPROVE');
-  const [reason, setReason] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onConfirm(action, reason);
-  };
-
-  return (
-    <div className="bg-white rounded-lg p-6 max-w-md w-full">
-      <h3 className="text-lg font-semibold mb-4">Moderate Project</h3>
-      
-      <div className="mb-4">
-        <div className="text-sm text-gray-600 mb-2">
-          Moderating: <strong>{project.name}</strong>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Action</label>
-            <select
-              value={action}
-              onChange={(e) => setAction(e.target.value as any)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="APPROVE">Approve</option>
-              <option value="REJECT">Reject</option>
-              <option value="SUSPEND">Suspend</option>
-              <option value="ACTIVATE">Activate</option>
-              <option value="DEACTIVATE">Deactivate</option>
-            </select>
-          </div>
-          
-          {(action === 'REJECT' || action === 'SUSPEND') && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+      {/* Disable Project Modal */}
+      {selectedProject && (
+        <Modal isOpen={isDisableModalOpen} onClose={() => setIsDisableModalOpen(false)}>
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-2 text-gray-900">Deshabilitar Proyecto</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Esta acción deshabilitará el proyecto <strong>{selectedProject.name}</strong>.
+            </p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Motivo (requerido)
+              </label>
               <textarea
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
+                value={disableReason}
+                onChange={(e) => setDisableReason(e.target.value)}
+                placeholder="Ej: Violación de términos, información incorrecta..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                placeholder={`Reason for ${action.toLowerCase()}...`}
-                required
               />
             </div>
-          )}
-          
-          <div className="flex gap-3 pt-4">
-            <Button type="submit" variant={action === 'APPROVE' || action === 'ACTIVATE' ? 'primary' : 'danger'}>
-              {action === 'APPROVE' ? 'Approve' : action === 'REJECT' ? 'Reject' : action === 'SUSPEND' ? 'Suspend' : action === 'ACTIVATE' ? 'Activate' : 'Deactivate'}
-            </Button>
-            <Button type="button" variant="outline" onClick={onCancel}>
-              Cancel
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                variant="danger"
+                onClick={() => handleDisableProject(selectedProject, disableReason)}
+                disabled={!disableReason.trim() || disableProjectMutation.isPending}
+              >
+                {disableProjectMutation.isPending ? 'Deshabilitando...' : 'Deshabilitar'}
+              </Button>
+              <Button variant="outline" onClick={() => { setDisableReason(''); setIsDisableModalOpen(false); }}>
+                Cancelar
+              </Button>
+            </div>
           </div>
-        </form>
-      </div>
+        </Modal>
+      )}
     </div>
   );
 }

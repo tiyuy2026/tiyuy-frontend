@@ -37,6 +37,8 @@ import {
   UserProjectsResponse,
   PropertyComment,
   NotifyOwnerRequest,
+  AgentDashboardStats,
+  AgentListItem,
 } from '@/core/domain/entities/Admin';
 import { PropertyReport } from '@/core/domain/entities/Moderation';
 import {
@@ -405,7 +407,7 @@ export class AdminRepository implements IAdminRepository {
     if (pagination?.size !== undefined) searchParams.append('size', pagination.size.toString());
     if (pagination?.sort) searchParams.append('sort', pagination.sort);
 
-    const response = await axiosClient.get(`/api/admin/projects?${searchParams.toString()}`);
+    const response = await axiosClient.get(`${this.basePath}/projects?${searchParams.toString()}`);
     
     // Transform backend format (priceFrom/priceTo) to frontend format (priceRange.min/max)
     const data = response.data;
@@ -433,21 +435,73 @@ export class AdminRepository implements IAdminRepository {
   }
 
   async getProjectStats(): Promise<any> {
-    const response = await axiosClient.get('/api/admin/project-stats');
+    const url = `${this.basePath}/projects/project-stats`;
+    console.log('[AdminRepository] Fetching project stats from:', url);
+    const response = await axiosClient.get(url);
+    console.log('[AdminRepository] Project stats response:', response.data);
     return response.data;
   }
 
   async moderateProject(projectId: number, request: any): Promise<void> {
-    await axiosClient.put(`/api/admin/projects/${projectId}/moderate`, request);
+    await axiosClient.put(`${this.basePath}/projects/${projectId}/moderate`, request);
   }
 
   async toggleFeaturedProject(projectId: number, featured: boolean): Promise<void> {
-    await axiosClient.put(`/api/admin/projects/${projectId}/featured`, { featured });
+    await axiosClient.put(`${this.basePath}/projects/${projectId}/featured?featured=${featured}`);
   }
 
   async deleteProject(projectId: number, reason?: string): Promise<void> {
     const searchParams = reason ? new URLSearchParams({ reason }) : '';
-    await axiosClient.delete(`/api/admin/projects/${projectId}${searchParams ? `?${searchParams.toString()}` : ''}`);
+    await axiosClient.delete(`${this.basePath}/projects/${projectId}${searchParams ? `?${searchParams.toString()}` : ''}`);
+  }
+
+  async getProjectReports(projectId: number): Promise<any[]> {
+    const response = await axiosClient.get(`${this.basePath}/projects/${projectId}/reports`);
+    return response.data;
+  }
+
+  async getProjectComments(projectId: number): Promise<any[]> {
+    const response = await axiosClient.get(`${this.basePath}/projects/${projectId}/comments`);
+    return response.data;
+  }
+
+  async deleteProjectComment(projectId: number, commentId: number): Promise<void> {
+    await axiosClient.delete(`${this.basePath}/projects/${projectId}/comments/${commentId}`);
+  }
+
+  async notifyProjectDeveloper(projectId: number, request: any): Promise<void> {
+    await axiosClient.post(`${this.basePath}/projects/${projectId}/notify-developer`, request);
+  }
+
+  async disableProjectByAdmin(projectId: number, reason?: string, notifyDeveloper: boolean = true): Promise<void> {
+    const params = new URLSearchParams();
+    if (reason) params.append('reason', reason);
+    params.append('notifyDeveloper', notifyDeveloper.toString());
+    await axiosClient.post(`${this.basePath}/projects/${projectId}/disable?${params.toString()}`);
+  }
+
+  async getProjectsSalesHistory(): Promise<{ labels: string[]; revenue: number[]; developers: number[]; projects: number[]; planDistribution: Record<string, Record<string, number>> }> {
+    const response = await axiosClient.get(`${this.basePath}/projects/sales-history`);
+    return response.data;
+  }
+
+  async getProjectsByStatus(): Promise<{ labels: string[]; values: number[] }> {
+    const response = await axiosClient.get(`${this.basePath}/projects/by-status`);
+    return response.data;
+  }
+
+  async enableProjectByAdmin(projectId: number, reason?: string, notifyDeveloper: boolean = true): Promise<void> {
+    const params = new URLSearchParams();
+    if (reason) params.append('reason', reason);
+    params.append('notifyDeveloper', notifyDeveloper.toString());
+    await axiosClient.post(`${this.basePath}/projects/${projectId}/enable?${params.toString()}`);
+  }
+
+  async reviewReport(reportId: number, approve: boolean, notes?: string): Promise<void> {
+    await axiosClient.post(`${this.basePath}/reports/${reportId}/review`, {
+      approve,
+      notes
+    });
   }
 
   // Finance and Monetization
@@ -500,17 +554,13 @@ export class AdminRepository implements IAdminRepository {
     params: PaginationParams = { page: 0, size: 20 }
   ): Promise<PaginatedResponse<AgentDiscount>> {
     const searchParams = new URLSearchParams();
-    if (filters.agentId) searchParams.append('agentId', filters.agentId.toString());
-    if (filters.discountCodeId) searchParams.append('discountCodeId', filters.discountCodeId.toString());
-    if (filters.status) searchParams.append('status', filters.status);
-    if (filters.assignedBy) searchParams.append('assignedBy', filters.assignedBy.toString());
-    if (filters.dateFrom) searchParams.append('dateFrom', filters.dateFrom);
-    if (filters.dateTo) searchParams.append('dateTo', filters.dateTo);
+    if (filters.agentId) searchParams.append('userId', filters.agentId.toString());
+    if (filters.status) searchParams.append('status', filters.status.toString());
     if (params?.page !== undefined) searchParams.append('page', params.page.toString());
     if (params?.size !== undefined) searchParams.append('size', params.size.toString());
     if (params?.sort) searchParams.append('sort', params.sort);
 
-    const response = await axiosClient.get(`${this.basePath}/discounts?${searchParams.toString()}`);
+    const response = await axiosClient.get(`${this.basePath}/discounts/assignments?${searchParams.toString()}`);
     return response.data;
   }
 
@@ -520,7 +570,7 @@ export class AdminRepository implements IAdminRepository {
   }
 
   async assignDiscountToAgent(request: AssignDiscountToAgentRequest): Promise<AgentDiscount> {
-    const response = await axiosClient.post(`${this.basePath}/discounts/assign`, request);
+    const response = await axiosClient.post(`${this.basePath}/discounts/assignments`, request);
     return response.data;
   }
 
@@ -529,17 +579,48 @@ export class AdminRepository implements IAdminRepository {
     return response.data;
   }
 
-  async removeDiscountFromAgent(agentId: number, discountCodeId: number): Promise<void> {
-    await axiosClient.delete(`${this.basePath}/discounts/agent/${agentId}/${discountCodeId}`);
+  async removeDiscountFromAgent(assignmentId: number): Promise<void> {
+    const response = await axiosClient.delete(`${this.basePath}/discounts/assignments/${assignmentId}`);
+    return response.data;
   }
 
-  async toggleAgentDiscountStatus(discountId: number): Promise<AgentDiscount> {
-    const response = await axiosClient.patch(`${this.basePath}/discounts/${discountId}/toggle`);
+  async toggleAgentDiscountStatus(assignmentId: number): Promise<AgentDiscount> {
+    const response = await axiosClient.put(`${this.basePath}/discounts/assignments/${assignmentId}/toggle`);
     return response.data;
   }
 
   async getAvailableDiscountsForAgent(agentId: number): Promise<DiscountCode[]> {
     const response = await axiosClient.get(`${this.basePath}/discounts/available?agentId=${agentId}`);
+    return response.data;
+  }
+
+  // Agent Plan Discount Management - Custom pricing per agent per plan
+  async createAgentPlanDiscount(
+    agentId: number, 
+    data: { 
+      planCode: string; 
+      discountPercentage: number; 
+      customPricePen?: number;
+      validFrom?: string;
+      validUntil?: string;
+      notes?: string;
+    }
+  ): Promise<any> {
+    const response = await axiosClient.post(`${this.basePath}/agents/${agentId}/plan-discounts`, data);
+    return response.data;
+  }
+
+  async getAgentPlanDiscounts(agentId: number): Promise<any[]> {
+    const response = await axiosClient.get(`${this.basePath}/agents/${agentId}/plan-discounts`);
+    return response.data;
+  }
+
+  async removeAgentPlanDiscount(agentId: number, discountId: number): Promise<void> {
+    await axiosClient.delete(`${this.basePath}/agents/${agentId}/plan-discounts/${discountId}`);
+  }
+
+  async calculateAgentPlanPrice(agentId: number, planCode: string): Promise<any> {
+    const response = await axiosClient.get(`${this.basePath}/agents/${agentId}/plan-price?planCode=${planCode}`);
     return response.data;
   }
 
@@ -586,6 +667,17 @@ export class AdminRepository implements IAdminRepository {
 
   async searchAgentByDni(dni: string): Promise<{id: number, name: string, dni: string, type: string, found: boolean}> {
     const response = await axiosClient.get(`${this.basePath}/subscription-plans/search/agent?dni=${dni}`);
+    return response.data;
+  }
+
+  // Agent Dashboard
+  async getAgentDashboardStats(): Promise<AgentDashboardStats> {
+    const response = await axiosClient.get(`${this.basePath}/agents/dashboard-stats`);
+    return response.data;
+  }
+
+  async getAgentList(params: PaginationParams): Promise<PaginatedResponse<AgentListItem>> {
+    const response = await axiosClient.get(`${this.basePath}/agents`, { params });
     return response.data;
   }
 }

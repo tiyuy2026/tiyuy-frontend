@@ -12,6 +12,7 @@ import {
   DashboardStats,
   UserStats,
   FinanceStats,
+  UserRegistrationHistory,
   UserListItem,
   ChangeUserRoleRequest,
   DiscountCode,
@@ -32,6 +33,8 @@ import {
   UserProjectsResponse,
   PropertyComment,
   NotifyOwnerRequest,
+  AgentDashboardStats,
+  AgentListItem,
 } from '@/core/domain/entities/Admin';
 import { PropertyReport } from '@/core/domain/entities/Moderation';
 import {
@@ -406,8 +409,8 @@ export const useCreateAgentDiscount = () => {
 export const useRemoveDiscountFromAgent = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ agentId, discountCodeId }: { agentId: number; discountCodeId: number }) =>
-      adminRepository.removeDiscountFromAgent(agentId, discountCodeId),
+    mutationFn: (assignmentId: number) =>
+      adminRepository.removeDiscountFromAgent(assignmentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'agent-discounts'] });
       queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'discounts'] });
@@ -619,7 +622,16 @@ export const useProjectsForAdmin = (
 export const useProjectStats = () => {
   return useQuery({
     queryKey: [ADMIN_QUERY_KEY, 'projects', 'stats'],
-    queryFn: () => adminRepository.getProjectStats(),
+    queryFn: async () => {
+      try {
+        const data = await adminRepository.getProjectStats();
+        console.log('[useProjectStats] Data received:', data);
+        return data;
+      } catch (error) {
+        console.error('[useProjectStats] Error fetching stats:', error);
+        throw error;
+      }
+    },
   });
 };
 
@@ -650,6 +662,80 @@ export const useDeleteProject = () => {
   return useMutation({
     mutationFn: ({ projectId, reason }: { projectId: number; reason?: string }) =>
       adminRepository.deleteProject(projectId, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'projects'] });
+    },
+  });
+};
+
+// Project reports and comments hooks
+export const useProjectReports = (projectId: number | null) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'projects', projectId, 'reports'],
+    queryFn: () => adminRepository.getProjectReports(projectId!),
+    enabled: !!projectId,
+    staleTime: 30 * 1000,
+  });
+};
+
+export const useProjectComments = (projectId: number | null) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'projects', projectId, 'comments'],
+    queryFn: () => adminRepository.getProjectComments(projectId!),
+    enabled: !!projectId,
+    staleTime: 30 * 1000,
+  });
+};
+
+export const useDeleteProjectComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ projectId, commentId }: { projectId: number; commentId: number }) =>
+      adminRepository.deleteProjectComment(projectId, commentId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'projects', variables.projectId, 'comments'] });
+    },
+  });
+};
+
+export const useNotifyProjectDeveloper = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ projectId, request }: { projectId: number; request: any }) =>
+      adminRepository.notifyProjectDeveloper(projectId, request),
+    onSuccess: () => {
+      // No need to invalidate queries, just notification sent
+    },
+  });
+};
+
+export const useDisableProjectByAdmin = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ projectId, reason, notifyDeveloper }: { projectId: number; reason?: string; notifyDeveloper?: boolean }) =>
+      adminRepository.disableProjectByAdmin(projectId, reason, notifyDeveloper),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'projects'] });
+    },
+  });
+};
+
+export const useEnableProjectByAdmin = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ projectId, reason, notifyDeveloper }: { projectId: number; reason?: string; notifyDeveloper?: boolean }) =>
+      adminRepository.enableProjectByAdmin(projectId, reason, notifyDeveloper),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'projects'] });
+    },
+  });
+};
+
+export const useReviewReport = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ reportId, approve, notes }: { reportId: number; approve: boolean; notes?: string }) =>
+      adminRepository.reviewReport(reportId, approve, notes),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'projects'] });
     },
@@ -766,5 +852,48 @@ export const useRefundTransaction = () => {
       queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'transactions'] });
       queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'finance', 'stats'] });
     },
+  });
+};
+
+// Agent Dashboard hooks
+export const useAgentDashboardStats = () => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'agents', 'dashboard-stats'],
+    queryFn: () => adminRepository.getAgentDashboardStats(),
+  });
+};
+
+export const useAgentList = (params: PaginationParams = { page: 0, size: 20 }) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'agents', 'list', params],
+    queryFn: () => adminRepository.getAgentList(params),
+  });
+};
+
+// Agent Plan Discount hooks
+export const useCreateAgentPlanDiscount = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ agentId, data }: { agentId: number; data: any }) => 
+      adminRepository.createAgentPlanDiscount(agentId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'agents', 'plan-discounts'] });
+    },
+  });
+};
+
+export const useGetAgentPlanDiscounts = (agentId: number | null) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'agents', 'plan-discounts', agentId],
+    queryFn: () => adminRepository.getAgentPlanDiscounts(agentId!),
+    enabled: !!agentId,
+  });
+};
+
+export const useCalculateAgentPlanPrice = (agentId: number | null, planCode: string) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'agents', 'plan-price', agentId, planCode],
+    queryFn: () => adminRepository.calculateAgentPlanPrice(agentId!, planCode),
+    enabled: !!agentId && !!planCode,
   });
 };

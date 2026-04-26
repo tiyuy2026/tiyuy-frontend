@@ -18,6 +18,7 @@ const emptyResponse: PaginatedResponse<UserListItem> = {
   totalPages: 0,
   size: 50,
   number: 0,
+  numberOfElements: 0,
   first: true,
   last: true,
   empty: true,

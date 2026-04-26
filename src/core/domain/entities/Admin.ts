@@ -346,7 +346,7 @@ export interface AdminNavItem {
 export type ProjectLifecycleStatus = 'ACTIVE' | 'PENDING' | 'PAST' | 'ENDING_SOON' | 'COMPLETED' | 'SUSPENDED';
 
 // Project status
-export type ProjectStatus = 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'COMPLETED' | 'SUSPENDED' | 'CANCELLED';
+export type ProjectStatus = 'DRAFT' | 'PUBLISHED' | 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'SUSPENDED' | 'CANCELLED';
 
 // Project type
 export type ProjectType = 'RESIDENTIAL' | 'COMMERCIAL' | 'MIXED_USE' | 'INDUSTRIAL';
@@ -379,6 +379,7 @@ export interface ProjectAdminItem {
     max: number;
   };
   constructionProgress: number;
+  startDate?: Date;
   estimatedDeliveryDate?: Date;
   launchDate?: Date;
   completionDate?: Date;
@@ -405,6 +406,11 @@ export interface ProjectStats {
   soldUnits: number;
   availableUnits: number;
   averageConstructionProgress: number;
+  // Extended stats for dashboard
+  totalSalesValue: number;
+  totalSoldUnits: number;
+  conversionRate: number;
+  totalAvailableUnits: number;
 }
 
 // Project moderation request
@@ -514,6 +520,87 @@ export interface CreateDiscountCodeRequest {
   applicableAgencyId?: number;
   minimumAmount?: number;
   maximumDiscount?: number;
+}
+
+// Agent dashboard stats matching backend
+export interface AgentDashboardStats {
+  totalRevenue: number;
+  totalRevenuePrevious: number;
+  monthlyRevenue: number;
+  monthlyRevenuePrevious: number;
+  weeklyRevenue: number;
+  weeklyRevenuePrevious: number;
+  activeAgents: number;
+  activeAgentsPrevious: number;
+  totalAgents: number;
+  conversionRate: number;
+  conversionRatePrevious: number;
+  freeAgents: number;
+  freeAgentsPrevious: number;
+  lostPotentialRevenue: number;
+  topAgents: AgentRevenueItem[];
+  revenueChart: {
+    labels: string[];
+    revenue: number[];
+    conversion: number[];
+  };
+  planDistribution: {
+    labels: string[];
+    values: number[];
+    total: number;
+  };
+  freeAgentList: AgentFreeItem[];
+}
+
+export interface AgentRevenueItem {
+  agentId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  profilePhotoUrl?: string;
+  city?: string;
+  country?: string;
+  weeklyRevenue: number;
+  monthlyRevenue: number;
+  yearlyRevenue: number;
+  conversionRate: number;
+  currentPlan: string;
+  isActive: boolean;
+  memberSince: string;
+}
+
+export interface AgentFreeItem {
+  agentId: number;
+  firstName: string;
+  lastName: string;
+  initials: string;
+  email: string;
+  status: string;
+  potentialRevenue: number;
+  createdAt: string;
+}
+
+export interface AgentListItem {
+  id: number;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  dni?: string;
+  city?: string;
+  country?: string;
+  profilePhotoUrl?: string;
+  enabled: boolean;
+  emailVerified: boolean;
+  phoneVerified: boolean;
+  currentPlan: string;
+  planExpiresAt?: Date;
+  weekRevenue: number;
+  monthRevenue: number;
+  yearRevenue: number;
+  conversionRate: number;
+  propertiesCount: number;
+  lastLoginAt?: Date;
+  createdAt: Date;
 }
 
 // Update discount code request matching backend

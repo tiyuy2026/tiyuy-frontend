@@ -62,12 +62,16 @@ export function CustomDropdown({ value, onChange, options, placeholder, minWidth
         </svg>
       </button>
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-full bg-white rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden">
+        <div className="absolute top-full left-0 mt-1 w-full bg-white rounded-xl shadow-xl border border-gray-200 z-[9999] overflow-hidden">
           {options.map((option) => (
             <div
               key={option.value}
               onClick={() => handleSelect(option.value)}
-              className="px-4 py-2.5 hover:bg-blue-50 cursor-pointer text-sm transition-colors"
+              className={`px-4 py-2.5 cursor-pointer text-sm transition-colors border-b border-gray-100 last:border-b-0 ${
+                value === option.value
+                  ? 'bg-blue-500 text-white font-medium'
+                  : 'hover:bg-blue-100 text-gray-800'
+              }`}
             >
               {option.label}
             </div>

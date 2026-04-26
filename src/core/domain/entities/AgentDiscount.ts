@@ -5,16 +5,17 @@
 
 export interface AgentDiscount {
   id: number;
-  agentId: number;
+  userId: number;
   discountCodeId: number;
   discountCode: DiscountCode;
+  discountType: 'DISCOUNT_CODE' | 'DEVELOPER_DISCOUNT' | 'AGENT_DISCOUNT' | 'INSURANCE_DISCOUNT';
   status: AgentDiscountStatus;
   assignedAt: string;
-  assignedBy: number;
+  assignedBy?: number;
   expiresAt?: string;
-  usedAt?: string;
   usageCount: number;
   maxUsage?: number;
+  notes?: string;
 }
 
 export type AgentDiscountStatus = 'ACTIVE' | 'EXPIRED' | 'USED' | 'CANCELLED';
@@ -39,10 +40,8 @@ export interface DiscountCode {
 }
 
 export interface AssignDiscountToAgentRequest {
-  agentId: number;
+  userId: number;
   discountCodeId: number;
-  maxUsage?: number;
-  expiresAt?: string;
   notes?: string;
 }
 
