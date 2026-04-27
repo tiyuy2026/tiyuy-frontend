@@ -39,6 +39,8 @@ export default function UnifiedNotificationsPanel({
         return <Clock className="w-4 h-4 text-yellow-600" />;
       case 'MARKETING':
         return <Star className="w-4 h-4 text-purple-600" />;
+      case 'ADMIN_NOTIFICATION':
+        return <Bell className="w-4 h-4 text-red-600" />;
       default:
         return <Bell className="w-4 h-4 text-gray-600" />;
     }

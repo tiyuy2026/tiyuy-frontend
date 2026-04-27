@@ -8,7 +8,9 @@ export type PropertyType =
 
 export type TransactionType = 'SALE' | 'RENT';
 
-export type PropertyStatus = 'DRAFT' | 'PUBLISHED' | 'RENTED' | 'SOLD' | 'INACTIVE';
+export type PropertyStatus = 'DRAFT' | 'PUBLISHED' | 'RENTED' | 'SOLD' | 'PAUSED' | 'INACTIVE';
+
+export type PropertyLifecycleStatus = 'ACTIVE' | 'GRACE_PERIOD' | 'PENDING_DELETION' | 'DELETED' | 'SUSPENDED';
 
 export type Currency = 'PEN' | 'USD';
 
@@ -105,6 +107,12 @@ export interface Property {
   isFeatured: boolean;
   isVerified: boolean;
   
+  // Lifecycle fields for subscription management
+  lifecycleStatus?: PropertyLifecycleStatus;
+  remainingGraceDays?: number;
+  gracePeriodEnd?: Date;
+  canReactivate?: boolean;
+  
   // Fechas
   createdAt: Date;
   updatedAt: Date;
@@ -129,4 +137,7 @@ export interface PropertySummary {
   isFeatured: boolean;
   isVerified: boolean;
   viewsCount: number;
+  // Lifecycle fields for subscription management
+  lifecycleStatus?: PropertyLifecycleStatus;
+  remainingGraceDays?: number;
 }

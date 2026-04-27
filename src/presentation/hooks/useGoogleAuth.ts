@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { signInWithPopup, signOut as firebaseSignOut, User as FirebaseUser } from 'firebase/auth';
 import { auth, googleProvider } from '@/config/firebase';
+import { AuthRepository } from '@/infrastructure/repositories/AuthRepository';
 
 interface GoogleUserData {
   email: string;
@@ -13,6 +14,7 @@ interface GoogleUserData {
 export const useGoogleAuth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const authRepository = new AuthRepository();
 
   const signInWithGoogle = async (): Promise<GoogleUserData | null> => {
     setLoading(true);
@@ -73,6 +75,55 @@ export const useGoogleAuth = () => {
     }
   };
 
+  const signInWithGoogleComplete = async (): Promise<{ exists: boolean; userData?: GoogleUserData; authResponse?: any }> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Obtener datos de Google
+      const googleUserData = await signInWithGoogle();
+      
+      if (!googleUserData) {
+        return { exists: false };
+      }
+
+      // Verificar si el email ya existe en el sistema
+      const { exists } = await authRepository.checkGoogleEmailExists(googleUserData.email);
+      
+      if (exists) {
+        // Si existe, intentar login directo
+        try {
+          const authResponse = await authRepository.loginWithGoogle(
+            googleUserData.email,
+            googleUserData.firstName,
+            googleUserData.lastName,
+            googleUserData.uid
+          );
+          
+          return { 
+            exists: true, 
+            userData: googleUserData, 
+            authResponse 
+          };
+        } catch (loginError: any) {
+          // Si falla el login, mostrar que necesita registrarse
+          console.error('Error en login con Google:', loginError);
+          return { exists: false, userData: googleUserData };
+        }
+      }
+
+      // Si no existe, devolver datos para registro
+      return { exists: false, userData: googleUserData };
+      
+    } catch (error: any) {
+      console.error('Error en autenticación completa con Google:', error);
+      setError(error.message || 'Error al autenticar con Google');
+      return { exists: false };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const signOut = async () => {
     try {
       if (auth) {
@@ -85,6 +136,7 @@ export const useGoogleAuth = () => {
 
   return {
     signInWithGoogle,
+    signInWithGoogleComplete,
     signOut,
     loading,
     error

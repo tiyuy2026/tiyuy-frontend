@@ -1,55 +1,69 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/presentation/hooks';
 import { useGoogleAuth } from '@/presentation/hooks/useGoogleAuth';
 import { Button, Input, InfoDialog } from '@/presentation/components/ui';
+import { User } from '@/core/domain/entities';
+import { authStorage } from '@/infrastructure/storage';
+import { useAuthStore } from '@/presentation/store/authStore';
 
 export const LoginForm: React.FC = () => {
   const router = useRouter();
   const { login, isLoading, error, clearError } = useAuth();
-  const { signInWithGoogle, loading: googleLoading, error: googleError } = useGoogleAuth();
+  const { signInWithGoogleComplete, loading: googleLoading, error: googleError } = useGoogleAuth();
+  const { setAuth } = useAuthStore();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const [infoDialog, setInfoDialog] = useState<{ isOpen: boolean; message: string }>({ isOpen: false, message: '' });
+  
+  // Auto-clear error after 5 seconds
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        clearError();
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, clearError]);
+  const [infoDialog, setInfoDialog] = useState<{ 
+    isOpen: boolean; 
+    message: string; 
+    showRegisterButton?: boolean;
+    googleData?: any;
+  }>({ isOpen: false, message: '' });
 
-  const validateForm = () => {
-    console.log('LoginForm: validateForm llamado');
+  const validateForm = (): Record<string, string> => {
     const errors: Record<string, string> = {};
 
     if (!formData.email) {
-      errors.email = 'El email es requerido';
+      errors.email = 'El correo electrónico es obligatorio';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Email invalido';
+      errors.email = 'El correo electrónico no es válido';
     }
 
     if (!formData.password) {
-      errors.password = 'La contrasena es requerida';
+      errors.password = 'La contraseña es obligatoria';
     } else if (formData.password.length < 6) {
-      errors.password = 'Minimo 6 caracteres';
+      errors.password = 'La contraseña debe tener mínimo 6 caracteres';
     }
 
-    console.log('LoginForm: errores de validacion:', errors);
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
+    return errors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('LoginForm: Intentando iniciar sesión con:', formData.email);
     clearError();
-
-    if (!validateForm()) return;
+    const newErrors = validateForm();
+    setValidationErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
 
     try {
       await login(formData.email, formData.password);
-      console.log('LoginForm: Login exitoso, redirigiendo al dashboard');
     } catch (err) {
-      console.log('LoginForm: Error en login:', err);
       // Error manejado por el hook
     }
   };
@@ -73,13 +87,67 @@ export const LoginForm: React.FC = () => {
     router.push('/profile-selector');
   };
 
+  const handleRegisterFromGoogle = () => {
+    if (infoDialog.googleData) {
+      // Guardar datos en sessionStorage para precargar en formulario de registro
+      sessionStorage.setItem('googleRegistrationData', JSON.stringify(infoDialog.googleData));
+    }
+    // Cerrar diálogo y redirigir a registro
+    setInfoDialog({ isOpen: false, message: '' });
+    router.push('/profile-selector');
+  };
+
   const handleGoogleSignIn = async () => {
     try {
-      const googleUserData = await signInWithGoogle();
+      const result = await signInWithGoogleComplete();
       
-      if (googleUserData) {
-        setInfoDialog({ isOpen: true, message: 'Registrate primero con Google para continuar' });
-        console.log('LoginForm: Datos de Google obtenidos:', googleUserData);
+      if (result.exists && result.authResponse) {
+        // Usuario existe y se logueó exitosamente
+        // Crear User desde AuthResponse del backend
+        const userData: User = {
+          id: result.authResponse.userId,
+          email: result.authResponse.email,
+          phone: '',
+          firstName: result.authResponse.firstName,
+          lastName: result.authResponse.lastName,
+          dni: '',
+          role: result.authResponse.role,
+          emailVerified: false,
+          phoneVerified: false,
+          publishedPropertiesCount: 0,
+          createdAt: new Date(),
+        };
+
+        // Extract admin data if present
+        const adminData = result.authResponse.adminRoleType ? {
+          adminRoleType: result.authResponse.adminRoleType,
+          permissions: result.authResponse.permissions,
+          departments: result.authResponse.departments,
+          isActive: result.authResponse.isActive,
+        } : undefined;
+
+        // Guardar en storage y store
+        authStorage.setToken(result.authResponse.token);
+        authStorage.setUser(userData);
+        setAuth(result.authResponse.token, userData, adminData);
+        
+        // Redirigir según el rol
+        const targetRoute = (result.authResponse.role === 'ADMIN' || result.authResponse.adminRoleType === 'SUPER_ADMIN') ? '/admin' : '/';
+        router.replace(targetRoute);
+        setTimeout(() => {
+          window.location.assign(targetRoute);
+        }, 100);
+        
+      } else if (result.userData) {
+        // Usuario no existe, mostrar diálogo de registro con datos precargados
+        setInfoDialog({ 
+          isOpen: true, 
+          message: `El correo ${result.userData.email} no está registrado. ¿Deseas registrarte ahora?`,
+          showRegisterButton: true,
+          googleData: result.userData
+        });
+        
+        console.log('LoginForm: Datos de Google para registro:', result.userData);
       }
     } catch (error) {
       console.error('LoginForm: Error en login con Google:', error);
@@ -94,7 +162,18 @@ export const LoginForm: React.FC = () => {
       title="Registro Requerido"
       message={infoDialog.message}
       variant="info"
-    />
+      showRegisterButton={infoDialog.showRegisterButton}
+      onRegister={() => {
+        // Guardar datos de Google en sessionStorage para pre-llenar el registro
+        if (infoDialog.googleData) {
+          sessionStorage.setItem('googleRegistrationData', JSON.stringify(infoDialog.googleData));
+          console.log('LoginForm: Datos de Google guardados para registro:', infoDialog.googleData);
+        }
+        // Cerrar diálogo y redirigir a selección de perfil primero
+        setInfoDialog({ isOpen: false, message: '' });
+        router.push('/select-profile');
+      }}
+          />
     <div className="w-full max-w-md">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-3">
@@ -103,13 +182,30 @@ export const LoginForm: React.FC = () => {
         <p className="text-gray-600">Inicia sesion en tu cuenta</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-start gap-2">
-            <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-            <span className="text-sm">{error}</span>
+          <div className="relative animate-in slide-in-from-top-2 fade-in-0 duration-300">
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-start gap-3 shadow-sm">
+              <div className="flex-shrink-0 w-5 h-5 mt-0.5 bg-red-100 rounded-full flex items-center justify-center">
+                <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium">{error}</p>
+                <p className="text-xs text-red-600 mt-1 opacity-75">Este mensaje desaparecerá en 5 segundos</p>
+              </div>
+              <button
+                type="button"
+                onClick={clearError}
+                className="flex-shrink-0 text-red-400 hover:text-red-600 transition-colors p-1 rounded-md hover:bg-red-100"
+                title="Cerrar mensaje"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
           </div>
         )}
 
@@ -121,7 +217,6 @@ export const LoginForm: React.FC = () => {
           value={formData.email}
           onChange={handleChange}
           error={validationErrors.email}
-          required
           leftIcon={
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
@@ -137,7 +232,6 @@ export const LoginForm: React.FC = () => {
           value={formData.password}
           onChange={handleChange}
           error={validationErrors.password}
-          required
           leftIcon={
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -155,18 +249,15 @@ export const LoginForm: React.FC = () => {
           </Link>
         </div>
 
-        <Button 
-  type="submit" 
-  variant="primary" 
-  size="lg" 
-  fullWidth 
-  isLoading={isLoading}
-  onClick={(e) => {
-    console.log('LoginForm: Boton Iniciar Sesion clickeado');
-  }}
->
-  Iniciar Sesion
-</Button>
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          fullWidth
+          isLoading={isLoading}
+        >
+          Iniciar Sesion
+        </Button>
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
@@ -211,7 +302,8 @@ export const LoginForm: React.FC = () => {
           
           <p className="text-sm text-gray-600">
             No tienes cuenta?{' '}
-            <button 
+            <button
+              type="button"
               onClick={handleRegisterClick}
               className="text-blue-600 hover:text-blue-700 font-semibold underline bg-transparent border-none cursor-pointer"
             >

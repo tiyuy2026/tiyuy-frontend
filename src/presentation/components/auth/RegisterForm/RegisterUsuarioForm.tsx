@@ -25,6 +25,27 @@ export const RegisterUsuarioForm: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [emailExists, setEmailExists] = useState(false);
 
+  // Auto-fill Google data if coming from login dialog
+  useEffect(() => {
+    const googleData = sessionStorage.getItem('googleRegistrationData');
+    if (googleData) {
+      try {
+        const parsedData = JSON.parse(googleData);
+        setFormData(prev => ({
+          ...prev,
+          email: parsedData.email,
+          firstName: parsedData.firstName,
+          lastName: parsedData.lastName,
+        }));
+        // Clear the session storage after using it
+        sessionStorage.removeItem('googleRegistrationData');
+        console.log('RegisterUsuarioForm: Datos de Google auto-llenados desde login:', parsedData);
+      } catch (error) {
+        console.error('Error parsing Google data from sessionStorage:', error);
+      }
+    }
+  }, []);
+
   // Validar email en tiempo real
   useEffect(() => {
     const validateEmailField = async () => {
@@ -32,14 +53,13 @@ export const RegisterUsuarioForm: React.FC = () => {
         try {
           const exists = await validateEmail(formData.email);
           setEmailExists(exists);
-          
           if (exists) {
             setErrors(prev => ({ ...prev, email: 'Este email ya está registrado' }));
           } else {
             setErrors(prev => {
-              const newErrors = { ...prev };
-              delete newErrors.email;
-              return newErrors;
+              const n = { ...prev };
+              delete n.email;
+              return n;
             });
           }
         } catch (error) {
@@ -47,10 +67,14 @@ export const RegisterUsuarioForm: React.FC = () => {
         }
       } else {
         setEmailExists(false);
+        // Solo limpiar el error si NO es un error de "campo obligatorio"
         setErrors(prev => {
-          const newErrors = { ...prev };
-          delete newErrors.email;
-          return newErrors;
+          if (prev.email && prev.email !== 'El correo electrónico es obligatorio') {
+            const n = { ...prev };
+            delete n.email;
+            return n;
+          }
+          return prev;
         });
       }
     };
@@ -59,27 +83,27 @@ export const RegisterUsuarioForm: React.FC = () => {
     return () => clearTimeout(timeoutId);
   }, [formData.email, validateEmail]);
 
-  const validateForm = () => {
+  const validateForm = (): Record<string, string> => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.email) newErrors.email = 'Email requerido';
+    if (!formData.email) newErrors.email = 'El correo electrónico es obligatorio';
     if (emailExists) newErrors.email = 'Este email ya está registrado';
-    if (!formData.password) newErrors.password = 'Contraseña requerida';
-    if (formData.password.length < 6) newErrors.password = 'Mínimo 6 caracteres';
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
-    if (!formData.firstName) newErrors.firstName = 'Nombre requerido';
-    if (!formData.lastName) newErrors.lastName = 'Apellidos requeridos';
-    if (!formData.dni || formData.dni.length !== 8) newErrors.dni = 'DNI inválido';
-    if (!isDniValidated) newErrors.dni = 'Debes validar tu DNI';
+    if (!formData.password) newErrors.password = 'La contraseña es obligatoria';
+    if (formData.password && formData.password.length < 6) newErrors.password = 'La contraseña debe tener mínimo 6 caracteres';
+    if (formData.password && formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    if (!formData.dni || formData.dni.length !== 8) newErrors.dni = 'El DNI debe tener 8 dígitos';
+    if (!isDniValidated) newErrors.dni = 'Debes validar tu DNI primero';
+    if (!formData.firstName) newErrors.firstName = 'El nombre es obligatorio';
+    if (!formData.lastName) newErrors.lastName = 'Los apellidos son obligatorios';
 
-    // Validar teléfono: 9 dígitos empezando con 9
     const phoneRegex = /^9\d{8}$/;
-    if (!formData.phone || !phoneRegex.test(formData.phone.trim())) {
-      newErrors.phone = 'Teléfono inválido. Debe tener 9 dígitos y empezar con 9';
+    if (!formData.phone) {
+      newErrors.phone = 'El teléfono es obligatorio';
+    } else if (!phoneRegex.test(formData.phone.trim())) {
+      newErrors.phone = 'Teléfono inválido: 9 dígitos empezando con 9';
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return newErrors;
   };
 
   const handleGoogleSignIn = async () => {
@@ -104,8 +128,10 @@ export const RegisterUsuarioForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
-    
+    const newErrors = validateForm();
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+
     const dataToSend = {
       email: formData.email,
       phone: formData.phone, // Ya viene limpio del handleChange
@@ -171,16 +197,20 @@ export const RegisterUsuarioForm: React.FC = () => {
         <p className="text-gray-600">Completa tus datos para comenzar</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         {/* DNI PRIMERO */}
         <DniInput
           value={formData.dni}
-          onChange={(val) => setFormData(prev => ({ ...prev, dni: val }))}
+          onChange={(val) => {
+            setFormData(prev => ({ ...prev, dni: val }));
+            if (errors.dni) setErrors(prev => { const n = { ...prev }; delete n.dni; return n; });
+          }}
           onValidated={handleDniValidated}
           leftIcon={<Hash className="w-5 h-5 text-gray-400" />}
           placeholder="Ingresa tu DNI"
           required
           disabled={isDniValidated}
+          externalError={errors.dni}
         />
 
         {/* NOMBRES DESPUÉS DE VALIDAR DNI */}

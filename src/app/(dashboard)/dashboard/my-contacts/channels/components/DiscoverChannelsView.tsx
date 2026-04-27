@@ -1,14 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useGetChannels, useSubscribeToChannel } from '@/presentation/hooks/useContacts';
+import { useChannels } from '@/presentation/hooks/useChannels';
 import { formatCompactNumber } from '@/utils/formatters';
 import { Users, FileText, Bell, BellOff } from 'lucide-react';
 
 export default function DiscoverChannelsView({ user, onChannelSelect }: { user: any; onChannelSelect: (channel: any) => void }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const { data: channels, isLoading } = useGetChannels(user?.id);
-  const subscribeToChannel = useSubscribeToChannel();
+  const { channels, channelsLoading: isLoading, subscribeToChannel, isSubscribing } = useChannels(user?.id);
   
   // Filtrar canales donde el usuario NO esta suscrito
   const availableChannels = channels?.filter((c: any) => !c.isSubscribed) ?? [];
@@ -33,7 +32,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
 
   const handleSubscribeChannel = (channelId: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    subscribeToChannel.mutate(channelId);
+    subscribeToChannel(channelId);
   };
 
   return (
@@ -140,10 +139,10 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                   {/* Boton de suscribirse */}
                   <button
                     onClick={(e) => handleSubscribeChannel(channel.id, e)}
-                    disabled={subscribeToChannel.isPending}
+                    disabled={isSubscribing}
                     className="w-full py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {subscribeToChannel.isPending ? 'Suscribiendose...' : 'Suscribirse'}
+                    {isSubscribing ? 'Suscribiendose...' : 'Suscribirse'}
                   </button>
                 </div>
               </div>

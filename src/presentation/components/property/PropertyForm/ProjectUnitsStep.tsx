@@ -253,7 +253,7 @@ export function ProjectUnitsStep({ formData, onChange, propertyId }: ProjectUnit
             mode === 'individual' ? 'bg-white shadow text-purple-700' : 'text-gray-500 hover:text-gray-700'
           }`}
         >
-          🏠 Individual
+          Individual
         </button>
         <button
           onClick={() => setMode('group')}
@@ -261,7 +261,7 @@ export function ProjectUnitsStep({ formData, onChange, propertyId }: ProjectUnit
             mode === 'group' ? 'bg-white shadow text-purple-700' : 'text-gray-500 hover:text-gray-700'
           }`}
         >
-          🏗️ Por Grupo
+          Por Grupo
         </button>
       </div>
 
@@ -283,7 +283,7 @@ export function ProjectUnitsStep({ formData, onChange, propertyId }: ProjectUnit
                   {preview ? (
                     <img src={preview} alt="Plano" className="w-full h-full object-contain p-1" />
                   ) : (
-                    <span className="text-3xl">📐</span>
+                    <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
                   )}
                 </div>
 
@@ -304,11 +304,11 @@ export function ProjectUnitsStep({ formData, onChange, propertyId }: ProjectUnit
 
                   {/* Stats en fila */}
                   <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-gray-600">
-                    <span>🛏 {group.bedrooms} dorm</span>
-                    <span>🚿 {group.bathrooms} baños</span>
-                    <span>📐 {group.area} m²</span>
-                    <span>🚗 {group.parkingSpots} est.</span>
-                    <span>🏢 Pisos {group.floorStart}–{group.floorEnd}</span>
+                    <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M3 12h18M3 12v5h18v-5M7 12V9h4v3M13 12V9h4v3"/></svg>{group.bedrooms} dorm</span>
+                    <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 12h16M4 12a2 2 0 01-2-2V7h4v3M4 12v5a2 2 0 002 2h12a2 2 0 002-2v-5M8 7V5a2 2 0 114 0v2"/></svg>{group.bathrooms} baños</span>
+                    <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>{group.area} m²</span>
+                    <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zm10 0a2 2 0 11-4 0 2 2 0 014 0zM4 9l2-5h12l2 5M4 9h16M4 9H2m18 0h2"/></svg>{group.parkingSpots} est.</span>
+                    <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3"/></svg>Pisos {group.floorStart}–{group.floorEnd}</span>
                   </div>
 
                   {/* Precio + disponibilidad */}
@@ -346,7 +346,7 @@ export function ProjectUnitsStep({ formData, onChange, propertyId }: ProjectUnit
                   {preview ? (
                     <img src={preview} alt="Plano" className="w-full h-full object-contain p-1" />
                   ) : (
-                    <span className="text-2xl">🏠</span>
+                    <svg className="w-7 h-7 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9 22V12h6v10"/></svg>
                   )}
                 </div>
 
@@ -364,9 +364,9 @@ export function ProjectUnitsStep({ formData, onChange, propertyId }: ProjectUnit
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-gray-600">
-                    {unit.bedrooms && <span>🛏 {unit.bedrooms} dorm</span>}
-                    <span>🚿 {unit.bathrooms} baños</span>
-                    <span>📐 {unit.area} m²</span>
+                    {unit.bedrooms && <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M3 12h18M3 12v5h18v-5M7 12V9h4v3M13 12V9h4v3"/></svg>{unit.bedrooms} dorm</span>}
+                    <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 12h16M4 12a2 2 0 01-2-2V7h4v3M4 12v5a2 2 0 002 2h12a2 2 0 002-2v-5M8 7V5a2 2 0 114 0v2"/></svg>{unit.bathrooms} baños</span>
+                    <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>{unit.area} m²</span>
                   </div>
                   <p className="text-base font-bold text-gray-900 mt-2">
                     {currencySymbol} {unit.price.toLocaleString()}

@@ -4,7 +4,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useGetChannels, useCreateChannel } from '@/presentation/hooks/useContacts';
+import { useChannels } from '@/presentation/hooks/useChannels';
 import { InfoDialog } from '@/presentation/components/ui';
 
 function CanalesListPanel({ 
@@ -18,7 +18,7 @@ function CanalesListPanel({
   activeSection: 'mis-canales-creados' | 'mis-canales-suscritos' | 'descubrir-canales' | 'crear-canal';
   onSectionChange: (s: 'mis-canales-creados' | 'mis-canales-suscritos' | 'descubrir-canales' | 'crear-canal') => void;
 }) {
-  const { data: channels, isLoading } = useGetChannels(user?.id);
+  const { channels, channelsLoading: isLoading } = useChannels(user?.id);
   const [searchQuery, setSearchQuery] = useState('');
   const [infoDialog, setInfoDialog] = useState(false);
   

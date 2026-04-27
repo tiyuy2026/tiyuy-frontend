@@ -4,7 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from '@/presentation/store/toastStore';
 import { Search, User, Bell, Plus, MapPin, Calendar, Users, Star, Share2, ChevronDown, Pin, MoreHorizontal, Filter, Edit, Trash2, Clock, Check, CheckCheck, MailOpen } from 'lucide-react';
-import { useChannelEvents, useChannelUpcomingEvents, useCreateChannelEvent, useChannelSubscribers, useChannelEventsWithFilters, useUserEvents, useDeleteChannelEvent, useUpdateChannelEvent } from '@/presentation/hooks/useContacts';
+import { useChannelEvents, useChannelUpcomingEvents, useCreateChannelEvent, useChannelSubscribers, useChannelEventsWithFilters, useUserEvents, useDeleteChannelEvent, useUpdateChannelEvent } from '@/presentation/hooks/useChannels';
 import { apiClient } from '@/infrastructure/api/axios-client';
 import ChannelEventCard from './ChannelEventCard';
 import EventDetailView from './EventDetailView';
@@ -200,15 +200,11 @@ export default function ChannelEventsPanel({
       }
       
       try {
+        // Backend de eventos espera PUT
         await apiClient.put(`/notifications/events/${notificationId}/read`);
       } catch (error: any) {
-        // Intentar endpoint alternativo
-        try {
-          await apiClient.patch(`/notifications/${notificationId}/read`);
-        } catch (error2) {
-          console.error('Error marking notification as read:', error);
-          throw error;
-        }
+        console.error('Error marking notification as read:', error);
+        throw error;
       }
     },
     onSuccess: () => {
@@ -226,14 +222,11 @@ export default function ChannelEventsPanel({
       }
       
       try {
+        // Backend de eventos espera PUT
         await apiClient.put(`/notifications/events/mark-all-read`);
       } catch (error: any) {
-        // Intentar endpoint alternativo
-        try {
-          await apiClient.patch(`/notifications/read-all`);
-        } catch (error2) {
-          console.error('Error marking all notifications as read:', error);
-        }
+        console.error('Error marking all notifications as read:', error);
+        throw error;
       }
     },
     onSuccess: () => {
@@ -624,9 +617,11 @@ export default function ChannelEventsPanel({
   // Legacy filter function for compatibility (now just returns events from API)
   const getFilteredEvents = () => {
     // Spring Data Page: los datos están en .content
-    let eventsData = events;
+    let eventsData: any[] = [];
     if (events && typeof events === 'object' && 'content' in events) {
-      eventsData = events.content;
+      eventsData = (events as any).content || [];
+    } else if (Array.isArray(events)) {
+      eventsData = events;
     }
     
     if (!eventsData || !Array.isArray(eventsData)) {

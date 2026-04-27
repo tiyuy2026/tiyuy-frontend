@@ -1,6 +1,8 @@
 export type UserRole = 'USER' | 'AGENT' | 'DEVELOPER' | 'ADMIN';
 export type ProfileType = UserRole;
 
+export type AdminRoleType = 'SUPER_ADMIN' | 'ADMIN' | 'SUPPORT';
+
 export interface User {
   id: number;
   email: string;
@@ -49,5 +51,10 @@ export interface AuthResponse {
   role: UserRole;
   firstName: string;
   lastName: string;
+  // Admin specific fields (only present when role is ADMIN)
+  adminRoleType?: AdminRoleType;
+  permissions?: string[];
+  departments?: string[];
+  isActive?: boolean;
 }
 
