@@ -215,7 +215,7 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
+    <div className="p-4 space-y-4 max-w-[1600px] mx-auto">
       {/* Header Stats */}
       <ProjectsHeaderStats stats={projectStats} isLoading={statsLoading} />
 

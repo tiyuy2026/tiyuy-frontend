@@ -2,14 +2,18 @@ import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
+// Remove /api from API_URL if it's already there to avoid duplication
+const CLEAN_API_URL = API_URL.replace(/\/api$/, '');
+
+// Add /api to baseURL since the backend has context-path: /api
 export const axiosClient = axios.create({
-  baseURL: API_URL,
+  baseURL: `${CLEAN_API_URL}/api`,
   timeout: 60000, // 60 segundos para Render cold start
 });
 
 // Public client for endpoints that don't require authentication
 export const publicApiClient = axios.create({
-  baseURL: API_URL,
+  baseURL: `${CLEAN_API_URL}/api`,
   timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
@@ -29,7 +33,7 @@ axiosClient.interceptors.response.use(
     
     if (shouldRetry) {
       error.config.__retry = true;
-      console.log('🔄 Reintentando request (Render cold start / Network error)...', error.code);
+      console.log(' Reintentando request (Render cold start / Network error)...', error.code);
       // Esperar 2 segundos antes de reintentar
       await new Promise(resolve => setTimeout(resolve, 2000));
       return axiosClient.request(error.config);
@@ -44,7 +48,7 @@ publicApiClient.interceptors.response.use(
   async (error) => {
     if (error.code === 'ECONNABORTED' && error.config && !error.config.__retry) {
       error.config.__retry = true;
-      console.log('🔄 Reintentando request (Render cold start)...');
+      console.log(' Reintentando request (Render cold start)...');
       return publicApiClient.request(error.config);
     }
     return Promise.reject(error);
@@ -56,7 +60,9 @@ export const apiClient = axiosClient;
 // Request interceptor: Agrega JWT automáticamente
 axiosClient.interceptors.request.use(
   (config) => {
-    console.log('🔍 AXIOS REQUEST - Method:', config.method?.toUpperCase(), 'URL:', config.url);
+    console.log(' AXIOS REQUEST - Method:', config.method?.toUpperCase(), 'URL:', config.url);
+    console.log(' AXIOS BASEURL:', axiosClient.defaults.baseURL);
+    console.log(' FULL URL:', (axiosClient.defaults.baseURL || '') + (config.url || ''));
     
     if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
       if (config.headers) {

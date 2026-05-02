@@ -26,15 +26,17 @@ export const usePermissions = () => {
   const isSupport = adminRoleType === 'SUPPORT';
 
   // Check if admin account is active
-  const hasActiveAdminAccount = isAdmin && isAdminActive === true;
+  // SUPER_ADMIN bypass: always considered active
+  const hasActiveAdminAccount = isSuperAdmin || (isAdmin && isAdminActive === true);
 
   /**
    * Check if user has a specific permission
-   * SUPER_ADMIN always has all permissions
+   * SUPER_ADMIN always has all permissions (bypass before checking isAdminActive)
    */
   const hasPermission = (permission: string): boolean => {
-    if (!isAdmin || !hasActiveAdminAccount) return false;
-    if (isSuperAdmin) return true; // SUPER_ADMIN has all permissions
+    if (!isAdmin) return false;
+    if (isSuperAdmin) return true; // SUPER_ADMIN bypass - always has all permissions
+    if (!isAdminActive) return false; // Only check active status for non-super admins
     return permissions?.includes(permission) ?? false;
   };
 
@@ -42,8 +44,9 @@ export const usePermissions = () => {
    * Check if user has any of the specified permissions
    */
   const hasAnyPermission = (requiredPermissions: string[]): boolean => {
-    if (!isAdmin || !hasActiveAdminAccount) return false;
+    if (!isAdmin) return false;
     if (isSuperAdmin) return true;
+    if (!isAdminActive) return false;
     return requiredPermissions.some(p => permissions?.includes(p));
   };
 
@@ -51,8 +54,9 @@ export const usePermissions = () => {
    * Check if user has all of the specified permissions
    */
   const hasAllPermissions = (requiredPermissions: string[]): boolean => {
-    if (!isAdmin || !hasActiveAdminAccount) return false;
+    if (!isAdmin) return false;
     if (isSuperAdmin) return true;
+    if (!isAdminActive) return false;
     return requiredPermissions.every(p => permissions?.includes(p));
   };
 
@@ -61,6 +65,7 @@ export const usePermissions = () => {
    */
   const belongsToDepartment = (departmentCode: string): boolean => {
     if (!isAdmin) return false;
+    if (isSuperAdmin) return true;
     const { departments } = useAuthStore.getState();
     return departments?.includes(departmentCode) ?? false;
   };

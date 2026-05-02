@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/presentation/hooks';
 import { Button, Input } from '@/presentation/components/ui';
 import { DniInput, RucInput } from '@/presentation/components/kyc';
-import { Mail, User, Phone, Lock, Hash, Building2, Star } from 'lucide-react';
+import { Mail, User, Phone, Lock, Hash, Building2, Star, MapPin } from 'lucide-react';
 
 export const RegisterDeveloperForm: React.FC = () => {
     const { register, isLoading, error, clearError } = useAuth();
@@ -18,6 +18,8 @@ export const RegisterDeveloperForm: React.FC = () => {
         ruc: '',
         companyName: '',
         phone: '',
+        city: '',
+        address: '',
     });
     const [isDniValidated, setIsDniValidated] = useState(false);
     const [isRucValidated, setIsRucValidated] = useState(false);
@@ -33,17 +35,12 @@ export const RegisterDeveloperForm: React.FC = () => {
 
     const handleDniValidated = (dniData: any) => {
         setIsDniValidated(true);
-        // Llenar automáticamente los campos de nombre y apellido
-        if (dniData && dniData.fullName) {
-            // Separar nombre y apellido del fullName
-            const nameParts = dniData.fullName.split(' ');
-            const firstName = nameParts[0] || '';
-            const lastName = nameParts.slice(1).join(' ') || '';
-            
+        // Llenar automáticamente los campos de nombre y apellido desde la validación
+        if (dniData) {
             setFormData(prev => ({
                 ...prev,
-                firstName: firstName,
-                lastName: lastName
+                firstName: dniData.firstName || '',
+                lastName: dniData.lastName || ''
             }));
         }
     };
@@ -91,6 +88,10 @@ export const RegisterDeveloperForm: React.FC = () => {
             firstName: formData.firstName,
             lastName: formData.lastName,
             dni: formData.dni,
+            ruc: formData.ruc,
+            fullName: formData.companyName,
+            city: formData.city,
+            address: formData.address,
             role: 'DEVELOPER'
         });
     };
@@ -212,6 +213,73 @@ export const RegisterDeveloperForm: React.FC = () => {
                     />
                 </div>
 
+                {/* EMAIL Y CONTRASEÑA */}
+                <Input
+                    name="email"
+                    label="Correo Electrónico"
+                    type="email"
+                    leftIcon={<Mail className="w-5 h-5 text-gray-400" />}
+                    value={formData.email}
+                    onChange={handleChange}
+                    error={errors.email}
+                    placeholder="tu@email.com"
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                        name="password"
+                        label="Contraseña"
+                        type="password"
+                        leftIcon={<Lock className="w-5 h-5 text-gray-400" />}
+                        value={formData.password}
+                        onChange={handleChange}
+                        error={errors.password}
+                        placeholder="Mínimo 6 caracteres"
+                    />
+
+                    <Input
+                        name="confirmPassword"
+                        label="Confirmar Contraseña"
+                        type="password"
+                        leftIcon={<Lock className="w-5 h-5 text-gray-400" />}
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        error={errors.confirmPassword}
+                        placeholder="Repite tu contraseña"
+                    />
+                </div>
+
+                <Input
+                    name="phone"
+                    label="Teléfono"
+                    leftIcon={<Phone className="w-5 h-5 text-gray-400" />}
+                    value={formData.phone}
+                    onChange={handleChange}
+                    error={errors.phone}
+                    placeholder="9xxxxxxxx"
+                    maxLength={9}
+                />
+
+                <Input
+                    name="city"
+                    label="Ciudad"
+                    leftIcon={<MapPin className="w-5 h-5 text-gray-400" />}
+                    value={formData.city}
+                    onChange={handleChange}
+                    error={errors.city}
+                    placeholder="Ingresa tu ciudad"
+                />
+
+                <Input
+                    name="address"
+                    label="Dirección de la Empresa"
+                    leftIcon={<MapPin className="w-5 h-5 text-gray-400" />}
+                    value={formData.address}
+                    onChange={handleChange}
+                    error={errors.address}
+                    placeholder="Ingresa la dirección de tu empresa"
+                />
+
                 {/* INFORMACIÓN EMPRESARIAL */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -241,76 +309,10 @@ export const RegisterDeveloperForm: React.FC = () => {
                         leftIcon={<Building2 className="w-5 h-5 text-gray-400" />}
                         value={formData.companyName}
                         onChange={handleChange}
-                        placeholder="Ej: Inmobiliaria Los Pinos S.A.C."
-                        className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                </div>
-
-                {/* EMAIL */}
-                <Input
-                    type="email"
-                    name="email"
-                    label="Correo Empresarial"
-                    leftIcon={<Mail className="w-5 h-5 text-gray-400" />}
-                    value={formData.email}
-                    onChange={handleChange}
-                    error={errors.email}
-                    placeholder="contacto@tuempresa.com"
-                    className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                />
-
-                {/* TELÉFONO */}
-                <Input
-                    type="tel"
-                    name="phone"
-                    label="Teléfono / WhatsApp"
-                    leftIcon={<Phone className="w-5 h-5 text-gray-400" />}
-                    value={formData.phone}
-                    onChange={handleChange}
-                    error={errors.phone}
-                    placeholder="987654321"
-                    maxLength={9}
-                    className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                />
-
-                {/* CONTRASEÑA */}
-                <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                        <Lock className="w-5 h-5 text-blue-500" />
-                        Seguridad de la Cuenta
-                    </h3>
-
-                    <Input
-                        type="password"
-                        name="password"
-                        label="Contraseña"
-                        leftIcon={<Lock className="w-5 h-5 text-gray-400" />}
-                        value={formData.password}
-                        onChange={handleChange}
-                        error={errors.password}
-                        placeholder="Mínimo 6 caracteres"
-                        className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                        error={errors.companyName}
+                        placeholder="Nombre de tu empresa"
                     />
 
-                    <Input
-                        type="password"
-                        name="confirmPassword"
-                        label="Confirmar contraseña"
-                        leftIcon={<Lock className="w-5 h-5 text-gray-400" />}
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        error={errors.confirmPassword}
-                        placeholder="Repite la contraseña"
-                        className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                </div>
-
-                {/* BENEFICIOS */}
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-4">
-                    <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                        <Star className="w-5 h-5 text-yellow-500" />
-                        Beneficios del Trial Enterprise
-                    </h4>
                     <div className="grid grid-cols-3 gap-3 text-center">
                         <div className="bg-white rounded-lg p-3">
                             <div className="text-blue-600 font-bold text-lg">1</div>
@@ -336,17 +338,19 @@ export const RegisterDeveloperForm: React.FC = () => {
                             onChange={(e) => {
                                 setAcceptedTerms(e.target.checked);
                                 if (e.target.checked && errors.terms) {
-                                    setErrors(prev => { const n = { ...prev }; delete n.terms; return n; });
+                                    const updated = { ...errors };
+                                    delete updated.terms;
+                                    setErrors(updated);
                                 }
                             }}
-                            className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
                         <div className="text-sm text-gray-600">
                             Acepto los <a href="/terminos" className="text-blue-600 hover:underline">Términos y Condiciones</a> y la <a href="/privacidad" className="text-blue-600 hover:underline">Política de Privacidad</a> de TIYUY
                         </div>
                     </label>
                     {errors.terms && (
-                        <p className="mt-1 text-sm text-red-600 flex items-center gap-1 ml-7">
+                        <p className="mt-2 text-sm text-red-600 flex items-center gap-1 ml-7">
                             <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                             </svg>

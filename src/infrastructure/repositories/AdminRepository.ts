@@ -28,6 +28,14 @@ import {
   CampaignAlert,
   PropertyModerationItem,
   ModeratePropertyRequest,
+  DeveloperAgentAssociation,
+  CreateAssociationRequest,
+  ReviewAssociationRequest,
+  DeveloperSearchFilter,
+  DeveloperResponse,
+  InmobiliariaWithStats,
+  CreateInmobiliariaDiscountRequest,
+  ApplyDirectDiscountRequest,
   AuditLogEntry,
   Department,
   Permission,
@@ -39,6 +47,14 @@ import {
   NotifyOwnerRequest,
   AgentDashboardStats,
   AgentListItem,
+  Inmobiliaria,
+  InmobiliariaAgent,
+  InmobiliariaDiscount,
+  InmobiliariaFilter,
+  InmobiliariaStatusHistory,
+  CreateInmobiliariaRequest,
+  UpdateInmobiliariaRequest,
+  AssignAgentToInmobiliariaRequest,
 } from '@/core/domain/entities/Admin';
 import { PropertyReport } from '@/core/domain/entities/Moderation';
 import {
@@ -678,6 +694,258 @@ export class AdminRepository implements IAdminRepository {
 
   async getAgentList(params: PaginationParams): Promise<PaginatedResponse<AgentListItem>> {
     const response = await axiosClient.get(`${this.basePath}/agents`, { params });
+    return response.data;
+  }
+
+  // ============================================
+  // DEVELOPER / INMOBILIARIA MANAGEMENT
+  // ============================================
+
+  async getDevelopers(filter?: InmobiliariaFilter): Promise<PaginatedResponse<InmobiliariaWithStats>> {
+    const searchParams = new URLSearchParams();
+    if (filter?.search) searchParams.append('search', filter.search);
+    if (filter?.status) searchParams.append('status', filter.status);
+    if (filter?.page !== undefined) searchParams.append('page', filter.page.toString());
+    if (filter?.size !== undefined) searchParams.append('size', filter.size.toString());
+
+    const response = await axiosClient.get(`${this.basePath}/developers?${searchParams.toString()}`);
+    return response.data;
+  }
+
+  async getDeveloperById(id: number): Promise<InmobiliariaWithStats> {
+    const response = await axiosClient.get(`${this.basePath}/developers/${id}`);
+    return response.data;
+  }
+
+  async changeDeveloperStatus(id: number, data: { status: string; reason?: string; notifyDeveloper?: boolean }): Promise<void> {
+    console.log('[DEBUG AdminRepository] changeDeveloperStatus llamado:', { id, data });
+    console.log('[DEBUG AdminRepository] URL:', `${this.basePath}/developers/${id}/status`);
+    try {
+      const response = await axiosClient.put(`${this.basePath}/developers/${id}/status`, data);
+      console.log('[DEBUG AdminRepository] Respuesta exitosa:', response.status);
+    } catch (error) {
+      console.error('[DEBUG AdminRepository] Error en petición:', error);
+      throw error;
+    }
+  }
+
+  async getDeveloperStatusHistory(
+    id: number,
+    page: number = 0,
+    size: number = 10
+  ): Promise<{ content: InmobiliariaStatusHistory[]; totalElements: number; totalPages: number; number: number }> {
+    const response = await axiosClient.get(
+      `${this.basePath}/developers/${id}/status-history?page=${page}&size=${size}&sort=createdAt,desc`
+    );
+    return response.data;
+  }
+
+  async clearDeveloperStatusHistory(id: number): Promise<void> {
+    await axiosClient.delete(`${this.basePath}/developers/${id}/status-history/clear`);
+  }
+
+  async deleteStatusHistoryEntry(developerId: number, entryId: number): Promise<void> {
+    await axiosClient.delete(`${this.basePath}/developers/${developerId}/status-history/${entryId}`);
+  }
+
+  async addDeveloperStatusHistory(developerId: number, data: {
+    previousStatus?: string;
+    newStatus: string;
+    reason?: string;
+    changedBy?: string;
+  }): Promise<InmobiliariaStatusHistory> {
+    const response = await axiosClient.post(`${this.basePath}/developers/${developerId}/status-history`, data);
+    return response.data;
+  }
+
+  async getDeveloperAgents(id: number): Promise<InmobiliariaAgent[]> {
+    const response = await axiosClient.get(`${this.basePath}/developers/${id}/agents`);
+    return response.data;
+  }
+
+  async assignAgentToDeveloper(developerId: number, data: { agentId: number; licenseNumber?: string }): Promise<InmobiliariaAgent> {
+    const response = await axiosClient.post(`${this.basePath}/developers/${developerId}/agents`, data);
+    return response.data;
+  }
+
+  async removeAgentFromDeveloper(developerId: number, agentId: number, reason?: string): Promise<void> {
+    await axiosClient.delete(`${this.basePath}/developers/${developerId}/agents/${agentId}`, {
+      params: { reason }
+    });
+  }
+
+  async getDeveloperDiscountCodes(developerId: number): Promise<InmobiliariaDiscount[]> {
+    const response = await axiosClient.get(`${this.basePath}/developers/${developerId}/discount-codes`);
+    return response.data;
+  }
+
+  async createDeveloperDiscountCode(developerId: number, data: CreateInmobiliariaDiscountRequest): Promise<InmobiliariaDiscount> {
+    const response = await axiosClient.post(`${this.basePath}/developers/${developerId}/discount-codes`, data);
+    return response.data;
+  }
+
+  async toggleDeveloperDiscountCodeStatus(discountId: number, status: string): Promise<void> {
+    await axiosClient.patch(`${this.basePath}/developers/discount-codes/${discountId}/status?status=${status}`);
+  }
+
+  async deleteDeveloperDiscountCode(discountId: number): Promise<void> {
+    await axiosClient.delete(`${this.basePath}/developers/discount-codes/${discountId}`);
+  }
+
+  async applyDirectDiscountToDeveloper(developerId: number, data: ApplyDirectDiscountRequest): Promise<{ discountId: number; appliedCount: number; failedCount: number }> {
+    const response = await axiosClient.post(`${this.basePath}/developers/${developerId}/apply-discount`, data);
+    return response.data;
+  }
+
+  async notifyDeveloper(developerId: number, data: { subject: string; message: string; sendEmail: boolean; sendInApp: boolean }): Promise<void> {
+    await axiosClient.post(`${this.basePath}/developers/${developerId}/notify`, data);
+  }
+
+  async getDeveloperStats(developerId: number): Promise<{
+    developerId: number;
+    totalAgents: number;
+    activeAgents: number;
+    verifiedAgents: number;
+    inactiveAgents: number;
+    totalDiscountCodes: number;
+    hasActiveDirectDiscount: boolean;
+  }> {
+    const response = await axiosClient.get(`${this.basePath}/developers/${developerId}/stats`);
+    return response.data;
+  }
+
+  // Public endpoints for agents using discount codes
+  async validateDeveloperDiscountCode(code: string, planCode: string): Promise<{
+    valid: boolean;
+    code: string;
+    discountPercentage?: number;
+    originalPrice?: number;
+    discountedPrice?: number;
+    message: string;
+  }> {
+    const response = await axiosClient.post(`${this.basePath}/developers/validate-discount`, {
+      code,
+      planCode
+    });
+    return response.data;
+  }
+
+  async useDeveloperDiscountCode(code: string, planCode: string, userId: number): Promise<{
+    valid: boolean;
+    code: string;
+    discountPercentage?: number;
+    originalPrice?: number;
+    discountedPrice?: number;
+    message: string;
+  }> {
+    const response = await axiosClient.post(`${this.basePath}/developers/use-discount`, {
+      code,
+      planCode,
+      userId
+    });
+    return response.data;
+  }
+
+  // Developer-Agent Association endpoints
+  async getMyDeveloperAssociation(): Promise<DeveloperAgentAssociation | null> {
+    try {
+      const response = await axiosClient.get(`${this.basePath}/developers/agents/me/developer-association`);
+      return response.data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async requestDeveloperAssociation(data: CreateAssociationRequest): Promise<DeveloperAgentAssociation> {
+    const response = await axiosClient.post(`${this.basePath}/developers/agents/me/developer-association-requests`, data);
+    return response.data;
+  }
+
+  async cancelDeveloperAssociationRequest(requestId: number): Promise<void> {
+    await axiosClient.delete(`${this.basePath}/developers/agents/me/developer-association-requests/${requestId}`);
+  }
+
+  async searchDevelopers(params: DeveloperSearchFilter): Promise<PaginatedResponse<DeveloperResponse>> {
+    const searchParams = new URLSearchParams();
+    if (params.query) searchParams.append('query', params.query);
+    if (params.city) searchParams.append('city', params.city);
+    if (params.page !== undefined) searchParams.append('page', params.page.toString());
+    if (params.size !== undefined) searchParams.append('size', params.size.toString());
+    if (params.sort) searchParams.append('sort', params.sort);
+
+    const url = `${this.basePath}/developers/search?${searchParams.toString()}`;
+    console.log('AdminRepository.searchDevelopers - URL:', url);
+    console.log('AdminRepository.searchDevelopers - params:', params);
+
+    const response = await axiosClient.get(url);
+    console.log('AdminRepository.searchDevelopers - response:', response.data);
+    return response.data;
+  }
+
+  async getDeveloperAssociationRequests(developerId: number): Promise<DeveloperAgentAssociation[]> {
+    const response = await axiosClient.get(`${this.basePath}/developers/${developerId}/association-requests`);
+    return response.data;
+  }
+
+  async getDeveloperAssociationRequestsPaginated(developerId: number, status: string | null = null, page: number = 0, size: number = 6): Promise<PaginatedResponse<DeveloperAgentAssociation>> {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    
+    const response = await axiosClient.get(`${this.basePath}/developers/${developerId}/association-requests/paginated?${params.toString()}`);
+    return response.data;
+  }
+
+  async getDeveloperAgentAssociationsPaginated(developerId: number, status: string | null = null, page: number = 0, size: number = 6): Promise<PaginatedResponse<DeveloperAgentAssociation>> {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    
+    const response = await axiosClient.get(`${this.basePath}/developers/${developerId}/associations/paginated?${params.toString()}`);
+    return response.data;
+  }
+
+  async getAllPendingAssociationRequests(): Promise<DeveloperAgentAssociation[]> {
+    const response = await axiosClient.get(`${this.basePath}/developers/association-requests/admin/all-pending`);
+    return response.data;
+  }
+
+  async getAllAssociationRequests(status: string | null = null, page: number = 0, size: number = 10): Promise<PaginatedResponse<DeveloperAgentAssociation>> {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    
+    const response = await axiosClient.get(`${this.basePath}/developers/association-requests/admin/all?${params.toString()}`);
+    return response.data;
+  }
+
+  async approveDeveloperAssociation(associationId: number, data: ReviewAssociationRequest): Promise<void> {
+    await axiosClient.post(`${this.basePath}/developers/association-requests/${associationId}/approve`, data);
+  }
+
+  async rejectDeveloperAssociation(associationId: number, data: ReviewAssociationRequest): Promise<void> {
+    await axiosClient.post(`${this.basePath}/developers/association-requests/${associationId}/reject`, data);
+  }
+
+  async getDeveloperAgentAssociations(developerId: number): Promise<DeveloperAgentAssociation[]> {
+    const response = await axiosClient.get(`${this.basePath}/developers/${developerId}/associations`);
+    return response.data;
+  }
+
+  async removeDeveloperAgent(developerId: number, agentId: number): Promise<void> {
+    await axiosClient.delete(`${this.basePath}/developers/${developerId}/agents/${agentId}`);
+  }
+
+  async getAdminDeveloperAgents(developerId: number): Promise<DeveloperAgentAssociation[]> {
+    const response = await axiosClient.get(`${this.basePath}/admin/developers/${developerId}/agents`);
+    return response.data;
+  }
+
+  async addAdminDeveloperAgent(developerId: number, agentId: number): Promise<DeveloperAgentAssociation> {
+    const response = await axiosClient.post(`${this.basePath}/admin/developers/${developerId}/agents`, { agentId });
     return response.data;
   }
 }

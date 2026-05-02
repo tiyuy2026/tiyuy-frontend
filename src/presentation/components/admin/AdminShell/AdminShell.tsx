@@ -81,7 +81,7 @@ const NAV_SECTIONS: NavSection[] = [
     title: 'ACTORES',
     items: [
       { label: 'Agentes Independientes', href: '/admin/agents', icon: UserCircle },
-      { label: 'Inmobiliarias', href: '/admin/developers', icon: Building2 },
+      { label: 'Inmobiliarias', href: '/admin/agencies', icon: Building2 },
       { label: 'Grupos', href: '/admin/groups', icon: Users },
     ],
   },
@@ -336,7 +336,7 @@ export function GitHubShell({ children }: GitHubShellProps) {
         </aside>
 
         {/* Contenido principal - scrollable */}
-        <main className="flex-1 h-full overflow-y-auto bg-gray-50">
+        <main className="flex-1 h-full overflow-y-auto bg-gray-50 p-6">
           {children}
         </main>
       </div>

@@ -8,13 +8,40 @@ interface PlanCardProps {
   isSelected?: boolean;
   isExhausted?: boolean;
   isActive?: boolean; // ✅ NUEVO - plan activo del usuario
+  discountPercentage?: number; // ✅ NUEVO - porcentaje de descuento
+  hasDiscount?: boolean; // ✅ NUEVO - si tiene descuento aplicado
 }
 
-export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive }: PlanCardProps) {
+export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive, discountPercentage, hasDiscount }: PlanCardProps) {
+  // DEBUG: Logs para depurar props recibidas
+  console.log('🔍 DEBUG PlanCard:', {
+    planName: plan.name,
+    planPrice: plan.price,
+    discountPercentage,
+    hasDiscount,
+    hasPriceDiscount: hasDiscount && discountPercentage && discountPercentage > 0
+  });
+
   const formatPrice = (price: number, currency: string) => {
     const symbol = currency === 'USD' ? 'US$' : 'S/';
     return `${symbol} ${price.toLocaleString()}`;
   };
+
+  // Calcular precio con descuento
+  const calculateDiscountedPrice = () => {
+    if (!hasDiscount || !discountPercentage) return plan.price;
+    const discountAmount = plan.price * (discountPercentage / 100);
+    return plan.price - discountAmount;
+  };
+
+  const discountedPrice = calculateDiscountedPrice();
+  const hasPriceDiscount = hasDiscount && discountPercentage && discountPercentage > 0;
+
+  console.log('🔍 DEBUG PlanCard cálculo:', {
+    discountedPrice,
+    hasPriceDiscount,
+    originalPrice: plan.price
+  });
 
   return (
     <div className={`bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all border-2 ${
@@ -46,7 +73,7 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
         <div className="space-y-2 mb-8">
           {plan.features.map((feature, index) => (
             <div key={index} className="flex items-center gap-2">
-              <span className={isActive ? 'text-green-500' : isExhausted ? 'text-gray-400' : 'text-green-500'}>✓</span>
+              <span className={isActive ? 'text-green-500' : isExhausted ? 'text-gray-400' : 'text-green-500'}>[OK]</span>
               <span className={isExhausted && !isActive ? 'text-gray-500 line-through' : 'text-gray-700'}>
                 {feature}
               </span>
@@ -55,9 +82,24 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
         </div>
 
         <div className="text-center">
-          <div className="text-4xl font-bold mb-2 text-gray-900">
-            {formatPrice(plan.price, plan.currency)}
-          </div>
+          {/* Mostrar precio con descuento */}
+          {hasPriceDiscount ? (
+            <div className="mb-2">
+              <div className="text-gray-400 line-through text-sm mb-1">
+                {formatPrice(plan.price, plan.currency)}
+              </div>
+              <div className="text-4xl font-bold text-green-600">
+                {formatPrice(discountedPrice, plan.currency)}
+              </div>
+              <div className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full inline-block mt-2">
+                🎉 {discountPercentage}% OFF
+              </div>
+            </div>
+          ) : (
+            <div className="text-4xl font-bold mb-2 text-gray-900">
+              {formatPrice(plan.price, plan.currency)}
+            </div>
+          )}
           <p className="text-sm mb-6 text-gray-500">
             {plan.maxPublications} publicaciones
           </p>

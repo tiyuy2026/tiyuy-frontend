@@ -25,6 +25,8 @@ export const useAuth = () => {
 
       // Debug: Log the complete response
       console.log('Auth Response Debug:', response);
+      console.log('User role from backend:', response.role);
+      console.log('Admin role type from backend:', response.adminRoleType);
 
       // Crear User desde AuthResponse del backend
       const userData: User = {

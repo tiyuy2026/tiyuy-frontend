@@ -38,10 +38,10 @@ export function ProjectsStatsCard({
   };
 
   return (
-    <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-lg p-2 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
-        <div className={`p-3 rounded-lg ${colorClass}`}>
-          <Icon className="w-5 h-5" />
+        <div className={`p-1.5 rounded-md ${colorClass}`}>
+          <Icon className="w-4 h-4" />
         </div>
         {trend && (
           <div className={`flex items-center gap-1 text-xs font-medium ${getTrendColor()}`}>
@@ -51,9 +51,9 @@ export function ProjectsStatsCard({
           </div>
         )}
       </div>
-      <div className="mt-3">
-        <div className="text-2xl font-bold text-gray-900">{value}</div>
-        <div className="text-sm text-gray-500 mt-0.5">{label}</div>
+      <div className="mt-1">
+        <div className="text-lg font-bold text-gray-900">{value}</div>
+        <div className="text-xs text-gray-500">{label}</div>
       </div>
     </div>
   );

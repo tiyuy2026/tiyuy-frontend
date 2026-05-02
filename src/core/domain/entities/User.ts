@@ -40,6 +40,10 @@ export interface RegisterData {
   firstName: string;
   lastName: string;
   dni: string;
+  ruc?: string;
+  fullName?: string;
+  city?: string;
+  address?: string;
   role?: UserRole;
 }
 

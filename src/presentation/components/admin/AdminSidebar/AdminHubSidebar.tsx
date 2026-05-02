@@ -121,11 +121,11 @@ export function GitHubSidebar() {
           requiredPermissions: ['USERS_CREATE']
         },
         {
-          id: 'developers',
-          label: 'Desarrolladores',
+          id: 'agencies',
+          label: 'Inmobiliarias',
           icon: <Building2 className="w-4 h-4" />,
-          path: '/admin/developers',
-          requiredPermissions: ['USERS_VIEW']
+          path: '/admin/agencies',
+          requiredPermissions: ['AGENCIES_VIEW']
         },
         {
           id: 'agents',

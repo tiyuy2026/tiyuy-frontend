@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { User } from '@/core/domain/entities';
 import { Button } from '@/presentation/components/ui';
-import { useAvailablePlans, useActiveSubscription, useSubscribeToPlan } from '@/presentation/hooks/useFinance';
+import { useAvailablePlans, useActiveSubscription, useSubscribeToPlan, useAvailableDeveloperDiscountCodes } from '@/presentation/hooks/useFinance';
 import { useMyProperties } from '@/presentation/hooks/useProperties';
 import { PlanCard } from '@/presentation/components/finance';
 import { SubscriptionPlan } from '@/core/domain/entities/Wallet';
@@ -18,8 +18,13 @@ export const PlansTab: React.FC<PlansTabProps> = ({ user }) => {
   const { data: plans, isLoading } = useAvailablePlans();
   const { data: activeSubscription, refetch: refetchSubscription } = useActiveSubscription();
   const { data: propertiesData } = useMyProperties();
+  const { data: agentDiscounts } = useAvailableDeveloperDiscountCodes();
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const subscribeMutation = useSubscribeToPlan();
+
+  // Debug: Ver qué descuentos está recibiendo el agente
+  console.log('Agente ID:', user.id);
+  console.log('Descuentos del agente:', agentDiscounts);
 
   // Calculate published properties count
   const publishedCount = (propertiesData?.properties || []).filter(
@@ -47,13 +52,23 @@ export const PlansTab: React.FC<PlansTabProps> = ({ user }) => {
     return false;
   };
 
-  // Lógica de suscripción (misma que /planes)
+  // Lógica de suscripción con descuento automático
   const handleSubscribe = () => {
     if (!selectedPlan) return;
+
+    // Obtener el mejor descuento disponible automáticamente
+    const bestDiscount = agentDiscounts?.find((discount: any) => 
+      discount.status === 'ACTIVE' && 
+      (!discount.validUntil || new Date(discount.validUntil) > new Date())
+    );
+
+    console.log('Mejor descuento encontrado:', bestDiscount);
+    console.log('Código de descuento a usar:', bestDiscount?.code);
 
     subscribeMutation.mutate({
       planId: selectedPlan.id,
       paymentMethod: 'MERCADOPAGO',
+      discountCode: bestDiscount?.code,
     }, {
       onSuccess: async (subscription) => {
         try {
@@ -110,6 +125,50 @@ export const PlansTab: React.FC<PlansTabProps> = ({ user }) => {
           Elige el plan que mejor se adapte a tus necesidades como {user.role === 'AGENT' ? 'agente inmobiliario' : 'desarrollador'}.
         </p>
       </div>
+
+      {/* Códigos de Descuento Disponibles - Solo para agentes */}
+      {user.role === 'AGENT' && agentDiscounts && agentDiscounts.length > 0 && (
+        <div className="mb-8 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l-5.5 9h11L12 2zm0 3.84L13.93 9h-3.87L12 5.84zM17.5 13c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zm-.88 6.32l-2.06-2.06 1.06-1.06 1 1 2.62-2.62 1.06 1.06-3.68 3.68zM3 21.5h8v-8H3v8zm2-6h4v4H5v-4z"/>
+            </svg>
+            <h3 className="text-lg font-bold text-green-900">Tus Códigos de Descuento</h3>
+          </div>
+          <div className="space-y-3">
+            {agentDiscounts.map((discount: any, index: number) => (
+              <div key={index} className="bg-white rounded-lg border border-green-300 p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-mono text-lg font-bold text-green-800 bg-green-100 px-3 py-1 rounded">
+                      {discount.code}
+                    </p>
+                    <p className="text-sm text-green-700 mt-1">
+                      {discount.discountPercentage}% de descuento
+                    </p>
+                    {discount.validUntil && (
+                      <p className="text-xs text-green-600 mt-1">
+                        Válido hasta: {new Date(discount.validUntil).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <button
+                      onClick={() => navigator.clipboard.writeText(discount.code)}
+                      className="text-green-600 hover:text-green-800 text-sm font-medium"
+                    >
+                      Copiar código
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-green-700 mt-3">
+            💡 Usa estos códigos al momento de pagar para obtener tu descuento
+          </p>
+        </div>
+      )}
 
       {/* Plan Actual */}
       {activeSubscription && (

@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
-      // Proxy API calls to backend
+      // Proxy API calls to backend (backend already has /api context-path)
       {
         source: '/api/:path*',
         destination: 'http://localhost:8080/api/:path*',
