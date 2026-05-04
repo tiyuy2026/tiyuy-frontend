@@ -146,8 +146,11 @@ export const useFinanceStats = () => {
   return useQuery({
     queryKey: [ADMIN_QUERY_KEY, 'dashboard', 'financeStats'],
     queryFn: async () => {
+      console.log('Fetching finance stats from backend...');
       try {
-        return await adminRepository.getFinanceStats();
+        const stats = await adminRepository.getFinanceStats();
+        console.log('Finance stats received:', stats);
+        return stats;
       } catch (error) {
         console.error(' Error fetching finance stats:', error);
         return {
@@ -748,6 +751,23 @@ export const useSubscriptionPlans = () => {
   return useQuery({
     queryKey: [ADMIN_QUERY_KEY, 'subscriptions', 'plans'],
     queryFn: () => adminRepository.getSubscriptionPlans(),
+  });
+};
+
+export const useActiveSubscriptionPlans = () => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'subscriptions', 'plans', 'active'],
+    queryFn: async () => {
+      console.log('Fetching active subscription plans...');
+      try {
+        const plans = await adminRepository.getActiveSubscriptionPlans();
+        console.log('Active subscription plans fetched:', plans);
+        return plans;
+      } catch (error) {
+        console.error('Error fetching active subscription plans:', error);
+        throw error;
+      }
+    },
   });
 };
 

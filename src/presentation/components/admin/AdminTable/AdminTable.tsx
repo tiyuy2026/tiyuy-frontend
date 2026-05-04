@@ -106,9 +106,9 @@ export function AdminTable<T extends Record<string, any>>({
     return selection.selectedItems.some(i => selection.getRowId(i) === itemId);
   };
 
-  const isAllSelected = selection ? data.length > 0 && data.every(isItemSelected) : false;
+  const isAllSelected = selection && Array.isArray(data) && data.length > 0 && data.every(isItemSelected) ? true : false;
 
-  const sortedData = [...data].sort((a, b) => {
+  const sortedData = Array.isArray(data) ? [...data].sort((a, b) => {
     if (!sortConfig.key) return 0;
     
     const aValue = a[sortConfig.key];
@@ -120,7 +120,7 @@ export function AdminTable<T extends Record<string, any>>({
     if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
     if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
     return 0;
-  });
+  }) : [];
 
   if (loading) {
     return <LoadingState message="Loading data..." />;
@@ -223,7 +223,7 @@ export function AdminTable<T extends Record<string, any>>({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
-              {sortedData.map((item, index) => (
+              {sortedData.map((item: T, index: number) => (
                 <tr key={selection ? selection.getRowId(item) : index} className="hover:bg-blue-50/50 transition-colors">
                   {/* Selection cell */}
                   {selection && (

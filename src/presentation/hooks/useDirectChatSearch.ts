@@ -42,37 +42,6 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
   return response.json();
 }
 
-const mockUsers = [
-  {
-    id: 201,
-    name: "Roberto Sánchez",
-    role: "DEVELOPER" as const,
-    phone: "+51 987 123 456",
-    properties: [
-      { id: 10, title: "Edificio Catalina Heights", city: "Catalina", price: 1500 },
-      { id: 11, title: "Torre Miraflores Prime", city: "Miraflores", price: 2000 }
-    ]
-  },
-  {
-    id: 202,
-    name: "Ana Martínez",
-    role: "AGENT" as const,
-    phone: "+51 976 543 210",
-    properties: [
-      { id: 12, title: "Casa de Campo", city: "Surco", price: 3000 }
-    ]
-  },
-  {
-    id: 203,
-    name: "Luis Torres",
-    role: "USER" as const,
-    phone: "+51 965 432 109",
-    properties: [
-      { id: 13, title: "Departamento Amoblado", city: "San Borja", price: 800 }
-    ]
-  }
-];
-
 export function useDirectChatSearch(
   searchTerm: string,
   searchType: 'all' | 'name' | 'role' | 'phone' | 'city',
@@ -81,7 +50,7 @@ export function useDirectChatSearch(
   const { data: apiUsers = [], isLoading: loadingUsers } = useQuery({
     queryKey: ['search-users', searchTerm, searchType],
     queryFn: async () => {
-      if (!searchTerm) return mockUsers;
+      if (!searchTerm) return [];
 
       const params = new URLSearchParams();
 
@@ -122,7 +91,7 @@ export function useDirectChatSearch(
         }));
       } catch (error) {
         console.error('Error fetching users:', error);
-        return mockUsers;
+        return [];
       }
     },
     enabled: true

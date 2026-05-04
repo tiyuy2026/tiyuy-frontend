@@ -1,0 +1,193 @@
+'use client';
+
+import { Input } from '@/presentation/components/ui/Input';
+import { ViewType, ViewMode, StatusFilter, SortBy } from '../types';
+
+interface FilterBarProps {
+  viewType: ViewType;
+  searchQuery: string;
+  setSearchQuery: (value: string) => void;
+  statusFilter: StatusFilter;
+  setStatusFilter: (value: StatusFilter) => void;
+  sortBy: SortBy;
+  setSortBy: (value: SortBy) => void;
+  viewMode: ViewMode;
+  setViewMode: (value: ViewMode) => void;
+  cityFilter: string;
+  setCityFilter: (value: string) => void;
+}
+
+export function FilterBar({
+  viewType,
+  searchQuery,
+  setSearchQuery,
+  statusFilter,
+  setStatusFilter,
+  sortBy,
+  setSortBy,
+  viewMode,
+  setViewMode,
+  cityFilter,
+  setCityFilter,
+}: FilterBarProps) {
+  const hasActiveFilters = statusFilter !== 'all' || cityFilter || searchQuery;
+
+  const clearAllFilters = () => {
+    setStatusFilter('all');
+    setCityFilter('');
+    setSearchQuery('');
+  };
+
+  const getStatusLabel = (status: StatusFilter) => {
+    switch (status) {
+      case 'active': return 'Activos';
+      case 'inactive': return 'Inactivos';
+      case 'suspended': return 'Suspendidos';
+      case 'violations': return 'Con Violaciones';
+      default: return '';
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+      {/* Row 1: Search, Status Filter, Sort, View Toggle */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Search Input */}
+        <div className="relative flex-1 min-w-[280px]">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <Input
+            placeholder={viewType === 'groups' ? 'Buscar grupos...' : viewType === 'channels' ? 'Buscar canales...' : 'Buscar suspendidos...'}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 w-full"
+          />
+        </div>
+
+        {/* Status Filter Dropdown */}
+        <div className="relative">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+            className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-10 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+          >
+            <option value="all">Estado: Todos</option>
+            <option value="active">Estado: Activos</option>
+            <option value="inactive">Estado: Inactivos</option>
+            <option value="suspended">Estado: Suspendidos</option>
+            <option value="violations">Estado: Con Violaciones</option>
+          </select>
+          <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+
+        {/* Sort Dropdown */}
+        <div className="relative">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as SortBy)}
+            className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-10 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+          >
+            <option value="newest">Ordenar: Más recientes</option>
+            <option value="oldest">Ordenar: Más antiguos</option>
+            <option value="az">Ordenar: A-Z</option>
+            <option value="za">Ordenar: Z-A</option>
+            <option value="most_members">Ordenar: Más miembros</option>
+            <option value="least_members">Ordenar: Menos miembros</option>
+          </select>
+          <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+
+        {/* View Toggle (Grid/List) */}
+        <div className="flex bg-gray-100 rounded-lg p-1">
+          <button
+            onClick={() => setViewMode('grid')}
+            className={`p-2 rounded-md transition ${
+              viewMode === 'grid'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+            title="Vista de cuadrícula"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+          </button>
+          <button
+            onClick={() => setViewMode('list')}
+            className={`p-2 rounded-md transition ${
+              viewMode === 'list'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+            title="Vista de lista"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Row 2: Active Filters */}
+      {hasActiveFilters && (
+        <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-100">
+          <span className="text-sm text-gray-500 font-medium">Filtros activos:</span>
+          
+          {statusFilter !== 'all' && (
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 text-sm rounded-full border border-green-200">
+              Estado: {getStatusLabel(statusFilter)}
+              <button 
+                onClick={() => setStatusFilter('all')}
+                className="ml-1 hover:text-green-900"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </span>
+          )}
+          
+          {cityFilter && (
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full border border-blue-200">
+              Ciudad: {cityFilter}
+              <button 
+                onClick={() => setCityFilter('')}
+                className="ml-1 hover:text-blue-900"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </span>
+          )}
+          
+          {searchQuery && (
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-50 text-purple-700 text-sm rounded-full border border-purple-200">
+              Búsqueda: {searchQuery}
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="ml-1 hover:text-purple-900"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </span>
+          )}
+          
+          <button
+            onClick={clearAllFilters}
+            className="ml-2 px-3 py-1 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition"
+          >
+            Limpiar todo
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

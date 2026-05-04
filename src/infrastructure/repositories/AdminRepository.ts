@@ -523,7 +523,21 @@ export class AdminRepository implements IAdminRepository {
   // Finance and Monetization
   async getSubscriptionPlans(): Promise<any[]> {
     const response = await axiosClient.get(`${this.basePath}/subscription-plans`);
-    return response.data;
+    return response.data.content || [];
+  }
+
+  async getActiveSubscriptionPlans(): Promise<any[]> {
+    const url = `${this.basePath}/subscription-plans/active`;
+    console.log('Making GET request to:', url);
+    try {
+      const response = await axiosClient.get(url);
+      console.log('Response status:', response.status);
+      console.log('Response data:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error in getActiveSubscriptionPlans:', error);
+      throw error;
+    }
   }
 
   async getAdminSubscriptions(
