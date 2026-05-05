@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Lock, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button, Input } from '@/presentation/components/ui';
+import { AuthErrorBanner, PasswordStrengthIndicator } from '@/presentation/components/auth/shared';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -167,11 +168,8 @@ export const ResetPasswordForm: React.FC = () => {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-            {error}
-          </div>
-        )}
+        {/* Error de validación o de API */}
+        <AuthErrorBanner error={error} onClose={() => setError(null)} />
 
         <div className="relative">
           <Input
@@ -192,6 +190,7 @@ export const ResetPasswordForm: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Mínimo 8 caracteres"
           />
+          <PasswordStrengthIndicator password={password} />
         </div>
 
         <div className="relative">

@@ -28,7 +28,7 @@ export function FeaturePropertyButton({
 
   // Obtener el plan actual del usuario
   const currentPlan = activeSubscription?.plan?.id || 'FREE';
-  const canFeatureProperty = currentPlan === 'PRO';
+  const canFeatureProperty = currentPlan === 'PREMIUM';
 
   // Solo mostrar si el usuario es el dueño y la propiedad está publicada
   if (!user || user.id !== ownerId) {
@@ -81,9 +81,9 @@ export function FeaturePropertyButton({
 
   const getPlanInfo = () => {
     switch (currentPlan) {
-      case 'PRO':
+      case 'PREMIUM':
         return {
-          name: 'PRO',
+          name: 'PREMIUM',
           icon: <Crown className="w-4 h-4" />,
           color: 'bg-purple-100 text-purple-700 border-purple-200',
           description: 'Acceso completo a todas las funciones'

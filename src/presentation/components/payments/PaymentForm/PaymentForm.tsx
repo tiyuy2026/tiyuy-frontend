@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { PaymentRequest } from '@/core/domain/entities/Wallet';
 import { useProcessPayment } from '@/presentation/hooks/usePayments';
+import { useValidateDeveloperDiscountCode, useUseDeveloperDiscountCode } from '@/presentation/hooks/admin/useDevelopers';
 
 interface PaymentFormProps {
   amount: number;
@@ -10,6 +11,8 @@ interface PaymentFormProps {
   onPaymentSuccess: (paymentId: string) => void;
   onPaymentError: (error: string) => void;
   planName?: string;
+  planCode?: string;
+  userId?: number;
 }
 
 export function PaymentForm({ 
@@ -17,12 +20,63 @@ export function PaymentForm({
   description, 
   onPaymentSuccess,
   onPaymentError,
-  planName
+  planName,
+  planCode = 'BASIC',
+  userId
 }: PaymentFormProps) {
   const processPaymentMutation = useProcessPayment();
+  const validateDiscountMutation = useValidateDeveloperDiscountCode();
+  const useDiscountMutation = useUseDeveloperDiscountCode();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cardFormReady, setCardFormReady] = useState(false);
+  const [discountCode, setDiscountCode] = useState('');
+  const [appliedDiscount, setAppliedDiscount] = useState<{
+    valid: boolean;
+    discountPercentage?: number;
+    originalPrice?: number;
+    discountedPrice?: number;
+    message: string;
+  } | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
+
+  const finalAmount = appliedDiscount?.discountedPrice ?? amount;
+
+  const handleValidateDiscount = async () => {
+    if (!discountCode.trim()) return;
+    
+    setIsValidating(true);
+    try {
+      const result = await validateDiscountMutation.mutateAsync({
+        code: discountCode,
+        planCode
+      });
+      
+      setAppliedDiscount(result);
+      
+      if (!result.valid) {
+        onPaymentError(result.message);
+      }
+    } catch (error: any) {
+      onPaymentError(error.message || 'Error al validar el código');
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const handleUseDiscount = async () => {
+    if (!appliedDiscount?.valid || !userId) return;
+    
+    try {
+      await useDiscountMutation.mutateAsync({
+        code: discountCode,
+        planCode,
+        userId
+      });
+    } catch (error: any) {
+      console.error('Error usando descuento:', error);
+    }
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined' && (window as any).MercadoPago) {
@@ -32,7 +86,7 @@ export function PaymentForm({
       );
 
       const cardForm = mp.cardForm({
-        amount: Number(amount),
+        amount: Number(finalAmount),
         autoMount: true,
         processingMode: 'aggregator',
         callback: {
@@ -43,9 +97,14 @@ export function PaymentForm({
           onSubmit: async (cardData: any) => {
             setIsProcessing(true);
             try {
+              // Usar el descuento antes del pago si está aplicado
+              if (appliedDiscount?.valid && userId) {
+                await handleUseDiscount();
+              }
+
               const result = await processPaymentMutation.mutateAsync({
                 token: cardData.token,
-                amount,
+                amount: finalAmount,
                 description,
               });
 
@@ -74,7 +133,7 @@ export function PaymentForm({
         cardForm.unmount();
       };
     }
-  }, [amount, description]);
+  }, [finalAmount, description]);
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-2xl shadow-2xl">
@@ -90,9 +149,73 @@ export function PaymentForm({
           {planName ? `Suscribirse al ${planName}` : 'Realizar Pago'}
         </h2>
         <p className="text-4xl font-bold text-green-600 mb-2">
-          S/ {amount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+          S/ {finalAmount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
         </p>
+        {appliedDiscount?.valid && (
+          <div className="text-sm text-green-600 mb-1">
+            <span className="line-through text-gray-400">
+              S/ {amount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+            </span>
+            <span className="ml-2 font-semibold">
+              {appliedDiscount.discountPercentage}% de descuento aplicado
+            </span>
+          </div>
+        )}
         <p className="text-gray-600">{description}</p>
+      </div>
+
+      {/* Discount Code Section */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-6">
+        <h3 className="text-sm font-semibold text-blue-800 mb-3 flex items-center gap-2">
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l-5.5 9h11L12 2zm0 3.84L13.93 9h-3.87L12 5.84zM17.5 13c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zm-.88 6.32l-2.06-2.06 1.06-1.06 1 1 2.62-2.62 1.06 1.06-3.68 3.68zM3 21.5h8v-8H3v8zm2-6h4v4H5v-4z"/>
+          </svg>
+          ¿Tienes un código de descuento de tu inmobiliaria?
+        </h3>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={discountCode}
+            onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+            placeholder="Ingresa tu código (ej: DESCUENTO20)"
+            className="flex-1 px-4 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm uppercase"
+            disabled={appliedDiscount?.valid || isValidating}
+          />
+          <button
+            onClick={handleValidateDiscount}
+            disabled={!discountCode.trim() || isValidating || appliedDiscount?.valid}
+            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              appliedDiscount?.valid
+                ? 'bg-green-500 text-white cursor-default'
+                : 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed'
+            }`}
+          >
+            {isValidating ? (
+              <span className="flex items-center gap-1">
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
+                Validando...
+              </span>
+            ) : appliedDiscount?.valid ? (
+              '✓ Aplicado'
+            ) : (
+              'Aplicar'
+            )}
+          </button>
+        </div>
+        {appliedDiscount?.valid && (
+          <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+            {appliedDiscount.message}
+          </p>
+        )}
+        {appliedDiscount && !appliedDiscount.valid && (
+          <p className="text-xs text-red-600 mt-2">{appliedDiscount.message}</p>
+        )}
       </div>
 
       {/* Payment Methods */}

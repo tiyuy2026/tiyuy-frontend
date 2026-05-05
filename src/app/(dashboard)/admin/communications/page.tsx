@@ -8,20 +8,55 @@
 import { useState } from 'react';
 import { useUserActivities, useActivityStats, useCommunicationStats } from '@/presentation/hooks/useAnalytics';
 import { usePermissions } from '@/presentation/hooks/usePermissions';
+import { useAuthStore } from '@/presentation/store/authStore';
+import { useAllAssociationRequests, useApproveDeveloperAssociation, useRejectDeveloperAssociation } from '@/presentation/hooks/admin/useDeveloperAssociations';
 import { Card } from '@/presentation/components/ui/Card';
+import { Button } from '@/presentation/components/ui/Button';
 import { Spinner } from '@/presentation/components/ui/Spinner';
 import { format } from 'date-fns';
 import { UserActivity, ActivityStats } from '@/core/domain/entities/Analytics';
+import { DeveloperAgentAssociation } from '@/core/domain/entities/Admin';
+import { Users, Clock, CheckCircle, XCircle, Building2, User } from 'lucide-react';
 
 export default function CommunicationsPage() {
   const { data: activities, isLoading: isLoadingActivities } = useUserActivities();
   const { data: stats, isLoading: isLoadingStats } = useActivityStats();
   const { data: commStats, isLoading: isLoadingComm } = useCommunicationStats();
+  
+  // Association requests state with pagination
+  const [associationStatus, setAssociationStatus] = useState<string | null>(null);
+  const [associationPage, setAssociationPage] = useState(0);
+  const associationSize = 6;
+  
+  const { data: associationsData, isLoading: isLoadingAssociations, refetch: refetchAssociations, error: associationsError } = 
+    useAllAssociationRequests(associationStatus, associationPage, associationSize);
+  
+  const approveMutation = useApproveDeveloperAssociation();
+  const rejectMutation = useRejectDeveloperAssociation();
   const { isSuperAdmin, isRegularAdmin, isSupport } = usePermissions();
+  const { user } = useAuthStore();
+
+  // Check if user can view association requests (from auth store role or permissions)
+  const userRole = user?.role?.toString().toUpperCase();
+  const canViewAssociations = isSuperAdmin || isRegularAdmin || isSupport || 
+                            ['ADMIN', 'SUPER_ADMIN', 'SUPPORT'].includes(userRole || '');
 
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
   const [showDetails, setShowDetails] = useState<string | null>(null);
+
+  // Association status tabs
+  const statusTabs = [
+    { key: null, label: 'Todas', count: associationsData?.totalElements || 0 },
+    { key: 'PENDING', label: 'Pendientes', color: 'yellow' },
+    { key: 'ACTIVE', label: 'Activas', color: 'green' },
+    { key: 'REJECTED', label: 'Rechazadas', color: 'red' },
+  ];
+
+  const handleStatusChange = (status: string | null) => {
+    setAssociationStatus(status);
+    setAssociationPage(0);
+  };
 
   const isLoading = isLoadingActivities || isLoadingStats || isLoadingComm;
 
@@ -58,6 +93,31 @@ export default function CommunicationsPage() {
       case 'completed': return 'text-green-600 bg-green-100';
       case 'pending': return 'text-yellow-600 bg-yellow-100';
       default: return 'text-gray-600 bg-gray-100';
+    }
+  };
+
+  // Handler functions for association requests
+  const handleApproveAssociation = async (associationId: number) => {
+    try {
+      await approveMutation.mutateAsync({
+        associationId,
+        data: {}
+      });
+      refetchAssociations();
+    } catch (error) {
+      console.error('Error approving association:', error);
+    }
+  };
+
+  const handleRejectAssociation = async (associationId: number) => {
+    try {
+      await rejectMutation.mutateAsync({
+        associationId,
+        data: {}
+      });
+      refetchAssociations();
+    } catch (error) {
+      console.error('Error rejecting association:', error);
     }
   };
 
@@ -142,6 +202,176 @@ export default function CommunicationsPage() {
             <p className="text-sm text-gray-600 mt-2">Esperando respuesta</p>
           </Card>
         </div>
+
+        {/* Association Requests Section (Admin Only) */}
+        {canViewAssociations && (
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Solicitudes de Asociación</h2>
+                  <p className="text-sm text-gray-600">Gestiona solicitudes de agentes a inmobiliarias</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                  {associationsData?.totalElements || 0} total
+                </span>
+              </div>
+            </div>
+
+            {/* Status Tabs */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {statusTabs.map((tab) => (
+                <button
+                  key={tab.key || 'all'}
+                  onClick={() => handleStatusChange(tab.key)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    associationStatus === tab.key
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {tab.label}
+                  {tab.key === 'PENDING' && associationsData && (
+                    <span className="ml-2 px-2 py-0.5 bg-yellow-200 text-yellow-800 rounded-full text-xs">
+                      {associationsData.content?.filter((a: DeveloperAgentAssociation) => a.status === 'PENDING').length || 0}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {isLoadingAssociations ? (
+              <div className="flex items-center justify-center py-8">
+                <Spinner size="md" />
+              </div>
+            ) : associationsError ? (
+              <div className="text-center py-8">
+                <XCircle className="w-12 h-12 mx-auto mb-4 text-red-400" />
+                <p className="text-red-600">Error al cargar solicitudes</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {associationsError instanceof Error ? associationsError.message : 'Error desconocido'}
+                </p>
+                <button 
+                  onClick={() => refetchAssociations()}
+                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Reintentar
+                </button>
+              </div>
+            ) : associationsData?.content && associationsData.content.length > 0 ? (
+              <>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {associationsData.content.map((association: DeveloperAgentAssociation) => (
+                  <div key={association.id} className="bg-gray-50 rounded-lg border border-gray-200 p-4">
+                    {/* Agent Info */}
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-white font-semibold">
+                        {association.agentFirstName?.[0] || association.agentEmail?.[0] || 'A'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-900 truncate">
+                          {association.agentFirstName} {association.agentLastName}
+                        </p>
+                        <p className="text-sm text-gray-500 truncate">{association.agentEmail}</p>
+                      </div>
+                    </div>
+
+                    {/* Developer Info */}
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                      <Building2 className="w-4 h-4" />
+                      <span className="truncate">Inmobiliaria ID: {association.developerId}</span>
+                    </div>
+
+                    {/* Request Date */}
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                      <Clock className="w-4 h-4" />
+                      <span>
+                        {association.requestedAt 
+                          ? new Date(association.requestedAt).toLocaleDateString('es-ES', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            })
+                          : '-'
+                        }
+                      </span>
+                    </div>
+
+                    {/* Notes */}
+                    {association.notes && (
+                      <div className="bg-white rounded p-2 text-sm text-gray-600 mb-3">
+                        <span className="font-medium">Notas:</span> {association.notes}
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex gap-2 pt-3 border-t border-gray-200">
+                      <Button
+                        onClick={() => handleApproveAssociation(association.id)}
+                        disabled={approveMutation.isPending || rejectMutation.isPending}
+                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-sm"
+                      >
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        Aprobar
+                      </Button>
+                      <Button
+                        onClick={() => handleRejectAssociation(association.id)}
+                        disabled={approveMutation.isPending || rejectMutation.isPending}
+                        variant="outline"
+                        className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 text-sm"
+                      >
+                        <XCircle className="w-4 h-4 mr-1" />
+                        Rechazar
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {associationsData && associationsData.totalPages > 1 && (
+                <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+                  <p className="text-sm text-gray-600">
+                    Mostrando {associationsData.content.length} de {associationsData.totalElements} solicitudes
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setAssociationPage(p => Math.max(0, p - 1))}
+                      disabled={associationPage === 0}
+                      className="px-3 py-1 rounded-lg bg-gray-100 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
+                    >
+                      Anterior
+                    </button>
+                    <span className="text-sm text-gray-600">
+                      Página {associationPage + 1} de {associationsData.totalPages}
+                    </span>
+                    <button
+                      onClick={() => setAssociationPage(p => Math.min(associationsData.totalPages - 1, p + 1))}
+                      disabled={associationPage >= associationsData.totalPages - 1}
+                      className="px-3 py-1 rounded-lg bg-gray-100 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
+                    >
+                      Siguiente
+                    </button>
+                  </div>
+                </div>
+              )}
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <Users className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                <p className="text-gray-500">No hay solicitudes de asociación {associationStatus ? `en estado ${associationStatus}` : ''}</p>
+                <p className="text-sm text-gray-400 mt-1">
+                  Las solicitudes aparecerán aquí cuando los agentes soliciten unirse a una inmobiliaria
+                </p>
+              </div>
+            )}
+          </Card>
+        )}
 
         {/* Communication Stats */}
         {(isSuperAdmin || isRegularAdmin) && commStats && (

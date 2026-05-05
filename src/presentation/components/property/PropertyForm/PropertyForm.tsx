@@ -570,7 +570,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
           console.log(' Actualizando proyecto con multimedia:', updateData);
           
           const updateResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${createdPropertyId}`,
+            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/projects/${createdPropertyId}`,
             {
               method: 'PUT',
               headers: {
@@ -592,7 +592,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
           
           // Luego publicar
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${createdPropertyId}/publish`,
+            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/projects/${createdPropertyId}/publish`,
             {
               method: 'PATCH',
               headers: {

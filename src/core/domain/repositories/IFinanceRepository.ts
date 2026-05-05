@@ -11,5 +11,15 @@ export interface IFinanceRepository {
   getAvailablePlans(): Promise<SubscriptionPlan[]>;
   hasUserUsedFreePlan(userId: number): Promise<boolean>;
   createMercadoPagoPreference(subscriptionId: string): Promise<any>;
-  subscribeToPlan(planId: string, paymentMethod: 'CARD' | 'MERCADOPAGO'): Promise<ActiveSubscription>;
+  subscribeToPlan(planId: string, paymentMethod: 'CARD' | 'MERCADOPAGO', discountCode?: string): Promise<ActiveSubscription>;
+  getAvailableDeveloperDiscountCodes(): Promise<{
+    id: number;
+    code: string;
+    discountPercentage: number;
+    maxUses: number | null;
+    usedCount: number;
+    status: string;
+    validFrom: string;
+    validUntil: string | null;
+  }[]>;
 }

@@ -95,7 +95,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
           formDataUpload.append('type', 'blueprints');
 
           try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${propertyId}/upload`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/projects/${propertyId}/upload`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}` },
               body: formDataUpload,
@@ -125,7 +125,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
           formDataUpload.append('type', 'blueprints');
 
           try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${propertyId}/upload`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/projects/${propertyId}/upload`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}` },
               body: formDataUpload,
@@ -196,7 +196,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
           setUploadProgress((prev) => Math.min(prev + (100 / files.length), 90));
         }, 200);
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/projects/${propertyId}/upload`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/projects/${propertyId}/upload`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,

@@ -42,6 +42,9 @@ function DashboardSidebar({
   
   const userRole = (user?.role || '').toString().toUpperCase();
   const isAgent = ['AGENT', 'DEVELOPER', 'ADMIN', 'INMOBILIARIA'].includes(userRole);
+  
+  // Debug: Log user role to verify DEVELOPER menu visibility
+  console.log('Dashboard Sidebar - User role:', user?.role, '| Normalized:', userRole, '| Is DEVELOPER:', userRole === 'DEVELOPER');
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
@@ -132,6 +135,22 @@ function DashboardSidebar({
             <Users className="w-5 h-5" />
             <span>Clientes</span>
             {pathname === '/dashboard/clients' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
+          </Link>
+        )}
+
+        {/* My Agents - Normal Link (DEVELOPER only) */}
+        {userRole === 'DEVELOPER' && (
+          <Link
+            href="/dashboard/agents"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+              pathname === '/dashboard/agents'
+                ? 'bg-teal-50 text-teal-700 font-medium'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            }`}
+          >
+            <Building className="w-5 h-5" />
+            <span>Mis Agentes</span>
+            {pathname === '/dashboard/agents' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
           </Link>
         )}
 

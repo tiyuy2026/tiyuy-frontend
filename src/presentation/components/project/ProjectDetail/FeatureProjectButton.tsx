@@ -28,7 +28,7 @@ export function FeatureProjectButton({
 
   // Obtener el plan actual del usuario
   const currentPlan = activeSubscription?.plan?.id || 'FREE';
-  const canFeatureProject = currentPlan === 'PRO';
+  const canFeatureProject = currentPlan === 'PREMIUM';
 
   // Solo mostrar si el usuario es el desarrollador y el proyecto está publicado
   if (!user || user.id !== developerId) {
@@ -81,9 +81,9 @@ export function FeatureProjectButton({
 
   const getPlanInfo = () => {
     switch (currentPlan) {
-      case 'PRO':
+      case 'PREMIUM':
         return {
-          name: 'PRO',
+          name: 'PREMIUM',
           icon: <Crown className="w-4 h-4" />,
           color: 'bg-purple-100 text-purple-700 border-purple-200',
           description: 'Acceso completo a todas las funciones'

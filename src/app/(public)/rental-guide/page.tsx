@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import jsPDF from 'jspdf';
+import { ShoppingCart, DollarSign, Home, Key, Link2, ArrowRight, Check } from 'lucide-react';
 
 interface Role {
   id: 'comprador' | 'vendedor' | 'arrendador' | 'inquilino';
   title: string;
   color: string;
   bgColor: string;
-  icon: string;
+  icon: React.ReactNode;
   description: string;
   howToKnow: string[];
   steps: {
@@ -36,7 +37,7 @@ const roles: Role[] = [
     title: 'COMPRADOR',
     color: 'text-blue-600',
     bgColor: 'bg-blue-50',
-    icon: '🛒',
+    icon: <ShoppingCart className="w-8 h-8" />,
     description: 'Persona que quiere comprar una propiedad (casa, departamento, terreno, local).',
     howToKnow: [
       'Estás buscando una propiedad para comprar',
@@ -109,7 +110,7 @@ const roles: Role[] = [
     title: 'VENDEDOR',
     color: 'text-green-600',
     bgColor: 'bg-green-50',
-    icon: '💰',
+    icon: <DollarSign className="w-8 h-8" />,
     description: 'Eres la persona dueña del inmueble y quieres venderlo.',
     howToKnow: [
       'La propiedad está a tu nombre',
@@ -173,7 +174,7 @@ const roles: Role[] = [
     title: 'ARRENDADOR (Dueño que alquila)',
     color: 'text-orange-600',
     bgColor: 'bg-orange-50',
-    icon: '🏠',
+    icon: <Home className="w-8 h-8" />,
     description: 'Persona que es dueña de una propiedad y desea alquilarla.',
     howToKnow: [
       'Tienes una propiedad a tu nombre',
@@ -239,7 +240,7 @@ const roles: Role[] = [
     title: 'INQUILINO',
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
-    icon: '🔑',
+    icon: <Key className="w-8 h-8" />,
     description: 'Persona que busca alquilar una propiedad.',
     howToKnow: [
       'No tienes propiedad',
@@ -707,8 +708,8 @@ export default function GuiaAlquilarPage() {
                     <div className="space-y-1">
                       {role.howToKnow.slice(0, 2).map((item, index) => (
                         <div key={index} className="flex items-start gap-2">
-                          <div className={`w-4 h-4 ${role.bgColor} ${role.color} rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5`}>
-                            ✔
+                          <div className={`w-4 h-4 ${role.color} flex-shrink-0 mt-0.5`}>
+                            <Check className="w-4 h-4" />
                           </div>
                           <p className="text-gray-700 text-xs">
                             {item}
@@ -803,8 +804,8 @@ export default function GuiaAlquilarPage() {
                 <div className="space-y-2">
                   {selectedRole.howToKnow.map((item, index) => (
                     <div key={index} className="flex items-start gap-3">
-                      <div className={`w-6 h-6 ${selectedRole.bgColor} ${selectedRole.color} rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5`}>
-                        ✔
+                      <div className={`w-5 h-5 ${selectedRole.color} flex-shrink-0 mt-0.5`}>
+                        <Check className="w-5 h-5" />
                       </div>
                       <p className="text-gray-700">
                         {item}
@@ -843,8 +844,8 @@ export default function GuiaAlquilarPage() {
                           {step.actions.map((action, actionIndex) => (
                             <div key={actionIndex} className="bg-gray-50 rounded-lg p-6">
                               <div className="flex items-center gap-3 mb-3">
-                                <div className={`w-8 h-8 ${selectedRole.bgColor} ${selectedRole.color} rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0`}>
-                                  🔗
+                                <div className={`w-8 h-8 ${selectedRole.bgColor} ${selectedRole.color} rounded-full flex items-center justify-center flex-shrink-0`}>
+                                  <Link2 className="w-4 h-4" />
                                 </div>
                                 <h4 className="font-bold text-gray-900">
                                   {action.title}
@@ -886,8 +887,9 @@ export default function GuiaAlquilarPage() {
                         <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
                           <p className="font-semibold text-yellow-800 mb-2">¿Por qué debes hacerlo?</p>
                           {step.why.map((reason, whyIndex) => (
-                            <p key={whyIndex} className="text-yellow-700 text-sm">
-                              ➡ {reason}
+                            <p key={whyIndex} className="text-yellow-700 text-sm flex items-start gap-1">
+                              <ArrowRight className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                              <span>{reason}</span>
                             </p>
                           ))}
                         </div>

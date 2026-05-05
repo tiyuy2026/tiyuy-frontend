@@ -10,6 +10,7 @@ import { axiosClient } from '@/infrastructure/api/axios-client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Sun, Moon, Type, Globe, Lock, User, Camera, CheckCircle, Palette, MessageSquare, Users, Diamond, LayoutDashboard, Home, Flame, ChevronDown, LogOut, Building, FolderGit, PlusCircle } from 'lucide-react';
 import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
+import MyAgencySection from '@/presentation/components/profile/MyAgencySection';
 
 // Sidebar Navigation Component
 function Sidebar({ user }: { user: any }) {
@@ -290,6 +291,7 @@ export default function ProfilePage() {
   const userRole = (user?.role || 'USER').toString().toUpperCase().trim();
   const canViewCRM = ['AGENT', 'DEVELOPER', 'ADMIN', 'INMOBILIARIA'].includes(userRole);
   const isDeveloper = userRole === 'DEVELOPER';
+  const isAgent = userRole === 'AGENT';
   
   // Debug: see which role is arriving
   console.log('DEBUG - User role raw:', user?.role, '| normalized:', userRole, '| canViewCRM:', canViewCRM);
@@ -513,6 +515,11 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
+
+            {/* Mi Inmobiliaria - SOLO para AGENT */}
+            {isAgent && !isDeveloper && (
+              <MyAgencySection />
+            )}
 
             {/* Proyectos y Desarrollos - SOLO para DEVELOPER */}
             {isDeveloper && (

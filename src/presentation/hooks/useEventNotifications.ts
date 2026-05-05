@@ -29,8 +29,8 @@ export const useEventNotifications = () => {
         const { data } = await apiClient.get<EventNotification[]>('/notifications/events');
         return data;
       } catch (error) {
-        // Si el endpoint no existe, usamos datos mock
-        return getMockEventNotifications(user);
+        console.error('Error fetching event notifications:', error);
+        return [];
       }
     },
     enabled: isAuthenticated && !!user,
@@ -80,68 +80,3 @@ export const useEventNotifications = () => {
     unreadCount: notificationsQuery.data?.filter((n: EventNotification) => !n.read).length || 0,
   };
 };
-
-// Función para generar notificaciones mock mientras el endpoint no está disponible
-function getMockEventNotifications(user: any): EventNotification[] {
-  const mockNotifications: EventNotification[] = [];
-
-  // Notificación de nuevo evento en canal suscrito
-  mockNotifications.push({
-    id: `event-${user.id}-new-event`,
-    title: '🎉 Nuevo evento en "Inmobiliarias Lima"',
-    message: 'Open House: Departamento de 3 ambientes en San Isidro. No te lo pierdas este sábado.',
-    type: 'EVENT_CREATED',
-    read: false,
-    createdAt: new Date(Date.now() - 3600000).toISOString(),
-    eventId: 123,
-    channelId: 1,
-    eventTitle: 'Open House San Isidro',
-    channelName: 'Inmobiliarias Lima'
-  });
-
-  // Notificación de recordatorio de evento
-  mockNotifications.push({
-    id: `event-${user.id}-reminder`,
-    title: '⏰ Recordatorio: Evento mañana',
-    message: 'La Feria Inmobiliaria 2024 comienza mañana a las 10:00 AM. ¡Prepárate!',
-    type: 'EVENT_REMINDER',
-    read: false,
-    createdAt: new Date(Date.now() - 7200000).toISOString(),
-    eventId: 456,
-    channelId: 2,
-    eventTitle: 'Feria Inmobiliaria 2024',
-    channelName: 'Eventos Inmobiliarios'
-  });
-
-  // Notificación de actualización de evento
-  mockNotifications.push({
-    id: `event-${user.id}-updated`,
-    title: '📝 Evento actualizado',
-    message: 'El Webinar "Marketing Digital para Agentes" ha cambiado de horario a las 4:00 PM.',
-    type: 'EVENT_UPDATED',
-    read: true,
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-    eventId: 789,
-    channelId: 3,
-    eventTitle: 'Marketing Digital para Agentes',
-    channelName: 'Capacitaciones'
-  });
-
-  // Notificación de que alguien se unió a tu evento
-  if (user.role === 'AGENT' || user.role === 'INMOBILIARIA') {
-    mockNotifications.push({
-      id: `event-${user.id}-joined`,
-      title: '👥 Nuevo participante en tu evento',
-      message: 'Carlos Rodríguez se ha unido a tu Open House. Contacta a los participantes.',
-      type: 'EVENT_JOINED',
-      read: false,
-      createdAt: new Date(Date.now() - 1800000).toISOString(),
-      eventId: 101,
-      channelId: 1,
-      eventTitle: 'Open House Miraflores',
-      channelName: 'Inmobiliarias Lima'
-    });
-  }
-
-  return mockNotifications;
-}

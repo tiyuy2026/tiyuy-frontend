@@ -23,9 +23,6 @@ export const useAuth = () => {
 
       const response: AuthResponse = await loginUseCase.execute(email, password);
 
-      // Debug: Log the complete response
-      console.log('Auth Response Debug:', response);
-
       // Crear User desde AuthResponse del backend
       const userData: User = {
         id: response.userId,
@@ -48,8 +45,6 @@ export const useAuth = () => {
         departments: response.departments,
         isActive: response.isActive,
       } : undefined;
-
-      console.log('Admin Data Extracted:', adminData);
 
       authStorage.setToken(response.token);
       authStorage.setUser(userData);

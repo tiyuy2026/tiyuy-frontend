@@ -16,9 +16,9 @@ export function PlanBadge({ className = '', showDescription = false }: PlanBadge
 
   const getPlanInfo = () => {
     switch (currentPlan) {
-      case 'PRO':
+      case 'PREMIUM':
         return {
-          name: 'PRO',
+          name: 'PREMIUM',
           icon: <Crown className="w-3 h-3" />,
           color: 'bg-purple-100 text-purple-700 border-purple-200',
           description: 'Acceso completo'

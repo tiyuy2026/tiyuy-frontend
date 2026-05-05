@@ -99,11 +99,17 @@ export class FinanceRepository implements IFinanceRepository {
     return response.data;
   }
 
-  async subscribeToPlan(planId: string, paymentMethod: 'CARD' | 'MERCADOPAGO'): Promise<ActiveSubscription> {
-    const response = await apiClient.post<ActiveSubscriptionDTO>(ENDPOINTS.FINANCE.SUBSCRIPTIONS.SUBSCRIBE, {
+  async subscribeToPlan(planId: string, paymentMethod: 'CARD' | 'MERCADOPAGO', discountCode?: string): Promise<ActiveSubscription> {
+    const body: any = {
       tier: planId, // Cambiado de planId a tier para coincidir con backend
       paymentMethod,
-    });
+    };
+    
+    if (discountCode) {
+      body.discountCode = discountCode;
+    }
+    
+    const response = await apiClient.post<ActiveSubscriptionDTO>(ENDPOINTS.FINANCE.SUBSCRIPTIONS.SUBSCRIBE, body);
 
     const data = response.data;
     return {
@@ -114,5 +120,28 @@ export class FinanceRepository implements IFinanceRepository {
       expiresAt: new Date(data.expiresAt),
       remainingPublications: data.remainingPublications,
     };
+  }
+
+  async getAvailableDeveloperDiscountCodes(): Promise<{
+    id: number;
+    code: string;
+    discountPercentage: number;
+    maxUses: number | null;
+    usedCount: number;
+    status: string;
+    validFrom: string;
+    validUntil: string | null;
+  }[]> {
+    // Usar el endpoint correcto para agentes que está configurado en la seguridad
+    console.log('🔍 DEBUG: Llamando a /admin/developers/available-discounts...');
+    const response = await apiClient.get(`/admin/developers/available-discounts`);
+    console.log('🔍 DEBUG: Respuesta completa:', response);
+    console.log('🔍 DEBUG: response.data:', response.data);
+    console.log('🔍 DEBUG: response.data length:', response.data?.length || 0);
+    
+    // El endpoint devuelve una lista directamente, no un Page
+    const result = response.data || [];
+    console.log('🔍 DEBUG: Resultado final:', result);
+    return result;
   }
 }

@@ -48,6 +48,71 @@ export type CampaignStatus = 'SCHEDULED' | 'ACTIVE' | 'EXPIRED' | 'INACTIVE';
 // Campaign alert type matching backend
 export type CampaignAlertType = 'LAST_WEEK' | 'LAST_DAY' | 'STARTED' | 'ENDED' | 'USAGE_LIMIT_WARNING';
 
+// Developer-Agent Association status
+export type AssociationStatus = 'PENDING' | 'ACTIVE' | 'REJECTED' | 'REMOVED';
+
+// Who requested the association
+export type AssociationRequester = 'AGENT' | 'DEVELOPER' | 'ADMIN';
+
+// Developer-Agent Association entity
+export interface DeveloperAgentAssociation {
+  id: number;
+  developerId: number;
+  developerName: string;
+  developerRuc?: string;
+  developerCity?: string;
+  developerCurrentPlan?: string;
+  agentId: number;
+  agentFirstName?: string;
+  agentLastName?: string;
+  agentEmail: string;
+  status: AssociationStatus;
+  requestedBy?: AssociationRequester;
+  requestedAt?: Date;
+  reviewedAt?: Date;
+  reviewedByName?: string;
+  notes?: string;
+  joinedAt?: Date;
+  isVerified?: boolean;
+  licenseNumber?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Request to create association
+export interface CreateAssociationRequest {
+  developerId: number;
+  notes?: string;
+}
+
+// Request to approve/reject association
+export interface ReviewAssociationRequest {
+  notes?: string;
+}
+
+// Developer (Inmobiliaria) response from backend
+export interface DeveloperResponse {
+  id: number;
+  email: string;
+  companyName: string;
+  ruc?: string;
+  phone?: string;
+  enabled: boolean;
+  status: string;
+  totalAgents: number;
+  createdAt: Date;
+  lastLoginAt?: Date;
+}
+
+// Search filter for developers
+export interface DeveloperSearchFilter {
+  query?: string;
+  city?: string;
+  page?: number;
+  size?: number;
+  sort?: string;
+}
+
 // Department entity
 export interface Department {
   id: number;
@@ -783,4 +848,145 @@ export interface AdminSidebarSection {
   title: string;
   department: DepartmentType;
   items: AdminNavItem[];
+}
+
+// ============================================
+// INMOBILIARIA / DEVELOPER ENTITIES
+// ============================================
+
+export interface Inmobiliaria {
+  id: number;
+  name: string;
+  ruc: string;
+  description?: string;
+  logoUrl?: string;
+  website?: string;
+  email: string;
+  phone?: string;
+  managerName?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface InmobiliariaWithStats extends Inmobiliaria {
+  totalAgents: number;
+  activeAgents: number;
+  totalProperties: number;
+  activeProperties: number;
+  totalProjects: number;
+  activeProjects: number;
+  subscriptionStatus: 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'EXPIRED';
+  currentPlan?: string;
+  planExpiryDate?: Date;
+  averageRating: number;
+  totalSales: number;
+  totalRentals: number;
+  enabled: boolean;
+  activeDiscounts?: number;
+  revenue30Days?: number;
+  lastActivity?: Date;
+}
+
+export interface InmobiliariaAgent {
+  id: number;
+  userId: number;
+  inmobiliariaId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  licenseNumber?: string;
+  isVerified: boolean;
+  status: 'ACTIVE' | 'INACTIVE';
+  joinedAt: Date;
+  totalSales: number;
+  totalRentals: number;
+  currentPlan?: string;
+  planStatus?: 'ACTIVE' | 'INACTIVE' | 'EXPIRED';
+}
+
+export interface InmobiliariaStatusHistory {
+  id: number;
+  inmobiliariaId: number;
+  previousStatus?: string;
+  newStatus: string;
+  reason?: string;
+  changedBy: string;
+  createdAt: Date;
+}
+
+export interface CreateInmobiliariaRequest {
+  name: string;
+  ruc: string;
+  description?: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  website?: string;
+}
+
+export interface UpdateInmobiliariaRequest {
+  name?: string;
+  description?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  website?: string;
+  status?: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+}
+
+export interface AssignAgentToInmobiliariaRequest {
+  userId: number;
+  licenseNumber?: string;
+}
+
+export interface InmobiliariaDiscount {
+  id: number;
+  inmobiliariaId: number;
+  code: string;
+  discountPercent: number;
+  maxUses: number;
+  usedCount: number;
+  status: 'ACTIVE' | 'INACTIVE' | 'EXPIRED';
+  validFrom: Date;
+  validUntil?: Date;
+  createdAt: Date;
+  createdBy: number;
+  isValid: boolean;
+}
+
+export interface CreateInmobiliariaDiscountRequest {
+  inmobiliariaId: number;
+  code: string;
+  discountPercentage: number;
+  maxUses?: number;
+  validFrom?: Date;
+  validUntil?: Date;
+  applicableToAgents?: boolean; // Si es false, solo la inmobiliaria puede usarlo (no sus agentes)
+}
+
+export interface ApplyDirectDiscountRequest {
+  discountPercentage: number;
+  reason: string;
+  applyToAllAgents?: boolean;
+  expiresAt?: Date;
+  maxAgents?: number;
+}
+
+export interface InmobiliariaFilter {
+  search?: string;
+  status?: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+  city?: string;
+  hasActiveSubscription?: boolean;
+  page?: number;
+  size?: number;
+  sort?: string;
 }
