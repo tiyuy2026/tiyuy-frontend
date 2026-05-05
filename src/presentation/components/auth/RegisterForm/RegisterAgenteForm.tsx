@@ -1,16 +1,22 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Eye, EyeOff, Mail, User, Phone, Lock, Hash, Briefcase } from 'lucide-react';
 import { useAuth } from '@/presentation/hooks';
+import { useUserValidation } from '@/presentation/hooks/useUserValidation';
 import { Button, Input } from '@/presentation/components/ui';
 import { DniInput } from '@/presentation/components/kyc';
-import { Mail, User, Phone, Lock, Hash, Briefcase } from 'lucide-react';
+import { AuthErrorBanner, PasswordStrengthIndicator } from '@/presentation/components/auth/shared';
 import { AgentRepository } from '@/infrastructure/repositories/AgentRepository';
-import { toast } from 'sonner';
 
 const agentRepo = new AgentRepository();
 
+/** Mínimo de caracteres para contraseñas en toda la aplicación */
+const MIN_PASSWORD_LENGTH = 8;
+
 export const RegisterAgenteForm: React.FC = () => {
-  const { register, isLoading, error } = useAuth();
+  const { register, isLoading, error, clearError } = useAuth();
+  const { validateEmail, isValidating: validatingEmail } = useUserValidation();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -24,32 +30,68 @@ export const RegisterAgenteForm: React.FC = () => {
   });
   const [isDniValidated, setIsDniValidated] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [emailExists, setEmailExists] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleDniValidated = (dniData: any) => {
-    setIsDniValidated(true);
-    // Llenar automáticamente los campos de nombre y apellido
-    if (dniData && dniData.fullName) {
-      // Separar nombre y apellido del fullName
-      const nameParts = dniData.fullName.split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
-      
-      setFormData(prev => ({
-        ...prev,
-        firstName: firstName,
-        lastName: lastName
-      }));
+  // ─── Validación de email en tiempo real ─────────────────────────────────────
+
+  useEffect(() => {
+    const isValidFormat = formData.email && /\S+@\S+\.\S+/.test(formData.email);
+    if (!isValidFormat) {
+      setEmailExists(false);
+      return;
     }
-  };
+
+    const timer = setTimeout(async () => {
+      try {
+        const exists = await validateEmail(formData.email);
+        setEmailExists(exists);
+        setErrors((prev) => {
+          const updated = { ...prev };
+          if (exists) {
+            updated.email = 'Este email ya está registrado';
+          } else {
+            delete updated.email;
+          }
+          return updated;
+        });
+      } catch {
+        // Silencioso: la validación de submit protegerá igualmente
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.email, validateEmail]);
+
+  // ─── Validación completa antes del submit ───────────────────────────────────
 
   const validateForm = (): Record<string, string> => {
     const newErrors: Record<string, string> = {};
-    if (!formData.email) newErrors.email = 'El correo electrónico es obligatorio';
-    if (!formData.password) newErrors.password = 'La contraseña es obligatoria';
-    if (formData.password && formData.password.length < 6) newErrors.password = 'La contraseña debe tener mínimo 6 caracteres';
-    if (formData.password && formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
-    if (!formData.dni || formData.dni.length !== 8) newErrors.dni = 'El DNI debe tener 8 dígitos';
-    if (!isDniValidated) newErrors.dni = 'Debes validar tu DNI primero';
+
+    if (!formData.email) {
+      newErrors.email = 'El correo electrónico es obligatorio';
+    } else if (emailExists) {
+      newErrors.email = 'Este email ya está registrado';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'La contraseña es obligatoria';
+    } else if (formData.password.length < MIN_PASSWORD_LENGTH) {
+      newErrors.password = `La contraseña debe tener mínimo ${MIN_PASSWORD_LENGTH} caracteres`;
+    }
+
+    if (formData.password && formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    }
+
+    if (!formData.dni || formData.dni.length !== 8) {
+      newErrors.dni = 'El DNI debe tener 8 dígitos';
+    }
+    if (!isDniValidated) {
+      newErrors.dni = 'Debes validar tu DNI primero';
+    }
+
     if (!formData.firstName) newErrors.firstName = 'El nombre es obligatorio';
     if (!formData.lastName) newErrors.lastName = 'Los apellidos son obligatorios';
 
@@ -61,6 +103,16 @@ export const RegisterAgenteForm: React.FC = () => {
     }
 
     return newErrors;
+  };
+
+  // ─── Handlers ──────────────────────────────────────────────────────────────
+
+  const handleDniValidated = (dniData: { fullName?: string }) => {
+    setIsDniValidated(true);
+    if (dniData?.fullName) {
+      const [firstName = '', ...rest] = dniData.fullName.split(' ');
+      setFormData((prev) => ({ ...prev, firstName, lastName: rest.join(' ') }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -80,61 +132,62 @@ export const RegisterAgenteForm: React.FC = () => {
         role: 'AGENT',
       });
 
-      // Después del registro exitoso, actualizar perfil de agente con datos profesionales
+      // Actualizar perfil de agente con datos profesionales (no es crítico si falla)
       try {
         await agentRepo.updateProfile({
           licenseNumber: formData.licenseNumber,
           agency: formData.agency || undefined,
         });
-      } catch (agentError) {
-        // Si falla la actualización del perfil de agente, no es crítico
-        console.warn('No se pudo actualizar perfil de agente inicialmente:', agentError);
+      } catch {
+        // No bloqueamos el registro si falla la actualización del perfil de agente
       }
-    } catch (err) {
-      // Error manejado por useAuth
+    } catch {
+      // El error se maneja en useAuth y se expone a través de `error`
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
-    // Manejo especial para el teléfono - solo números y que empiece con 9
+
     if (name === 'phone') {
-      // Solo permitir números, máximo 9 dígitos
-      const cleanedValue = value.replace(/\D/g, '').slice(0, 9);
-      setFormData(prev => ({ ...prev, [name]: cleanedValue }));
+      const cleaned = value.replace(/\D/g, '').slice(0, 9);
+      setFormData((prev) => ({ ...prev, [name]: cleaned }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
-    
-    if (errors[name]) {
-      const updated = { ...errors };
-      delete updated[name];
-      setErrors(updated);
+
+    // Limpiar el error del campo al escribir (excepto email, lo gestiona el useEffect)
+    if (name !== 'email' && errors[name]) {
+      setErrors((prev) => {
+        const updated = { ...prev };
+        delete updated[name];
+        return updated;
+      });
     }
   };
 
+  // ─── Render ────────────────────────────────────────────────────────────────
+
   return (
     <div className="w-full">
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6">
-          {error}
-        </div>
-      )}
+      {/* Error de API */}
+      <div className="mb-4">
+        <AuthErrorBanner error={error} onClose={clearError} autoDismissSeconds={8} />
+      </div>
 
-      {/* HEADER simplificado */}
+      {/* Encabezado */}
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Crea tu cuenta de Agente</h2>
         <p className="text-gray-600">Completa tus datos profesionales</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-        {/* DNI PRIMERO */}
+        {/* DNI primero */}
         <DniInput
           value={formData.dni}
           onChange={(val) => {
-            setFormData(prev => ({ ...prev, dni: val }));
-            if (errors.dni) setErrors(prev => { const n = { ...prev }; delete n.dni; return n; });
+            setFormData((prev) => ({ ...prev, dni: val }));
+            if (errors.dni) setErrors((prev) => { const n = { ...prev }; delete n.dni; return n; });
           }}
           onValidated={handleDniValidated}
           leftIcon={<Hash className="w-5 h-5 text-gray-400" />}
@@ -144,7 +197,7 @@ export const RegisterAgenteForm: React.FC = () => {
           externalError={errors.dni}
         />
 
-        {/* NOMBRES DESPUÉS DE VALIDAR DNI */}
+        {/* Nombre y apellido (auto-llenados desde DNI) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             name="firstName"
@@ -155,9 +208,7 @@ export const RegisterAgenteForm: React.FC = () => {
             error={errors.firstName}
             placeholder="Ingresa tus nombres"
             readOnly={!isDniValidated}
-            className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
           />
-
           <Input
             name="lastName"
             label="Apellidos"
@@ -167,23 +218,20 @@ export const RegisterAgenteForm: React.FC = () => {
             error={errors.lastName}
             placeholder="Ingresa tus apellidos"
             readOnly={!isDniValidated}
-            className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
           />
         </div>
 
-        {/* LICENCIA Y AGENCIA */}
+        {/* Licencia y agencia (opcionales) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             name="licenseNumber"
-            label="Número de Licencia (opcional)"
+            label="N.° de Licencia (opcional)"
             leftIcon={<Briefcase className="w-5 h-5 text-gray-400" />}
             value={formData.licenseNumber}
             onChange={handleChange}
             error={errors.licenseNumber}
             placeholder="Tu licencia de agente"
-            className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
           />
-
           <Input
             name="agency"
             label="Inmobiliaria (opcional)"
@@ -191,11 +239,10 @@ export const RegisterAgenteForm: React.FC = () => {
             value={formData.agency}
             onChange={handleChange}
             placeholder="Nombre de tu inmobiliaria"
-            className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
           />
         </div>
 
-        {/* EMAIL */}
+        {/* Email con validación en tiempo real */}
         <Input
           type="email"
           name="email"
@@ -205,10 +252,14 @@ export const RegisterAgenteForm: React.FC = () => {
           onChange={handleChange}
           error={errors.email}
           placeholder="ejemplo@correo.com"
-          className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+          rightIcon={
+            validatingEmail ? (
+              <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent animate-spin rounded-full" />
+            ) : undefined
+          }
         />
 
-        {/* TELÉFONO */}
+        {/* Teléfono */}
         <Input
           type="tel"
           name="phone"
@@ -219,24 +270,36 @@ export const RegisterAgenteForm: React.FC = () => {
           error={errors.phone}
           placeholder="987654321"
           maxLength={9}
-          className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
         />
 
-        {/* CONTRASEÑA */}
-        <Input
-          type="password"
-          name="password"
-          label="Contraseña"
-          leftIcon={<Lock className="w-5 h-5 text-gray-400" />}
-          value={formData.password}
-          onChange={handleChange}
-          error={errors.password}
-          placeholder="Mínimo 6 caracteres"
-          className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-        />
+        {/* Contraseña con toggle y fortaleza */}
+        <div>
+          <Input
+            type={showPassword ? 'text' : 'password'}
+            name="password"
+            label="Contraseña"
+            leftIcon={<Lock className="w-5 h-5 text-gray-400" />}
+            value={formData.password}
+            onChange={handleChange}
+            error={errors.password}
+            placeholder={`Mínimo ${MIN_PASSWORD_LENGTH} caracteres`}
+            rightIcon={
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            }
+          />
+          <PasswordStrengthIndicator password={formData.password} />
+        </div>
 
+        {/* Confirmar contraseña con toggle */}
         <Input
-          type="password"
+          type={showConfirmPassword ? 'text' : 'password'}
           name="confirmPassword"
           label="Confirmar contraseña"
           leftIcon={<Lock className="w-5 h-5 text-gray-400" />}
@@ -244,22 +307,24 @@ export const RegisterAgenteForm: React.FC = () => {
           onChange={handleChange}
           error={errors.confirmPassword}
           placeholder="Repite la contraseña"
-          className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+          rightIcon={
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((v) => !v)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            >
+              {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          }
         />
 
-        {/* BOTÓN PRINCIPAL */}
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          fullWidth
-          isLoading={isLoading}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold transition-colors"
-        >
+        {/* Botón principal */}
+        <Button type="submit" variant="primary" size="lg" fullWidth isLoading={isLoading}>
           Crear Cuenta de Agente
         </Button>
 
-        {/* ENLACE A LOGIN */}
+        {/* Link a login */}
         <div className="text-center pt-4">
           <p className="text-gray-600">
             ¿Ya tienes cuenta?{' '}

@@ -1,16 +1,21 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { Eye, EyeOff, Mail, User, Phone, Lock, Hash } from 'lucide-react';
 import { useAuth } from '@/presentation/hooks';
 import { useGoogleAuth } from '@/presentation/hooks/useGoogleAuth';
 import { useUserValidation } from '@/presentation/hooks/useUserValidation';
 import { Button, Input } from '@/presentation/components/ui';
 import { DniInput } from '@/presentation/components/kyc';
-import { Mail, User, Phone, Lock, Hash } from 'lucide-react';
+import { AuthErrorBanner, PasswordStrengthIndicator } from '@/presentation/components/auth/shared';
+
+/** Mínimo de caracteres para contraseñas en toda la aplicación */
+const MIN_PASSWORD_LENGTH = 8;
 
 export const RegisterUsuarioForm: React.FC = () => {
-  const { register, isLoading, error } = useAuth();
+  const { register, isLoading, error, clearError } = useAuth();
   const { signInWithGoogle, loading: googleLoading, error: googleError } = useGoogleAuth();
   const { validateEmail, isValidating: validatingEmail } = useUserValidation();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -18,81 +23,92 @@ export const RegisterUsuarioForm: React.FC = () => {
     firstName: '',
     lastName: '',
     dni: '',
-    phone: '', // Solo 9 dígitos empezando con 9
+    phone: '',
   });
-
   const [isDniValidated, setIsDniValidated] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [emailExists, setEmailExists] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Auto-fill Google data if coming from login dialog
+  // ─── Auto-completar desde Google (vía sessionStorage) ──────────────────────
+
   useEffect(() => {
-    const googleData = sessionStorage.getItem('googleRegistrationData');
-    if (googleData) {
-      try {
-        const parsedData = JSON.parse(googleData);
-        setFormData(prev => ({
-          ...prev,
-          email: parsedData.email,
-          firstName: parsedData.firstName,
-          lastName: parsedData.lastName,
-        }));
-        // Clear the session storage after using it
-        sessionStorage.removeItem('googleRegistrationData');
-        console.log('RegisterUsuarioForm: Datos de Google auto-llenados desde login:', parsedData);
-      } catch (error) {
-        console.error('Error parsing Google data from sessionStorage:', error);
-      }
+    const raw = sessionStorage.getItem('googleRegistrationData');
+    if (!raw) return;
+
+    try {
+      const parsed = JSON.parse(raw);
+      setFormData((prev) => ({
+        ...prev,
+        email: parsed.email ?? prev.email,
+        firstName: parsed.firstName ?? prev.firstName,
+        lastName: parsed.lastName ?? prev.lastName,
+      }));
+      sessionStorage.removeItem('googleRegistrationData');
+    } catch {
+      sessionStorage.removeItem('googleRegistrationData');
     }
   }, []);
 
-  // Validar email en tiempo real
-  useEffect(() => {
-    const validateEmailField = async () => {
-      if (formData.email && formData.email.includes('@')) {
-        try {
-          const exists = await validateEmail(formData.email);
-          setEmailExists(exists);
-          if (exists) {
-            setErrors(prev => ({ ...prev, email: 'Este email ya está registrado' }));
-          } else {
-            setErrors(prev => {
-              const n = { ...prev };
-              delete n.email;
-              return n;
-            });
-          }
-        } catch (error) {
-          console.error('Error validando email:', error);
-        }
-      } else {
-        setEmailExists(false);
-        // Solo limpiar el error si NO es un error de "campo obligatorio"
-        setErrors(prev => {
-          if (prev.email && prev.email !== 'El correo electrónico es obligatorio') {
-            const n = { ...prev };
-            delete n.email;
-            return n;
-          }
-          return prev;
-        });
-      }
-    };
+  // ─── Validación de email en tiempo real ─────────────────────────────────────
 
-    const timeoutId = setTimeout(validateEmailField, 500);
-    return () => clearTimeout(timeoutId);
+  useEffect(() => {
+    const isValidFormat = formData.email && /\S+@\S+\.\S+/.test(formData.email);
+    if (!isValidFormat) {
+      setEmailExists(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const exists = await validateEmail(formData.email);
+        setEmailExists(exists);
+        setErrors((prev) => {
+          const updated = { ...prev };
+          if (exists) {
+            updated.email = 'Este email ya está registrado';
+          } else {
+            delete updated.email;
+          }
+          return updated;
+        });
+      } catch {
+        // Silencioso: la validación de submit seguirá protegiendo
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
   }, [formData.email, validateEmail]);
+
+  // ─── Validación completa antes del submit ───────────────────────────────────
 
   const validateForm = (): Record<string, string> => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.email) newErrors.email = 'El correo electrónico es obligatorio';
-    if (emailExists) newErrors.email = 'Este email ya está registrado';
-    if (!formData.password) newErrors.password = 'La contraseña es obligatoria';
-    if (formData.password && formData.password.length < 6) newErrors.password = 'La contraseña debe tener mínimo 6 caracteres';
-    if (formData.password && formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
-    if (!formData.dni || formData.dni.length !== 8) newErrors.dni = 'El DNI debe tener 8 dígitos';
-    if (!isDniValidated) newErrors.dni = 'Debes validar tu DNI primero';
+    if (!formData.email) {
+      newErrors.email = 'El correo electrónico es obligatorio';
+    } else if (emailExists) {
+      newErrors.email = 'Este email ya está registrado';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'La contraseña es obligatoria';
+    } else if (formData.password.length < MIN_PASSWORD_LENGTH) {
+      newErrors.password = `La contraseña debe tener mínimo ${MIN_PASSWORD_LENGTH} caracteres`;
+    }
+
+    if (formData.password && formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Las contraseñas no coinciden';
+    }
+
+    if (!formData.dni || formData.dni.length !== 8) {
+      newErrors.dni = 'El DNI debe tener 8 dígitos';
+    }
+    if (!isDniValidated) {
+      newErrors.dni = 'Debes validar tu DNI primero';
+    }
+
     if (!formData.firstName) newErrors.firstName = 'El nombre es obligatorio';
     if (!formData.lastName) newErrors.lastName = 'Los apellidos son obligatorios';
 
@@ -106,25 +122,7 @@ export const RegisterUsuarioForm: React.FC = () => {
     return newErrors;
   };
 
-  const handleGoogleSignIn = async () => {
-    try {
-      const googleUserData = await signInWithGoogle();
-      
-      if (googleUserData) {
-        // Autocompletar los datos del formulario con los datos de Google
-        setFormData(prev => ({
-          ...prev,
-          email: googleUserData.email,
-          firstName: googleUserData.firstName,
-          lastName: googleUserData.lastName,
-        }));
-        
-        console.log('RegisterUsuarioForm: Datos de Google autocompletados:', googleUserData);
-      }
-    } catch (error) {
-      console.error('RegisterUsuarioForm: Error al obtener datos de Google:', error);
-    }
-  };
+  // ─── Handlers ──────────────────────────────────────────────────────────────
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,78 +130,84 @@ export const RegisterUsuarioForm: React.FC = () => {
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
-    const dataToSend = {
+    await register({
       email: formData.email,
-      phone: formData.phone, // Ya viene limpio del handleChange
+      phone: formData.phone,
       password: formData.password,
       firstName: formData.firstName,
       lastName: formData.lastName,
       dni: formData.dni,
-      role: 'USER' as const
-    };
-    
-    console.log('Datos a enviar:', dataToSend);
-    
-    await register(dataToSend);
+      role: 'USER',
+    });
   };
 
-  const handleDniValidated = (dniData: any) => {
+  const handleDniValidated = (dniData: { fullName?: string }) => {
     setIsDniValidated(true);
-    // Llenar automáticamente los campos de nombre y apellido
-    if (dniData && dniData.fullName) {
-      // Separar nombre y apellido del fullName
-      const nameParts = dniData.fullName.split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
-      
-      setFormData(prev => ({
-        ...prev,
-        firstName: firstName,
-        lastName: lastName
-      }));
+    if (dniData?.fullName) {
+      const [firstName = '', ...rest] = dniData.fullName.split(' ');
+      setFormData((prev) => ({ ...prev, firstName, lastName: rest.join(' ') }));
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
-    // Manejo especial para el teléfono - solo números y que empiece con 9
+
     if (name === 'phone') {
-      // Solo permitir números, máximo 9 dígitos
-      const cleanedValue = value.replace(/\D/g, '').slice(0, 9);
-      setFormData(prev => ({ ...prev, [name]: cleanedValue }));
+      const cleaned = value.replace(/\D/g, '').slice(0, 9);
+      setFormData((prev) => ({ ...prev, [name]: cleaned }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
-    
-    if (errors[name]) {
-      const updated = { ...errors };
-      delete updated[name];
-      setErrors(updated);
+
+    // Limpiar error al escribir (excepto email — lo gestiona el useEffect)
+    if (name !== 'email' && errors[name]) {
+      setErrors((prev) => {
+        const updated = { ...prev };
+        delete updated[name];
+        return updated;
+      });
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      const googleUserData = await signInWithGoogle();
+      if (googleUserData) {
+        setFormData((prev) => ({
+          ...prev,
+          email: googleUserData.email,
+          firstName: googleUserData.firstName,
+          lastName: googleUserData.lastName,
+        }));
+      }
+    } catch {
+      // El error se expone a través de googleError
+    }
+  };
+
+  // ─── Render ────────────────────────────────────────────────────────────────
+
   return (
     <div className="w-full">
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6">
-          {error}
-        </div>
-      )}
+      {/* Error de API */}
+      <div className="mb-4">
+        <AuthErrorBanner error={error} onClose={clearError} autoDismissSeconds={8} />
+        <AuthErrorBanner error={googleError} />
+      </div>
 
-      {/* HEADER simplificado */}
+      {/* Encabezado */}
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Crea tu cuenta</h2>
         <p className="text-gray-600">Completa tus datos para comenzar</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-        {/* DNI PRIMERO */}
+        {/* DNI primero */}
         <DniInput
           value={formData.dni}
           onChange={(val) => {
-            setFormData(prev => ({ ...prev, dni: val }));
-            if (errors.dni) setErrors(prev => { const n = { ...prev }; delete n.dni; return n; });
+            setFormData((prev) => ({ ...prev, dni: val }));
+            if (errors.dni) setErrors((prev) => { const n = { ...prev }; delete n.dni; return n; });
           }}
           onValidated={handleDniValidated}
           leftIcon={<Hash className="w-5 h-5 text-gray-400" />}
@@ -213,7 +217,7 @@ export const RegisterUsuarioForm: React.FC = () => {
           externalError={errors.dni}
         />
 
-        {/* NOMBRES DESPUÉS DE VALIDAR DNI */}
+        {/* Nombre y apellido (auto-llenados desde DNI) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             name="firstName"
@@ -224,9 +228,7 @@ export const RegisterUsuarioForm: React.FC = () => {
             error={errors.firstName}
             placeholder="Ingresa tus nombres"
             readOnly={!isDniValidated}
-            className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
           />
-
           <Input
             name="lastName"
             label="Apellidos"
@@ -236,11 +238,10 @@ export const RegisterUsuarioForm: React.FC = () => {
             error={errors.lastName}
             placeholder="Ingresa tus apellidos"
             readOnly={!isDniValidated}
-            className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
           />
         </div>
 
-        {/* EMAIL */}
+        {/* Email con validación en tiempo real */}
         <Input
           type="email"
           name="email"
@@ -250,12 +251,14 @@ export const RegisterUsuarioForm: React.FC = () => {
           onChange={handleChange}
           error={errors.email}
           placeholder="ejemplo@correo.com"
-          rightIcon={validatingEmail && <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent border-r-transparent animate-spin rounded-full border-l-blue-500"></div>}
-          helperText={emailExists ? "Este email ya está registrado" : undefined}
-          className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+          rightIcon={
+            validatingEmail ? (
+              <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent animate-spin rounded-full" />
+            ) : undefined
+          }
         />
 
-        {/* TELÉFONO */}
+        {/* Teléfono */}
         <Input
           type="tel"
           name="phone"
@@ -266,24 +269,36 @@ export const RegisterUsuarioForm: React.FC = () => {
           error={errors.phone}
           placeholder="987654321"
           maxLength={9}
-          className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
         />
 
-        {/* CONTRASEÑA */}
-        <Input
-          type="password"
-          name="password"
-          label="Contraseña"
-          leftIcon={<Lock className="w-5 h-5 text-gray-400" />}
-          value={formData.password}
-          onChange={handleChange}
-          error={errors.password}
-          placeholder="Mínimo 6 caracteres"
-          className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-        />
+        {/* Contraseña con toggle y fortaleza */}
+        <div>
+          <Input
+            type={showPassword ? 'text' : 'password'}
+            name="password"
+            label="Contraseña"
+            leftIcon={<Lock className="w-5 h-5 text-gray-400" />}
+            value={formData.password}
+            onChange={handleChange}
+            error={errors.password}
+            placeholder={`Mínimo ${MIN_PASSWORD_LENGTH} caracteres`}
+            rightIcon={
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            }
+          />
+          <PasswordStrengthIndicator password={formData.password} />
+        </div>
 
+        {/* Confirmar contraseña con toggle */}
         <Input
-          type="password"
+          type={showConfirmPassword ? 'text' : 'password'}
           name="confirmPassword"
           label="Confirmar contraseña"
           leftIcon={<Lock className="w-5 h-5 text-gray-400" />}
@@ -291,41 +306,35 @@ export const RegisterUsuarioForm: React.FC = () => {
           onChange={handleChange}
           error={errors.confirmPassword}
           placeholder="Repite la contraseña"
-          className="bg-gray-50 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+          rightIcon={
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((v) => !v)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            >
+              {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          }
         />
 
-        {/* BOTÓN PRINCIPAL */}
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          fullWidth
-          isLoading={isLoading}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold transition-colors"
-        >
+        {/* Botón principal */}
+        <Button type="submit" variant="primary" size="lg" fullWidth isLoading={isLoading}>
           Crear Cuenta
         </Button>
 
-        {/* DIVISOR */}
+        {/* Divisor */}
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
+            <div className="w-full border-t border-gray-300" />
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="px-4 bg-white text-gray-500">o regístrate con</span>
           </div>
         </div>
 
-        {/* BOTÓN GOOGLE */}
-        <Button 
-          type="button" 
-          variant="outline" 
-          size="lg" 
-          fullWidth
-          onClick={handleGoogleSignIn}
-          isLoading={googleLoading}
-          className="border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl py-3 font-semibold transition-colors"
-        >
+        {/* Botón Google */}
+        <Button type="button" variant="outline" size="lg" fullWidth onClick={handleGoogleSignIn} isLoading={googleLoading}>
           <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -335,14 +344,7 @@ export const RegisterUsuarioForm: React.FC = () => {
           {googleLoading ? 'Conectando...' : 'Google'}
         </Button>
 
-        {/* ERROR DE GOOGLE */}
-        {googleError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mt-4">
-            {googleError}
-          </div>
-        )}
-
-        {/* ENLACE A LOGIN */}
+        {/* Link a login */}
         <div className="text-center pt-4">
           <p className="text-gray-600">
             ¿Ya tienes cuenta?{' '}

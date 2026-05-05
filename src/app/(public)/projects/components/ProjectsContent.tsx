@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Building2, AlertTriangle } from 'lucide-react';
 import { ProjectRepository } from '@/infrastructure/repositories/ProjectRepository';
 import { ProjectCard } from '@/presentation/components/project/ProjectCard/ProjectCard';
 import { FeaturedProjects } from '@/presentation/components/project/FeaturedProjects/FeaturedProjects';
@@ -26,10 +27,8 @@ export default function ProjectsContent() {
         });
         
         setAllProjects(result.content || []);
-        console.log('✅ Todos los proyectos cargados:', result.content?.length || 0);
         
       } catch (error) {
-        console.error('❌ Error loading all projects:', error);
         setError('No se pudieron cargar los proyectos');
         setAllProjects([]);
       } finally {
@@ -48,7 +47,7 @@ export default function ProjectsContent() {
           <div className="max-w-[1920px] mx-auto">
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
-                <span>🏗️</span>
+                <Building2 className="w-4 h-4" />
                 <span>PROYECTOS DESTACADOS</span>
               </div>
               <h1 className="text-4xl xl:text-5xl font-bold text-gray-900 mb-4">
@@ -95,7 +94,9 @@ export default function ProjectsContent() {
             </div>
           ) : error ? (
             <div className="text-center py-20 bg-red-50 rounded-2xl">
-              <div className="text-6xl mb-4">⚠️</div>
+              <div className="flex justify-center mb-4">
+                <AlertTriangle className="w-16 h-16 text-red-400" />
+              </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
                 Error al cargar proyectos
               </h3>
@@ -109,7 +110,9 @@ export default function ProjectsContent() {
             </div>
           ) : allProjects.length === 0 ? (
             <div className="text-center py-20 bg-gray-50 rounded-2xl">
-              <div className="text-6xl mb-4">🏗️</div>
+              <div className="flex justify-center mb-4">
+                <Building2 className="w-16 h-16 text-gray-300" />
+              </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
                 No hay proyectos disponibles
               </h3>

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { Button, Input } from '@/presentation/components/ui';
+import { AuthErrorBanner } from '@/presentation/components/auth/shared';
 import Link from 'next/link';
 import { useForgotPassword } from '@/presentation/hooks/useForgotPassword';
 
@@ -87,11 +88,8 @@ export const ForgotPasswordForm: React.FC = () => {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        {displayError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-            {displayError}
-          </div>
-        )}
+        {/* Error de validación o de API */}
+        <AuthErrorBanner error={displayError} onClose={() => setValidationError(null)} />
 
         <Input
           type="email"
