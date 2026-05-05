@@ -14,7 +14,7 @@ interface PlanDetailsModalProps {
 export default function PlanDetailsModal({ isOpen, onClose, planDistribution }: PlanDetailsModalProps) {
   const planNames: Record<string, string> = {
     'ENTERPRISE': 'Empresarial',
-    'PRO': 'Pro',
+    'PREMIUM': 'Pro',
     'BASIC': 'Básico',
     'FREE': 'Gratis'
   };

@@ -61,7 +61,7 @@ export default function PlansPage() {
   // Función para determinar si un plan es empresarial
   const isEnterprisePlan = (plan: SubscriptionPlan): boolean => {
     // Consideramos empresariales los planes con precios altos o nombres que indican nivel empresarial
-    const enterpriseKeywords = ['EMPRESARIAL', 'ENTERPRISE', 'PRO', 'PREMIUM', 'BUSINESS'];
+    const enterpriseKeywords = ['EMPRESARIAL', 'ENTERPRISE', 'PREMIUM', 'BUSINESS'];
     const planNameUpper = plan.name.toUpperCase();
     const hasEnterpriseKeyword = enterpriseKeywords.some(keyword => planNameUpper.includes(keyword));
     const isHighValuePlan = plan.price >= 199; // Planes de S/199 o más se consideran empresariales
@@ -598,7 +598,7 @@ export default function PlansPage() {
                           className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                             appliedManualDiscount?.valid
                               ? 'bg-green-500 text-white cursor-default'
-                              : 'bg-yellow-600 text-white hover:bg-yellow-700 disabled:bg-gray-300 disabled:cursor-not-allowed'
+                              : selectedPlan?.name === 'PREMIUM' ? 'bg-purple-100 text-purple-800' : 'bg-yellow-600 text-white hover:bg-yellow-700 disabled:bg-gray-300 disabled:cursor-not-allowed'
                           }`}
                         >
                           {isValidatingManual ? (

@@ -89,7 +89,7 @@ export default function AgentsPage() {
     { value: 'all', label: 'Todos los planes' },
     { value: 'ENTERPRISE', label: 'Plan Empresarial' },
     { value: 'ENTERPRISE_TRIAL', label: 'Prueba Empresarial' },
-    { value: 'PRO', label: 'Plan Pro' },
+    { value: 'PREMIUM', label: 'Plan Pro' },
     { value: 'BASIC', label: 'Plan Básico' },
     { value: 'FREE', label: 'Plan Gratis' }
   ];
@@ -456,7 +456,7 @@ export default function AgentsPage() {
         { value: 'all', label: 'Todos los planes' },
         { value: 'ENTERPRISE', label: 'Plan Empresarial (S/399)' },
         { value: 'ENTERPRISE_TRIAL', label: 'Prueba Empresarial (S/299)' },
-        { value: 'PRO', label: 'Plan Pro (S/99)' },
+        { value: 'PREMIUM', label: 'Plan Pro (S/99)' },
         { value: 'BASIC', label: 'Plan Basico (S/29)' },
         { value: 'FREE', label: 'Plan Gratis' }
       ]
@@ -632,7 +632,7 @@ export default function AgentsPage() {
                 const value = dashboardStats?.planDistribution?.values[index] || 0;
                 const total = dashboardStats?.planDistribution?.total || 1;
                 const percentage = Math.round((value / total) * 100);
-                const planCodes = ['ENTERPRISE', 'PRO', 'BASIC', 'FREE'];
+                const planCodes = ['ENTERPRISE', 'PREMIUM', 'BASIC', 'FREE'];
                 const colors = ['#0d9488', '#f59e0b', '#9ca3af'];
                 return (
                   <div

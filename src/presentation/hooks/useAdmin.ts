@@ -172,7 +172,9 @@ export const useFinanceStats = () => {
         };
       }
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0, // No caché - siempre datos frescos
+    refetchOnWindowFocus: true, // Refrescar al enfocar ventana
+    refetchOnReconnect: true, // Refrescar al reconectar
   });
 };
 

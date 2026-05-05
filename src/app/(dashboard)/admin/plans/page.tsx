@@ -6,6 +6,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Componente PlanCard
 interface PlanCardProps {
@@ -130,7 +131,6 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan, onEdit, onManageDiscounts, on
 import { 
   useFinanceStats, 
   useSubscriptionPlans,
-  useActiveSubscriptionPlans,
   useAdminSubscriptions, 
   usePaymentTransactions,
   useRefundTransaction,
@@ -185,12 +185,21 @@ export default function PlansPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchResult, setSearchResult] = useState<{id: number, name: string, type: string} | null>(null);
 
+  const queryClient = useQueryClient();
   const { hasPermission } = usePermissions();
   const canManageSubscriptions = hasPermission('FINANCE_MANAGE_SUBSCRIPTIONS');
   const canRefund = hasPermission('FINANCE_REFUNDS');
 
   const { data: financeStats, isLoading: statsLoading } = useFinanceStats();
-  const { data: plans, isLoading: plansLoading } = useActiveSubscriptionPlans();
+
+  // Función para refrescar datos manualmente
+  const handleRefreshData = () => {
+    queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard', 'financeStats'] });
+    queryClient.invalidateQueries({ queryKey: ['admin', 'subscriptions', 'plans'] });
+    queryClient.invalidateQueries({ queryKey: ['admin', 'subscriptions'] });
+    queryClient.invalidateQueries({ queryKey: ['admin', 'transactions'] });
+  };
+  const { data: plans, isLoading: plansLoading } = useSubscriptionPlans();
   
   // Debug logging para verificar datos
   console.log('Plans data in component:', plans);
@@ -682,6 +691,13 @@ export default function PlansPage() {
           <h2 className="text-2xl font-bold text-gray-900">Plans & Monetization</h2>
           <p className="text-gray-600">Manage subscriptions, payments, and revenue</p>
         </div>
+        <button
+          onClick={handleRefreshData}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          disabled={statsLoading}
+        >
+          {statsLoading ? 'Actualizando...' : '🔄 Refrescar Datos'}
+        </button>
       </div>
 
       {/* Finance Stats Cards */}
@@ -1246,7 +1262,7 @@ export default function PlansPage() {
                 <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
                   selectedSubscription.tier === 'FREE' ? 'bg-gray-100 text-gray-800' :
                   selectedSubscription.tier === 'BASIC' ? 'bg-blue-100 text-blue-800' :
-                  selectedSubscription.tier === 'PRO' ? 'bg-purple-100 text-purple-800' :
+                  selectedSubscription.tier === 'PREMIUM' ? 'bg-purple-100 text-purple-800' :
                   selectedSubscription.tier === 'ENTERPRISE' ? 'bg-orange-100 text-orange-800' :
                   'bg-gray-100 text-gray-800'
                 }`}>

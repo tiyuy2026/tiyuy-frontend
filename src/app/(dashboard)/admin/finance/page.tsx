@@ -107,7 +107,7 @@ export default function FinancePage() {
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value === 'FREE' ? 'bg-gray-100 text-gray-800' :
           value === 'BASIC' ? 'bg-blue-100 text-blue-800' :
-          value === 'PRO' ? 'bg-purple-100 text-purple-800' :
+          value === 'PREMIUM' ? 'bg-purple-100 text-purple-800' :
           value === 'ENTERPRISE_TRIAL' ? 'bg-orange-100 text-orange-800' :
           value === 'ENTERPRISE' ? 'bg-green-100 text-green-800' :
           'bg-gray-100 text-gray-800'
