@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/presentation/hooks';
-import { useGoogleAuth } from '@/presentation/hooks/useGoogleAuth';
+import { useGoogleAuth, GoogleUserData } from '@/presentation/hooks/useGoogleAuth';
 import { Button, Input, InfoDialog } from '@/presentation/components/ui';
 import { AuthErrorBanner } from '@/presentation/components/auth/shared';
 import { User } from '@/core/domain/entities';
@@ -27,7 +27,7 @@ export const LoginForm: React.FC = () => {
     isOpen: boolean;
     message: string;
     showRegisterButton?: boolean;
-    googleData?: Record<string, string>;
+    googleData?: GoogleUserData;
   }>({ isOpen: false, message: '' });
 
   // ─── Validación ────────────────────────────────────────────────────────────

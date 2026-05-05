@@ -3,7 +3,7 @@ import { signInWithPopup, signOut as firebaseSignOut, User as FirebaseUser } fro
 import { auth, googleProvider } from '@/config/firebase';
 import { AuthRepository } from '@/infrastructure/repositories/AuthRepository';
 
-interface GoogleUserData {
+export interface GoogleUserData {
   email: string;
   firstName: string;
   lastName: string;
