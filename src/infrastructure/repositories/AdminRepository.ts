@@ -521,11 +521,6 @@ export class AdminRepository implements IAdminRepository {
   }
 
   // Finance and Monetization
-  async getSubscriptionPlans(): Promise<any[]> {
-    const response = await axiosClient.get(`${this.basePath}/subscription-plans`);
-    return response.data.content || [];
-  }
-
   async getActiveSubscriptionPlans(): Promise<any[]> {
     const url = `${this.basePath}/subscription-plans/active`;
     console.log('Making GET request to:', url);
@@ -657,6 +652,18 @@ export class AdminRepository implements IAdminRepository {
   // Subscription Plan Management
   async createSubscriptionPlan(plan: Partial<SubscriptionPlan>): Promise<SubscriptionPlan> {
     const response = await axiosClient.post(`${this.basePath}/subscription-plans`, plan);
+    return response.data;
+  }
+
+  async getSubscriptionPlans(): Promise<any[]> {
+    const response = await axiosClient.get(`${this.basePath}/subscription-plans`);
+    return response.data.content || [];
+  }
+
+  async getSubscriptionSalesHistory(period: string = '6months'): Promise<{ labels: string[], revenue: number[], subscriptions: number[] }> {
+    const response = await axiosClient.get(`${this.basePath}/dashboard/stats/finance/history`, {
+      params: { period }
+    });
     return response.data;
   }
 

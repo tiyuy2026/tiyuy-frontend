@@ -7,127 +7,6 @@
 
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-
-// Componente PlanCard
-interface PlanCardProps {
-  plan: any;
-  onEdit: () => void;
-  onManageDiscounts: () => void;
-  onToggle: () => void;
-}
-
-const PlanCard: React.FC<PlanCardProps> = ({ plan, onEdit, onManageDiscounts, onToggle }) => {
-  const cycleMap = {
-    'MONTHLY': 'Mensual',
-    'QUARTERLY': 'Trimestral', 
-    'YEARLY': 'Anual',
-    'LIFETIME': 'Vitalicio'
-  };
-
-  return (
-    <div className={`bg-white rounded-xl shadow-lg border-2 ${
-      plan.isFeatured ? 'border-blue-500' : 'border-gray-200'
-    } overflow-hidden hover:shadow-xl transition-shadow duration-300`}>
-      {/* Header */}
-      <div className={`p-6 ${
-        plan.isFeatured ? 'bg-gradient-to-r from-blue-500 to-teal-400' : 'bg-gradient-to-r from-gray-50 to-gray-100'
-      }`}>
-        <div className="flex justify-between items-start mb-4">
-          <h3 className="text-xl font-bold text-gray-900">{plan.displayName}</h3>
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-            plan.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-          }`}>
-            {plan.isActive ? 'Activo' : 'Inactivo'}
-          </span>
-        </div>
-        <div className="text-3xl font-bold text-gray-900">
-          S/ {plan.priceInPen?.toLocaleString() || '0'}
-          <span className="text-sm font-normal text-gray-600">/mes</span>
-        </div>
-        {plan.priceInUsd && (
-          <div className="text-sm text-gray-600">
-            ${plan.priceInUsd?.toLocaleString()} USD
-          </div>
-        )}
-      </div>
-
-      {/* Body */}
-      <div className="p-6 space-y-4">
-        {/* Description */}
-        <p className="text-gray-600 text-sm">{plan.description}</p>
-
-        {/* Limits */}
-        <div className="space-y-2">
-          <h4 className="font-semibold text-gray-900">Límites:</h4>
-          <div className="space-y-1 text-sm text-gray-600">
-            <div>📄 {plan.publicationsLimit || 0} publicaciones</div>
-            <div>🏢 {plan.projectsLimit || 0} proyectos</div>
-            <div>📸 {plan.photosLimit || 0} fotos</div>
-          </div>
-        </div>
-
-        {/* Billing Cycle */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">Ciclo:</span>
-          <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-            {cycleMap[plan.billingCycle as keyof typeof cycleMap] || plan.billingCycle}
-          </span>
-        </div>
-
-        {/* Duration */}
-        {plan.durationDays && plan.durationDays > 0 && (
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Duración:</span>
-            <span className="text-sm font-medium text-gray-900">{plan.durationDays} días</span>
-          </div>
-        )}
-
-        {/* Features */}
-        {plan.features && plan.features.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="font-semibold text-gray-900">Características:</h4>
-            <div className="space-y-1">
-              {plan.features.slice(0, 3).map((feature: string, index: number) => (
-                <div key={index} className="text-sm text-gray-600">✓ {feature}</div>
-              ))}
-              {plan.features.length > 3 && (
-                <div className="text-sm text-gray-500">+{plan.features.length - 3} más...</div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Actions */}
-      <div className="p-4 bg-gray-50 border-t border-gray-200">
-        <div className="space-y-2">
-          <button
-            onClick={onEdit}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-          >
-            Editar Plan
-          </button>
-          <button
-            onClick={onManageDiscounts}
-            className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium"
-          >
-            Descuentos
-          </button>
-          <button
-            onClick={onToggle}
-            className={`w-full px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
-              plan.isActive 
-                ? 'bg-red-600 text-white hover:bg-red-700' 
-                : 'bg-green-600 text-white hover:bg-green-700'
-            }`}
-          >
-            {plan.isActive ? 'Desactivar' : 'Activar'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 import { 
   useFinanceStats, 
   useSubscriptionPlans,
@@ -142,11 +21,11 @@ import {
 import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { adminRepository } from '@/infrastructure/repositories/AdminRepository';
 import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/Card';
-import { Modal } from '@/presentation/components/ui/Modal';
 import { Button } from '@/presentation/components/ui/Button';
 import { AdminTable } from '@/presentation/components/admin/AdminTable/AdminTable';
-import { AdminFilters } from '@/presentation/components/admin/AdminFilters/AdminFilters';
+import { RevenueChart } from '@/presentation/components/admin/RevenueChart/RevenueChart';
 import { PaginationParams, PaginatedResponse } from '@/core/domain/repositories/IAdminRepository';
+import { TrendingUp, CreditCard, Users, RefreshCw, DollarSign, Search, Filter, X } from 'lucide-react';
 import { 
   FinanceStatsDto, 
   SubscriptionPlan, 
@@ -154,6 +33,14 @@ import {
   PaymentTransaction,
   AgencyPlanDiscount
 } from '@/core/domain/entities/Admin';
+
+// Componentes y Modales Refactorizados
+import { PlanCard } from '@/presentation/components/admin/PlansModals/PlanCard';
+import { AdminPlansFilters } from '@/presentation/components/admin/PlansModals/AdminPlansFilters';
+import { EditPlanModal } from '@/presentation/components/admin/PlansModals/EditPlanModal';
+import { DiscountModal } from '@/presentation/components/admin/PlansModals/DiscountModal';
+import { TransactionDetailsModal } from '@/presentation/components/admin/PlansModals/TransactionDetailsModal';
+import { SubscriptionDetailsModal } from '@/presentation/components/admin/PlansModals/SubscriptionDetailsModal';
 
 export default function PlansPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -226,7 +113,7 @@ export default function PlansPage() {
   };
 
   const handleRefundTransaction = async (transaction: PaymentTransaction, reason: string) => {
-    if (confirm(`Are you sure you want to refund transaction ${transaction.id}?`)) {
+    if (confirm(`¿Estás seguro de que deseas reembolsar la transacción ${transaction.id}?`)) {
       await refundMutation.mutateAsync({
         transactionId: transaction.id,
         reason
@@ -240,7 +127,7 @@ export default function PlansPage() {
   const togglePlanMutation = useTogglePlanStatus();
   const createDiscountMutation = useCreateAgencyDiscount();
 
-  // Handle edit plan
+  // Action handlers
   const handleEditPlan = (plan: SubscriptionPlan) => {
     setSelectedPlan(plan);
     setEditForm({
@@ -372,9 +259,9 @@ export default function PlansPage() {
     },
     {
       key: 'userId' as keyof Subscription,
-      label: 'User ID',
+      label: 'Usuario',
       sortable: true,
-      render: (value: number) => `User ${value}`
+      render: (value: number) => `Usuario ${value}`
     },
     {
       key: 'tier' as keyof Subscription,
@@ -388,13 +275,16 @@ export default function PlansPage() {
           value === 'ENTERPRISE' ? 'bg-orange-100 text-orange-800' :
           'bg-gray-100 text-gray-800'
         }`}>
-          {value}
+          {value === 'FREE' ? 'GRATIS' :
+           value === 'BASIC' ? 'BÁSICO' :
+           value === 'PRO' ? 'PRO' :
+           value === 'ENTERPRISE' ? 'EMPRESARIAL' : value}
         </span>
       )
     },
     {
       key: 'status' as keyof Subscription,
-      label: 'Status',
+      label: 'Estado',
       sortable: true,
       render: (value: string) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -404,23 +294,26 @@ export default function PlansPage() {
           value === 'EXPIRED' ? 'bg-orange-100 text-orange-800' :
           'bg-gray-100 text-gray-800'
         }`}>
-          {value}
+          {value === 'ACTIVE' ? 'ACTIVO' :
+           value === 'INACTIVE' ? 'INACTIVO' :
+           value === 'CANCELLED' ? 'CANCELADO' :
+           value === 'EXPIRED' ? 'EXPIRADO' : value}
         </span>
       )
     },
     {
       key: 'price' as keyof Subscription,
-      label: 'Price',
+      label: 'Precio',
       sortable: true,
       render: (value: number, subscription: Subscription) => (
         <div className="font-medium text-green-600">
-          {subscription.currency} {value.toLocaleString()}
+          {subscription.currency === 'PEN' ? 'S/' : '$'} {value.toLocaleString()}
         </div>
       )
     },
     {
       key: 'paymentMethod' as keyof Subscription,
-      label: 'Payment Method',
+      label: 'Método de Pago',
       sortable: true,
       render: (value: string) => (
         <span className="text-sm text-gray-600">{value}</span>
@@ -428,27 +321,27 @@ export default function PlansPage() {
     },
     {
       key: 'autoRenew' as keyof Subscription,
-      label: 'Auto Renew',
+      label: 'Auto Renovación',
       sortable: true,
       render: (value: boolean) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
           value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
         }`}>
-          {value ? 'Enabled' : 'Disabled'}
+          {value ? 'Activado' : 'Desactivado'}
         </span>
       )
     },
     {
       key: 'startDate' as keyof Subscription,
-      label: 'Started',
+      label: 'Iniciado',
       sortable: true,
-      render: (value: string) => new Date(value).toLocaleDateString()
+      render: (value: string) => new Date(value).toLocaleDateString('es-PE')
     },
     {
       key: 'endDate' as keyof Subscription,
-      label: 'Ends',
+      label: 'Vence',
       sortable: true,
-      render: (value?: string) => value ? new Date(value).toLocaleDateString() : 'No end date'
+      render: (value?: string) => value ? new Date(value).toLocaleDateString('es-PE') : 'Sin fecha fin'
     }
   ];
 
@@ -462,29 +355,29 @@ export default function PlansPage() {
     },
     {
       key: 'userId' as keyof PaymentTransaction,
-      label: 'User ID',
+      label: 'Usuario',
       sortable: true,
-      render: (value: number) => `User ${value}`
+      render: (value: number) => `Usuario ${value}`
     },
     {
       key: 'subscriptionId' as keyof PaymentTransaction,
-      label: 'Subscription',
+      label: 'Suscripción',
       sortable: true,
       render: (value?: number) => value ? `#${value}` : 'N/A'
     },
     {
       key: 'amount' as keyof PaymentTransaction,
-      label: 'Amount',
+      label: 'Monto',
       sortable: true,
       render: (value: number, transaction: PaymentTransaction) => (
         <div className="font-medium text-green-600">
-          {transaction.currency} {value.toLocaleString()}
+          {transaction.currency === 'PEN' ? 'S/' : '$'} {value.toLocaleString()}
         </div>
       )
     },
     {
       key: 'paymentMethod' as keyof PaymentTransaction,
-      label: 'Method',
+      label: 'Método',
       sortable: true,
       render: (value: string) => (
         <span className="text-sm text-gray-600">{value}</span>
@@ -492,7 +385,7 @@ export default function PlansPage() {
     },
     {
       key: 'status' as keyof PaymentTransaction,
-      label: 'Status',
+      label: 'Estado',
       sortable: true,
       render: (value: string) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -502,7 +395,10 @@ export default function PlansPage() {
           value === 'REFUNDED' ? 'bg-orange-100 text-orange-800' :
           'bg-gray-100 text-gray-800'
         }`}>
-          {value}
+          {value === 'COMPLETED' ? 'COMPLETADO' :
+           value === 'PENDING' ? 'PENDIENTE' :
+           value === 'FAILED' ? 'FALLIDO' :
+           value === 'REFUNDED' ? 'REEMBOLSADO' : value}
         </span>
       )
     },
@@ -514,7 +410,7 @@ export default function PlansPage() {
     },
     {
       key: 'description' as keyof PaymentTransaction,
-      label: 'Description',
+      label: 'Descripción',
       sortable: false,
       render: (value: string) => (
         <div className="text-sm text-gray-600 max-w-xs truncate" title={value}>
@@ -524,9 +420,9 @@ export default function PlansPage() {
     },
     {
       key: 'createdAt' as keyof PaymentTransaction,
-      label: 'Date',
+      label: 'Fecha',
       sortable: true,
-      render: (value: string) => new Date(value).toLocaleDateString()
+      render: (value: string) => new Date(value).toLocaleDateString('es-PE')
     }
   ];
 
@@ -548,7 +444,7 @@ export default function PlansPage() {
       label: 'Precio (PEN)',
       sortable: true,
       render: (value: number) => (
-        <div className="font-medium text-green-600">S/ {value.toLocaleString()}</div>
+        <div className="font-medium text-green-600">S/ {value?.toLocaleString()}</div>
       )
     },
     {
@@ -556,7 +452,7 @@ export default function PlansPage() {
       label: 'Precio (USD)',
       sortable: true,
       render: (value: number) => (
-        <div className="font-medium text-blue-600">${value.toLocaleString()}</div>
+        <div className="font-medium text-blue-600">${value?.toLocaleString()}</div>
       )
     },
     {
@@ -627,7 +523,7 @@ export default function PlansPage() {
   // Actions
   const subscriptionActions = [
     {
-      label: 'View Details',
+      label: 'Ver Detalles',
       onClick: handleViewSubscription,
       variant: 'primary' as const
     }
@@ -635,14 +531,14 @@ export default function PlansPage() {
 
   const transactionActions = [
     {
-      label: 'View Details',
+      label: 'Ver Detalles',
       onClick: handleViewTransaction,
       variant: 'primary' as const
     },
     ...(canRefund ? [{
-      label: 'Refund',
+      label: 'Reembolsar',
       onClick: (transaction: PaymentTransaction) => {
-        const reason = prompt('Enter refund reason:');
+        const reason = prompt('Ingrese el motivo del reembolso:');
         if (reason) handleRefundTransaction(transaction, reason);
       },
       variant: 'danger' as const,
@@ -654,21 +550,27 @@ export default function PlansPage() {
   const filterOptions = [
     {
       key: 'status',
-      label: 'Status',
+      label: 'Estado',
       type: 'select' as const,
       options: [
-        { value: 'all', label: 'All Status' },
-        { value: 'ACTIVE', label: 'Active' },
-        { value: 'INACTIVE', label: 'Inactive' },
-        { value: 'CANCELLED', label: 'Cancelled' },
-        { value: 'EXPIRED', label: 'Expired' },
-        { value: 'COMPLETED', label: 'Completed' },
-        { value: 'PENDING', label: 'Pending' },
-        { value: 'FAILED', label: 'Failed' },
-        { value: 'REFUNDED', label: 'Refunded' }
+        { value: 'all', label: 'Todos los estados' },
+        { value: 'ACTIVE', label: 'Activo' },
+        { value: 'INACTIVE', label: 'Inactivo' },
+        { value: 'CANCELLED', label: 'Cancelado' },
+        { value: 'EXPIRED', label: 'Expirado' },
+        { value: 'COMPLETED', label: 'Completado' },
+        { value: 'PENDING', label: 'Pendiente' },
+        { value: 'FAILED', label: 'Fallido' },
+        { value: 'REFUNDED', label: 'Reembolsado' }
       ]
     }
   ];
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setStatusFilter('all');
+    setCurrentPage(1);
+  };
 
   const handleFilterChange = (filters: Record<string, any>) => {
     if (filters.status !== undefined) {
@@ -677,69 +579,98 @@ export default function PlansPage() {
     setCurrentPage(1);
   };
 
-  const handleClearFilters = () => {
-    setSearchQuery('');
-    setStatusFilter('all');
-    setCurrentPage(1);
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Plans & Monetization</h2>
-          <p className="text-gray-600">Manage subscriptions, payments, and revenue</p>
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Planes y Monetización</h2>
+          <p className="text-gray-500 text-sm">Gestión de suscripciones, pagos y análisis de ingresos en tiempo real</p>
         </div>
-        <button
-          onClick={handleRefreshData}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          disabled={statsLoading}
-        >
-          {statsLoading ? 'Actualizando...' : '🔄 Refrescar Datos'}
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={handleRefreshData}
+            className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-all flex items-center gap-2 text-sm font-semibold shadow-sm active:scale-95"
+            disabled={statsLoading}
+          >
+            <RefreshCw className={`w-4 h-4 text-blue-500 ${statsLoading ? 'animate-spin' : ''}`} />
+            {statsLoading ? 'Sincronizando...' : 'Refrescar Datos'}
+          </button>
+        </div>
       </div>
 
       {/* Finance Stats Cards */}
       {financeStats && (
-        <div className="grid grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-2xl font-bold text-green-600">
-                ${(financeStats.totalRevenue ?? 0).toLocaleString()}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="border-none shadow-sm bg-gradient-to-br from-green-500/10 to-emerald-500/5">
+            <CardContent className="p-5 flex flex-col justify-between h-full">
+              <div className="flex justify-between items-start">
+                <div className="p-2 bg-green-500 text-white rounded-lg shadow-sm shadow-green-200">
+                  <DollarSign className="w-5 h-5" />
+                </div>
+                <div className="text-[10px] font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full uppercase">Ingresos</div>
               </div>
-              <div className="text-sm text-gray-500">Ingresos Totales</div>
-              <div className="text-xs text-green-600">
-                +${(financeStats.revenueToday ?? 0).toLocaleString()} hoy
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-2xl font-bold text-blue-600">{financeStats.totalSubscriptions ?? 0}</div>
-              <div className="text-sm text-gray-500">Suscripciones Totales</div>
-              <div className="text-xs text-blue-600">
-                {financeStats.activeSubscriptions ?? 0} activas
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-2xl font-bold text-purple-600">{financeStats.totalTransactions ?? 0}</div>
-              <div className="text-sm text-gray-500">Transacciones Totales</div>
-              <div className="text-xs text-purple-600">
-                {financeStats.transactionsToday ?? 0} hoy
+              <div className="mt-4">
+                <div className="text-2xl font-black text-gray-900">
+                  S/ {(financeStats.totalRevenue ?? 0).toLocaleString()}
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp className="w-3 h-3 text-green-500" />
+                  <span className="text-xs text-green-600 font-medium">+S/ {(financeStats.revenueToday ?? 0).toLocaleString()} hoy</span>
+                </div>
               </div>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="text-2xl font-bold text-orange-600">
-                ${(financeStats.averageTransactionValue ?? 0).toLocaleString()}
+
+          <Card className="border-none shadow-sm bg-gradient-to-br from-blue-500/10 to-indigo-500/5">
+            <CardContent className="p-5 flex flex-col justify-between h-full">
+              <div className="flex justify-between items-start">
+                <div className="p-2 bg-blue-500 text-white rounded-lg shadow-sm shadow-blue-200">
+                  <CreditCard className="w-5 h-5" />
+                </div>
+                <div className="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full uppercase">Suscripciones</div>
               </div>
-              <div className="text-sm text-gray-500">Transacción Promedio</div>
-              <div className="text-xs text-red-600">
-                ${(financeStats.refundsTotal ?? 0).toLocaleString()} reembolsado
+              <div className="mt-4">
+                <div className="text-2xl font-black text-gray-900">{financeStats.totalSubscriptions ?? 0}</div>
+                <div className="flex items-center gap-1 mt-1 text-xs text-blue-600 font-medium">
+                  {financeStats.activeSubscriptions ?? 0} activas actualmente
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-sm bg-gradient-to-br from-purple-500/10 to-fuchsia-500/5">
+            <CardContent className="p-5 flex flex-col justify-between h-full">
+              <div className="flex justify-between items-start">
+                <div className="p-2 bg-purple-500 text-white rounded-lg shadow-sm shadow-purple-200">
+                  <TrendingUp className="w-5 h-5" />
+                </div>
+                <div className="text-[10px] font-bold text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full uppercase">Transacciones</div>
+              </div>
+              <div className="mt-4">
+                <div className="text-2xl font-black text-gray-900">{financeStats.totalTransactions ?? 0}</div>
+                <div className="flex items-center gap-1 mt-1 text-xs text-purple-600 font-medium">
+                  {financeStats.transactionsToday ?? 0} transacciones registradas hoy
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-sm bg-gradient-to-br from-orange-500/10 to-amber-500/5">
+            <CardContent className="p-5 flex flex-col justify-between h-full">
+              <div className="flex justify-between items-start">
+                <div className="p-2 bg-orange-500 text-white rounded-lg shadow-sm shadow-orange-200">
+                  <RefreshCw className="w-5 h-5" />
+                </div>
+                <div className="text-[10px] font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full uppercase">Promedio</div>
+              </div>
+              <div className="mt-4">
+                <div className="text-2xl font-black text-gray-900">
+                  S/ {(financeStats.averageTransactionValue ?? 0).toLocaleString()}
+                </div>
+                <div className="flex items-center gap-1 mt-1 text-xs text-red-600 font-medium">
+                  S/ {(financeStats.refundsTotal ?? 0).toLocaleString()} en reembolsos
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -773,46 +704,96 @@ export default function PlansPage() {
       {/* Tab Content */}
       {activeTab === 'overview' && (
         <div className="space-y-6">
-          {/* Revenue Chart Placeholder */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Resumen de Ingresos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 flex items-center justify-center text-gray-500">
-                Gráfico de ingresos se mostraría aquí
+          {/* Revenue Chart */}
+          <Card className="border-none shadow-sm overflow-hidden">
+            <CardHeader className="border-b border-gray-50 bg-white py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg font-bold text-gray-800">Historial de Ingresos</CardTitle>
+                  <p className="text-xs text-gray-500">Visualización de ventas de planes por mes</p>
+                </div>
               </div>
+            </CardHeader>
+            <CardContent className="p-6 bg-white">
+              <RevenueChart />
             </CardContent>
           </Card>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Distribución de Suscripciones</CardTitle>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="border-none shadow-sm bg-white">
+              <CardHeader className="border-b border-gray-50 py-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                    <CreditCard className="w-5 h-5" />
+                  </div>
+                  <CardTitle className="text-md font-bold text-gray-800">Distribución de Suscripciones</CardTitle>
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {Array.isArray(plans) && plans?.map((plan) => (
-                    <div key={plan.id} className="flex justify-between items-center">
-                      <span className="text-sm">{plan.displayName}</span>
-                      <span className="text-sm font-medium">{plan.priceInPen} PEN</span>
+              <CardContent className="p-4">
+                <div className="space-y-3">
+                  {Array.isArray(plans) && plans?.length > 0 ? (
+                    plans.slice(0, 5).map((plan) => (
+                      <div key={plan.id} className="flex justify-between items-center p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-10 rounded-full ${
+                            plan.displayName.includes('Pro') ? 'bg-purple-500' :
+                            plan.displayName.includes('Empresarial') ? 'bg-orange-500' : 'bg-blue-500'
+                          }`} />
+                          <div>
+                            <span className="text-sm font-semibold text-gray-700 block">{plan.displayName}</span>
+                            <span className="text-xs text-gray-500">{plan.isActive ? 'Activo' : 'Inactivo'}</span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-sm font-bold text-gray-900 block">S/ {plan.priceInPen?.toLocaleString()}</span>
+                          <span className="text-[10px] text-gray-400 uppercase tracking-wider">{plan.billingCycle}</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-gray-400">
+                      <CreditCard className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                      <p className="text-sm">No hay planes activos</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
+            <Card className="border-none shadow-sm bg-white">
+              <CardHeader className="border-b border-gray-50 py-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-teal-50 rounded-lg text-teal-600">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <CardTitle className="text-md font-bold text-gray-800">Actividad Reciente</CardTitle>
+                </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div>Today's Revenue: ${financeStats?.revenueToday.toLocaleString()}</div>
-                  <div>This Week: ${financeStats?.revenueThisWeek.toLocaleString()}</div>
-                  <div>This Month: ${financeStats?.revenueThisMonth.toLocaleString()}</div>
-                  <div>New Subscriptions Today: {financeStats?.newSubscriptionsToday}</div>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100/50">
+                    <p className="text-[10px] font-bold text-green-600 uppercase tracking-widest mb-1">Hoy</p>
+                    <p className="text-xl font-black text-green-800">S/ {(financeStats?.revenueToday ?? 0).toLocaleString()}</p>
+                    <p className="text-[10px] text-green-600/70 mt-1 flex items-center gap-1">
+                      Data actualizada hace un momento
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100/50">
+                    <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">Semana</p>
+                    <p className="text-xl font-black text-blue-800">S/ {(financeStats?.revenueThisWeek ?? 0).toLocaleString()}</p>
+                    <p className="text-[10px] text-blue-600/70 mt-1">7 días transcurridos</p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-50 to-fuchsia-50 border border-purple-100/50">
+                    <p className="text-[10px] font-bold text-purple-600 uppercase tracking-widest mb-1">Mes</p>
+                    <p className="text-xl font-black text-purple-800">S/ {(financeStats?.revenueThisMonth ?? 0).toLocaleString()}</p>
+                    <p className="text-[10px] text-purple-600/70 mt-1">Acumulado mensual</p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-100/50">
+                    <p className="text-[10px] font-bold text-teal-600 uppercase tracking-widest mb-1">Nuevos</p>
+                    <p className="text-xl font-black text-teal-800">{financeStats?.newSubscriptionsToday ?? 0}</p>
+                    <p className="text-[10px] text-teal-600/70 mt-1">Suscripciones hoy</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -822,83 +803,93 @@ export default function PlansPage() {
 
       {activeTab === 'subscriptions' && (
         <div className="space-y-6">
-          <AdminFilters
-            searchPlaceholder="Search by user ID or plan..."
-            onSearchChange={setSearchQuery}
-            onFilterChange={handleFilterChange}
-            filters={filterOptions}
+          <AdminPlansFilters
+            placeholder="Buscar por ID de usuario o plan..."
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
             onClear={handleClearFilters}
+            options={[
+              { value: 'all', label: 'Todos los estados' },
+              { value: 'ACTIVE', label: 'Activo' },
+              { value: 'INACTIVE', label: 'Inactivo' },
+              { value: 'CANCELLED', label: 'Cancelado' },
+              { value: 'EXPIRED', label: 'Expirado' }
+            ]}
           />
 
-          <AdminTable
-            data={subscriptionsData?.content || []}
-            columns={subscriptionColumns}
-            loading={subscriptionsLoading}
-            actions={subscriptionActions}
-            selection={{
-              selectedItems: selectedSubscriptions,
-              onSelectionChange: setSelectedSubscriptions,
-              getRowId: (subscription) => subscription.id
-            }}
-            pagination={
-              subscriptionsData && {
-                page: currentPage,
-                size: pageSize,
-                total: subscriptionsData.totalElements,
-                onPageChange: setCurrentPage,
-                onSizeChange: setPageSize
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <AdminTable
+              data={subscriptionsData?.content || []}
+              columns={subscriptionColumns}
+              loading={subscriptionsLoading}
+              actions={subscriptionActions}
+              pagination={
+                subscriptionsData && {
+                  page: currentPage,
+                  size: pageSize,
+                  total: subscriptionsData.totalElements,
+                  onPageChange: setCurrentPage,
+                  onSizeChange: setPageSize
+                }
               }
-            }
-            emptyState={{
-              title: 'No subscriptions found',
-              description: 'Try adjusting your search or filter criteria.',
-              action: {
-                label: 'Clear Filters',
-                onClick: handleClearFilters
-              }
-            }}
-          />
+              emptyState={{
+                title: 'No se encontraron suscripciones',
+                description: 'Asegúrate de que existan registros en el backend para los filtros seleccionados.',
+                action: {
+                  label: 'Ver todas las suscripciones',
+                  onClick: handleClearFilters
+                }
+              }}
+            />
+          </div>
         </div>
       )}
 
       {activeTab === 'transactions' && (
         <div className="space-y-6">
-          <AdminFilters
-            searchPlaceholder="Search by transaction ID or user..."
-            onSearchChange={setSearchQuery}
-            onFilterChange={handleFilterChange}
-            filters={filterOptions}
+          <AdminPlansFilters
+            placeholder="Buscar por ID de transacción o usuario..."
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
             onClear={handleClearFilters}
+            options={[
+              { value: 'all', label: 'Todos los estados' },
+              { value: 'COMPLETED', label: 'Completado' },
+              { value: 'PENDING', label: 'Pendiente' },
+              { value: 'FAILED', label: 'Fallido' },
+              { value: 'REFUNDED', label: 'Reembolsado' }
+            ]}
           />
 
-          <AdminTable
-            data={transactionsData?.content || []}
-            columns={transactionColumns}
-            loading={transactionsLoading}
-            actions={transactionActions}
-            selection={{
-              selectedItems: selectedTransactions,
-              onSelectionChange: setSelectedTransactions,
-              getRowId: (transaction) => transaction.id
-            }}
-            pagination={
-              transactionsData && {
-                page: currentPage,
-                size: pageSize,
-                total: transactionsData.totalElements,
-                onPageChange: setCurrentPage,
-                onSizeChange: setPageSize
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <AdminTable
+              data={transactionsData?.content || []}
+              columns={transactionColumns}
+              loading={transactionsLoading}
+              actions={transactionActions}
+              pagination={
+                transactionsData && {
+                  page: currentPage,
+                  size: pageSize,
+                  total: transactionsData.totalElements,
+                  onPageChange: setCurrentPage,
+                  onSizeChange: setPageSize
+                }
               }
-            }
-            emptyState={{
-              title: 'No transactions found',
-              description: 'Try adjusting your search or filter criteria.',
-              action: {
-                label: 'Clear Filters',
-                onClick: handleClearFilters
-              }
-            }}
-          />
+              emptyState={{
+                title: 'No se encontraron transacciones',
+                description: 'Asegúrate de que existan transacciones registradas en el sistema.',
+                action: {
+                  label: 'Ver todas las transacciones',
+                  onClick: handleClearFilters
+                }
+              }}
+            />
+          </div>
         </div>
       )}
 
@@ -914,407 +905,76 @@ export default function PlansPage() {
               <div className="text-gray-400">No hay planes de suscripción disponibles.</div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {plans.slice(0, 4).map((plan: any) => {
-                console.log('Rendering plan card for:', plan);
-                return (
-                  <PlanCard 
-                    key={plan.id} 
-                    plan={plan} 
-                    onEdit={() => handleEditPlan(plan)}
-                    onManageDiscounts={() => handleManageDiscounts(plan)}
-                    onToggle={() => handleTogglePlan(plan.id)}
-                  />
-                );
-              })}
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {plans.map((plan: any) => (
+              <PlanCard 
+                key={plan.id} 
+                plan={plan} 
+                onEdit={() => handleEditPlan(plan)}
+                onManageDiscounts={() => handleManageDiscounts(plan)}
+                onToggle={() => handleTogglePlan(plan.id)}
+              />
+            ))}
+          </div>
           )}
         </div>
       )}
 
       {/* Edit Plan Modal */}
       {isEditPlanModalOpen && selectedPlan && (
-        <Modal isOpen={isEditPlanModalOpen} onClose={() => setIsEditPlanModalOpen(false)}>
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">Editar Plan: {selectedPlan.displayName}</h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre para Mostrar</label>
-                <input
-                  type="text"
-                  value={editForm.displayName || ''}
-                  onChange={(e) => setEditForm({...editForm, displayName: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                <textarea
-                  value={editForm.description || ''}
-                  onChange={(e) => setEditForm({...editForm, description: e.target.value})}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Precio (PEN)</label>
-                  <input
-                    type="number"
-                    value={editForm.priceInPen || ''}
-                    onChange={(e) => setEditForm({...editForm, priceInPen: parseFloat(e.target.value)})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Precio (USD)</label>
-                  <input
-                    type="number"
-                    value={editForm.priceInUsd || ''}
-                    onChange={(e) => setEditForm({...editForm, priceInUsd: parseFloat(e.target.value)})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Duración (Días)</label>
-                  <input
-                    type="number"
-                    value={editForm.durationDays || ''}
-                    onChange={(e) => setEditForm({...editForm, durationDays: parseInt(e.target.value)})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Límite de Publicaciones</label>
-                  <input
-                    type="number"
-                    value={editForm.publicationsLimit || ''}
-                    onChange={(e) => setEditForm({...editForm, publicationsLimit: parseInt(e.target.value)})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Límite de Fotos</label>
-                  <input
-                    type="number"
-                    value={editForm.photosLimit || ''}
-                    onChange={(e) => setEditForm({...editForm, photosLimit: parseInt(e.target.value)})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={editForm.isActive || false}
-                    onChange={(e) => setEditForm({...editForm, isActive: e.target.checked})}
-                    className="mr-2"
-                  />
-                  <span className="text-sm text-gray-700">Activo</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={editForm.isFeatured || false}
-                    onChange={(e) => setEditForm({...editForm, isFeatured: e.target.checked})}
-                    className="mr-2"
-                  />
-                  <span className="text-sm text-gray-700">Destacado</span>
-                </label>
-              </div>
-            </div>
-            
-            <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-              <Button variant="outline" onClick={() => setIsEditPlanModalOpen(false)}>
-                Cancelar
-              </Button>
-              <Button 
-                onClick={handleSavePlan}
-                disabled={updatePlanMutation.isPending}
-              >
-                {updatePlanMutation.isPending ? 'Guardando...' : 'Guardar'}
-              </Button>
-            </div>
-          </div>
-        </Modal>
+        <EditPlanModal
+          isOpen={isEditPlanModalOpen}
+          onClose={() => setIsEditPlanModalOpen(false)}
+          selectedPlan={selectedPlan}
+          editForm={editForm}
+          setEditForm={setEditForm}
+          onSave={handleSavePlan}
+          isPending={updatePlanMutation.isPending}
+        />
       )}
 
-      {/* Agency Discount Modal */}
+      {/* Discount Modal */}
       {isDiscountModalOpen && discountPlan && (
-        <Modal isOpen={isDiscountModalOpen} onClose={() => setIsDiscountModalOpen(false)}>
-          <div className="bg-white rounded-lg p-6 max-w-lg w-full">
-            <h3 className="text-lg font-semibold mb-4">
-              Apply Discount: {discountPlan.displayName}
-            </h3>
-            
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    RUC Inmobiliaria
-                  </label>
-                  <input
-                    type="text"
-                    value={agencyRuc}
-                    onChange={(e) => setAgencyRuc(e.target.value)}
-                    placeholder="Enter RUC (e.g., 20123456789)"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    O DNI Agente
-                  </label>
-                  <input
-                    type="text"
-                    value={agentDni}
-                    onChange={(e) => setAgentDni(e.target.value)}
-                    placeholder="Enter DNI (e.g., 12345678)"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-              
-              {/* Search Button */}
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={handleSearchAgency}
-                  disabled={isSearching || (!agencyRuc && !agentDni)}
-                  className="flex-1"
-                >
-                  {isSearching ? 'Searching...' : 'Buscar'}
-                </Button>
-              </div>
-              
-              {/* Search Result */}
-              {searchResult && (
-                <div className="bg-green-50 p-3 rounded-md border border-green-200">
-                  <p className="text-sm text-green-800">
-                    <strong>Encontrado:</strong> {searchResult.name}
-                  </p>
-                  <p className="text-xs text-green-600">
-                    ID: {searchResult.id} | Tipo: {searchResult.type}
-                  </p>
-                </div>
-              )}
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Custom Price (PEN) - Optional
-                  </label>
-                  <input
-                    type="number"
-                    value={customPrice}
-                    onChange={(e) => setCustomPrice(e.target.value)}
-                    placeholder="e.g., 299"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Discount % - Optional
-                  </label>
-                  <input
-                    type="number"
-                    value={discountPercentage}
-                    onChange={(e) => setDiscountPercentage(e.target.value)}
-                    placeholder="e.g., 20"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                <textarea
-                  value={discountNotes}
-                  onChange={(e) => setDiscountNotes(e.target.value)}
-                  placeholder="Reason for discount..."
-                  rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div className="bg-blue-50 p-3 rounded-md">
-                <p className="text-sm text-blue-800">
-                  <strong>Current Price:</strong> S/ {discountPlan.priceInPen}
-                </p>
-                {customPrice && (
-                  <p className="text-sm text-green-700 mt-1">
-                    <strong>New Price:</strong> S/ {customPrice}
-                  </p>
-                )}
-                {discountPercentage && !customPrice && (
-                  <p className="text-sm text-green-700 mt-1">
-                    <strong>With {discountPercentage}% off:</strong> S/ {(discountPlan.priceInPen * (1 - parseFloat(discountPercentage)/100)).toFixed(2)}
-                  </p>
-                )}
-              </div>
-            </div>
-            
-            <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-              <Button variant="outline" onClick={() => setIsDiscountModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleCreateDiscount}
-                disabled={createDiscountMutation.isPending || !agencyId}
-              >
-                {createDiscountMutation.isPending ? 'Applying...' : 'Apply Discount'}
-              </Button>
-            </div>
-          </div>
-        </Modal>
+        <DiscountModal
+          isOpen={isDiscountModalOpen}
+          onClose={() => setIsDiscountModalOpen(false)}
+          discountPlan={discountPlan}
+          agencyRuc={agencyRuc}
+          setAgencyRuc={setAgencyRuc}
+          agentDni={agentDni}
+          setAgentDni={setAgentDni}
+          isSearching={isSearching}
+          onSearch={handleSearchAgency}
+          searchResult={searchResult}
+          customPrice={customPrice}
+          setCustomPrice={setCustomPrice}
+          discountPercentage={discountPercentage}
+          setDiscountPercentage={setDiscountPercentage}
+          discountNotes={discountNotes}
+          setDiscountNotes={setDiscountNotes}
+          onCreateDiscount={handleCreateDiscount}
+          isPending={createDiscountMutation.isPending}
+        />
       )}
 
       {/* Transaction Details Modal */}
       {selectedTransaction && (
-        <Modal isOpen={isTransactionModalOpen} onClose={() => setIsTransactionModalOpen(false)}>
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-4">Transaction Details</h3>
-            
-            <div className="space-y-4">
-              <div>
-                <strong>Transaction ID:</strong> #{selectedTransaction.id}
-              </div>
-              <div>
-                <strong>User ID:</strong> {selectedTransaction.userId}
-              </div>
-              <div>
-                <strong>Amount:</strong> {selectedTransaction.currency} {selectedTransaction.amount.toLocaleString()}
-              </div>
-              <div>
-                <strong>Payment Method:</strong> {selectedTransaction.paymentMethod}
-              </div>
-              <div>
-                <strong>Status:</strong> 
-                <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                  selectedTransaction.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                  selectedTransaction.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                  selectedTransaction.status === 'FAILED' ? 'bg-red-100 text-red-800' :
-                  selectedTransaction.status === 'REFUNDED' ? 'bg-orange-100 text-orange-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {selectedTransaction.status}
-                </span>
-              </div>
-              <div>
-                <strong>Description:</strong> {selectedTransaction.description}
-              </div>
-              <div>
-                <strong>Date:</strong> {new Date(selectedTransaction.createdAt).toLocaleString()}
-              </div>
-              {selectedTransaction.paymentId && (
-                <div>
-                  <strong>Payment ID:</strong> {selectedTransaction.paymentId}
-                </div>
-              )}
-            </div>
-            
-            <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-              <Button variant="outline" onClick={() => setIsTransactionModalOpen(false)}>
-                Close
-              </Button>
-              {canRefund && selectedTransaction.status === 'COMPLETED' && (
-                <Button 
-                  variant="danger"
-                  onClick={() => {
-                    const reason = prompt('Enter refund reason:');
-                    if (reason) {
-                      handleRefundTransaction(selectedTransaction, reason);
-                      setIsTransactionModalOpen(false);
-                    }
-                  }}
-                >
-                  Refund
-                </Button>
-              )}
-            </div>
-          </div>
-        </Modal>
+        <TransactionDetailsModal
+          isOpen={isTransactionModalOpen}
+          onClose={() => setIsTransactionModalOpen(false)}
+          transaction={selectedTransaction}
+          canRefund={canRefund}
+          onRefund={handleRefundTransaction}
+        />
       )}
 
       {/* Subscription Details Modal */}
       {selectedSubscription && (
-        <Modal isOpen={isSubscriptionModalOpen} onClose={() => setIsSubscriptionModalOpen(false)}>
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-4">Subscription Details</h3>
-            
-            <div className="space-y-4">
-              <div>
-                <strong>Subscription ID:</strong> #{selectedSubscription.id}
-              </div>
-              <div>
-                <strong>User ID:</strong> {selectedSubscription.userId}
-              </div>
-              <div>
-                <strong>Plan:</strong> 
-                <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                  selectedSubscription.tier === 'FREE' ? 'bg-gray-100 text-gray-800' :
-                  selectedSubscription.tier === 'BASIC' ? 'bg-blue-100 text-blue-800' :
-                  selectedSubscription.tier === 'PREMIUM' ? 'bg-purple-100 text-purple-800' :
-                  selectedSubscription.tier === 'ENTERPRISE' ? 'bg-orange-100 text-orange-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {selectedSubscription.tier}
-                </span>
-              </div>
-              <div>
-                <strong>Status:</strong> 
-                <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                  selectedSubscription.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                  selectedSubscription.status === 'INACTIVE' ? 'bg-gray-100 text-gray-800' :
-                  selectedSubscription.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
-                  selectedSubscription.status === 'EXPIRED' ? 'bg-orange-100 text-orange-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {selectedSubscription.status}
-                </span>
-              </div>
-              <div>
-                <strong>Price:</strong> {selectedSubscription.currency} {selectedSubscription.price.toLocaleString()}
-              </div>
-              <div>
-                <strong>Payment Method:</strong> {selectedSubscription.paymentMethod}
-              </div>
-              <div>
-                <strong>Auto Renew:</strong> 
-                <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                  selectedSubscription.autoRenew ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {selectedSubscription.autoRenew ? 'Enabled' : 'Disabled'}
-                </span>
-              </div>
-              <div>
-                <strong>Start Date:</strong> {new Date(selectedSubscription.startDate).toLocaleDateString()}
-              </div>
-              {selectedSubscription.endDate && (
-                <div>
-                  <strong>End Date:</strong> {new Date(selectedSubscription.endDate).toLocaleDateString()}
-                </div>
-              )}
-              <div>
-                <strong>Created:</strong> {new Date(selectedSubscription.createdAt).toLocaleDateString()}
-              </div>
-            </div>
-            
-            <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-              <Button variant="outline" onClick={() => setIsSubscriptionModalOpen(false)}>
-                Close
-              </Button>
-            </div>
-          </div>
-        </Modal>
+        <SubscriptionDetailsModal
+          isOpen={isSubscriptionModalOpen}
+          onClose={() => setIsSubscriptionModalOpen(false)}
+          subscription={selectedSubscription}
+        />
       )}
     </div>
   );
