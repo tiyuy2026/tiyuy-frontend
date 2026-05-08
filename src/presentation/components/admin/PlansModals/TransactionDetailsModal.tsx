@@ -116,8 +116,7 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
             </Button>
           )}
           <Button 
-            variant="outline" 
-            className="w-full py-3 rounded-2xl font-bold text-gray-400 border-none hover:bg-gray-50" 
+            className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-blue-100 transition-all active:scale-95" 
             onClick={onClose}
           >
             Cerrar Ventana

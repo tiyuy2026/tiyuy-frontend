@@ -126,7 +126,7 @@ export const EditPlanModal: React.FC<EditPlanModalProps> = ({
                   onChange={(e) => setEditForm({...editForm, isFeatured: e.target.checked})}
                   className="sr-only"
                 />
-                <div className={`w-10 h-6 rounded-full transition-colors ${editForm.isFeatured ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
+                <div className={`w-10 h-6 rounded-full transition-colors ${editForm.isFeatured ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
                 <div className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform ${editForm.isFeatured ? 'translate-x-4' : ''}`}></div>
               </div>
               <span className="text-xs font-black text-gray-700 uppercase tracking-wider">Destacado</span>
@@ -144,7 +144,7 @@ export const EditPlanModal: React.FC<EditPlanModalProps> = ({
           </Button>
           <Button 
             variant="outline" 
-            className="w-full py-3 rounded-2xl font-bold text-gray-400 border-none hover:bg-gray-50" 
+            className="w-full py-3 rounded-2xl font-bold text-gray-500 border border-gray-200 hover:bg-gray-50" 
             onClick={onClose}
           >
             Cancelar

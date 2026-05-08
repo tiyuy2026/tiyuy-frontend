@@ -104,7 +104,7 @@ export const SubscriptionDetailsModal: React.FC<SubscriptionDetailsModalProps> =
         
         <div className="flex flex-col gap-3 mt-8 pt-6 border-t border-gray-100">
           <Button 
-            className="w-full py-4 bg-gray-900 hover:bg-black text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-gray-100 transition-all active:scale-95" 
+            className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-blue-100 transition-all active:scale-95" 
             onClick={onClose}
           >
             Cerrar Detalles

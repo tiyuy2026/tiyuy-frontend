@@ -150,7 +150,7 @@ export const DiscountModal: React.FC<DiscountModalProps> = ({
           </Button>
           <Button 
             variant="outline" 
-            className="w-full py-3 rounded-2xl font-bold text-gray-400 border-none hover:bg-gray-50" 
+            className="w-full py-3 rounded-2xl font-bold text-gray-500 border border-gray-200 hover:bg-gray-50" 
             onClick={onClose}
           >
             Cerrar
