@@ -8,7 +8,6 @@ interface ProjectMultimediaStepProps {
   formData: any;
   onChange: (field: string, value: any) => void;
   projectId?: number;
-  // 🔍 FIX: Agregar archivos de unidades para subir en paso 5
   unitBlueprintFiles?: {[key: number]: File};
   groupBlueprintFiles?: {[key: number]: File};
 }
