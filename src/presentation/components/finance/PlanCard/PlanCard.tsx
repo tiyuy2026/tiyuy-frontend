@@ -1,6 +1,6 @@
 'use client';
 
-import { SubscriptionPlan } from '@/core/domain/entities/Wallet';
+import { SubscriptionPlan, BillingCycle } from '@/core/domain/entities/Wallet';
 
 interface PlanCardProps {
   plan: SubscriptionPlan;
@@ -13,9 +13,11 @@ interface PlanCardProps {
   canRenew?: boolean; //  NUEVO - si el plan puede renovarse
   isExpired?: boolean; //  NUEVO - si el plan esta vencido por tiempo
   isExhaustedByLimit?: boolean; //  NUEVO - si el plan esta agotado por limite
+  selectedBillingCycle?: BillingCycle; //  NUEVO - ciclo de facturacion seleccionado
+  onBillingCycleChange?: (cycle: BillingCycle) => void; //  NUEVO - callback para cambio de ciclo
 }
 
-export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive, discountPercentage, hasDiscount, canRenew, isExpired, isExhaustedByLimit }: PlanCardProps) {
+export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive, discountPercentage, hasDiscount, canRenew, isExpired, isExhaustedByLimit, selectedBillingCycle, onBillingCycleChange }: PlanCardProps) {
   // DEBUG: Logs para depurar props recibidas
   console.log(' DEBUG PlanCard:', {
     planName: plan.name,
@@ -40,10 +42,29 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
   const discountedPrice = calculateDiscountedPrice();
   const hasPriceDiscount = hasDiscount && discountPercentage && discountPercentage > 0;
 
+  // Calculate price for selected billing cycle
+  const getPriceForCycle = (cycle: BillingCycle): number => {
+    switch (cycle) {
+      case 'QUARTERLY':
+        return plan.priceQuarterly || (plan.price * 3 * 0.9); // 10% discount
+      case 'YEARLY':
+        return plan.priceYearly || (plan.price * 12 * 0.8); // 20% discount
+      default:
+        return plan.price;
+    }
+  };
+
+  const currentCycle = selectedBillingCycle || 'MONTHLY';
+  const currentPrice = getPriceForCycle(currentCycle);
+  const finalPrice = hasPriceDiscount ? currentPrice * (1 - discountPercentage / 100) : currentPrice;
+
   console.log(' DEBUG PlanCard cálculo:', {
     discountedPrice,
     hasPriceDiscount,
-    originalPrice: plan.price
+    originalPrice: plan.price,
+    currentCycle,
+    currentPrice,
+    finalPrice
   });
 
   return (
@@ -107,14 +128,68 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
         </div>
 
         <div className="text-center">
+          {/* Billing Cycle Selection */}
+          {!isActive && !isExhausted && !isExpired && plan.id !== 'FREE' && (
+            <div className="mb-4">
+              <div className="flex justify-center gap-2 mb-3">
+                <button
+                  onClick={() => onBillingCycleChange?.('MONTHLY')}
+                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                    currentCycle === 'MONTHLY'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  Mensual
+                </button>
+                <button
+                  onClick={() => onBillingCycleChange?.('QUARTERLY')}
+                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                    currentCycle === 'QUARTERLY'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  Trimestral
+                </button>
+                <button
+                  onClick={() => onBillingCycleChange?.('YEARLY')}
+                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                    currentCycle === 'YEARLY'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  Anual
+                </button>
+              </div>
+              
+              {/* Show discount badges for billing cycles */}
+              {currentCycle !== 'MONTHLY' && (
+                <div className="flex justify-center gap-2 mb-2">
+                  {currentCycle === 'QUARTERLY' && (
+                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                      10% OFF
+                    </span>
+                  )}
+                  {currentCycle === 'YEARLY' && (
+                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                      20% OFF
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Mostrar precio con descuento */}
           {hasPriceDiscount ? (
             <div className="mb-2">
               <div className="text-gray-400 line-through text-sm mb-1">
-                {formatPrice(plan.price, plan.currency)}
+                {formatPrice(currentPrice, plan.currency)}
               </div>
               <div className="text-4xl font-bold text-green-600">
-                {formatPrice(discountedPrice, plan.currency)}
+                {formatPrice(finalPrice, plan.currency)}
               </div>
               <div className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full inline-block mt-2">
                  {discountPercentage}% OFF
@@ -122,9 +197,19 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
             </div>
           ) : (
             <div className="text-4xl font-bold mb-2 text-gray-900">
-              {formatPrice(plan.price, plan.currency)}
+              {formatPrice(finalPrice, plan.currency)}
             </div>
           )}
+          
+          {/* Show billing cycle duration */}
+          {plan.id !== 'FREE' && (
+            <p className="text-sm mb-2 text-gray-500">
+              {currentCycle === 'MONTHLY' && '30 días'}
+              {currentCycle === 'QUARTERLY' && '90 días (3 meses)'}
+              {currentCycle === 'YEARLY' && '365 días (1 año)'}
+            </p>
+          )}
+          
           <p className="text-sm mb-6 text-gray-500">
             {plan.maxPublications} publicaciones
           </p>

@@ -7,7 +7,7 @@ import { useAvailablePlans, useSubscribeToPlan, useActiveSubscription, useAvaila
 import { useValidateDeveloperDiscountCode, useUseDeveloperDiscountCode } from '@/presentation/hooks/admin/useDevelopers';
 import { useMyProperties } from '@/presentation/hooks/useProperties';
 import { PlanCard } from '@/presentation/components/finance';
-import { SubscriptionPlan } from '@/core/domain/entities/Wallet';
+import { SubscriptionPlan, BillingCycle } from '@/core/domain/entities/Wallet';
 import { UpgradePlanModal } from '@/presentation/components/modals/UpgradePlanModal';
 import { authStorage } from '@/infrastructure/storage/auth-storage';
 
@@ -20,6 +20,7 @@ export default function PlansPage() {
   const subscribeMutation = useSubscribeToPlan();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [discountCode, setDiscountCode] = useState('');
+  const [selectedBillingCycles, setSelectedBillingCycles] = useState<Record<string, BillingCycle>>({});
   
   // Hooks para descuentos manuales
   const validateDiscountMutation = useValidateDeveloperDiscountCode();
@@ -266,6 +267,14 @@ export default function PlansPage() {
   const publishedCount = (propertiesData?.properties || []).filter(
     (p: any) => p.status === 'PUBLISHED'
   ).length;
+
+  // Handle billing cycle change for a plan
+  const handleBillingCycleChange = (planId: string, cycle: BillingCycle) => {
+    setSelectedBillingCycles(prev => ({
+      ...prev,
+      [planId]: cycle
+    }));
+  };
 
   useEffect(() => {
     refetchSubscription();
@@ -607,6 +616,8 @@ export default function PlansPage() {
                     canRenew={canRenewPlan(plan)}
                     discountPercentage={finalDiscountPercentage}
                     hasDiscount={hasAnyDiscount}
+                    selectedBillingCycle={selectedBillingCycles[plan.id] || 'MONTHLY'}
+                    onBillingCycleChange={(cycle) => handleBillingCycleChange(plan.id, cycle)}
                   />
                 );
               })
