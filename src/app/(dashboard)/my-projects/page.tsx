@@ -273,9 +273,15 @@ export default function MyProjectsPage() {
                   <div className="aspect-video bg-gray-100 relative">
                     {project.coverImageUrl ? (
                       <img
-                        src={project.coverImageUrl}
+                        src={`/api/images/proxy?url=${encodeURIComponent(project.coverImageUrl)}`}
                         alt={project.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('Error loading project image:', project.coverImageUrl);
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
+                          e.currentTarget.parentElement!.innerHTML = '<div class="w-12 h-12 bg-gray-300 rounded"></div>';
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
@@ -344,7 +350,7 @@ export default function MyProjectsPage() {
                           Ver
                         </Link>
                         <Link
-                          href={`/my-projects/${project.id}/edit`}
+                          href={`/dashboard/projects/${project.id}/edit`}
                           className="flex-1 text-center px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
                         >
                           Editar

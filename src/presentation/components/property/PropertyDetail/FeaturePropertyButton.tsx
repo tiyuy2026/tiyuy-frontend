@@ -55,7 +55,7 @@ export function FeaturePropertyButton({
       const propertyRepo = new PropertyRepository();
       await propertyRepo.featureProperty(propertyId);
       
-      toast.success('✅ ¡Propiedad destacada correctamente!');
+      toast.success(' ¡Propiedad destacada correctamente!');
       
       // Recargar la página para mostrar el cambio
       setTimeout(() => {

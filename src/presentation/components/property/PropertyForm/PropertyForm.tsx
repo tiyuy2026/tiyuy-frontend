@@ -12,6 +12,7 @@ import { BasicInfoStep } from './BasicInfoStep';
 import { LocationStep } from './LocationStep';
 import { CharacteristicsStep } from './CharacteristicsStep';
 import { ProjectMultimediaStep } from './ProjectMultimediaStep';
+import { ProjectMultimediaStep as ProjectMediaStep } from '@/presentation/components/project/ProjectMultimediaStep';
 import { ProjectInfoStep } from './ProjectInfoStep';
 import { ProjectUnitsStep } from './ProjectUnitsStep';
 import { ProjectTimelineStep } from './ProjectTimelineStep';
@@ -43,7 +44,7 @@ const PROJECT_STEPS = [
   { number: 5, title: 'Multimedia', description: 'Planos y renders' },
 ];
 
-const StepComponents: Record<number, React.ComponentType<any>> = {
+const PropertyStepComponents: Record<number, React.ComponentType<any>> = {
   1: BasicInfoStep,
   2: LocationStep,
   3: CharacteristicsStep,
@@ -55,7 +56,7 @@ const ProjectStepComponents: Record<number, React.ComponentType<any>> = {
   2: LocationStep,
   3: ProjectUnitsStep,
   4: ProjectTimelineStep,
-  5: ProjectMultimediaStep,
+  5: ProjectMediaStep,
 };
 
 export function PropertyForm({ property, mode, onStepChange, formType = 'property' }: PropertyFormProps) {
@@ -132,6 +133,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       images: (property && 'images' in property) ? property.images : [],
       blueprints: (property && 'blueprints' in property) ? property.blueprints : [],
       renders: (property && 'renders' in property) ? property.renders : [],
+      coverImageUrl: (property && 'coverImageUrl' in property) ? (property as any).coverImageUrl : '',
     } : {})
   });
 
@@ -142,7 +144,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
 
   // Determine steps and components according to type
   const currentSteps = formType === 'project' ? PROJECT_STEPS : STEPS;
-  const currentStepComponents = formType === 'project' ? ProjectStepComponents : StepComponents;
+  const currentStepComponents = formType === 'project' ? ProjectStepComponents : PropertyStepComponents;
   const totalSteps = currentSteps.length;
 
   const goToStep = (step: number) => {
@@ -356,62 +358,15 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
   // Function to prepare data for projects according to backend
   const prepareProjectData = (data: any) => {
     console.log(' prepareProjectData - All form data:', data);
+    console.log('🔍 DEBUG - coverImageUrl in form data:', data.coverImageUrl);
+    console.log('🔍 DEBUG - images count:', data.images?.length);
     
-    // Detailed logging for each step
-    console.log(' Step 1 - Basic information:', {
+    const projectData = {
+      // Step 1: Basic Information
       name: data.name || data.projectName || '',
       description: data.description || '',
       phase: data.phase || 'PRE_SALE',
       type: data.projectType || 'RESIDENTIAL',
-      mainAmenities: data.amenities || [] //  NEW: Main amenities from step 1 (comes as 'amenities' from frontend)
-    });
-    
-    console.log(' Step 2 - Location:', {
-      address: data.address || data.fullAddress || '',
-      district: data.district || '',
-      province: data.province || '',
-      region: data.region || '',
-      latitude: data.latitude,
-      longitude: data.longitude,
-      urbanization: data.urbanization || '',
-      street: data.street || '',
-      streetNumber: data.streetNumber || '',
-      fullAddress: data.fullAddress || '',
-      showExactAddress: data.showExactAddress
-    });
-    
-    console.log(' Step 3 - Commercial and Units:', {
-      totalUnits: data.totalUnits,
-      availableUnits: data.availableUnits,
-      priceFrom: data.priceFrom,
-      priceTo: data.priceTo,
-      currency: data.currency,
-      areaFrom: data.areaFrom,
-      areaTo: data.areaTo,
-      units: data.units || [],
-      amenities: data.amenities || []
-    });
-    
-    console.log(' Step 4 - Timeline:', {
-      timeline: data.timeline || []
-    });
-    
-    console.log(' Step 5 - Multimedia (will be uploaded separately):', {
-      images: data.images || [],
-      blueprints: data.blueprints || [],
-      renders: data.renders || []
-    });
-    
-    // NOW send all fields that the backend accepts
-    const projectData = {
-      // Step 1: Basic information
-      name: data.name || data.projectName || '',
-      description: data.description || '',
-      phase: data.phase || 'PRE_SALE',
-      type: data.projectType || 'RESIDENTIAL', //  Use projectType instead of type
-      
-      // NEW: Main amenities (checkboxes from step 1)
-      mainAmenities: data.amenities || [], //  NEW: Main amenities from step 1 (comes as 'amenities' from frontend)
       
       // Step 2: Location
       address: data.fullAddress || '',
@@ -420,8 +375,6 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       region: data.region || '',
       latitude: data.latitude ? Number(data.latitude) : undefined,
       longitude: data.longitude ? Number(data.longitude) : undefined,
-      
-      // NEW: Additional address fields (from step 2)
       urbanization: data.urbanization || '',
       street: data.street || '',
       streetNumber: data.streetNumber || '',
@@ -429,7 +382,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       showExactAddress: data.showExactAddress !== undefined ? data.showExactAddress : true,
       
       // Step 3: Commercial information
-      totalUnits: Number(data.totalUnits) > 0 ? Number(data.totalUnits) : 1, // Default to 1 if 0 or invalid
+      totalUnits: Number(data.totalUnits) > 0 ? Number(data.totalUnits) : 1,
       availableUnits: Number(data.availableUnits) || Number(data.totalUnits) || 0,
       priceFrom: Number(data.priceFrom) || 0,
       priceTo: Number(data.priceTo) || 0,
@@ -452,17 +405,16 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
         price: unit.price || 150000,
         status: unit.status || 'AVAILABLE',
         view: unit.view || '',
-        // FIX: Add unit images
-        image: unit.image || '',           // Unit image
-        blueprintImage: unit.blueprintImage || ''  // Unit blueprint
+        image: unit.image || '',
+        blueprintImage: unit.blueprintImage || ''
       })),
       
       // FIX: Add missing fields from step 3
-      certifications: data.certifications || [],  // Certificates
-      timeline: data.timeline || [],              // Timeline/Important dates
+      certifications: data.certifications || [],
+      timeline: data.timeline || [],
       
-      // Step 5: Multimedia (will be uploaded separately, but include URLs if they already exist)
-      coverImageUrl: data.coverImageUrl || '',
+      // Step 5: Multimedia -  FIX PORTADA: No sobrescribir coverImageUrl si ya existe
+      coverImageUrl: data.coverImageUrl || (data.images && data.images.length > 0 ? data.images[0] : ''),
       
       // NEW: Unit groups (from step 3)
       unitGroups: (data.unitGroups || []).map((group: any) => ({
@@ -478,8 +430,8 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
         status: group.status || 'AVAILABLE',
         view: group.view || '',
         quantity: group.quantity || 1,
-        image: group.image || '',           // Group image
-        blueprintImage: group.blueprintImage || ''  // Group blueprint
+        image: group.image || '',
+        blueprintImage: group.blueprintImage || ''
       })),
       
       // NEW: Detailed amenities (from step 3)
@@ -490,7 +442,8 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       }))
     };
     
-    console.log('📦 Final data to send:', projectData);
+    console.log(' Final data to send:', projectData);
+    console.log(' DEBUG - Final coverImageUrl:', projectData.coverImageUrl);
     return projectData;
   };
 
@@ -499,13 +452,13 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
   // Función para verificar que todos los datos se guardaron correctamente
   const verifyProjectData = async (projectId: number) => {
     try {
-      console.log('🔍 Verifying project data for ID:', projectId);
+      console.log(' Verifying project data for ID:', projectId);
       
       // Use the repository directly instead of hooks
       const projectRepository = new ProjectRepository();
       const project = await projectRepository.getById(projectId);
       
-      console.log('✅ Verification of saved data:', {
+      console.log(' Verification of saved data:', {
           id: project.id,
           name: project.name,
           description: project.description,
@@ -565,49 +518,44 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
             images: formData.images || [],
             blueprints: formData.blueprints || [],
             renders: formData.renders || [],
+            // 🔍 FIX: Si no hay coverImageUrl pero hay imágenes, usar la primera como portada
+            coverImageUrl: formData.coverImageUrl || (formData.images && formData.images.length > 0 ? formData.images[0] : '')
           };
           
-          console.log(' Actualizando proyecto con multimedia:', updateData);
+          console.log('📤 Actualizando proyecto con multimedia y portada:', {
+            id: createdPropertyId,
+            coverImage: updateData.coverImageUrl,
+            imagesCount: updateData.images?.length
+          });
           
-          const updateResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/projects/${createdPropertyId}`,
-            {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` 
-              },
-              body: JSON.stringify(updateData)
-            }
-          );
+          // FIX: Construcción de URL limpia sin duplicar /api
+          const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+          // Si la URL base ya trae /api, lo respetamos pero evitamos concatenar otro /api manual
+          const cleanBaseUrl = rawBaseUrl.replace(/\/$/, '');
           
-          if (!updateResponse.ok) {
-            const error = await updateResponse.json();
-            console.error('Error actualizando proyecto:', error);
-            toast.error('Error al actualizar los datos multimedia');
-            return;
-          }
-          
-          console.log(' Proyecto actualizado con multimedia, ahora publicando...');
-          
-          // Luego publicar
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/projects/${createdPropertyId}/publish`,
-            {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` 
-              }
-            }
-          );
+          const updateUrl = `${cleanBaseUrl}/projects/${createdPropertyId}`.replace(/([^:]\/)\/+/g, "$1");
+          const publishUrl = `${cleanBaseUrl}/projects/${createdPropertyId}/publish`.replace(/([^:]\/)\/+/g, "$1");
+      
 
-          if (response.ok) {
-            toast.success('¡Proyecto publicado exitosamente! 🎉');
-            router.push('/my-projects');
+          // 1. Primero actualizar multimedia
+          const updateResponse = await fetch(updateUrl, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(updateData),
+          });
+
+          if (updateResponse.ok) {
+            console.log(' Proyecto actualizado correctamente');
+            toast.success('¡Proyecto guardado como borrador! 📝');
+            
+            // 2. Redirigir a la página de edición para que el usuario pueda publicar después
+            router.push(`/my-projects/${createdPropertyId}/edit`);
           } else {
-            const error = await response.json();
-            toast.error(error.message || 'Error al publicar el proyecto');
+            const error = await updateResponse.json();
+            toast.error(error.message || 'Error al guardar el proyecto');
           }
         } catch (error) {
           toast.error('Error al publicar el proyecto');
@@ -698,6 +646,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
             formData={formData}
             onChange={handleChange}
             propertyId={createdPropertyId}
+            projectId={createdPropertyId}
             groupBlueprintFiles={formData.groupBlueprintFiles}
           />
         </div>

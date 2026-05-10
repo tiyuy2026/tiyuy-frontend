@@ -15,7 +15,7 @@ export function ProjectInfoStep({ formData, onChange }: ProjectInfoStepProps) {
 
   // Función para actualizar con logging
   const handleChangeWithLog = (field: string, value: any) => {
-    console.log(`📝 ProjectInfoStep - Actualizando ${field}:`, value);
+    console.log(` ProjectInfoStep - Actualizando ${field}:`, value);
     onChange(field, value);
   };
 
@@ -124,9 +124,9 @@ export function ProjectInfoStep({ formData, onChange }: ProjectInfoStepProps) {
           <div className="flex-1">
             <h4 className="font-medium text-amber-900 mb-1">Plan Desarrollador</h4>
             <p className="text-sm text-amber-800">
-              <strong>✅ Primer proyecto GRATIS</strong> (30 días de prueba)
+              <strong> Primer proyecto GRATIS</strong> (30 días de prueba)
               <br />
-              <strong>📈 Proyectos adicionales</strong> requieren suscripción ENTERPRISE
+              <strong> Proyectos adicionales</strong> requieren suscripción ENTERPRISE
               <br />
               <Link 
                 href="/plans"

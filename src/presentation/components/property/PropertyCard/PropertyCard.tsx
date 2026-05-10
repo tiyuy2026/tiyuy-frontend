@@ -86,13 +86,16 @@ export function PropertyCard({ property }: PropertyCardProps) {
       <Link href={`/property/${getPropertySlug(property)}`} className="relative block flex-shrink-0">
         <div className="relative w-full h-64 bg-gray-200 overflow-hidden">
           {property.coverPhotoUrl ? (
-            <Image
-              src={property.coverPhotoUrl || ''}
+            <img
+              src={`/api/images/proxy?url=${encodeURIComponent(property.coverPhotoUrl)}`}
               alt={property.title || ''}
-              fill
-              className="object-cover group-hover:scale-110 transition-transform duration-500"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 320px"
-              priority={property.isFeatured}
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              onError={(e) => {
+                console.error('Error loading cover image:', property.coverPhotoUrl);
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
+                e.currentTarget.parentElement!.innerHTML = '<span class="text-6xl">🏠</span>';
+              }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">

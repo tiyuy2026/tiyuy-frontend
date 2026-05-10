@@ -9,6 +9,9 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project }: ProjectCardProps) {
   const formatPrice = (price: number) => `Desde S/ ${price.toLocaleString()}`;
+  
+  // SIMPLE: Usar la primera imagen del array como portada
+  const coverImage = project.images?.[0] || null;
 
   // Helper to render lifecycle status badge
   const renderLifecycleBadge = () => {
@@ -50,9 +53,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
       <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group border border-gray-100 hover:border-blue-200 w-full h-full flex flex-col">
         {/* Imagen */}
         <div className="relative w-full h-64 bg-gray-200 overflow-hidden flex-shrink-0">
-          {project.coverImageUrl ? (
+          {coverImage ? (
             <Image
-              src={project.coverImageUrl}
+              src={coverImage}
               alt={project.name}
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-500"

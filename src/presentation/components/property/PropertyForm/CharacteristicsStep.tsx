@@ -13,7 +13,7 @@ export function CharacteristicsStep({ formData, onChange }: CharacteristicsStepP
 
   // Función para actualizar con logging
   const handleChangeWithLog = (field: string, value: any) => {
-    console.log(`📝 CharacteristicsStep - Actualizando ${field}:`, value);
+    console.log(` CharacteristicsStep - Actualizando ${field}:`, value);
     onChange(field, value);
   };
 

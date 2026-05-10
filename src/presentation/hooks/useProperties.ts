@@ -111,10 +111,23 @@ export function useDeleteProperty() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['properties', 'my-properties'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['properties', 'search'], exact: false });
-      toast.success('Propiedad eliminada');
+      toast.success('Propiedad eliminada exitosamente');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al eliminar');
+      const errorMessage = error.response?.data?.message || error.message || 'Error al eliminar';
+      
+      // Mensajes específicos para errores comunes
+      if (errorMessage.includes('Solo se pueden eliminar propiedades en borrador')) {
+        toast.error('Solo se pueden eliminar propiedades en estado BORRADOR. Las propiedades publicadas solo pueden pausarse o archivarse.');
+      } else if (errorMessage.includes('No tienes permiso')) {
+        toast.error('No tienes permiso para eliminar esta propiedad.');
+      } else if (error.response?.status === 404) {
+        toast.error('Propiedad no encontrada.');
+      } else if (error.response?.status === 403) {
+        toast.error('Acceso denegado. No puedes eliminar esta propiedad.');
+      } else {
+        toast.error(`Error al eliminar propiedad: ${errorMessage}`);
+      }
     },
   });
 }

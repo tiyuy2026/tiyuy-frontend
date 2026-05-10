@@ -221,9 +221,9 @@ export default function PlansPage() {
       const validDiscount = validDiscounts[0];
       const discountCodeValue = validDiscount.code;
       
-      console.log('✅ Descuento válido encontrado y aplicado:', discountCodeValue);
+      console.log(' Descuento válido encontrado y aplicado:', discountCodeValue);
       setDiscountCode(discountCodeValue);
-      console.log('🎁 Descuento de agencia aplicado automáticamente:', discountCodeValue);
+      console.log(' Descuento de agencia aplicado automáticamente:', discountCodeValue);
     }
   }, [isAgent, hasDiscountCodes, availableDiscountCodes, appliedManualDiscount?.valid]);
 
@@ -277,20 +277,105 @@ export default function PlansPage() {
     }
   }, [showUpgradeModal, refetchSubscription]);
 
-  // ✅ Lógica corregida para detectar plan agotado
+  // ✅ Enhanced plan exhaustion detection with expiration date validation
   const isPlanExhausted = (plan: SubscriptionPlan) => {
-    if (plan.id !== 'FREE') return false;
+    // FREE plan special case: permanently blocked after first use
+    if (plan.id === 'FREE') {
+      // If user has any published property, FREE is permanently blocked
+      if (publishedCount >= 1) return true;
+      
+      // If user has active paid subscription, FREE is also blocked
+      if (activeSubscription && (activeSubscription as any).tier !== 'FREE') return true;
+      
+      // If user has FREE subscription but no remaining publications, it's blocked
+      if (activeSubscription && (activeSubscription as any).tier === 'FREE' 
+          && activeSubscription.remainingPublications <= 0) return true;
+      
+      return false;
+    }
 
-    // Tiene suscripción de pago → FREE agotado
-    if (activeSubscription && (activeSubscription as any).tier !== 'FREE') return true;
+    // For paid plans, only evaluate if there's an active subscription
+    if (!activeSubscription) return false;
 
-    // Tiene FREE pero sin publicaciones restantes → agotado
-    if (activeSubscription && (activeSubscription as any).tier === 'FREE' 
-        && activeSubscription.remainingPublications <= 0) return true;
+    // Get current plan tier, remaining publications, and expiration date
+    const currentTier = (activeSubscription as any).tier || activeSubscription.plan?.id;
+    const remainingPublications = activeSubscription.remainingPublications || 0;
+    const expirationDate = activeSubscription.expiresAt;
+    
+    // If this is the current active plan
+    if (currentTier === plan.id) {
+      // Check if plan is expired
+      if (expirationDate) {
+        const expiration = new Date(expirationDate);
+        const now = new Date();
+        if (expiration <= now) {
+          return true; // Plan is expired - can be renewed
+        }
+      }
+      
+      // Plan is exhausted when no remaining publications but NOT expired
+      return remainingPublications <= 0;
+    }
+    
+    // If user has a different active plan, this plan is not exhausted (available for upgrade)
+    return false;
+  };
 
-    // Sin suscripción pero ya publicó 1 → agotado
-    if (!activeSubscription && publishedCount >= 1) return true;
+  // ✅ Check if plan can be renewed (only when expired, not just exhausted)
+  const canRenewPlan = (plan: SubscriptionPlan) => {
+    if (plan.id === 'FREE') return false; // FREE plan cannot be renewed
+    
+    if (!activeSubscription) return false;
+    
+    const currentTier = (activeSubscription as any).tier || activeSubscription.plan?.id;
+    const expirationDate = activeSubscription.expiresAt;
+    
+    // Can only renew if this is the current active plan AND it's expired
+    return currentTier === plan.id && expirationDate && new Date(expirationDate) <= new Date();
+  };
 
+  // ✅ Check if plan is expired (by time)
+  const isPlanExpired = (plan: SubscriptionPlan) => {
+    if (!activeSubscription) return false;
+    
+    const currentTier = (activeSubscription as any).tier || activeSubscription.plan?.id;
+    const expirationDate = activeSubscription.expiresAt;
+    
+    // Only check expiration for the current active plan
+    if (currentTier !== plan.id) return false;
+    
+    return expirationDate && new Date(expirationDate) <= new Date();
+  };
+
+  // ✅ Check if plan is exhausted (by publication limit, not expired)
+  const isPlanExhaustedByLimit = (plan: SubscriptionPlan) => {
+    if (plan.id === 'FREE') {
+      // FREE plan special case: permanently blocked after first use
+      if (publishedCount >= 1) return true;
+      
+      // If user has active paid subscription, FREE is also blocked
+      if (activeSubscription && (activeSubscription as any).tier !== 'FREE') return true;
+      
+      // If user has FREE subscription but no remaining publications, it's blocked
+      if (activeSubscription && (activeSubscription as any).tier === 'FREE' 
+          && activeSubscription.remainingPublications <= 0) return true;
+      
+      return false;
+    }
+
+    // For paid plans, only evaluate if there's an active subscription
+    if (!activeSubscription) return false;
+
+    const currentTier = (activeSubscription as any).tier || activeSubscription.plan?.id;
+    const remainingPublications = activeSubscription.remainingPublications || 0;
+    
+    // If this is the current active plan and has no remaining publications
+    if (currentTier === plan.id && remainingPublications <= 0) {
+      // Only return true if NOT expired (exhausted by limit, not by time)
+      const expirationDate = activeSubscription.expiresAt;
+      return !expirationDate || new Date(expirationDate) > new Date();
+    }
+    
     return false;
   };
 
@@ -515,8 +600,11 @@ export default function PlansPage() {
                     plan={plan}
                     onSelectPlan={setSelectedPlan}
                     isSelected={selectedPlan?.id === plan.id}
-                    isActive={isActive && !isExhausted}
+                    isActive={isActive}
                     isExhausted={isExhausted}
+                    isExpired={isPlanExpired(plan)}
+                    isExhaustedByLimit={isPlanExhaustedByLimit(plan)}
+                    canRenew={canRenewPlan(plan)}
                     discountPercentage={finalDiscountPercentage}
                     hasDiscount={hasAnyDiscount}
                   />

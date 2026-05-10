@@ -7,12 +7,10 @@ import { toast } from '@/presentation/store/toastStore';
 interface ProjectMultimediaStepProps {
   formData: any;
   onChange: (field: string, value: any) => void;
-  propertyId?: number;
+  projectId?: number;
   // 🔍 FIX: Agregar archivos de unidades para subir en paso 5
   unitBlueprintFiles?: {[key: number]: File};
   groupBlueprintFiles?: {[key: number]: File};
-  // 🔍 FIX: Agregar tipo para manejar propiedades vs proyectos
-  entityType?: 'property' | 'project';
 }
 
 const getVideoDuration = (file: File): Promise<number> => {
@@ -57,9 +55,9 @@ const validateFile = async (file: File, type: 'images' | 'blueprints' | 'renders
 
   // Validar formatos permitidos
   const allowedTypes = {
-    images: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
-    blueprints: ['application/pdf', 'image/vnd.dwg', 'application/dxf'],
-    renders: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'video/mp4', 'video/avi']
+    images: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'], // Solo JPG, PNG, WebP
+    blueprints: ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'image/webp'], // PDF + imágenes
+    renders: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'video/mp4', 'video/avi'] // JPG, PNG, WebP, MP4, AVI
   };
 
   if (!allowedTypes[type].includes(file.type)) {
@@ -69,7 +67,7 @@ const validateFile = async (file: File, type: 'images' | 'blueprints' | 'renders
   return null; // sin error
 };
 
-export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlueprintFiles, groupBlueprintFiles, entityType = 'property' }: ProjectMultimediaStepProps) {
+export function ProjectMultimediaStep({ formData, onChange, projectId, unitBlueprintFiles, groupBlueprintFiles }: ProjectMultimediaStepProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -78,7 +76,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
 
   // Función para subir planos de unidades (del paso 3)
   const uploadUnitBlueprints = async () => {
-    if (!propertyId) return;
+    if (!projectId) return;
 
     const token = authStorage.getToken() || localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token');
     if (!token) return;
@@ -94,10 +92,10 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
         if (file) {
           const formDataUpload = new FormData();
           formDataUpload.append('files', file);
-          formDataUpload.append('type', 'blueprints');
+          formDataUpload.append('type', 'BLUEPRINT');
 
           try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/properties/${propertyId}/photos`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/projects/${projectId}/upload`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}` },
               body: formDataUpload,
@@ -105,7 +103,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
 
             if (response.ok) {
               const result = await response.json();
-              const uploadedUrl = result[0];
+              const uploadedUrl = result[0]?.url || result[0];
               console.log(`Plano de unidad ${unitId} subido:`, uploadedUrl);
               
               // Guardar la URL para actualizar la unidad
@@ -124,10 +122,10 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
         if (file) {
           const formDataUpload = new FormData();
           formDataUpload.append('files', file);
-          formDataUpload.append('type', 'blueprints');
+          formDataUpload.append('type', 'BLUEPRINT');
 
           try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/properties/${propertyId}/photos`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/projects/${projectId}/upload`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}` },
               body: formDataUpload,
@@ -135,7 +133,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
 
             if (response.ok) {
               const result = await response.json();
-              const uploadedUrl = result[0];
+              const uploadedUrl = result[0]?.url || result[0];
               console.log(`Plano de grupo ${groupId} subido:`, uploadedUrl);
               
               // Guardar la URL para actualizar el grupo
@@ -153,18 +151,16 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
   };
 
   const handleFileUpload = async (files: FileList, type: 'images' | 'blueprints' | 'renders') => {
-    if (!propertyId) {
+    if (!projectId) {
       toast.error('Primero debes guardar el proyecto para subir archivos');
       return;
     }
 
-    if (propertyId <= 0) {
+    if (projectId <= 0) {
       toast.error('ID de proyecto inválido. Por favor, recarga la página e intenta nuevamente.');
       return;
     }
 
-    
-    
     for (const file of Array.from(files)) {
       const error = await validateFile(file, type);
       if (error) {
@@ -180,19 +176,19 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
       const token = authStorage.getToken();
       if (!token) throw new Error('No se encontró el token de autenticación');
 
-      // Crear FormData para la subida
+      // Crear FormData para la subida (formato específico para proyectos)
       const formDataUpload = new FormData();
       
-      // Agregar archivos
+      // Para proyectos, usar el formato que espera el backend (/upload endpoint)
       Array.from(files).forEach(file => {
         formDataUpload.append('files', file);
       });
-
-      // Agregar metadatos
+      
+      // El backend requiere el parámetro "type" para proyectos
       const backendType = type === 'images' ? 'PHOTO' : type === 'blueprints' ? 'BLUEPRINT' : 'RENDER';
-      formDataUpload.append('mediaType', backendType);
+      formDataUpload.append('type', backendType);
 
-      console.log(`Subiendo ${files.length} archivos al proyecto ${propertyId}`);
+      console.log(`Subiendo ${files.length} archivos al proyecto ${projectId}`);
 
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => Math.min(prev + 5, 95));
@@ -201,7 +197,8 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
       const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
       const cleanBaseUrl = rawBaseUrl.replace(/\/$/, "");
       
-      const uploadUrl = `${cleanBaseUrl}/properties/${propertyId}/photos`;
+      // Usar endpoint específico para proyectos
+      const uploadUrl = `${cleanBaseUrl}/projects/${projectId}/upload`;
 
       console.log(`Enviando POST a: ${uploadUrl}`);
 
@@ -209,7 +206,6 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
-          // No establecer Content-Type manualmente para FormData, el navegador lo hace automáticamente
         },
         body: formDataUpload,
       });
@@ -232,7 +228,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
       }
 
       const result = await response.json();
-      const newUrls = Array.isArray(result) ? result.map((m: any) => m.url) : [];
+      const newUrls = Array.isArray(result) ? result.map((m: any) => m.url || m) : [];
       
       const currentUrls = formData[type] || [];
       onChange(type, [...currentUrls, ...newUrls]);
@@ -261,7 +257,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
         </p>
       </div>
 
-      {!propertyId && (
+      {!projectId && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <div className="flex items-center space-x-2">
             <div className="text-yellow-600"></div>
@@ -320,7 +316,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
         
         <button
           onClick={() => fileInputRef.current?.click()}
-          disabled={!propertyId || uploading}
+          disabled={!projectId || uploading}
           className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-purple-500 hover:text-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {uploading ? 'Subiendo...' : '+ Subir Imágenes'}
@@ -331,7 +327,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
       <div>
         <h4 className="font-medium text-gray-900 mb-3">Planos del Proyecto</h4>
         <p className="text-sm text-gray-600 mb-3">
-          Planos arquitectónicos, plantas, distribuciones (PDF, DWG)
+          Planos arquitectónicos, plantas, distribuciones (PDF, JPG, PNG, WebP - máx 20MB)
         </p>
         
         {/* Lista de planos existentes */}
@@ -365,14 +361,14 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
           ref={blueprintInputRef}
           type="file"
           multiple
-          accept="application/pdf,image/vnd.dwg,application/dxf"
+          accept="application/pdf,image/jpeg,image/jpg,image/png,image/webp"
           onChange={(e) => e.target.files && handleFileUpload(e.target.files, 'blueprints')}
           className="hidden"
         />
         
         <button
           onClick={() => blueprintInputRef.current?.click()}
-          disabled={!propertyId || uploading}
+          disabled={!projectId || uploading}
           className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-purple-500 hover:text-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {uploading ? 'Subiendo...' : '+ Subir Planos'}
@@ -401,20 +397,18 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
                         className="w-full h-full object-cover"
                         controls
                         muted
-                        playsInline
-                      >
-                        Tu navegador no soporta el tag de video.
-                      </video>
+                      />
                     ) : (
                       <img
                         src={render}
                         alt={`Render ${index + 1}`}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error(`Error cargando render ${index + 1}:`, render);
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
                     )}
-                    <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-1 rounded">
-                      {isVideo ? ' VIDEO' : '3D'}
-                    </div>
                   </div>
                   <button
                     onClick={() => removeFile('renders', index)}
@@ -441,63 +435,35 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
         
         <button
           onClick={() => renderInputRef.current?.click()}
-          disabled={!propertyId || uploading}
+          disabled={!projectId || uploading}
           className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-purple-500 hover:text-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {uploading ? 'Subiendo...' : '+ Subir Renders 3D'}
+          {uploading ? 'Subiendo...' : '+ Subir Renders'}
         </button>
       </div>
 
-      {/* Progreso de subida */}
       {uploading && (
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">Subiendo archivos...</span>
-            <span className="text-sm text-gray-500">{uploadProgress}%</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${uploadProgress}%` }}
-            />
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p className="text-blue-800 font-medium">Subiendo archivos...</p>
+              <div className="w-full bg-blue-200 rounded-full h-2 mt-2">
+                <div
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
+            <span className="text-blue-600 text-sm font-medium">{uploadProgress}%</span>
           </div>
         </div>
       )}
-
-      {/* Resumen multimedia */}
-      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-        <h4 className="font-medium text-purple-900 mb-3">Resumen Multimedia</h4>
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div>
-            <span className="text-purple-700 block text-sm">Imágenes</span>
-            <p className="font-semibold text-purple-900 text-lg">{formData.images?.length || 0}</p>
-          </div>
-          <div>
-            <span className="text-purple-700 block text-sm">Planos</span>
-            <p className="font-semibold text-purple-900 text-lg">{formData.blueprints?.length || 0}</p>
-          </div>
-          <div>
-            <span className="text-purple-700 block text-sm">Renders</span>
-            <p className="font-semibold text-purple-900 text-lg">{formData.renders?.length || 0}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Tips */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start space-x-2">
-          <div className="text-blue-600 mt-0.5"></div>
-          <div>
-            <p className="text-blue-800 font-medium mb-1">Recomendaciones</p>
-            <ul className="text-blue-700 text-sm space-y-1">
-              <li>• Usa imágenes de alta resolución (mínimo 1200x800px)</li>
-              <li>• Incluye fotos del edificio, amenities y vistas</li>
-              <li>• Los planos deben estar en PDF y ser legibles</li>
-              <li>• Los renders 3D ayudan a visualizar el proyecto final</li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

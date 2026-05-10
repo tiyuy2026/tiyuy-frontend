@@ -94,7 +94,7 @@ export default function MyPropertiesPage() {
     return normalizedProperties.filter((p: any) => p.status === 'PUBLISHED').length;
   }, [normalizedProperties]);
 
-  // Use exact backend logic
+  // Enhanced logic with FREE plan permanent blocking
   const canPublish = useMemo(() => {
     if (activeSubscription) {
       // Has plan: use plan logic (remainingPublications)
@@ -102,6 +102,7 @@ export default function MyPropertiesPage() {
     }
     
     // WITHOUT SUBSCRIPTION: up to 1 FREE PUBLISHED property
+    // Once user publishes 1 property, FREE is permanently blocked
     return publishedCount < 1;
   }, [activeSubscription, publishedCount]);
 
@@ -180,8 +181,15 @@ export default function MyPropertiesPage() {
     router.push(`/my-properties/${parsedId}/edit`);
   };
 
-  const handleDelete = async (id: number, title: string) => {
-    if (confirm(`Estas seguro de eliminar "${title}"?`)) {
+  const handleDelete = async (id: number, title: string, status: string) => {
+    // Solo permitir eliminar si está en borrador
+    if (status !== 'DRAFT') {
+      toast.error('Solo se pueden eliminar propiedades en estado BORRADOR');
+      return;
+    }
+    
+    const confirmMessage = `¿Estás seguro de eliminar la propiedad "${title}"?\n\nEsta acción no se puede deshacer.`;
+    if (confirm(confirmMessage)) {
       await deleteMutation.mutateAsync(id);
     }
   };
@@ -381,12 +389,12 @@ export default function MyPropertiesPage() {
               {activeSubscription && activeSubscription.plan
                 ? `Has alcanzado el limite de ${activeSubscription.plan.maxPublications} publicaciones para tu plan ${activeSubscription.plan.name}.` 
                 : 'Has alcanzado el limite de 1 propiedad gratis.'}{' '}
-              <button
-                onClick={() => setShowUpgradeModal(true)}
+              <Link
+                href="/plans"
                 className="text-blue-600 hover:underline font-semibold"
               >
                 {activeSubscription && activeSubscription.plan ? 'Renovar plan' : 'Mejorar tu plan'}
-              </button>{' '}
+              </Link>{' '}
               para publicar mas propiedades.
             </p>
           </div>
@@ -484,7 +492,7 @@ export default function MyPropertiesPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-4xl">🏠</span>
+                      <span className="text-4xl"></span>
                     </div>
                   )}
                     
@@ -572,19 +580,21 @@ export default function MyPropertiesPage() {
                       </Link>
                       
                       <Link
-                        href={`/my-properties/edit/${property.id}`}
+                        href={`/my-properties/${property.id}/edit`}
                         className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
                       >
                         Editar
                       </Link>
                       
-                      <button
-                        onClick={() => handleDelete(property.id, property.title)}
-                        disabled={deleteMutation.isPending}
-                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 disabled:bg-gray-400"
-                      >
-                        {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
-                      </button>
+                      {property.status === 'DRAFT' && (
+                        <button
+                          onClick={() => handleDelete(property.id, property.title, property.status)}
+                          disabled={deleteMutation.isPending}
+                          className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 disabled:bg-gray-400"
+                        >
+                          {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -633,7 +643,7 @@ function StatusBadge({ status, lifecycleStatus, remainingGraceDays }: { status: 
           {badge.label}
         </span>
         <span className="bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded">
-          ⏰ {remainingGraceDays} dias para renovar
+          {remainingGraceDays} dias para renovar
         </span>
       </div>
     );

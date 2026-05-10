@@ -93,7 +93,7 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
                 )}
                 {property.isNegotiable && (
                   <span className="inline-flex items-center gap-1 text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full">
-                    💰 Negociable
+                     Negociable
                   </span>
                 )}
               </div>
@@ -135,7 +135,7 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
             {/* Debug: mostrar si hay descripción */}
             {!property.description && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-sm text-yellow-800">
-                ⚠️ No hay descripción disponible para esta propiedad
+                 No hay descripción disponible para esta propiedad
               </div>
             )}
 
