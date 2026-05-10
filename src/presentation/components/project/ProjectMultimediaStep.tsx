@@ -95,7 +95,7 @@ export function ProjectMultimediaStep({ formData, onChange, projectId, unitBluep
           formDataUpload.append('type', 'BLUEPRINT');
 
           try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/projects/${projectId}/upload`, {
+            const response = await fetch(`/projects/${projectId}/upload`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}` },
               body: formDataUpload,
@@ -125,7 +125,7 @@ export function ProjectMultimediaStep({ formData, onChange, projectId, unitBluep
           formDataUpload.append('type', 'BLUEPRINT');
 
           try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/projects/${projectId}/upload`, {
+            const response = await fetch(`/projects/${projectId}/upload`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}` },
               body: formDataUpload,
@@ -194,11 +194,8 @@ export function ProjectMultimediaStep({ formData, onChange, projectId, unitBluep
         setUploadProgress((prev) => Math.min(prev + 5, 95));
       }, 500);
 
-      const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-      const cleanBaseUrl = rawBaseUrl.replace(/\/$/, "");
-      
-      // Usar endpoint específico para proyectos
-      const uploadUrl = `${cleanBaseUrl}/projects/${projectId}/upload`;
+      // Usar ruta relativa - Vercel actúa como puente
+      const uploadUrl = `/projects/${projectId}/upload`;
 
       console.log(`Enviando POST a: ${uploadUrl}`);
 

@@ -97,7 +97,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
           formDataUpload.append('type', 'blueprints');
 
           try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/properties/${propertyId}/photos`, {
+            const response = await fetch(`/properties/${propertyId}/photos`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}` },
               body: formDataUpload,
@@ -127,7 +127,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
           formDataUpload.append('type', 'blueprints');
 
           try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/properties/${propertyId}/photos`, {
+            const response = await fetch(`/properties/${propertyId}/photos`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}` },
               body: formDataUpload,
@@ -198,10 +198,8 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
         setUploadProgress((prev) => Math.min(prev + 5, 95));
       }, 500);
 
-      const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-      const cleanBaseUrl = rawBaseUrl.replace(/\/$/, "");
-      
-      const uploadUrl = `${cleanBaseUrl}/properties/${propertyId}/photos`;
+      // Usar ruta relativa - Vercel actúa como puente
+      const uploadUrl = `/properties/${propertyId}/photos`;
 
       console.log(`Enviando POST a: ${uploadUrl}`);
 

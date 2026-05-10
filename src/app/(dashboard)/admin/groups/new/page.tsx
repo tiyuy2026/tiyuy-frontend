@@ -22,8 +22,8 @@ export default function NewGroupPage() {
     mutationFn: async (groupData: typeof formData) => {
       console.log('Enviando al backend:', groupData);
       
-      // Llamada real al backend
-      console.log('Enviando petición POST a:', 'http://152.70.129.43:8080/api/admin/groups');
+      // Llamada real al backend usando ruta relativa (Vercel actúa como puente)
+      console.log('Enviando petición POST a:', '/api/admin/groups');
       console.log('Datos enviados:', JSON.stringify(groupData, null, 2));
       
       // Extraer el token JWT puro del objeto Zustand
@@ -32,7 +32,7 @@ export default function NewGroupPage() {
       
       console.log('Token JWT extraído:', token.substring(0, 50) + '...');
       
-      const response = await fetch('http://152.70.129.43:8080/api/admin/groups', {
+      const response = await fetch('/api/admin/groups', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

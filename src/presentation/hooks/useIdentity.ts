@@ -2,7 +2,7 @@ export class IdentityRepository {
 
   // ✔️ Validar DNI
   async validateDni(dni: string) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/identity/validate-dni`, {
+    const res = await fetch(`/identity/validate-dni`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ dni })
@@ -12,7 +12,7 @@ export class IdentityRepository {
 
   // ✔️ Completar KYC
   async completeKyc(userId: number, documents: FormData) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/identity/complete-kyc/${userId}`, {
+    const res = await fetch(`/identity/complete-kyc/${userId}`, {
       method: 'POST',
       body: documents
     });
@@ -21,7 +21,7 @@ export class IdentityRepository {
 
   // ✔️ Subir a Developer
   async upgradeToDeveloper(userId: number, ruc: string) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/identity/upgrade-to-developer/${userId}`, {
+    const res = await fetch(`/identity/upgrade-to-developer/${userId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ruc })
@@ -35,7 +35,7 @@ export class IdentityRepository {
 
   // ✔️ Validar RUC
   async validateRuc(ruc: string) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/identity/validate-ruc`, {
+    const res = await fetch(`/identity/validate-ruc`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ruc })
@@ -45,7 +45,7 @@ export class IdentityRepository {
 
   // ✔️ Subir a AGENTE
   async upgradeToAgent(userId: number, ruc: string) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/identity/upgrade-to-agent/${userId}`, {
+    const res = await fetch(`/identity/upgrade-to-agent/${userId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ruc })
@@ -55,7 +55,7 @@ export class IdentityRepository {
 
   // ✔️ Obtener estado del KYC
   async getKycStatus(userId: number) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/identity/kyc-status/${userId}`);
+    const res = await fetch(`/identity/kyc-status/${userId}`);
     return res.json();
   }
 }

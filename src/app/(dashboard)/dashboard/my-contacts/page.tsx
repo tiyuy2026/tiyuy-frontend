@@ -44,50 +44,19 @@ import LocationAutocomplete from '@/presentation/components/LocationAutocomplete
 import { useGooglePlaces } from '@/presentation/hooks/useGooglePlaces';
 import { useWebSocket, getCurrentUserId } from '@/presentation/hooks/useWebSocket';
 
-// Helper function for API calls
+// Helper function for API calls - usando axiosClient centralizado
+import { axiosClient } from '@/infrastructure/api/axios-client';
+
 async function apiCall(endpoint: string, options: RequestInit = {}) {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-  const url = `${API_BASE_URL}${endpoint}`;
+  const url = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   
-  let token = null;
-  if (typeof window !== 'undefined') {
-    // Logs de depuración para tokens
-    console.log('TOKEN1:', localStorage.getItem('tiyuy-auth-token'));
-    console.log('TOKEN2:', localStorage.getItem('token'));
-    console.log('TOKEN3:', localStorage.getItem('auth-token'));
-    
-    try {
-      const { useAuthStore } = require('@/presentation/store/authStore');
-      const authStore = useAuthStore.getState();
-      token = authStore.token;
-      
-      if (!token) {
-        token = localStorage.getItem('tiyuy-auth-token') || 
-               localStorage.getItem('token') || 
-               localStorage.getItem('auth-token');
-      }
-    } catch {
-      token = localStorage.getItem('tiyuy-auth-token') || 
-             localStorage.getItem('token') || 
-             localStorage.getItem('auth-token');
-    }
-  }
-  
-  const response = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` }),
-      ...options.headers,
-    },
-    ...options,
+  const response = await axiosClient.request({
+    method: options.method || 'GET',
+    url,
+    data: options.body,
   });
   
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => 'Unknown error');
-    throw new Error(`Error ${response.status}: ${response.statusText} - ${errorText}`);
-  }
-  
-  return response.json();
+  return response.data;
 }
 
 type MainTab = 'chats' | 'estados' | 'canales' | 'grupos';

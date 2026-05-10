@@ -528,13 +528,9 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
             imagesCount: updateData.images?.length
           });
           
-          // FIX: Construcción de URL limpia sin duplicar /api
-          const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-          // Si la URL base ya trae /api, lo respetamos pero evitamos concatenar otro /api manual
-          const cleanBaseUrl = rawBaseUrl.replace(/\/$/, '');
-          
-          const updateUrl = `${cleanBaseUrl}/projects/${createdPropertyId}`.replace(/([^:]\/)\/+/g, "$1");
-          const publishUrl = `${cleanBaseUrl}/projects/${createdPropertyId}/publish`.replace(/([^:]\/)\/+/g, "$1");
+          // Usar rutas relativas - Vercel actúa como puente
+          const updateUrl = `/projects/${createdPropertyId}`;
+          const publishUrl = `/projects/${createdPropertyId}/publish`;
       
 
           // 1. Primero actualizar multimedia

@@ -93,12 +93,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       // URL del WebSocket - con validación para evitar URLs corruptas
       let wsUrl = process.env.NEXT_PUBLIC_WS_URL?.trim();
       
-      // Si no hay URL válida, usar la misma lógica de API que useContacts.ts
+      // Si no hay URL válida, usar ruta relativa (Vercel actúa como puente)
       if (!wsUrl || wsUrl.includes('"') || wsUrl.includes('>') || !wsUrl.startsWith('ws')) {
-        // Usar la misma URL base que el resto de la app (para conectar al backend remoto)
-        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-        const wsProtocol = API_BASE_URL.startsWith('https') ? 'wss' : 'ws';
-        const host = API_BASE_URL.replace(/^https?:\/\//, '');
+        // Usar ruta relativa para WebSocket - Vercel no soporta WebSocket proxy, 
+        // así que necesitamos la URL real del backend para WebSocket
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const host = window.location.hostname === 'localhost' ? 'localhost:8080' : '152.70.129.43:8080';
         wsUrl = `${wsProtocol}://${host}/ws/chat`;
       }
 

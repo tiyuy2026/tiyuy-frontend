@@ -50,7 +50,7 @@ export default function StatusPostsWithContact({ onChatCreated }: StatusPostsWit
       statusId: number;
       action: 'like' | 'comment' | 'contact';
     }) => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/contacts/extended/chats`, {
+      const response = await fetch(`/api/contacts/extended/chats`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

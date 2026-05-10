@@ -1,50 +1,19 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { axiosClient } from '@/infrastructure/api/axios-client';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-
-// Helper function for API calls
+// Helper function for API calls - usando axiosClient centralizado
 async function apiCall(endpoint: string, options: RequestInit = {}) {
-  const baseUrl = API_BASE_URL.replace(/\/$/, '');
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = `${baseUrl}${cleanEndpoint}`;
-
-  let token = null;
-  if (typeof window !== 'undefined') {
-    try {
-      const { useAuthStore } = require('@/presentation/store/authStore');
-      const authStore = useAuthStore.getState();
-      token = authStore.token;
-      if (!token) {
-        token = localStorage.getItem('tiyuy-auth-token') || 
-               localStorage.getItem('token') || 
-               localStorage.getItem('auth-token');
-      }
-    } catch {
-      token = localStorage.getItem('tiyuy-auth-token') || 
-             localStorage.getItem('token') || 
-             localStorage.getItem('auth-token');
-    }
-  }
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` }),
-    ...((options.headers as Record<string, string>) || {}),
-  };
-
-  const response = await fetch(url, {
-    ...options,
-    headers,
+  const url = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  
+  const response = await axiosClient.request({
+    method: options.method || 'GET',
+    url,
+    data: options.body,
   });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`API Error: ${response.status} - ${error}`);
-  }
-
-  return response.json();
+  
+  return response.data;
 }
 
 interface SystemStats {

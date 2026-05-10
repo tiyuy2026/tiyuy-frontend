@@ -4,46 +4,19 @@ import { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from '@/presentation/store/toastStore';
 
-// Helper function for API calls (copied from useContacts since it's not exported)
+// Helper function for API calls - usando axiosClient centralizado
+import { axiosClient } from '@/infrastructure/api/axios-client';
+
 async function apiCall(endpoint: string, options: RequestInit = {}) {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-  const url = `${API_BASE_URL}${endpoint}`;
+  const url = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   
-  // Get token from authStore
-  let token = null;
-  if (typeof window !== 'undefined') {
-    try {
-      const { useAuthStore } = require('@/presentation/store/authStore');
-      const authStore = useAuthStore.getState();
-      token = authStore.token;
-      
-      if (!token) {
-        token = localStorage.getItem('tiyuy-auth-token') || 
-               localStorage.getItem('token') || 
-               localStorage.getItem('auth-token');
-      }
-    } catch {
-      token = localStorage.getItem('tiyuy-auth-token') || 
-             localStorage.getItem('token') || 
-             localStorage.getItem('auth-token');
-    }
-  }
-  
-  const response = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` }),
-      ...options.headers,
-    },
-    ...options,
+  const response = await axiosClient.request({
+    method: options.method || 'GET',
+    url,
+    data: options.body,
   });
   
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => 'Unknown error');
-    throw new Error(`Error ${response.status}: ${response.statusText} - ${errorText}`);
-  }
-  
-  return response.json();
+  return response.data;
 }
 
 // Avatar component (copied from the contacts page)

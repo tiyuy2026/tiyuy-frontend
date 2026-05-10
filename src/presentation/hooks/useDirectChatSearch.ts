@@ -1,45 +1,17 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from '@/presentation/store/toastStore';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+import { axiosClient } from '@/infrastructure/api/axios-client';
 
 async function apiCall(endpoint: string, options: RequestInit = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
-
-  let token = null;
-  if (typeof window !== 'undefined') {
-    try {
-      const { useAuthStore } = require('@/presentation/store/authStore');
-      const authStore = useAuthStore.getState();
-      token = authStore.token;
-
-      if (!token) {
-        token = localStorage.getItem('tiyuy-auth-token') ||
-               localStorage.getItem('token') ||
-               localStorage.getItem('auth-token');
-      }
-    } catch {
-      token = localStorage.getItem('tiyuy-auth-token') ||
-             localStorage.getItem('token') ||
-             localStorage.getItem('auth-token');
-    }
-  }
-
-  const response = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` }),
-      ...options.headers,
-    },
-    ...options,
+  const url = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  
+  const response = await axiosClient.request({
+    method: options.method || 'GET',
+    url,
+    data: options.body,
   });
-
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => 'Unknown error');
-    throw new Error(`Error ${response.status}: ${response.statusText} - ${errorText}`);
-  }
-
-  return response.json();
+  
+  return response.data;
 }
 
 export function useDirectChatSearch(
@@ -75,7 +47,7 @@ export function useDirectChatSearch(
       params.append('sortOrder', 'desc');
 
       try {
-        const response = await apiCall(`/api/contacts/extended/search/users?${params}`);
+        const response = await apiCall(`/contacts/extended/search/users?${params}`);
         return response.map((user: any) => ({
           id: user.id,
           name: user.name,
@@ -99,16 +71,8 @@ export function useDirectChatSearch(
 
   const createDirectChat = useMutation({
     mutationFn: async ({ userId, initialMessage }: { userId: number; initialMessage: string }) => {
-      const response = await fetch(`${API_BASE_URL}/api/contacts/extended/chats`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ participantId: userId, initialMessage })
-      });
-      if (!response.ok) throw new Error('Error al crear chat');
-      return response.json();
+      const response = await axiosClient.post('/contacts/extended/chats', { participantId: userId, initialMessage });
+      return response.data;
     },
     onSuccess: (response) => {
       toast.success('¡Chat creado! Ahora puedes conversar.');

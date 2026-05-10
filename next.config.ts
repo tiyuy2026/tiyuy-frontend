@@ -3,10 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
-      // Proxy API calls to backend (backend already has /api context-path)
+      // Proxy API calls to backend (Vercel actuará como puente hacia tu Oracle)
       {
         source: '/api/:path*',
-        destination: 'http://localhost:8080/api/:path*',
+        destination: 'http://152.70.129.43:8080/api/:path*', // ← Cambiado a tu IP real
       },
       // Existing rewrites
       {

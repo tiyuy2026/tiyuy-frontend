@@ -45,7 +45,10 @@ export function AdminRealtime() {
     setConnectionStatus('connecting');
     
     try {
-      const wsUrl = `ws://localhost:8080/ws/chat`;
+      // Usar ruta dinámica para WebSocket
+      const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      const host = window.location.hostname === 'localhost' ? 'localhost:8080' : '152.70.129.43:8080';
+      const wsUrl = `${protocol}://${host}/ws/chat`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 

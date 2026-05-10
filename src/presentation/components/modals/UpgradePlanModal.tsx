@@ -249,7 +249,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
       console.log('🔑 Token JWT:', token ? 'Presente' : 'Ausente');
       
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/finance/mercadopago/create-preference`,
+        `/finance/mercadopago/create-preference`,
         {
           method: 'POST',
           headers: {

@@ -29,7 +29,7 @@ const VISIBILITY_TYPES = [
 ] as const;
 
 const MAX_IMAGES = 5;
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+// Usar axiosClient centralizado - no se necesita API_BASE_URL
 
 export default function CreateEventModal({ isOpen, onClose, channelId, onSuccess }: CreateEventModalProps) {
   const queryClient = useQueryClient();

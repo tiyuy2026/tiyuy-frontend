@@ -1,19 +1,15 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-
-// Remove /api from API_URL if it's already there to avoid duplication
-const CLEAN_API_URL = API_URL.replace(/\/api$/, '');
-
-// Add /api to baseURL since the backend has context-path: /api
+// Usar ruta relativa para que Vercel actúe como puente hacia el backend
+// Esto evita bloqueos por seguridad del navegador y permite HTTPS
 export const axiosClient = axios.create({
-  baseURL: `${CLEAN_API_URL}/api`,
+  baseURL: '/api',
   timeout: 60000, // 60 segundos para Render cold start
 });
 
 // Public client for endpoints that don't require authentication
 export const publicApiClient = axios.create({
-  baseURL: `${CLEAN_API_URL}/api`,
+  baseURL: '/api',
   timeout: 60000,
   headers: {
     'Content-Type': 'application/json',

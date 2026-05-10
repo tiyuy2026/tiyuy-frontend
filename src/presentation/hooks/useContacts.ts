@@ -98,8 +98,6 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
 
     let statusText = response?.statusText || 'Network Error';
 
-    
-
     try {
 
       if (response) {

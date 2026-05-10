@@ -400,7 +400,7 @@ export default function PlansPage() {
         try {
           const token = authStorage.getToken();
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/finance/mercadopago/create-preference`,
+            `/finance/mercadopago/create-preference`,
             {
               method: 'POST',
               headers: {

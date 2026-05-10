@@ -4,7 +4,7 @@ export class IdentityRepository {
 
   // ✔️ Validar DNI
   async validateDni(dni: string) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/identity/validate-dni`, {
+    const response = await fetch(`/identity/validate-dni`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ dni })
@@ -16,7 +16,7 @@ export class IdentityRepository {
 
   // ✔️ Completar KYC
   async completeKyc(userId: number, documents: FormData) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/identity/complete-kyc/${userId}`, {
+    const response = await fetch(`/identity/complete-kyc/${userId}`, {
       method: 'POST',
       body: documents   // FormData automáticamente maneja headers
     });
@@ -27,7 +27,7 @@ export class IdentityRepository {
 
   // ✔️ Subir a Developer / Inmobiliaria
   async upgradeToDeveloper(userId: number, ruc: string) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/identity/upgrade-to-developer/${userId}`, {
+    const response = await fetch(`/identity/upgrade-to-developer/${userId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ruc })
