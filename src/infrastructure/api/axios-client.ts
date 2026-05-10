@@ -1,15 +1,26 @@
 import axios from 'axios';
 
-// Usar ruta relativa para que Vercel actúe como puente hacia el backend
-// Esto evita bloqueos por seguridad del navegador y permite HTTPS
+// Configuración dinámica para SEO y producción
+const getBaseURL = () => {
+  if (typeof window === 'undefined') {
+    // Server-side: usar URL absoluta para SEO
+    return process.env.NEXT_PUBLIC_SITE_URL || 'https://dev.tiyuy.com';
+  }
+  // Client-side: usar ruta relativa para proxy Vercel
+  return '';
+};
+
+// BaseURL dinámica para servidor vs cliente
+const baseURL = `${getBaseURL()}/api`;
+
 export const axiosClient = axios.create({
-  baseURL: '/api',
+  baseURL,
   timeout: 60000, // 60 segundos para Render cold start
 });
 
 // Public client for endpoints that don't require authentication
 export const publicApiClient = axios.create({
-  baseURL: '/api',
+  baseURL,
   timeout: 60000,
   headers: {
     'Content-Type': 'application/json',

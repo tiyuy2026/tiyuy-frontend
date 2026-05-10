@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { axiosClient } from '@/infrastructure/api/axios-client';
 
 interface ValidationCache {
   [key: string]: {
@@ -46,15 +47,11 @@ export const useUserValidation = () => {
     }
 
     try {
-      const response = await fetch('/api/auth/check-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
+      const response = await axiosClient.post('/auth/check-email', {
+        data: { email }
       });
 
-      const data = await response.json();
+      const data = response.data;
       const exists = data.exists;
       
       // Guardar en cache
