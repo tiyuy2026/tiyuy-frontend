@@ -58,7 +58,7 @@ axiosClient.interceptors.request.use(
   (config) => {
     console.log(' AXIOS REQUEST - Method:', config.method?.toUpperCase(), 'URL:', config.url);
     console.log(' AXIOS BASEURL:', axiosClient.defaults.baseURL);
-    console.log(' FULL URL:', (axiosClient.defaults.baseURL || '') + (config.url || ''));
+    console.log(' FULL URL:', `${axiosClient.defaults.baseURL || ''}${config.url || ''}`);
     
     if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
       if (config.headers) {

@@ -41,7 +41,7 @@ export function SEOContent({ propertyType, propertyTypeLabel, district, transact
     {
       question: `¿Cuál es el precio promedio de alquiler de ${propertyTypeLabel.toLowerCase()} en ${district}?`,
       answer: properties.length > 0 
-        ? `Los precios varían según la ubicación exacta, características y estado de la propiedad. En TIYUY encontrarás opciones desde S/.${Math.min(...properties.map((p) => p.price))} hasta S/.${Math.max(...properties.map((p) => p.price))}.`
+        ? `Los precios varían según la ubicación exacta, características y estado de la propiedad. En TIYUY encontrarás opciones desde S/.${Math.min(...properties.filter(p => p.price > 0).map((p) => p.price))} hasta S/.${Math.max(...properties.map((p) => p.price))}.`
         : `Los precios varían según la ubicación exacta, características y estado de la propiedad. Contáctanos para conocer las opciones disponibles en ${district}.`
     },
     {
@@ -60,7 +60,7 @@ export function SEOContent({ propertyType, propertyTypeLabel, district, transact
     {
       question: `¿Cuál es el precio promedio de ${propertyTypeLabel.toLowerCase()} en ${district}?`,
       answer: properties.length > 0 
-        ? `Los precios varían según la ubicación exacta, características y estado de la propiedad. En TIYUY encontrarás opciones desde S/.${Math.min(...properties.map((p) => p.price))} hasta S/.${Math.max(...properties.map((p) => p.price))}.`
+        ? `Los precios varían según la ubicación exacta, características y estado de la propiedad. En TIYUY encontrarás opciones desde S/.${Math.min(...properties.filter(p => p.price > 0).map((p) => p.price))} hasta S/.${Math.max(...properties.map((p) => p.price))}.`
         : `Los precios varían según la ubicación exacta, características y estado de la propiedad. Contáctanos para conocer las opciones disponibles en ${district}.`
     },
     {
