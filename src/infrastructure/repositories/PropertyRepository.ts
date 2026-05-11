@@ -7,9 +7,9 @@ import { PropertyMapper } from '@/core/application/mappers/PropertyMapper';
 
 export class PropertyRepository implements IPropertyRepository {
   async search(filters: PropertyFilter): Promise<PropertySearchResult> {
-    console.log('🔍 Enviando filtros al backend:', JSON.stringify(filters, null, 2));
-    console.log('🌐 BaseURL actual:', axiosClient.defaults.baseURL);
-    console.log('🔗 Endpoint completo:', `${axiosClient.defaults.baseURL}${ENDPOINTS.PROPERTIES.SEARCH}`);
+    console.log('Enviando filtros al backend:', JSON.stringify(filters, null, 2));
+    console.log('BaseURL actual:', axiosClient.defaults.baseURL);
+    console.log('Endpoint completo:', `${axiosClient.defaults.baseURL}${ENDPOINTS.PROPERTIES.SEARCH}`);
     
     const response = await axiosClient.get(ENDPOINTS.PROPERTIES.SEARCH, {
       params: {
@@ -30,7 +30,7 @@ export class PropertyRepository implements IPropertyRepository {
       },
     });
 
-    console.log('✅ Respuesta del backend:', {
+    console.log('Respuesta del backend:', {
       totalElements: response.data.totalElements,
       first: response.data.first,
       content: response.data.content?.length || 0
@@ -38,7 +38,7 @@ export class PropertyRepository implements IPropertyRepository {
 
     // Log detallado de las propiedades recibidas
     if (response.data.content && response.data.content.length > 0) {
-      console.log('📋 Primeras 3 propiedades:', response.data.content.slice(0, 3).map((p: any) => ({
+      console.log('Primeras 3 propiedades:', response.data.content.slice(0, 3).map((p: any) => ({
         id: p.id,
         title: p.title,
         transactionType: p.transactionType,
@@ -46,7 +46,7 @@ export class PropertyRepository implements IPropertyRepository {
         price: p.price
       })));
     } else {
-      console.log('⚠️ No se recibieron propiedades en la respuesta');
+      console.log('No se recibieron propiedades en la respuesta');
     }
 
     return {
@@ -73,12 +73,12 @@ export class PropertyRepository implements IPropertyRepository {
     const response = await axiosClient.get(ENDPOINTS.PROPERTIES.BY_SLUG(slug));
     
     const dto = response.data?.property ? response.data.property : response.data;
-    console.log('🔍 DTO fields (slug):', Object.keys(dto));
-    console.log('📝 Description field (slug):', dto.description);
-    console.log('📝 Full DTO (slug):', dto);
+    console.log('DTO fields (slug):', Object.keys(dto));
+    console.log('Description field (slug):', dto.description);
+    console.log('Full DTO (slug):', dto);
     
     const mappedProperty = PropertyMapper.toDomain(dto);
-    console.log('🏠 Mapped Property description (slug):', mappedProperty.description);
+    console.log('Mapped Property description (slug):', mappedProperty.description);
     
     return mappedProperty;
   }
@@ -86,15 +86,15 @@ export class PropertyRepository implements IPropertyRepository {
 // En PropertyRepository.ts, método getById
 async getById(id: number): Promise<Property> {
   const response = await axiosClient.get(`${ENDPOINTS.PROPERTIES.BASE}/${id}`);
-  console.log('🔥 RAW response.data:', JSON.stringify(response.data, null, 2));
+  console.log('RAW response.data:', JSON.stringify(response.data, null, 2));
   
   const dto = response.data?.property ? response.data.property : response.data;
-  console.log('🔍 DTO fields:', Object.keys(dto));
-  console.log('📝 Description field:', dto.description);
-  console.log('📝 Full DTO:', dto);
+  console.log('DTO fields:', Object.keys(dto));
+  console.log('Description field:', dto.description);
+  console.log('Full DTO:', dto);
   
   const mappedProperty = PropertyMapper.toDomain(dto);
-  console.log('🏠 Mapped Property description:', mappedProperty.description);
+  console.log('Mapped Property description:', mappedProperty.description);
   
   return mappedProperty;
 }

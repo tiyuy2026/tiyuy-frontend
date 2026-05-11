@@ -1,17 +1,10 @@
 import axios from 'axios';
 
-// Configuración dinámica para SEO y producción
-const getBaseURL = () => {
-  if (typeof window === 'undefined') {
-    // Server-side: usar URL absoluta para SEO con puerto 8080
-    return process.env.NEXT_PUBLIC_SITE_URL || 'https://dev.tiyuy.com';
-  }
-  // Client-side: usar ruta relativa para proxy Vercel
-  return '';
-};
-
-// BaseURL dinámica para servidor vs cliente - siempre con puerto 8080
-const baseURL = process.env.NEXT_PUBLIC_API_URL || `${getBaseURL()}/api`;
+// BaseURL dinámica: localhost para desarrollo, producción para deploy
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 
+  (typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+    ? 'http://localhost:8080/api' 
+    : 'http://152.70.129.43:8080/api');
 
 export const axiosClient = axios.create({
   baseURL,
