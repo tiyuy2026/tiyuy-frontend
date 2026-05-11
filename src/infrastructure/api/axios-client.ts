@@ -4,7 +4,7 @@ import axios from 'axios';
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 
   (typeof window !== 'undefined' && window.location.hostname === 'localhost' 
     ? 'http://localhost:8080/api' 
-    : 'http://152.70.129.43:8080/api');
+    : 'https://152.70.129.43:8080/api');
 
 export const axiosClient = axios.create({
   baseURL,
