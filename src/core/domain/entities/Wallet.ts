@@ -38,7 +38,14 @@ export interface SubscriptionPlan {
   features: string[];
   maxPublications: number;
   isFeatured: boolean;
+  billingCycle?: BillingCycle;
+  priceQuarterly?: number;
+  priceYearly?: number;
+  discountPctQuarterly?: number;
+  discountPctYearly?: number;
 }
+
+export type BillingCycle = 'MONTHLY' | 'QUARTERLY' | 'YEARLY' | 'LIFETIME';
 
 export interface ActiveSubscription {
   id: string;
@@ -47,6 +54,9 @@ export interface ActiveSubscription {
   startsAt: Date;
   expiresAt: Date;
   remainingPublications: number;
+  billingCycle?: BillingCycle;
+  nextResetDate?: Date;
+  billingAnchorDay?: number;
 }
 
 export interface Payment {

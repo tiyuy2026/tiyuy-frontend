@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
       // Proxy API calls to backend (Vercel actuará como puente hacia tu Oracle)
       {
         source: '/api/:path*',
-        destination: 'http://152.70.129.43:8080/api/:path*', // ← Cambiado a tu IP real
+
+        destination: process.env.BACKEND_URL || 'http://localhost:8080/api/:path*',
       },
       // Existing rewrites
       {
@@ -25,7 +26,7 @@ const nextConfig: NextConfig = {
         source: '/dashboard/planes',
         destination: '/planes',
       },
-    ];
+          ];
   },
   images: {
     remotePatterns: [
