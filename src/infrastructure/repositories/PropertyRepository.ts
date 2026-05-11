@@ -38,7 +38,7 @@ export class PropertyRepository implements IPropertyRepository {
 
     // Log detallado de las propiedades recibidas
     if (response.data.content && response.data.content.length > 0) {
-      console.log('📋 Primeras 3 propiedades:', response.data.content.slice(0, 3).map(p => ({
+      console.log('📋 Primeras 3 propiedades:', response.data.content.slice(0, 3).map((p: any) => ({
         id: p.id,
         title: p.title,
         transactionType: p.transactionType,
