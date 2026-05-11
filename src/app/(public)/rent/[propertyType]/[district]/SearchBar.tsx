@@ -54,7 +54,9 @@ export function SearchBar({ propertyType, district }: { propertyType: string; di
       : district;
     if (selectedLocation) params.set('filtered', '1');
     
-    const finalUrl = `/${transactionType}/${selectedType}/${slug}?${params.toString()}`;
+    // Convertir 'venta'/'alquiler' a 'sale'/'rent' para usar rutas existentes
+    const routeTransactionType = transactionType === 'venta' ? 'sale' : 'rent';
+    const finalUrl = `/${routeTransactionType}/${selectedType}/${slug}?${params.toString()}`;
     console.log('URL final:', finalUrl);
     
     window.location.href = finalUrl;

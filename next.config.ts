@@ -6,7 +6,9 @@ const nextConfig: NextConfig = {
       // Proxy API calls to backend (backend already has /api context-path)
       {
         source: '/api/:path*',
-        destination: 'http://localhost:8080/api/:path*',
+        destination: process.env.BACKEND_URL 
+          ? `${process.env.BACKEND_URL}/api/:path*`
+          : 'http://localhost:8080/api/:path*',
       },
       // Existing rewrites
       {
