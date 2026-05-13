@@ -1,11 +1,10 @@
 import axios from 'axios';
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL || 
-  (typeof window === 'undefined'
-    ? 'http://152.70.129.43:8080/api'        // SSR en Vercel (sin NEXT_PUBLIC_API_URL)
-    : window.location.hostname === 'localhost' 
-      ? 'http://localhost:8080/api'           // Browser local ✅
-      : '/api');  
+const baseURL = typeof window === 'undefined'
+  ? (process.env.BACKEND_URL                    // Vercel SSR: usa BACKEND_URL
+      || process.env.NEXT_PUBLIC_API_URL         // fallback
+      || 'http://localhost:8080/api')             // Local SSR
+  : (process.env.NEXT_PUBLIC_API_URL || '/api'); // Browser: siempre /api 
                                
 export const axiosClient = axios.create({
   baseURL,
