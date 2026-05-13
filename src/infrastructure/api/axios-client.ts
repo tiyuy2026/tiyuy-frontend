@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-const isServer = typeof window === 'undefined';
-const baseURL = isServer
-  ? (process.env.BACKEND_URL || 'http://152.70.129.43:8080/api')
-  : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api');
+// BaseURL dinámica: localhost para desarrollo, producción para deploy
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 
+  (typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+    ? 'http://localhost:8080/api' 
+    : '/api');
 
 export const axiosClient = axios.create({
   baseURL,
