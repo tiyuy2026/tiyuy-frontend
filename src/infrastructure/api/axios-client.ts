@@ -1,11 +1,12 @@
 import axios from 'axios';
 
-// BaseURL dinámica: localhost para desarrollo, producción para deploy
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 
-  (typeof window !== 'undefined' && window.location.hostname === 'localhost' 
-    ? 'http://localhost:8080/api' 
-    : '/api');
-
+  (typeof window === 'undefined'
+    ? 'http://152.70.129.43:8080/api'        // SSR en Vercel (sin NEXT_PUBLIC_API_URL)
+    : window.location.hostname === 'localhost' 
+      ? 'http://localhost:8080/api'           // Browser local ✅
+      : '/api');  
+                               
 export const axiosClient = axios.create({
   baseURL,
   timeout: 60000, // 60 segundos para Render cold start
