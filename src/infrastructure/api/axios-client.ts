@@ -1,17 +1,19 @@
 import axios from 'axios';
 
-const baseURL = typeof window === 'undefined'
-  ? (process.env.BACKEND_URL                    // Vercel SSR: usa BACKEND_URL
-      || process.env.NEXT_PUBLIC_API_URL         // fallback
-      || 'http://localhost:8080/api')             // Local SSR
-  : (process.env.NEXT_PUBLIC_API_URL || '/api'); // Browser: siempre /api 
-                               
+const serverBaseURL = process.env.BACKEND_URL
+  ? `${process.env.BACKEND_URL}/api`
+  : 'http://localhost:8080/api';
+
+const baseURL =
+  typeof window === 'undefined'
+    ? serverBaseURL
+    : (process.env.NEXT_PUBLIC_API_URL || '/api');
+
 export const axiosClient = axios.create({
   baseURL,
-  timeout: 60000, // 60 segundos para Render cold start
+  timeout: 60000,
 });
 
-// Public client for endpoints that don't require authentication
 export const publicApiClient = axios.create({
   baseURL,
   timeout: 60000,
@@ -24,20 +26,21 @@ export const publicApiClient = axios.create({
 axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const shouldRetry = (error.code === 'ECONNABORTED' || 
-                        error.code === 'ERR_NETWORK' || 
-                        error.code === 'ECONNREFUSED' ||
-                        !error.response) && 
-                        error.config && 
-                        !error.config.__retry;
-    
+    const shouldRetry =
+      (error.code === 'ECONNABORTED' ||
+        error.code === 'ERR_NETWORK' ||
+        error.code === 'ECONNREFUSED' ||
+        !error.response) &&
+      error.config &&
+      !error.config.__retry;
+
     if (shouldRetry) {
       error.config.__retry = true;
       console.log(' Reintentando request (Render cold start / Network error)...', error.code);
-      // Esperar 2 segundos antes de reintentar
       await new Promise(resolve => setTimeout(resolve, 2000));
       return axiosClient.request(error.config);
     }
+
     return Promise.reject(error);
   }
 );
@@ -51,6 +54,7 @@ publicApiClient.interceptors.response.use(
       console.log(' Reintentando request (Render cold start)...');
       return publicApiClient.request(error.config);
     }
+
     return Promise.reject(error);
   }
 );
@@ -63,7 +67,7 @@ axiosClient.interceptors.request.use(
     console.log(' AXIOS REQUEST - Method:', config.method?.toUpperCase(), 'URL:', config.url);
     console.log(' AXIOS BASEURL:', axiosClient.defaults.baseURL);
     console.log(' FULL URL:', `${axiosClient.defaults.baseURL || ''}${config.url || ''}`);
-    
+
     if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
       if (config.headers) {
         delete (config.headers as any)['Content-Type'];
@@ -79,34 +83,31 @@ axiosClient.interceptors.request.use(
     }
 
     if (typeof window !== 'undefined') {
-      // Check all possible token keys
-      const tokenKeys = ['tiyuy-auth-token', 'token', 'auth-token'];
-      console.log(' localStorage keys:', Object.keys(localStorage));
-      
-      let token = localStorage.getItem('tiyuy-auth-token') || 
-              localStorage.getItem('token') || 
-              localStorage.getItem('auth-token');
-      
-      // Si el token está en formato de objeto Zustand, extraer el token real
+      let token =
+        localStorage.getItem('tiyuy-auth-token') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('auth-token');
+
       if (token && token.startsWith('{"state":')) {
         try {
           const parsed = JSON.parse(token);
-          token = parsed.state?.token || token; // Extraer el token real
+          token = parsed.state?.token || token;
           console.log(' Extracted token from Zustand object');
         } catch (e) {
           console.log(' Failed to parse token object:', e);
         }
       }
-      
+
       console.log(' Token check:', token ? 'EXISTS' : 'MISSING');
+
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
         console.log(' Token added to headers');
       } else {
         console.log(' No token found in localStorage');
-        console.log(' Available localStorage items:', Object.keys(localStorage));
       }
     }
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -117,12 +118,12 @@ axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expirado → logout automático
       if (typeof window !== 'undefined') {
         localStorage.removeItem('tiyuy-auth-token');
         window.location.href = '/login';
       }
     }
+
     return Promise.reject(error);
   }
 );
