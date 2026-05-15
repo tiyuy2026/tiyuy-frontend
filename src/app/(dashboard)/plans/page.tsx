@@ -302,10 +302,10 @@ export default function PlansPage() {
       if (publishedCount >= 1) return true;
       
       // If user has active paid subscription, FREE is also blocked
-      if (activeSubscription && (activeSubscription as any).tier !== 'FREE') return true;
+      if (activeSubscription && activeSubscription.plan?.id !== 'FREE') return true;
       
       // If user has FREE subscription but no remaining publications, it's blocked
-      if (activeSubscription && (activeSubscription as any).tier === 'FREE' 
+      if (activeSubscription && activeSubscription.plan?.id === 'FREE' 
           && activeSubscription.remainingPublications <= 0) return true;
       
       return false;
@@ -340,7 +340,8 @@ export default function PlansPage() {
 
   // Check if plan can be renewed (only when expired, not just exhausted)
   const canRenewPlan = (plan: SubscriptionPlan) => {
-    if (plan.id === 'FREE') return false; // FREE plan cannot be renewed
+    const planTier = getPlanTierCode(plan.id);
+    if (planTier === 'FREE') return false; // FREE plan cannot be renewed
     
     if (!activeSubscription) return false;
     
@@ -348,47 +349,40 @@ export default function PlansPage() {
     const expirationDate = activeSubscription.expiresAt;
     
     // Can only renew if this is the current active plan AND it's expired
-    return currentTier === plan.id && expirationDate && new Date(expirationDate) <= new Date();
+    return currentTier === planTier && expirationDate && new Date(expirationDate) <= new Date();
   };
 
   // Check if plan is expired (by time)
   const isPlanExpired = (plan: SubscriptionPlan) => {
+    const planTier = getPlanTierCode(plan.id);
     if (!activeSubscription) return false;
     
     const currentTier = (activeSubscription as any).tier || activeSubscription.plan?.id;
     const expirationDate = activeSubscription.expiresAt;
     
     // Only check expiration for the current active plan
-    if (currentTier !== plan.id) return false;
+    if (currentTier !== planTier) return false;
     
     return expirationDate && new Date(expirationDate) <= new Date();
   };
 
   // Check if plan is exhausted (by publication limit, not expired)
   const isPlanExhaustedByLimit = (plan: SubscriptionPlan) => {
-    if (plan.id === 'FREE') {
-      // FREE plan special case: permanently blocked after first use
+    const planTier = getPlanTierCode(plan.id);
+    if (planTier === 'FREE') {
       if (publishedCount >= 1) return true;
-      
-      // If user has active paid subscription, FREE is also blocked
-      if (activeSubscription && (activeSubscription as any).tier !== 'FREE') return true;
-      
-      // If user has FREE subscription but no remaining publications, it's blocked
-      if (activeSubscription && (activeSubscription as any).tier === 'FREE' 
+      if (activeSubscription && activeSubscription.plan?.id !== 'FREE') return true;
+      if (activeSubscription && activeSubscription.plan?.id === 'FREE' 
           && activeSubscription.remainingPublications <= 0) return true;
-      
       return false;
     }
 
-    // For paid plans, only evaluate if there's an active subscription
     if (!activeSubscription) return false;
 
-    const currentTier = (activeSubscription as any).tier || activeSubscription.plan?.id;
+    const currentTier = activeSubscription.plan?.id;
     const remainingPublications = activeSubscription.remainingPublications || 0;
     
-    // If this is the current active plan and has no remaining publications
-    if (currentTier === plan.id && remainingPublications <= 0) {
-      // Only return true if NOT expired (exhausted by limit, not by time)
+    if (currentTier === planTier && remainingPublications <= 0) {
       const expirationDate = activeSubscription.expiresAt;
       return !expirationDate || new Date(expirationDate) > new Date();
     }
@@ -541,7 +535,7 @@ export default function PlansPage() {
                 console.log('🔍 DEBUG: Procesando plan en /plans:', plan.name, 'precio:', plan.price);
                 
                 const backendTier = activeSubscription
-                  ? (activeSubscription as any).tier || activeSubscription.plan?.id
+                  ? activeSubscription.plan?.id
                   : null;
                 const planIdToTier: Record<string, string> = {
                   '1': 'FREE', '2': 'BASIC', '3': 'PREMIUM',
