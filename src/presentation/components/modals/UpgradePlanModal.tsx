@@ -19,7 +19,7 @@ interface UpgradePlanModalProps {
 }
 
 export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
-  console.log('🔍 DEBUG: UpgradePlanModal se está ejecutando');
+  console.log('DEBUG: UpgradePlanModal se está ejecutando');
   
   const { data: plans, isLoading } = useAvailablePlans();
   const { data: activeSubscription } = useActiveSubscription();
@@ -63,17 +63,17 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   
   // Función para detectar descuentos inteligentes basados en reglas de negocio - PARA AGENTES Y DEVELOPERS CON DESCUENTOS DE AGENCIA
   const detectIntelligentDiscount = (planPrice: number): { code: string; percentage: number } | null => {
-    console.log('🔍 Detectando descuento inteligente para precio:', planPrice, 'usuario es agente:', isAgent, 'usuario es developer:', isDeveloper, 'tiene descuentos de agencia:', hasDiscountCodes);
+    console.log('Detectando descuento inteligente para precio:', planPrice, 'usuario es agente:', isAgent, 'usuario es developer:', isDeveloper, 'tiene descuentos de agencia:', hasDiscountCodes);
     
     // 🔒 CRÍTICO: Solo agentes y developers con descuentos de agencia pueden tener descuentos inteligentes
     if (!hasAgencyRole || !hasDiscountCodes) {
-      console.log('🚫 Usuario no es agente/developer o no tiene descuentos de agencia - no se aplican descuentos inteligentes');
+      console.log('Usuario no es agente/developer o no tiene descuentos de agencia - no se aplican descuentos inteligentes');
       return null;
     }
     
     // Regla: Si el precio es 29, aplicar 20% de descuento
     if (planPrice === 29) {
-      console.log('✅ Descuento inteligente detectado: 20% para precio 29 (agente/developer con descuentos)');
+      console.log('Descuento inteligente detectado: 20% para precio 29 (agente/developer con descuentos)');
       return {
         code: 'AUTO20',
         percentage: 20
@@ -82,7 +82,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
     
     // Regla: Si el precio es 49, aplicar 15% de descuento
     if (planPrice === 49) {
-      console.log('✅ Descuento inteligente detectado: 15% para precio 49 (agente/developer con descuentos)');
+      console.log('Descuento inteligente detectado: 15% para precio 49 (agente/developer con descuentos)');
       return {
         code: 'AUTO15',
         percentage: 15
@@ -91,14 +91,14 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
     
     // Regla: Si el precio es 99, aplicar 10% de descuento
     if (planPrice === 99) {
-      console.log('✅ Descuento inteligente detectado: 10% para precio 99 (agente/developer con descuentos)');
+      console.log('Descuento inteligente detectado: 10% para precio 99 (agente/developer con descuentos)');
       return {
         code: 'AUTO10',
         percentage: 10
       };
     }
     
-    console.log('❌ No se detectó descuento inteligente para precio:', planPrice);
+    console.log('No se detectó descuento inteligente para precio:', planPrice);
     return null;
   };
 
@@ -129,7 +129,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   };
   
   useEffect(() => {
-    console.log('🔍 useEffect triggered:', {
+    console.log('useEffect triggered:', {
       isAgent,
       hasDiscountCodes,
       availableDiscountCodes,
@@ -139,19 +139,19 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
     if (isAgent && hasDiscountCodes && availableDiscountCodes && availableDiscountCodes.length > 0) {
       // Aplicar automáticamente el primer descuento disponible
       const firstDiscount = availableDiscountCodes[0];
-      console.log('🔍 firstDiscount structure:', firstDiscount);
+      console.log('firstDiscount structure:', firstDiscount);
       
       // El código está anidado en discountCode.code
       const discountCodeObj = (firstDiscount as any).discountCode;
       const discountCodeValue = discountCodeObj?.code || discountCodeObj;
       const discountPercentage = discountCodeObj?.discountPercentage || 0;
-      console.log('🔍 discountCodeValue:', discountCodeValue, 'percentage:', discountPercentage);
+      console.log('discountCodeValue:', discountCodeValue, 'percentage:', discountPercentage);
       
       setAutoDiscountCode(discountCodeValue);
       setAutoDiscountPercentage(discountPercentage);
       setDiscountCode(discountCodeValue);
       setIsIntelligentDiscount(false);
-      console.log('🎁 Descuento de agente aplicado automáticamente:', discountCodeValue, discountPercentage + '%');
+      console.log('Descuento de agente aplicado automáticamente:', discountCodeValue, discountPercentage + '%');
     }
   }, [isAgent, hasDiscountCodes, availableDiscountCodes]);
 
@@ -160,7 +160,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   const showDiscountField = hasAnyDiscountAvailable;
 
   // DEBUG: Log para depurar
-  console.log('🔍 DEBUG UpgradePlanModal:', {
+  console.log('DEBUG UpgradePlanModal:', {
     userRole,
     isAgent,
     availableDiscountCodes,
@@ -226,7 +226,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   };
 
   const openMercadoPagoPayment = (plan: SubscriptionPlan, subscriptionId: string) => {
-    console.log('🚀 Abriendo MercadoPago para plan:', plan.name);
+    console.log('Abriendo MercadoPago para plan:', plan.name);
     
     // Cargar SDK dinámicamente si no está disponible
     if (!(window as any).MercadoPago) {
@@ -266,29 +266,29 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ Error del backend:', response.status, errorText);
+        console.error('Error del backend:', response.status, errorText);
         toast.error('Error al crear preferencia de pago');
         return;
       }
 
       const data = await response.json();
-      console.log('🔍 DATA COMPLETA:', data); // ← DEBUG
+      console.log('DATA COMPLETA:', data); // ← DEBUG
       
       // FIX: Todos los nombres posibles
       const url = data.sandbox_init_point || data.sandboxInitPoint || 
                   data.init_point || data.initPoint;
       
-      console.log('🚀 URL FINAL:', url);
+      console.log('URL FINAL:', url);
 
       if (url) {
         window.open(url, '_blank');
       } else {
-        console.error('❌ NO URL:', Object.keys(data));
+        console.error('NO URL:', Object.keys(data));
         toast.error('No se recibió URL de pago');
       }
 
     } catch (error) {
-      console.error('❌ Error:', error);
+      console.error('Error:', error);
       toast.error('Error al iniciar el pago');
     }
   };
@@ -316,14 +316,14 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
         window.open(checkoutUrl, '_blank');
       }
     } catch (error) {
-      console.error('❌ Error abriendo checkout:', error);
+      console.error('Error abriendo checkout:', error);
       toast.error('Error al abrir checkout de MercadoPago');
     }
   };
 
   const tryAlternativeMethod = (mp: any, preference: any) => {
     // Si create falla, intentar con el método antiguo
-    console.log('🔄 Intentando método alternativo...');
+    console.log('Intentando método alternativo...');
     if (mp.checkout && mp.checkout.render) {
       mp.checkout.render({
         preference: preference,
@@ -331,7 +331,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
       });
     } else {
       // Como último recurso, construir URL manual
-      console.log('🔧 Construyendo URL manual como fallback');
+      console.log('Construyendo URL manual como fallback');
       const manualUrl = `https://www.mercadopago.com/checkout/v1/redirect?preference_id=${Math.random().toString(36).substring(2, 9)}`;
       window.open(manualUrl, '_blank');
     }
@@ -341,7 +341,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   const isPlanExhausted = (plan: SubscriptionPlan) => {
     if (plan.id !== 'FREE') return false;
     
-    console.log('🔍 Verificando plan FREE:', {
+    console.log('Verificando plan FREE:', {
       hasUsedFreePlan,
       activeSubscription,
       activeSubscriptionPlan: activeSubscription?.plan?.id
@@ -349,19 +349,19 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
     
     // Si tiene suscripción activa diferente de FREE, el FREE está agotado
     if (activeSubscription && (activeSubscription as any).tier !== 'FREE') {
-      console.log('✅ Plan FREE agotado: Tiene suscripción activa diferente');
+      console.log('Plan FREE agotado: Tiene suscripción activa diferente');
       return true;
     }
     
     // Si tiene suscripción FREE activa pero ya usó todas las publicaciones, está agotado
     if (activeSubscription && (activeSubscription as any).tier === 'FREE' && (activeSubscription as any).publicationsLimit - (activeSubscription as any).publicationsUsed <= 0) {
-      console.log('✅ Plan FREE agotado: Sin publicaciones restantes');
+      console.log('Plan FREE agotado: Sin publicaciones restantes');
       return true;
     }
     
     // Si el modal se abre, es porque el usuario intenta publicar otra propiedad
     // Esto significa que ya usó su plan gratuito de 1 propiedad
-    console.log('✅ Plan FREE agotado: Modal abierto = usuario ya consumió su plan gratuito');
+    console.log('Plan FREE agotado: Modal abierto = usuario ya consumió su plan gratuito');
     return true;
   };
 
@@ -377,7 +377,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  🚀 Actualiza tu plan
+                  Actualiza tu plan
                 </h2>
                 <p className="text-gray-600 mt-1">
                   Elige el plan perfecto para publicar más propiedades y hacer crecer tu negocio inmobiliario.
@@ -465,11 +465,11 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
                   </div>
                   {appliedManualDiscount?.valid ? (
                     <div className="text-xs text-green-600">
-                      ✅ {appliedManualDiscount.message}
+                      {appliedManualDiscount.message}
                     </div>
                   ) : (
                     <div className="text-xs text-red-600">
-                      ❌ {appliedManualDiscount?.message}
+                      {appliedManualDiscount?.message}
                     </div>
                   )}
                 </div>

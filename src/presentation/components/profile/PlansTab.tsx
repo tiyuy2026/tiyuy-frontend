@@ -165,7 +165,7 @@ export const PlansTab: React.FC<PlansTabProps> = ({ user }) => {
             ))}
           </div>
           <p className="text-xs text-green-700 mt-3">
-            💡 Usa estos códigos al momento de pagar para obtener tu descuento
+            Usa estos códigos al momento de pagar para obtener tu descuento
           </p>
         </div>
       )}

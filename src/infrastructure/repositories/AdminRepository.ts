@@ -521,18 +521,39 @@ export class AdminRepository implements IAdminRepository {
   }
 
   // Finance and Monetization
-  async getActiveSubscriptionPlans(): Promise<any[]> {
+  async getActiveSubscriptionPlans(): Promise<SubscriptionPlan[]> {
     const url = `${this.basePath}/subscription-plans/active`;
-    console.log('Making GET request to:', url);
-    try {
-      const response = await axiosClient.get(url);
-      console.log('Response status:', response.status);
-      console.log('Response data:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error('Error in getActiveSubscriptionPlans:', error);
-      throw error;
-    }
+    const response = await axiosClient.get(url);
+
+    const content = Array.isArray(response.data)
+      ? response.data
+      : Array.isArray(response.data?.content)
+        ? response.data.content
+        : [];
+
+    return content.map((item: any) => ({
+      id: Number(item.id),
+      code: String(item.code ?? ''),
+      displayName: String(item.displayName ?? item.name ?? ''),
+      description: String(item.description ?? ''),
+      priceInPen: Number(item.priceInPen ?? 0),
+      priceInUsd: Number(item.priceInUsd ?? 0),
+      currency: String(item.currency ?? 'PEN'),
+      durationDays: Number(item.durationDays ?? 0),
+      publicationsLimit: Number(item.publicationsLimit ?? 0),
+      projectsLimit: Number(item.projectsLimit ?? 0),
+      photosLimit: Number(item.photosLimit ?? 0),
+      isActive: Boolean(item.isActive),
+      isFeatured: Boolean(item.isFeatured),
+      displayOrder: Number(item.displayOrder ?? 0),
+      billingCycle: item.billingCycle,
+      features: Array.isArray(item.features) ? item.features : [],
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      agencyDiscountCount: Number(item.agencyDiscountCount ?? 0),
+      name: item.name ?? item.code ?? '',
+      limits: item.limits
+    }));
   }
 
   async getAdminSubscriptions(
@@ -655,9 +676,38 @@ export class AdminRepository implements IAdminRepository {
     return response.data;
   }
 
-  async getSubscriptionPlans(): Promise<any[]> {
+  async getSubscriptionPlans(): Promise<SubscriptionPlan[]> {
     const response = await axiosClient.get(`${this.basePath}/subscription-plans`);
-    return response.data.content || [];
+
+    const content = Array.isArray(response.data?.content)
+      ? response.data.content
+      : Array.isArray(response.data)
+        ? response.data
+        : [];
+
+    return content.map((item: any) => ({
+      id: Number(item.id),
+      code: String(item.code ?? ''),
+      displayName: String(item.displayName ?? item.name ?? ''),
+      description: String(item.description ?? ''),
+      priceInPen: Number(item.priceInPen ?? 0),
+      priceInUsd: Number(item.priceInUsd ?? 0),
+      currency: String(item.currency ?? 'PEN'),
+      durationDays: Number(item.durationDays ?? 0),
+      publicationsLimit: Number(item.publicationsLimit ?? 0),
+      projectsLimit: Number(item.projectsLimit ?? 0),
+      photosLimit: Number(item.photosLimit ?? 0),
+      isActive: Boolean(item.isActive),
+      isFeatured: Boolean(item.isFeatured),
+      displayOrder: Number(item.displayOrder ?? 0),
+      billingCycle: item.billingCycle,
+      features: Array.isArray(item.features) ? item.features : [],
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      agencyDiscountCount: Number(item.agencyDiscountCount ?? 0),
+      name: item.name ?? item.code ?? '',
+      limits: item.limits
+    }));
   }
 
   async getSubscriptionSalesHistory(period: string = '6months'): Promise<{ labels: string[], revenue: number[], subscriptions: number[] }> {
