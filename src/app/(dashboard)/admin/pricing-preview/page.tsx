@@ -322,7 +322,7 @@ export default function PricingPreviewPage() {
                         key={plan.id}
                         size="sm"
                         variant="outline"
-                        onClick={() => handleQuickCalculate(plan.name, discount.code)}
+                        onClick={() => handleQuickCalculate(plan.name || '', discount.code)}
                         className="w-full text-xs"
                       >
                         Apply to {plan.displayName}
@@ -369,7 +369,7 @@ export default function PricingPreviewPage() {
                     size="sm"
                     variant="outline"
                     onClick={() => {
-                      setSelectedPlan(plan.name);
+                      setSelectedPlan(plan.name || '');
                       setOriginalAmount(plan.priceInPen);
                     }}
                     className="w-full"
