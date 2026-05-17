@@ -51,10 +51,21 @@ export function useSubscribeToPlan() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallet', 'balance'] });
       queryClient.invalidateQueries({ queryKey: ['subscription', 'active'] });
-      toast.success('¡Suscripción activada! Ya puedes publicar más propiedades.');
+      // No mostrar mensaje de activacion porque la suscripcion aun no esta activa
+      // Se activara cuando MercadoPago notifique el pago
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al activar suscripción');
+      console.error('Error en useSubscribeToPlan:', error);
+      console.error('Error response:', error.response);
+      console.error('Error data:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.message || 
+                          'Error al activar suscripción';
+      
+      toast.error(errorMessage);
     },
   });
 }

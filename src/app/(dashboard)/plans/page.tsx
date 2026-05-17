@@ -37,16 +37,16 @@ export default function PlansPage() {
 
   // Check if user is agent and has available discount codes
   const userData = authStorage.getUser();
-  console.log('🔍 DEBUG: Datos completos del usuario:', userData);
+  console.log('DEBUG: Datos completos del usuario:', userData);
   
   const userRole = userData?.role;
   const isAgent = userRole === 'AGENT';
   const isDeveloper = userRole === 'DEVELOPER';
-  // 🔒 SEGURIDAD: Agentes pueden tener descuentos en todos los planes, Developers solo en empresariales
+  // SEGURIDAD: Agentes pueden tener descuentos en todos los planes, Developers solo en empresariales
   const hasAgencyRole = isAgent || isDeveloper;
   const hasDiscountCodes = hasAgencyRole && availableDiscountCodes && availableDiscountCodes.length > 0;
   
-  console.log('🔍 DEBUG: Información de agencia:', {
+  console.log('DEBUG: Información de agencia:', {
     userId: userData?.id,
     agencyId: userData?.agencyId,
     agencyName: userData?.agencyName,
@@ -72,17 +72,17 @@ export default function PlansPage() {
 
   // Función para detectar descuentos inteligentes basados en reglas de negocio - DINÁMICO DESDE BACKEND
   const detectIntelligentDiscount = (plan: SubscriptionPlan): { code: string; percentage: number } | null => {
-    console.log('🔍 Detectando descuento inteligente para plan:', plan.name, 'precio:', plan.price);
+    console.log('Detectando descuento inteligente para plan:', plan.name, 'precio:', plan.price);
     
     // Para Developers: solo aplicar descuentos en planes empresariales
     if (isDeveloper && !isEnterprisePlan(plan)) {
-      console.log('🚫 Developer solo puede tener descuentos en planes empresariales');
+      console.log('Developer solo puede tener descuentos en planes empresariales');
       return null;
     }
     
     // Para Agents: solo si tienen descuentos de agencia
     if (isAgent && !hasDiscountCodes) {
-      console.log('🚫 Agente no tiene descuentos de agencia disponibles');
+      console.log('Agente no tiene descuentos de agencia disponibles');
       return null;
     }
     
@@ -94,7 +94,7 @@ export default function PlansPage() {
       );
       
       if (intelligentDiscount) {
-        console.log('✅ Descuento inteligente encontrado desde backend:', intelligentDiscount.code, intelligentDiscount.discountPercentage + '%');
+        console.log('Descuento inteligente encontrado desde backend:', intelligentDiscount.code, intelligentDiscount.discountPercentage + '%');
         return {
           code: intelligentDiscount.code,
           percentage: intelligentDiscount.discountPercentage
@@ -102,7 +102,7 @@ export default function PlansPage() {
       }
     }
     
-    console.log('❌ No se encontraron descuentos inteligentes para este plan');
+    console.log('No se encontraron descuentos inteligentes para este plan');
     return null;
   };
 
@@ -133,7 +133,7 @@ export default function PlansPage() {
 
   // Función para verificar si un descuento es válido para este usuario
   const isDiscountValidForUser = (discount: any) => {
-    console.log('🔍 DEBUG: Validando descuento para usuario:', {
+    console.log('DEBUG: Validando descuento para usuario:', {
       userId: userData?.id,
       agencyId: userData?.agencyId,
       role: userData?.role,
@@ -143,7 +143,7 @@ export default function PlansPage() {
     
     // 1. Verificar que el descuento esté activo
     if (discount.status !== 'ACTIVE') {
-      console.log('❌ Descuento inválido: No está activo');
+      console.log('Descuento inválido: No está activo');
       return false;
     }
     
@@ -152,7 +152,7 @@ export default function PlansPage() {
       const expiryDate = new Date(discount.validUntil);
       const now = new Date();
       if (now > expiryDate) {
-        console.log('❌ Descuento inválido: Ha expirado', {
+        console.log('Descuento inválido: Ha expirado', {
           validUntil: discount.validUntil,
           now: now.toISOString()
         });
@@ -162,7 +162,7 @@ export default function PlansPage() {
     
     // 3. Verificar que no haya alcanzado el límite de uso
     if (discount.maxUses && discount.usedCount >= discount.maxUses) {
-      console.log('❌ Descuento inválido: Ha alcanzado el límite de uso');
+      console.log('Descuento inválido: Ha alcanzado el límite de uso');
       return false;
     }
     
@@ -174,33 +174,33 @@ export default function PlansPage() {
       
       // Si el descuento tiene userId, verificamos que pertenezca a un usuario de la misma agencia
       // Esto es complicado porque el backend no devuelve la información de la agencia del descuento
-      console.log('🚨 SEGURIDAD: Verificando agencia del usuario');
-      console.log('🔍 Usuario agencyId:', userData?.agencyId);
-      console.log('🔍 Descuento asignado a userId:', discount.userId);
+      console.log('SEGURIDAD: Verificando agencia del usuario');
+      console.log('Usuario agencyId:', userData?.agencyId);
+      console.log('Descuento asignado a userId:', discount.userId);
       
       // Por ahora, permitimos el descuento pero registramos la advertencia de seguridad
-      console.log('⚠️ ADVERTENCIA: El backend debería filtrar descuentos por agencyId');
-      console.log('⚠️ Actualmente todos los agentes ven todos los descuentos - PROBLEMA DE SEGURIDAD');
+      console.log('ADVERTENCIA: El backend debería filtrar descuentos por agencyId');
+      console.log('Actualmente todos los agentes ven todos los descuentos - PROBLEMA DE SEGURIDAD');
     }
     
-    console.log('✅ Descuento válido para este usuario (con advertencias de seguridad)');
+    console.log('Descuento válido para este usuario (con advertencias de seguridad)');
     return true;
   };
 
   // Auto-aplicar descuento de agencia SOLO si no hay descuento inteligente ni manual
   useEffect(() => {
-    console.log('🔍 DEBUG: useEffect de descuentos - availableDiscountCodes:', availableDiscountCodes);
+    console.log('DEBUG: useEffect de descuentos - availableDiscountCodes:', availableDiscountCodes);
     
     // No aplicar descuento de agencia si ya hay descuento manual aplicado
     if (appliedManualDiscount?.valid) {
-      console.log('🚫 Saltando aplicación de descuento de agencia - ya hay descuento manual');
+      console.log('Saltando aplicación de descuento de agencia - ya hay descuento manual');
       return;
     }
     
     if (isAgent && hasDiscountCodes && availableDiscountCodes && availableDiscountCodes.length > 0) {
-      console.log('🔍 DEBUG: Analizando descuentos disponibles:');
+      console.log('DEBUG: Analizando descuentos disponibles:');
       availableDiscountCodes.forEach((discount, index) => {
-        console.log(`🔍 Descuento ${index + 1}:`, {
+        console.log(`Descuento ${index + 1}:`, {
           id: discount.id,
           code: discount.code,
           discountPercentage: discount.discountPercentage,
@@ -213,7 +213,7 @@ export default function PlansPage() {
       const validDiscounts = availableDiscountCodes.filter(discount => isDiscountValidForUser(discount));
       
       if (validDiscounts.length === 0) {
-        console.log('❌ No hay descuentos válidos para este usuario');
+        console.log('No hay descuentos válidos para este usuario');
         setDiscountCode(''); // Limpiar descuento
         return;
       }
@@ -254,12 +254,12 @@ export default function PlansPage() {
     if (isAgentDiscountValid) {
       const agentDiscount = availableDiscountCodes[0];
       const discountPercent = (agentDiscount as any).discountPercentage || (agentDiscount as any).discountPercent || 0;
-      console.log('💰 Calculando descuento:', { planPrice: plan.price, discountPercent, agentDiscount });
+      console.log('Calculando descuento:', { planPrice: plan.price, discountPercent, agentDiscount });
       return plan.price - (plan.price * discountPercent / 100);
     }
     
     // Si ningún descuento es válido, volver al precio normal
-    console.log('⚠️ Ningún descuento válido, volviendo al precio normal');
+    console.log('Ningún descuento válido, volviendo al precio normal');
     return plan.price;
   };
 
@@ -286,18 +286,26 @@ export default function PlansPage() {
     }
   }, [showUpgradeModal, refetchSubscription]);
 
-  // ✅ Enhanced plan exhaustion detection with expiration date validation
+  // Enhanced plan exhaustion detection with expiration date validation
+  // Mapeo ID numerico a codigo tier (mismo que FinanceRepository)
+  const planIdToTier: Record<string, string> = {
+    '1': 'FREE', '2': 'BASIC', '3': 'PREMIUM',
+    '4': 'ENTERPRISE_TRIAL', '5': 'ENTERPRISE'
+  };
+  const getPlanTierCode = (planId: string): string => planIdToTier[planId] || planId;
+
   const isPlanExhausted = (plan: SubscriptionPlan) => {
+    const planTier = getPlanTierCode(plan.id);
     // FREE plan special case: permanently blocked after first use
-    if (plan.id === 'FREE') {
+    if (planTier === 'FREE') {
       // If user has any published property, FREE is permanently blocked
       if (publishedCount >= 1) return true;
       
       // If user has active paid subscription, FREE is also blocked
-      if (activeSubscription && (activeSubscription as any).tier !== 'FREE') return true;
+      if (activeSubscription && activeSubscription.plan?.id !== 'FREE') return true;
       
       // If user has FREE subscription but no remaining publications, it's blocked
-      if (activeSubscription && (activeSubscription as any).tier === 'FREE' 
+      if (activeSubscription && activeSubscription.plan?.id === 'FREE' 
           && activeSubscription.remainingPublications <= 0) return true;
       
       return false;
@@ -312,7 +320,7 @@ export default function PlansPage() {
     const expirationDate = activeSubscription.expiresAt;
     
     // If this is the current active plan
-    if (currentTier === plan.id) {
+    if (currentTier === planTier) {
       // Check if plan is expired
       if (expirationDate) {
         const expiration = new Date(expirationDate);
@@ -330,9 +338,10 @@ export default function PlansPage() {
     return false;
   };
 
-  // ✅ Check if plan can be renewed (only when expired, not just exhausted)
+  // Check if plan can be renewed (only when expired, not just exhausted)
   const canRenewPlan = (plan: SubscriptionPlan) => {
-    if (plan.id === 'FREE') return false; // FREE plan cannot be renewed
+    const planTier = getPlanTierCode(plan.id);
+    if (planTier === 'FREE') return false; // FREE plan cannot be renewed
     
     if (!activeSubscription) return false;
     
@@ -340,47 +349,40 @@ export default function PlansPage() {
     const expirationDate = activeSubscription.expiresAt;
     
     // Can only renew if this is the current active plan AND it's expired
-    return currentTier === plan.id && expirationDate && new Date(expirationDate) <= new Date();
+    return currentTier === planTier && expirationDate && new Date(expirationDate) <= new Date();
   };
 
-  // ✅ Check if plan is expired (by time)
+  // Check if plan is expired (by time)
   const isPlanExpired = (plan: SubscriptionPlan) => {
+    const planTier = getPlanTierCode(plan.id);
     if (!activeSubscription) return false;
     
     const currentTier = (activeSubscription as any).tier || activeSubscription.plan?.id;
     const expirationDate = activeSubscription.expiresAt;
     
     // Only check expiration for the current active plan
-    if (currentTier !== plan.id) return false;
+    if (currentTier !== planTier) return false;
     
     return expirationDate && new Date(expirationDate) <= new Date();
   };
 
-  // ✅ Check if plan is exhausted (by publication limit, not expired)
+  // Check if plan is exhausted (by publication limit, not expired)
   const isPlanExhaustedByLimit = (plan: SubscriptionPlan) => {
-    if (plan.id === 'FREE') {
-      // FREE plan special case: permanently blocked after first use
+    const planTier = getPlanTierCode(plan.id);
+    if (planTier === 'FREE') {
       if (publishedCount >= 1) return true;
-      
-      // If user has active paid subscription, FREE is also blocked
-      if (activeSubscription && (activeSubscription as any).tier !== 'FREE') return true;
-      
-      // If user has FREE subscription but no remaining publications, it's blocked
-      if (activeSubscription && (activeSubscription as any).tier === 'FREE' 
+      if (activeSubscription && activeSubscription.plan?.id !== 'FREE') return true;
+      if (activeSubscription && activeSubscription.plan?.id === 'FREE' 
           && activeSubscription.remainingPublications <= 0) return true;
-      
       return false;
     }
 
-    // For paid plans, only evaluate if there's an active subscription
     if (!activeSubscription) return false;
 
-    const currentTier = (activeSubscription as any).tier || activeSubscription.plan?.id;
+    const currentTier = activeSubscription.plan?.id;
     const remainingPublications = activeSubscription.remainingPublications || 0;
     
-    // If this is the current active plan and has no remaining publications
-    if (currentTier === plan.id && remainingPublications <= 0) {
-      // Only return true if NOT expired (exhausted by limit, not by time)
+    if (currentTier === planTier && remainingPublications <= 0) {
       const expirationDate = activeSubscription.expiresAt;
       return !expirationDate || new Date(expirationDate) > new Date();
     }
@@ -388,12 +390,12 @@ export default function PlansPage() {
     return false;
   };
 
-  // ✅ Misma lógica que el modal - abre MercadoPago
+  // Misma lógica que el modal - abre MercadoPago
   const handleSubscribe = () => {
     if (!selectedPlan) return;
 
     const finalPrice = getDiscountedPrice(selectedPlan);
-    console.log('💳 MERCADOPAGO: Enviando precio final:', { 
+    console.log('MERCADOPAGO: Enviando precio final:', { 
       planName: selectedPlan.name, 
       originalPrice: selectedPlan.price, 
       finalPrice,
@@ -407,9 +409,12 @@ export default function PlansPage() {
     }, {
       onSuccess: async (subscription) => {
         try {
+          console.log('Suscripcion creada:', subscription);
           const token = authStorage.getToken();
+          console.log('Token:', token ? 'Presente' : 'Ausente');
+          
           const response = await fetch(
-            `/finance/mercadopago/create-preference`,
+            `/api/finance/mercadopago/create-preference`,
             {
               method: 'POST',
               headers: {
@@ -424,22 +429,31 @@ export default function PlansPage() {
             }
           );
 
+          console.log('Respuesta create-preference:', response.status);
+
           if (!response.ok) {
-            toast.error('Error al crear preferencia de pago');
+            const errorText = await response.text();
+            console.error('Error create-preference:', response.status, errorText);
+            toast.error(`Error ${response.status} al crear preferencia`);
             return;
           }
 
           const data = await response.json();
+          console.log('Datos preferencia:', data);
           const url = data.sandbox_init_point || data.sandboxInitPoint ||
                       data.init_point || data.initPoint;
 
+          console.log('URL pago:', url);
+
           if (url) {
-            window.location.href = url; // ✅ misma pestaña, no se bloquea
+            window.location.href = url;
           } else {
-            toast.error('No se recibió URL de pago');
+            console.error('Sin URL. Keys:', Object.keys(data));
+            toast.error('No se recibio URL de pago');
           }
         } catch (error) {
-          toast.error('Error al iniciar el pago');
+          console.error('Error pago:', error);
+          toast.error('Error al iniciar pago: ' + (error as any).message);
         }
       },
       onError: (error: any) => {
@@ -533,11 +547,16 @@ export default function PlansPage() {
                 console.log('🔍 DEBUG: Procesando plan en /plans:', plan.name, 'precio:', plan.price);
                 
                 const backendTier = activeSubscription
-                  ? (activeSubscription as any).tier || activeSubscription.plan?.id
+                  ? activeSubscription.plan?.id
                   : null;
+                const planIdToTier: Record<string, string> = {
+                  '1': 'FREE', '2': 'BASIC', '3': 'PREMIUM',
+                  '4': 'ENTERPRISE_TRIAL', '5': 'ENTERPRISE'
+                };
+                const planTierCode = planIdToTier[plan.id] || plan.id;
                 const isActive = !activeSubscription
-                  ? plan.id === 'FREE'
-                  : backendTier === plan.id;
+                  ? planTierCode === 'FREE'
+                  : backendTier === planTierCode;
                 const isExhausted = isPlanExhausted(plan);
                 
                 // Detectar descuento inteligente para este plan específico

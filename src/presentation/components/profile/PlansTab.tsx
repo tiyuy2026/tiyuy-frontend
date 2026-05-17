@@ -72,9 +72,12 @@ export const PlansTab: React.FC<PlansTabProps> = ({ user }) => {
     }, {
       onSuccess: async (subscription) => {
         try {
+          console.log('Suscripcion creada exitosamente:', subscription);
           const token = authStorage.getToken();
+          console.log('Token obtenido:', token ? 'Presente' : 'Ausente');
+          
           const response = await fetch(
-            `/finance/mercadopago/create-preference`,
+            `/api/finance/mercadopago/create-preference`,
             {
               method: 'POST',
               headers: {
@@ -89,22 +92,31 @@ export const PlansTab: React.FC<PlansTabProps> = ({ user }) => {
             }
           );
 
+          console.log('Respuesta de create-preference:', response.status, response.statusText);
+
           if (!response.ok) {
-            toast.error('Error al crear preferencia de pago');
+            const errorText = await response.text();
+            console.error('Error en create-preference:', response.status, errorText);
+            toast.error(`Error al crear preferencia de pago: ${response.status}`);
             return;
           }
 
           const data = await response.json();
+          console.log('Datos de preferencia:', data);
           const url = data.sandbox_init_point || data.sandboxInitPoint ||
                       data.init_point || data.initPoint;
+
+          console.log('URL de pago:', url);
 
           if (url) {
             window.location.href = url;
           } else {
-            toast.error('No se recibió URL de pago');
+            console.error('No se encontro URL en respuesta:', Object.keys(data));
+            toast.error('No se recibio URL de pago del servidor');
           }
         } catch (error) {
-          toast.error('Error al iniciar el pago');
+          console.error('Error en flujo de pago:', error);
+          toast.error('Error al iniciar el pago: ' + (error as any).message);
         }
       },
       onError: (error: any) => {
@@ -165,7 +177,7 @@ export const PlansTab: React.FC<PlansTabProps> = ({ user }) => {
             ))}
           </div>
           <p className="text-xs text-green-700 mt-3">
-            💡 Usa estos códigos al momento de pagar para obtener tu descuento
+            Usa estos códigos al momento de pagar para obtener tu descuento
           </p>
         </div>
       )}

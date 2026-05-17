@@ -10,6 +10,7 @@ import {
   DashboardStats,
   UserStats,
   FinanceStats,
+  FinanceHistoryDto,
   UserListItem,
   ChangeUserRoleRequest,
   DiscountCode,
@@ -24,6 +25,8 @@ import {
   AuditLogEntry,
   Department,
   Permission,
+  CentralDiscountDto,
+  CentralDiscountSummary,
 } from '@/core/domain/entities/Admin';
 
 // Pagination types (aligned with backend Page response)
@@ -50,6 +53,7 @@ export interface IAdminRepository {
   getDashboardStats(): Promise<DashboardStats>;
   getUserStats(): Promise<UserStats>;
   getFinanceStats(): Promise<FinanceStats>;
+  getFinanceHistory(period?: string): Promise<FinanceHistoryDto>;
 
   // Admin User Management (requires SUPER_ADMIN)
   getAllAdmins(params: PaginationParams): Promise<PaginatedResponse<AdminUser>>;
@@ -115,4 +119,16 @@ export interface IAdminRepository {
 
   // Automation
   triggerManualAutomation(): Promise<string>;
+
+  // Central Discount Management
+  getCentralDiscounts(params: {
+    source?: string;
+    status?: string;
+    search?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    page?: number;
+    size?: number;
+  }): Promise<PaginatedResponse<CentralDiscountDto>>;
+  getCentralDiscountSummary(): Promise<CentralDiscountSummary>;
 }

@@ -35,9 +35,9 @@ const roles: Role[] = [
   {
     id: 'comprador',
     title: 'COMPRADOR',
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-    icon: <ShoppingCart className="w-8 h-8" />,
+    color: 'text-[#5dae4c]',
+    bgColor: 'bg-[#5dae4c]/10',
+    icon: <ShoppingCart className="w-8 h-8 text-[#5dae4c]" />,
     description: 'Persona que quiere comprar una propiedad (casa, departamento, terreno, local).',
     howToKnow: [
       'Estás buscando una propiedad para comprar',
@@ -108,9 +108,9 @@ const roles: Role[] = [
   {
     id: 'vendedor',
     title: 'VENDEDOR',
-    color: 'text-green-600',
-    bgColor: 'bg-green-50',
-    icon: <DollarSign className="w-8 h-8" />,
+    color: 'text-[#5dae4c]',
+    bgColor: 'bg-[#5dae4c]/10',
+    icon: <DollarSign className="w-8 h-8 text-[#5dae4c]" />,
     description: 'Eres la persona dueña del inmueble y quieres venderlo.',
     howToKnow: [
       'La propiedad está a tu nombre',
@@ -172,9 +172,9 @@ const roles: Role[] = [
   {
     id: 'arrendador',
     title: 'ARRENDADOR (Dueño que alquila)',
-    color: 'text-orange-600',
-    bgColor: 'bg-orange-50',
-    icon: <Home className="w-8 h-8" />,
+    color: 'text-[#5dae4c]',
+    bgColor: 'bg-[#5dae4c]/10',
+    icon: <Home className="w-8 h-8 text-[#5dae4c]" />,
     description: 'Persona que es dueña de una propiedad y desea alquilarla.',
     howToKnow: [
       'Tienes una propiedad a tu nombre',
@@ -238,9 +238,9 @@ const roles: Role[] = [
   {
     id: 'inquilino',
     title: 'INQUILINO',
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-50',
-    icon: <Key className="w-8 h-8" />,
+    color: 'text-[#5dae4c]',
+    bgColor: 'bg-[#5dae4c]/10',
+    icon: <Key className="w-8 h-8 text-[#5dae4c]" />,
     description: 'Persona que busca alquilar una propiedad.',
     howToKnow: [
       'No tienes propiedad',
@@ -314,8 +314,8 @@ export default function GuiaAlquilarPage() {
     });
     
     // Configurar fuentes y colores
-    const primaryColor: [number, number, number] = [59, 130, 246]; // blue-600
-    const secondaryColor: [number, number, number] = [20, 184, 166]; // teal-600
+    const primaryColor: [number, number, number] = [93, 174, 76]; // #5dae4c
+    const secondaryColor: [number, number, number] = [74, 154, 62]; // #4a9a3e
     const textColor: [number, number, number] = [31, 41, 55]; // gray-800
     
     // Página 1: Título y descripción
@@ -625,45 +625,77 @@ export default function GuiaAlquilarPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Mensaje de éxito flotante */}
       {showSuccessMessage && (
-        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-pulse">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-          {showSuccessMessage}
+        <div className="fixed top-6 right-6 z-50 bg-gradient-to-r from-[#5dae4c] to-[#4a9a3e] text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce">
+          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <span className="font-semibold">{showSuccessMessage}</span>
         </div>
       )}
 
       {/* Breadcrumb */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-gray-100">
         <div className="w-full px-8 xl:px-16">
-          <div className="max-w-[1920px] mx-auto py-4">
+          <div className="max-w-[1920px] mx-auto py-3">
             <nav className="flex items-center gap-2 text-sm">
-              <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <Link href="/" className="text-gray-500 hover:text-[#5dae4c] transition-colors font-medium flex items-center gap-1">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
                 Inicio
               </Link>
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-              <span className="text-gray-900 font-medium">Guía para alquilar</span>
+              <span className="text-[#5dae4c] font-semibold bg-[#5dae4c]/10 px-3 py-1 rounded-full">Guía para alquilar</span>
             </nav>
           </div>
         </div>
       </div>
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-teal-600 text-white">
-        <div className="w-full px-8 xl:px-16">
-          <div className="max-w-[1920px] mx-auto py-16">
+      <div className="relative bg-gradient-to-br from-[#5dae4c] via-[#4da643] to-[#3d8b35] text-white overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-48 h-48 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-white rounded-full blur-2xl"></div>
+        </div>
+        <div className="w-full px-8 xl:px-16 py-20 relative z-10">
+          <div className="max-w-[1920px] mx-auto">
             <div className="text-center">
-              <h1 className="text-4xl xl:text-5xl font-bold mb-4">
-                IDENTIFICA TU PERFIL Y QUÉ DEBES HACER
+              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <span>GUÍA OFICIAL TIYUY</span>
+              </div>
+              <h1 className="text-4xl xl:text-6xl font-bold mb-6 leading-tight">
+                Identifica tu perfil y<br/>
+                <span className="text-green-200">qué debes hacer</span>
               </h1>
-              <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-                (CON INSTRUCCIONES Y LINKS OFICIALES)
+              <p className="text-xl text-green-100/80 max-w-2xl mx-auto mb-8">
+                Con instrucciones y links oficiales de entidades gubernamentales del Perú
               </p>
+              <div className="flex justify-center gap-4">
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+                  <svg className="w-5 h-5 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-sm font-medium">100% Gratuito</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+                  <svg className="w-5 h-5 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  <span className="text-sm font-medium">Información Verificada</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white/10 to-transparent"></div>
       </div>
 
       {/* Selector de Roles */}
@@ -671,64 +703,50 @@ export default function GuiaAlquilarPage() {
         <div className="w-full px-8 xl:px-16 py-12">
           <div className="max-w-[1920px] mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                ¿Quién eres?
-              </h2>
-              <p className="text-lg text-gray-600">
-                Selecciona tu perfil para obtener la guía personalizada
+              <div className="inline-block relative">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  ¿Quién eres?
+                </h2>
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-24 h-1 bg-[#5dae4c] rounded-full"></div>
+              </div>
+              <p className="text-lg text-gray-600 mt-6 max-w-xl mx-auto">
+                Selecciona tu perfil para obtener la guía personalizada con pasos detallados
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {roles.map((role) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {roles.map((role, index) => (
                 <button
                   key={role.id}
                   onClick={() => setSelectedRole(role)}
-                  className={`bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-gray-200 text-left`}
+                  className="group bg-white rounded-2xl p-6 shadow-md hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-[#5dae4c] hover:-translate-y-1 text-left relative overflow-hidden"
                 >
-                  <div className={`w-16 h-16 ${role.bgColor} rounded-xl flex items-center justify-center mb-4 text-2xl`}>
-                    {role.icon}
-                  </div>
-                  <h3 className={`text-xl font-bold ${role.color} mb-3`}>
-                    {role.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                    {role.description}
-                  </p>
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-[#5dae4c]/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-[#5dae4c]/10 transition-colors"></div>
                   
-                  {/* ¿Cómo saber si este es tu perfil? */}
-                  <div className={`${role.bgColor} rounded-lg p-4 mb-4`}>
-                    <h4 className={`font-bold ${role.color} mb-2 text-sm flex items-center gap-2`}>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.651 2.032-2.75 3.772-2.75 1.74 0 3.223 1.099 3.772 2.75.063.19.097.39.097.597v.197c0 .208-.034.408-.097.597l-2.5 7.5a1 1 0 01-1.896 0l-2.5-7.5A2.225 2.225 0 018.228 9z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12v.01M12 12v.01M12 12v.01" />
-                      </svg>
-                      ¿Cómo saber si este es tu perfil?
-                    </h4>
-                    <div className="space-y-1">
-                      {role.howToKnow.slice(0, 2).map((item, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          <div className={`w-4 h-4 ${role.color} flex-shrink-0 mt-0.5`}>
-                            <Check className="w-4 h-4" />
-                          </div>
-                          <p className="text-gray-700 text-xs">
-                            {item}
-                          </p>
-                        </div>
-                      ))}
-                      {role.howToKnow.length > 2 && (
-                        <p className={`text-xs ${role.color} font-medium mt-1`}>
-                          +{role.howToKnow.length - 2} más...
-                        </p>
-                      )}
+                  <div className="relative">
+                    <div className={`w-14 h-14 ${role.bgColor} rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      {role.icon}
+                    </div>
+                    
+                    <div className="absolute -top-1 -left-1 w-6 h-6 bg-[#5dae4c] rounded-full flex items-center justify-center text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      {index + 1}
                     </div>
                   </div>
                   
-                  <div className={`inline-flex items-center gap-2 ${role.color} font-semibold text-sm`}>
-                    <span>Ver guía completa</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#5dae4c] transition-colors">
+                    {role.title}
+                  </h3>
+                  <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">
+                    {role.description}
+                  </p>
+                  
+                  <div className="pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-2 text-[#5dae4c] font-semibold text-sm group-hover:gap-3 transition-all">
+                      <span>Comenzar guía</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
                   </div>
                 </button>
               ))}
@@ -745,7 +763,7 @@ export default function GuiaAlquilarPage() {
             <div className="flex justify-between items-center mb-8">
               <button
                 onClick={() => setSelectedRole(null)}
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium"
+                className="flex items-center gap-2 text-gray-600 hover:text-[#5dae4c] font-medium transition-colors bg-white px-4 py-2 rounded-lg shadow-sm hover:shadow-md border border-gray-200 hover:border-[#5dae4c]"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -753,10 +771,10 @@ export default function GuiaAlquilarPage() {
                 Volver a perfiles
               </button>
               
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => shareGuide(selectedRole)}
-                  className={`flex items-center gap-2 ${selectedRole.color} ${selectedRole.bgColor} px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity`}
+                  className="flex items-center gap-2 bg-white text-[#5dae4c] px-6 py-3 rounded-xl font-semibold hover:bg-[#5dae4c] hover:text-white transition-all shadow-md hover:shadow-lg border-2 border-[#5dae4c]"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-7.432 0m9.032-4.026A9.001 9.001 0 0112 3c-4.474 0-8.268 3.12-9.032 7.326m0 0A9.001 9.001 0 0012 21c4.474 0 8.268-3.12 9.032-7.326" />
@@ -766,7 +784,7 @@ export default function GuiaAlquilarPage() {
                 
                 <button
                   onClick={() => downloadGuide(selectedRole)}
-                  className={`flex items-center gap-2 ${selectedRole.color} ${selectedRole.bgColor} px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity`}
+                  className="flex items-center gap-2 bg-gradient-to-r from-[#5dae4c] to-[#4a9a3e] text-white px-6 py-3 rounded-xl font-semibold hover:from-[#4a9a3e] hover:to-[#3d8b35] transition-all shadow-lg hover:shadow-xl"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -777,37 +795,38 @@ export default function GuiaAlquilarPage() {
             </div>
 
             {/* Header del rol */}
-            <div className={`${selectedRole.bgColor} rounded-xl p-8 mb-8`}>
-              <div className="flex items-center gap-4 mb-4">
-                <div className={`w-20 h-20 ${selectedRole.bgColor} rounded-xl flex items-center justify-center text-4xl border-2 border-white`}>
+            <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#5dae4c] to-[#4a9a3e]"></div>
+              
+              <div className="flex items-start gap-6 mb-6">
+                <div className="w-24 h-24 bg-[#5dae4c]/10 rounded-2xl flex items-center justify-center text-5xl shadow-lg flex-shrink-0">
                   {selectedRole.icon}
                 </div>
-                <div>
-                  <h1 className={`text-3xl font-bold ${selectedRole.color} mb-2`}>
+                <div className="flex-1">
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">
                     {selectedRole.title}
                   </h1>
-                  <p className="text-gray-700 text-lg">
+                  <p className="text-gray-600 text-lg">
                     {selectedRole.description}
                   </p>
                 </div>
               </div>
               
               {/* ¿Cómo saber si este es tu perfil? */}
-              <div className="bg-white/80 rounded-lg p-6 mt-6">
-                <h3 className={`font-bold ${selectedRole.color} mb-3 flex items-center gap-2`}>
+              <div className="bg-gradient-to-br from-[#5dae4c]/5 to-[#5dae4c]/10 rounded-xl p-6 border border-[#5dae4c]/20">
+                <h3 className="font-bold text-[#5dae4c] mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.651 2.032-2.75 3.772-2.75 1.74 0 3.223 1.099 3.772 2.75.063.19.097.39.097.597v.197c0 .208-.034.408-.097.597l-2.5 7.5a1 1 0 01-1.896 0l-2.5-7.5A2.225 2.225 0 018.228 9z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12v.01M12 12v.01M12 12v.01" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                   ¿Cómo saber si este es tu perfil?
                 </h3>
-                <div className="space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {selectedRole.howToKnow.map((item, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <div className={`w-5 h-5 ${selectedRole.color} flex-shrink-0 mt-0.5`}>
-                        <Check className="w-5 h-5" />
+                    <div key={index} className="flex items-start gap-3 bg-white/60 rounded-lg p-3">
+                      <div className="w-6 h-6 bg-[#5dae4c] rounded-full flex items-center justify-center flex-shrink-0">
+                        <Check className="w-3 h-3 text-white" />
                       </div>
-                      <p className="text-gray-700">
+                      <p className="text-gray-700 text-sm">
                         {item}
                       </p>
                     </div>
@@ -817,35 +836,42 @@ export default function GuiaAlquilarPage() {
             </div>
 
             {/* Pasos a seguir */}
-            <div className="space-y-8">
+            <div className="space-y-6">
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Si eres {selectedRole.title}, DEBES hacer esto:
+                <div className="inline-flex items-center gap-2 bg-[#5dae4c]/10 text-[#5dae4c] px-4 py-2 rounded-full text-sm font-semibold mb-4">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                  <span>PASOS OBLIGATORIOS</span>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Si eres <span className="text-[#5dae4c]">{selectedRole.title}</span>, haz esto:
                 </h2>
               </div>
 
               {selectedRole.steps.map((step, index) => (
-                <div key={index} className="bg-white rounded-xl shadow-lg p-8">
-                  <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 ${selectedRole.bgColor} ${selectedRole.color} rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0`}>
-                      {index + 1}
+                <div key={index} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
+                  <div className="flex items-stretch">
+                    <div className="w-16 bg-gradient-to-br from-[#5dae4c] to-[#4a9a3e] flex flex-col items-center justify-center py-8 text-white">
+                      <span className="text-3xl font-bold">{index + 1}</span>
+                      <span className="text-xs uppercase mt-1 opacity-80">Paso</span>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 mb-3">
+                    <div className="flex-1 p-6">
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#5dae4c] transition-colors">
                         {step.title}
                       </h3>
-                      <p className="text-gray-600 mb-6">
+                      <p className="text-gray-600 mb-4">
                         {step.description}
                       </p>
 
                       {/* Acciones con links */}
                       {step.actions.length > 0 && (
-                        <div className="space-y-4">
+                        <div className="space-y-4 mt-4">
                           {step.actions.map((action, actionIndex) => (
-                            <div key={actionIndex} className="bg-gray-50 rounded-lg p-6">
+                            <div key={actionIndex} className="bg-gray-50 rounded-xl p-5 border border-gray-100 hover:border-[#5dae4c]/30 hover:shadow-md transition-all">
                               <div className="flex items-center gap-3 mb-3">
-                                <div className={`w-8 h-8 ${selectedRole.bgColor} ${selectedRole.color} rounded-full flex items-center justify-center flex-shrink-0`}>
-                                  <Link2 className="w-4 h-4" />
+                                <div className="w-10 h-10 bg-[#5dae4c]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                                  <Link2 className="w-5 h-5 text-[#5dae4c]" />
                                 </div>
                                 <h4 className="font-bold text-gray-900">
                                   {action.title}
@@ -859,7 +885,7 @@ export default function GuiaAlquilarPage() {
                                 className={`inline-flex items-center gap-2 ${selectedRole.color} font-medium mb-4 hover:underline`}
                               >
                                 {action.description}
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 text-[#5dae4c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                 </svg>
                               </a>
@@ -883,23 +909,111 @@ export default function GuiaAlquilarPage() {
                       )}
 
                       {/* Listas adicionales */}
-                      {step.why && (
-                        <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
-                          <p className="font-semibold text-yellow-800 mb-2">¿Por qué debes hacerlo?</p>
-                          {step.why.map((reason, whyIndex) => (
-                            <p key={whyIndex} className="text-yellow-700 text-sm flex items-start gap-1">
-                              <ArrowRight className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                              <span>{reason}</span>
-                            </p>
-                          ))}
+{step.why && (
+                        <div className="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
+                          <p className="font-bold text-amber-800 mb-3 flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            ¿Por qué debes hacerlo?
+                          </p>
+                          <div className="space-y-2">
+                            {step.why.map((reason, whyIndex) => (
+                              <p key={whyIndex} className="text-amber-700 text-sm flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                                <span>{reason}</span>
+                              </p>
+                            ))}
+                          </div>
                         </div>
                       )}
 
                       {step.shows && (
-                        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                          <p className="font-semibold text-blue-800 mb-2">Esto te mostrará:</p>
+                        <div className="mt-4 p-4 bg-[#5dae4c]/5 rounded-xl border border-[#5dae4c]/20">
+                          <p className="font-bold text-[#5dae4c] mb-3 flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            Esto te mostrará:
+                          </p>
+                          <div className="space-y-2">
+                            {step.shows.map((item, showIndex) => (
+                              <p key={showIndex} className="text-gray-700 text-sm flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 bg-[#5dae4c] rounded-full mt-1.5 flex-shrink-0"></span>
+                                {item}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {step.documents && (
+                        <div className="mt-4 p-4 bg-[#5dae4c]/5 rounded-xl border border-[#5dae4c]/20">
+                          <p className="font-bold text-[#5dae4c] mb-3 flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Debes tener:
+                          </p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {step.documents.map((doc, docIndex) => (
+                              <p key={docIndex} className="text-gray-700 text-sm flex items-center gap-2 bg-white/60 rounded-lg px-3 py-2">
+                                <span className="w-5 h-5 bg-[#5dae4c]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                  <svg className="w-3 h-3 text-[#5dae4c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </span>
+                                {doc}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {step.tips && (
+                        <div className="mt-4 p-4 bg-[#5dae4c]/5 rounded-xl border border-[#5dae4c]/20">
+                          <p className="font-bold text-[#5dae4c] mb-3 flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                            Recomendaciones:
+                          </p>
+                          <div className="space-y-2">
+                            {step.tips.map((tip, tipIndex) => (
+                              <p key={tipIndex} className="text-gray-700 text-sm flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 bg-[#5dae4c] rounded-full mt-1.5 flex-shrink-0"></span>
+                                {tip}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {step.conditions && (
+                        <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                          <p className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            Condiciones a revisar:
+                          </p>
+                          <div className="space-y-2">
+                            {step.conditions.map((condition, condIndex) => (
+                              <p key={condIndex} className="text-gray-600 text-sm flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-1.5 flex-shrink-0"></span>
+                                {condition}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {step.shows && (
+                        <div className="mt-4 p-4 bg-[#5dae4c]/10 rounded-lg border border-[#5dae4c]/20">
+                          <p className="font-semibold text-[#5dae4c] mb-2">Esto te mostrará:</p>
                           {step.shows.map((item, showIndex) => (
-                            <p key={showIndex} className="text-blue-700 text-sm">
+                            <p key={showIndex} className="text-gray-700 text-sm">
                               • {item}
                             </p>
                           ))}
@@ -907,10 +1021,10 @@ export default function GuiaAlquilarPage() {
                       )}
 
                       {step.documents && (
-                        <div className="mt-4 p-4 bg-green-50 rounded-lg">
-                          <p className="font-semibold text-green-800 mb-2">Debes tener:</p>
+                        <div className="mt-4 p-4 bg-[#5dae4c]/10 rounded-lg border border-[#5dae4c]/20">
+                          <p className="font-semibold text-[#5dae4c] mb-2">Debes tener:</p>
                           {step.documents.map((doc, docIndex) => (
-                            <p key={docIndex} className="text-green-700 text-sm">
+                            <p key={docIndex} className="text-gray-700 text-sm">
                               • {doc}
                             </p>
                           ))}
@@ -918,10 +1032,10 @@ export default function GuiaAlquilarPage() {
                       )}
 
                       {step.tips && (
-                        <div className="mt-4 p-4 bg-purple-50 rounded-lg">
-                          <p className="font-semibold text-purple-800 mb-2">Recomendaciones:</p>
+                        <div className="mt-4 p-4 bg-[#5dae4c]/10 rounded-lg border border-[#5dae4c]/20">
+                          <p className="font-semibold text-[#5dae4c] mb-2">Recomendaciones:</p>
                           {step.tips.map((tip, tipIndex) => (
-                            <p key={tipIndex} className="text-purple-700 text-sm">
+                            <p key={tipIndex} className="text-gray-700 text-sm">
                               • {tip}
                             </p>
                           ))}
@@ -929,8 +1043,11 @@ export default function GuiaAlquilarPage() {
                       )}
 
                       {step.important && (
-                        <div className="mt-4 p-4 bg-red-50 rounded-lg">
-                          <p className="font-semibold text-red-800">
+                        <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
+                          <p className="font-semibold text-red-800 flex items-center gap-2">
+                            <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
                             Importante: {step.important}
                           </p>
                         </div>
