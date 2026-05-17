@@ -47,13 +47,13 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
           font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .transaction-btn:hover {
-          border-color: #22c55e;
-          color: #22c55e;
+          border-color: brand;
+          color: brand;
           background: #f0fdf4;
         }
         .transaction-btn.active {
-          border-color: #22c55e;
-          background: #22c55e;
+          border-color: brand;
+          background: brand;
           color: #fff;
           box-shadow: 0 4px 14px rgba(34,197,94,0.25);
         }
@@ -76,17 +76,17 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
           width: 100%;
         }
         .type-btn:hover {
-          border-color: #22c55e;
-          color: #22c55e;
+          border-color: brand;
+          color: brand;
           background: #f0fdf4;
         }
-        .type-btn:hover svg { color: #22c55e; }
+        .type-btn:hover svg { color: brand; }
         .type-btn.active {
-          border-color: #22c55e;
+          border-color: brand;
           background: #f0fdf4;
-          color: #16a34a;
+          color: brand-dark;
         }
-        .type-btn.active svg { color: #22c55e; }
+        .type-btn.active svg { color: brand; }
 
         .field-label {
           font-size: 11px;
@@ -113,7 +113,7 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
         }
         .form-input::placeholder { color: #94a3b8; }
         .form-input:focus {
-          border-color: #22c55e;
+          border-color: brand;
           background: #fff;
           box-shadow: 0 0 0 3px rgba(34,197,94,0.08);
         }
@@ -132,7 +132,7 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
           font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .form-select:focus {
-          border-color: #22c55e;
+          border-color: brand;
           background: #fff;
           box-shadow: 0 0 0 3px rgba(34,197,94,0.08);
         }
@@ -140,7 +140,7 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
         .section-divider {
           width: 28px;
           height: 2.5px;
-          background: #22c55e;
+          background: brand;
           border-radius: 2px;
           margin-bottom: 14px;
         }
@@ -188,7 +188,7 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
                 onClick={() => onChange('type', type.value)}
                 className={`type-btn ${isActive('type', type.value) ? 'active' : ''}`}
               >
-                <span style={{ color: isActive('type', type.value) ? '#22c55e' : '#94a3b8', transition: 'color 0.2s' }}>
+                <span style={{ color: isActive('type', type.value) ? 'brand' : '#94a3b8', transition: 'color 0.2s' }}>
                   {type.icon}
                 </span>
                 <span>{type.label}</span>

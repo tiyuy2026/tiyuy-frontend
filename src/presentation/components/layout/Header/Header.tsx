@@ -221,7 +221,7 @@ export function Header() {
               >
                 <button
                   onClick={toggleComprarMenu}
-                  className="text-black hover:text-gray-800 font-normal text-base py-2 flex items-center gap-1"
+                  className="text-black hover:text-gray-800 font-normal text-base py-2 flex items-center gap-1 cursor-pointer"
                 >
                   Comprar
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -248,7 +248,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('estado', 'lima')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.estado === 'lima' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -258,7 +258,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('estado', 'piura')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.estado === 'piura' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -268,7 +268,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('estado', 'callao')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.estado === 'callao' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -278,7 +278,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('estado', 'ica')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.estado === 'ica' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -288,7 +288,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('estado', 'lambayeque')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.estado === 'lambayeque' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -298,7 +298,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('estado', 'lalibertad')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.estado === 'lalibertad' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -308,7 +308,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('estado', 'arequipa')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.estado === 'arequipa' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -318,7 +318,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('estado', 'cusco')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.estado === 'cusco' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -335,7 +335,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('tipo', 'departamentos')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.tipo === 'departamentos' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -345,7 +345,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('tipo', 'casas')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.tipo === 'casas' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -355,7 +355,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('tipo', 'terrenos')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.tipo === 'terrenos' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -365,7 +365,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('tipo', 'oficinas')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.tipo === 'oficinas' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -375,7 +375,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('tipo', 'locales')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.tipo === 'locales' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -392,7 +392,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('dormitorios', '3')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.dormitorios === '3' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -402,7 +402,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('dormitorios', '2')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.dormitorios === '2' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -412,7 +412,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('dormitorios', '4')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.dormitorios === '4' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -422,7 +422,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('dormitorios', '5')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.dormitorios === '5' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -432,7 +432,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleComprarFilter('dormitorios', '1')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       comprarFilters.dormitorios === '1' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -449,7 +449,7 @@ export function Header() {
                                 <li>
                                   <Link
                                     href="/#guia-comprar"
-                                    className="text-gray-800 hover:text-black text-base block"
+                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
                                   >
                                     Guía para comprar un inmueble
                                   </Link>
@@ -457,7 +457,7 @@ export function Header() {
                                 <li>
                                   <Link
                                     href="/my-properties/new"
-                                    className="text-gray-800 hover:text-black text-base block"
+                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
                                   >
                                     Publica un inmueble para venta
                                   </Link>
@@ -472,7 +472,7 @@ export function Header() {
                                 <li>
                                   <Link
                                     href="/#proyectos"
-                                    className="text-gray-800 hover:text-black text-base block"
+                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
                                   >
                                     Proyectos
                                   </Link>
@@ -495,7 +495,7 @@ export function Header() {
               >
                 <button
                   onClick={toggleAlquilarMenu}
-                  className="text-black hover:text-gray-800 font-normal text-base py-2 flex items-center gap-1"
+                  className="text-black hover:text-gray-800 font-normal text-base py-2 flex items-center gap-1 cursor-pointer"
                 >
                   Alquilar
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -522,7 +522,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('estado', 'lima')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.estado === 'lima' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -532,7 +532,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('estado', 'piura')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.estado === 'piura' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -542,7 +542,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('estado', 'callao')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.estado === 'callao' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -552,7 +552,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('estado', 'ica')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.estado === 'ica' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -562,7 +562,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('estado', 'lambayeque')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.estado === 'lambayeque' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -572,7 +572,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('estado', 'lalibertad')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.estado === 'lalibertad' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -582,7 +582,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('estado', 'arequipa')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.estado === 'arequipa' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -592,7 +592,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('estado', 'cusco')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.estado === 'cusco' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -609,7 +609,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('tipo', 'departamentos')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.tipo === 'departamentos' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -619,7 +619,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('tipo', 'casas')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.tipo === 'casas' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -629,7 +629,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('tipo', 'terrenos')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.tipo === 'terrenos' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -639,7 +639,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('tipo', 'oficinas')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.tipo === 'oficinas' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -649,7 +649,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('tipo', 'locales')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.tipo === 'locales' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -659,7 +659,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('tipo', 'habitaciones')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.tipo === 'habitaciones' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -669,7 +669,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('tipo', 'minidepartamentos')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.tipo === 'minidepartamentos' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -686,7 +686,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('dormitorios', '3')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.dormitorios === '3' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -696,7 +696,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('dormitorios', '2')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.dormitorios === '2' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -706,7 +706,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('dormitorios', '4')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.dormitorios === '4' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -716,7 +716,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('dormitorios', '5')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.dormitorios === '5' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -726,7 +726,7 @@ export function Header() {
                                 <li>
                                   <button
                                     onClick={() => handleAlquilarFilter('dormitorios', '1')}
-                                    className={`text-gray-800 hover:text-black text-base block w-full text-left ${
+                                    className={`text-gray-800 hover:text-black text-base block cursor-pointer w-full text-left cursor-pointer ${
                                       alquilarFilters.dormitorios === '1' ? 'font-bold text-teal-600' : ''
                                     }`}
                                   >
@@ -743,7 +743,7 @@ export function Header() {
                                 <li>
                                   <Link
                                     href="/#rental-guide"
-                                    className="text-gray-800 hover:text-black text-base block"
+                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
                                   >
                                     Guía para alquilar un inmueble
                                   </Link>
@@ -751,7 +751,7 @@ export function Header() {
                                 <li>
                                   <Link
                                     href="/my-properties/new"
-                                    className="text-gray-800 hover:text-black text-base block"
+                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
                                   >
                                     Publica un inmueble para alquilar
                                   </Link>
@@ -766,7 +766,7 @@ export function Header() {
                                 <li>
                                   <Link
                                     href="/#proyectos"
-                                    className="text-gray-800 hover:text-black text-base block"
+                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
                                   >
                                     Proyectos
                                   </Link>
@@ -787,7 +787,7 @@ export function Header() {
                 onMouseEnter={() => setShowServiciosMenu(true)}
                 onMouseLeave={() => setShowServiciosMenu(false)}
               >
-                <button className="text-black hover:text-gray-800 font-normal text-base py-2 flex items-center gap-1">
+                <button className="text-black hover:text-gray-800 font-normal text-base py-2 flex items-center gap-1 cursor-pointer">
                   Servicios
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -811,7 +811,7 @@ export function Header() {
                                 <li>
                                   <Link
                                     href="/my-properties/new"
-                                    className="text-gray-800 hover:text-black text-base block"
+                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
                                   >
                                     Publica un inmueble
                                   </Link>
@@ -825,7 +825,7 @@ export function Header() {
                                 <li>
                                   <Link
                                     href="/#guia-comprar"
-                                    className="text-gray-800 hover:text-black text-base block"
+                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
                                   >
                                     Guía para comprar un inmueble
                                   </Link>
@@ -833,7 +833,7 @@ export function Header() {
                                 <li>
                                   <Link
                                     href="/#guia-vender"
-                                    className="text-gray-800 hover:text-black text-base block"
+                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
                                   >
                                     Guía para vender un inmueble
                                   </Link>
@@ -841,7 +841,7 @@ export function Header() {
                                 <li>
                                   <Link
                                     href="/#rental-guide"
-                                    className="text-gray-800 hover:text-black text-base block"
+                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
                                   >
                                     Guía para alquilar un inmueble
                                   </Link>
@@ -849,7 +849,7 @@ export function Header() {
                                 <li>
                                   <Link
                                     href="/#tips-decoracion"
-                                    className="text-gray-800 hover:text-black text-base block"
+                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
                                   >
                                     Tips de decoración
                                   </Link>
@@ -863,7 +863,7 @@ export function Header() {
                                 <li>
                                   <Link
                                     href="/#reporte-indice"
-                                    className="text-gray-800 hover:text-black text-base block"
+                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
                                   >
                                     Reporte Índice por m2
                                   </Link>
@@ -877,7 +877,7 @@ export function Header() {
                                 <li>
                                   <Link
                                     href="/#mercado-inmobiliario"
-                                    className="text-gray-800 hover:text-black text-base block"
+                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
                                   >
                                     Mercado Inmobiliario
                                   </Link>

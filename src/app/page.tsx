@@ -135,21 +135,21 @@ export default function HomePage() {
 
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-full px-8 xl:px-16">
-            <div className="max-w-[1920px] mx-auto flex justify-center">
+            <div className="max-w-[1920px] mx-auto flex justify-center items-center">
               <div className="max-w-[800px] w-full text-center">
                 <h1 className="text-5xl xl:text-6xl font-bold text-white mb-8 drop-shadow-lg">
                   Encuentra tu hogar
                 </h1>
 
                 <div className="bg-white rounded-2xl shadow-2xl overflow-visible">
-                  <div className="border-b border-gray-200">
-                    <div className="flex">
+                  <div className="border-b border-gray-200 rounded-t-2xl">
+                    <div className="flex rounded-t-2xl">
                       <button
                         onClick={() => handleTabClick('rent')}
                         className={`flex-1 py-4 text-base font-semibold transition-colors ${
                           activeTab === 'rent'
-                            ? 'text-[#5dae4c] bg-white border-b-2 border-[#5dae4c]'
-                            : 'text-gray-600 hover:text-[#5dae4c]'
+                            ? 'text-[#4A9A3E] bg-white border-b-2 border-[#4A9A3E]'
+                            : 'text-gray-600 hover:text-[#4A9A3E]'
                         }`}
                       >
                         Alquilar
@@ -158,8 +158,8 @@ export default function HomePage() {
                         onClick={() => handleTabClick('sale')}
                         className={`flex-1 py-4 text-base font-semibold transition-colors ${
                           activeTab === 'sale'
-                            ? 'text-[#5dae4c] bg-white border-b-2 border-[#5dae4c]'
-                            : 'text-gray-600 hover:text-[#5dae4c]'
+                            ? 'text-[#4A9A3E] bg-white border-b-2 border-[#4A9A3E]'
+                            : 'text-gray-600 hover:text-[#4A9A3E]'
                         }`}
                       >
                         Comprar
@@ -168,8 +168,8 @@ export default function HomePage() {
                         onClick={() => handleTabClick('projects')}
                         className={`flex-1 py-4 text-base font-semibold transition-colors ${
                           activeTab === 'projects'
-                            ? 'text-[#5dae4c] bg-white border-b-2 border-[#5dae4c]'
-                            : 'text-gray-600 hover:text-[#5dae4c]'
+                            ? 'text-[#4A9A3E] bg-white border-b-2 border-[#4A9A3E]'
+                            : 'text-gray-600 hover:text-[#4A9A3E]'
                         }`}
                       >
                         Proyectos
@@ -182,7 +182,7 @@ export default function HomePage() {
                       <select 
                         value={selectedPropertyType}
                         onChange={(e) => setSelectedPropertyType(e.target.value)}
-                        className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#5dae4c] focus:ring-2 focus:ring-[#5dae4c] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[180px]"
+                        className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#4A9A3E] focus:ring-2 focus:ring-[#4A9A3E] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[180px]"
                       >
                         {getPropertyTypes().map(type => (
                           <option key={type.value} value={type.value}>
@@ -196,7 +196,7 @@ export default function HomePage() {
                         <select 
                           value={selectedBedrooms}
                           onChange={(e) => setSelectedBedrooms(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#5dae4c] focus:ring-2 focus:ring-[#5dae4c] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#4A9A3E] focus:ring-2 focus:ring-[#4A9A3E] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
                         >
                           <option value="">Habitaciones</option>
                           <option value="1">1 habitación</option>
@@ -209,7 +209,7 @@ export default function HomePage() {
                         <select 
                           value={selectedBathrooms}
                           onChange={(e) => setSelectedBathrooms(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#5dae4c] focus:ring-2 focus:ring-[#5dae4c] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#4A9A3E] focus:ring-2 focus:ring-[#4A9A3E] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
                         >
                           <option value="">Baños</option>
                           <option value="propio">Propio</option>
@@ -221,7 +221,7 @@ export default function HomePage() {
                           placeholder="Área mínima (m²)"
                           value={selectedMinArea}
                           onChange={(e) => setSelectedMinArea(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#5dae4c] focus:ring-2 focus:ring-[#5dae4c] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#4A9A3E] focus:ring-2 focus:ring-[#4A9A3E] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
                         />
                       ) : selectedPropertyType === 'terrenos' ? (
                         <input
@@ -229,7 +229,7 @@ export default function HomePage() {
                           placeholder="Área mínima (m²)"
                           value={selectedMinArea}
                           onChange={(e) => setSelectedMinArea(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#5dae4c] focus:ring-2 focus:ring-[#5dae4c] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#4A9A3E] focus:ring-2 focus:ring-[#4A9A3E] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
                         />
                       ) : selectedPropertyType === 'locales' ? (
                         <input
@@ -237,7 +237,7 @@ export default function HomePage() {
                           placeholder="Área mínima (m²)"
                           value={selectedMinArea}
                           onChange={(e) => setSelectedMinArea(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#5dae4c] focus:ring-2 focus:ring-[#5dae4c] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#4A9A3E] focus:ring-2 focus:ring-[#4A9A3E] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
                         />
                       ) : selectedPropertyType === 'lotes' ? (
                         <input
@@ -245,7 +245,7 @@ export default function HomePage() {
                           placeholder="Área mínima (m²)"
                           value={selectedMinArea}
                           onChange={(e) => setSelectedMinArea(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#5dae4c] focus:ring-2 focus:ring-[#5dae4c] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-[#4A9A3E] focus:ring-2 focus:ring-[#4A9A3E] focus:outline-none text-base text-gray-500 bg-white w-full lg:w-[140px]"
                         />
                       ) : null}
 
@@ -259,7 +259,7 @@ export default function HomePage() {
 
                       <button
                         onClick={handleSearch}
-                        className="bg-[#5dae4c] text-white px-10 py-3.5 rounded-lg font-bold text-base hover:bg-[#4a9a3e] transition-colors whitespace-nowrap w-full lg:w-auto shadow-md hover:shadow-lg"
+                        className="bg-[#4A9A3E] text-white px-10 py-3.5 rounded-xl font-bold text-base hover:bg-[#4A9A3E] transition-colors whitespace-nowrap w-full lg:w-[180px] shadow-md hover:shadow-lg cursor-pointer"
                       >
                         Buscar
                       </button>
@@ -279,25 +279,25 @@ export default function HomePage() {
             <div className="flex gap-8">
               <Link
                 href="/rent/departamentos/lima"
-                className="py-4 text-base font-semibold text-gray-600 hover:text-[#5dae4c] hover:border-b-4 hover:border-[#5dae4c]"
+                className="py-4 text-base font-semibold text-gray-600 hover:text-[#4A9A3E] hover:border-b-4 hover:border-[#4A9A3E]"
               >
                 Alquilar
               </Link>
               <Link
                 href="/sale/departamentos/lima"
-                className="py-4 text-base font-semibold text-[#5dae4c] border-b-4 border-[#5dae4c] hover:text-[#4a9a3e]"
+                className="py-4 text-base font-semibold text-[#4A9A3E] border-b-4 border-[#4A9A3E] hover:text-[#4A9A3E]"
               >
                 Comprar
               </Link>
               <Link
                 href="/my-properties/new"
-                className="py-4 text-base font-medium text-gray-600 hover:text-[#5dae4c] hover:border-b-4 hover:border-[#5dae4c]"
+                className="py-4 text-base font-medium text-gray-600 hover:text-[#4A9A3E] hover:border-b-4 hover:border-[#4A9A3E]"
               >
                 Publicar
               </Link>
               <Link
                 href="/#projects"
-                className="py-4 text-base font-medium text-gray-600 hover:text-[#5dae4c] hover:border-b-4 hover:border-[#5dae4c]"
+                className="py-4 text-base font-medium text-gray-600 hover:text-[#4A9A3E] hover:border-b-4 hover:border-[#4A9A3E]"
               >
                 Proyectos
               </Link>
@@ -312,19 +312,19 @@ export default function HomePage() {
           <div className="max-w-[1920px] mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <Link href="/blog" className="block group h-full">
-                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-all border-2 border-transparent group-hover:border-[#5dae4c] group-hover:scale-105">
+                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-all border-2 border-transparent border-[#4A9A3E] group-hover:scale-105">
                   <div className="flex-grow">
-                    <div className="w-14 h-14 bg-[#5dae4c]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#5dae4c]/20 transition-colors">
-                      <svg className="w-7 h-7 text-[#5dae4c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-14 h-14 bg-[#4A9A3E]/10 rounded-xl flex items-center justify-center mb-5 bg-[#4A9A3E]/20 transition-colors">
+                      <svg className="w-7 h-7 text-[#4A9A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#5dae4c] transition-colors">Nuestro blog</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 text-[#4A9A3E] transition-colors">Nuestro blog</h3>
                     <p className="text-gray-600 text-base leading-relaxed mb-4">
                       Consejos, novedades y noticias del ámbito de la construcción.
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 text-[#5dae4c] font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-2 text-[#4A9A3E] font-semibold text-sm ">
                     <span>Ver blog completo</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -334,19 +334,19 @@ export default function HomePage() {
               </Link>
 
               <Link href="/rental-guide" className="block group h-full">
-                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-all border-2 border-transparent group-hover:border-[#5dae4c] group-hover:scale-105">
+                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-all border-2 border-transparent border-[#4A9A3E] group-hover:scale-105">
                   <div className="flex-grow">
-                    <div className="w-14 h-14 bg-[#5dae4c]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#5dae4c]/20 transition-colors">
-                      <svg className="w-7 h-7 text-[#5dae4c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-14 h-14 bg-[#4A9A3E]/10 rounded-xl flex items-center justify-center mb-5 bg-[#4A9A3E]/20 transition-colors">
+                      <svg className="w-7 h-7 text-[#4A9A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#5dae4c] transition-colors">Guía para alquilar</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 text-[#4A9A3E] transition-colors">Guía para alquilar</h3>
                     <p className="text-gray-600 text-base leading-relaxed mb-4">
                       Lo que necesitas saber a la hora de alquilar en un solo lugar.
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 text-[#5dae4c] font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-2 text-[#4A9A3E] font-semibold text-sm ">
                     <span>Ver guía completa</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -356,19 +356,19 @@ export default function HomePage() {
               </Link>
 
               <Link href="/projects" className="block group h-full">
-                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-all border-2 border-transparent group-hover:border-[#5dae4c] group-hover:scale-105">
+                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-all border-2 border-transparent border-[#4A9A3E] group-hover:scale-105">
                   <div className="flex-grow">
-                    <div className="w-14 h-14 bg-[#5dae4c]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#5dae4c]/20 transition-colors">
-                      <svg className="w-7 h-7 text-[#5dae4c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-14 h-14 bg-[#4A9A3E]/10 rounded-xl flex items-center justify-center mb-5 bg-[#4A9A3E]/20 transition-colors">
+                      <svg className="w-7 h-7 text-[#4A9A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#5dae4c] transition-colors">Proyectos Inmobiliarios</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 text-[#4A9A3E] transition-colors">Proyectos Inmobiliarios</h3>
                     <p className="text-gray-600 text-base leading-relaxed mb-4">
                       Descubre los mejores proyectos de vivienda y inversión de las principales inmobiliarias.
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 text-[#5dae4c] font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-2 text-[#4A9A3E] font-semibold text-sm">
                     <span>Ver proyectos</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -378,19 +378,19 @@ export default function HomePage() {
               </Link>
 
               <Link href="/about-tiyuy" className="block group h-full">
-                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-all border-2 border-transparent group-hover:border-[#5dae4c] group-hover:scale-105">
+                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm hover:shadow-lg transition-all border-2 border-transparent border-[#4A9A3E] group-hover:scale-105">
                   <div className="flex-grow">
-                    <div className="w-14 h-14 bg-[#5dae4c]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#5dae4c]/20 transition-colors">
-                      <svg className="w-7 h-7 text-[#5dae4c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-14 h-14 bg-[#4A9A3E]/10 rounded-xl flex items-center justify-center mb-5 bg-[#4A9A3E]/20 transition-colors">
+                      <svg className="w-7 h-7 text-[#4A9A3E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#5dae4c] transition-colors">Conoce TIYUY</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 text-[#4A9A3E] transition-colors">Conoce TIYUY</h3>
                     <p className="text-gray-600 text-base leading-relaxed mb-4">
                       Toda la información sobre cómo usar nuestro portal ¡y mucho más!
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 text-[#5dae4c] font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-2 text-[#4A9A3E] font-semibold text-sm ">
                     <span>Conocer más</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -409,13 +409,13 @@ export default function HomePage() {
           <div className="max-w-[1920px] mx-auto">
             {/* Header */}
             <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 bg-[#5dae4c]/10 text-[#5dae4c] px-4 py-2 rounded-full text-sm font-semibold mb-4">
+              <div className="inline-flex items-center gap-2 bg-[#4A9A3E]/10 text-[#4A9A3E] px-4 py-2 rounded-full text-sm font-semibold mb-4">
                 <span>⭐</span>
                 <span>PROPIEDADES DESTACADAS</span>
               </div>
               <h2 className="text-4xl xl:text-5xl font-bold text-gray-900 mb-4">
                 Encuentra el hogar de tus
-                <span className="text-[#5dae4c]"> sueños</span>
+                <span className="text-[#4A9A3E]"> sueños</span>
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Descubre las mejores propiedades en todo el Perú, seleccionadas cuidadosamente para ofrecerte calidad y confianza
@@ -428,18 +428,18 @@ export default function HomePage() {
       </section>
 
       {/* PROYECTOS INMOBILIARIOS */}
-      <section className="py-20 bg-gradient-to-br from-[#5dae4c]/5 to-white">
+      <section className="py-20 bg-gradient-to-br from-[#4A9A3E]/5 to-white">
         <div className="w-full px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             {/* Header */}
             <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 bg-[#5dae4c]/10 text-[#5dae4c] px-4 py-2 rounded-full text-sm font-semibold mb-4">
+              <div className="inline-flex items-center gap-2 bg-[#4A9A3E]/10 text-[#4A9A3E] px-4 py-2 rounded-full text-sm font-semibold mb-4">
                 <span>🏗️</span>
                 <span>PROYECTOS INMOBILIARIOS</span>
               </div>
               <h2 className="text-4xl xl:text-5xl font-bold text-gray-900 mb-4">
                 Proyectos
-                <span className="text-[#5dae4c]"> cerca de ti</span>
+                <span className="text-[#4A9A3E]"> cerca de ti</span>
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Descubre los mejores proyectos de vivienda e inversión de las principales inmobiliarias del Perú
@@ -459,16 +459,16 @@ export default function HomePage() {
               Búsquedas populares en Perú
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-4">
-              <Link href="/rent/departamentos/lima" className="text-[#5dae4c] hover:underline text-base font-medium">
+              <Link href="/rent/departamentos/lima" className="text-[#4A9A3E] hover:underline text-base font-medium">
                 Departamentos en Lima
               </Link>
-              <Link href="/rent/casas/arequipa" className="text-[#5dae4c] hover:underline text-base font-medium">
+              <Link href="/rent/casas/arequipa" className="text-[#4A9A3E] hover:underline text-base font-medium">
                 Casas en Arequipa
               </Link>
-              <Link href="/rent/departamentos/cusco" className="text-[#5dae4c] hover:underline text-base font-medium">
+              <Link href="/rent/departamentos/cusco" className="text-[#4A9A3E] hover:underline text-base font-medium">
                 Departamentos en Cusco
               </Link>
-              <Link href="/sale/casas/trujillo" className="text-[#5dae4c] hover:underline text-base font-medium">
+              <Link href="/sale/casas/trujillo" className="text-[#4A9A3E] hover:underline text-base font-medium">
                 Casas en Trujillo
               </Link>
             </div>
