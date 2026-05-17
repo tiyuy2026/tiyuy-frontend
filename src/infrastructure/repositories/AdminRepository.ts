@@ -16,6 +16,7 @@ import {
   DashboardStats,
   UserStats,
   FinanceStats,
+  FinanceHistoryDto,
   UserRegistrationHistory,
   UserListItem,
   ChangeUserRoleRequest,
@@ -710,7 +711,7 @@ export class AdminRepository implements IAdminRepository {
     }));
   }
 
-  async getSubscriptionSalesHistory(period: string = '6months'): Promise<{ labels: string[], revenue: number[], subscriptions: number[] }> {
+  async getFinanceHistory(period: string = '1M'): Promise<FinanceHistoryDto> {
     const response = await axiosClient.get(`${this.basePath}/dashboard/stats/finance/history`, {
       params: { period }
     });

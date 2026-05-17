@@ -843,6 +843,22 @@ export interface FinanceStatsDto {
   totalWalletBalance: number;
 }
 
+export interface FinanceHistoryDto {
+  labels: string[];
+  revenue: number[];
+  subscriptions: number[];
+  transactions: number[];
+  period: string;
+  summary: {
+    totalRevenue: number;
+    totalSubscriptions: number;
+    totalTransactions: number;
+    revenueGrowth: number;
+    subscriptionsGrowth: number;
+    transactionsGrowth: number;
+  };
+}
+
 // Admin sidebar section
 export interface AdminSidebarSection {
   title: string;
@@ -990,3 +1006,4 @@ export interface InmobiliariaFilter {
   size?: number;
   sort?: string;
 }
+

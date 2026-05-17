@@ -10,6 +10,7 @@ import {
   DashboardStats,
   UserStats,
   FinanceStats,
+  FinanceHistoryDto,
   UserListItem,
   ChangeUserRoleRequest,
   DiscountCode,
@@ -50,6 +51,7 @@ export interface IAdminRepository {
   getDashboardStats(): Promise<DashboardStats>;
   getUserStats(): Promise<UserStats>;
   getFinanceStats(): Promise<FinanceStats>;
+  getFinanceHistory(period?: string): Promise<FinanceHistoryDto>;
 
   // Admin User Management (requires SUPER_ADMIN)
   getAllAdmins(params: PaginationParams): Promise<PaginatedResponse<AdminUser>>;

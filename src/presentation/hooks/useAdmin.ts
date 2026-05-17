@@ -12,6 +12,7 @@ import {
   DashboardStats,
   UserStats,
   FinanceStats,
+  FinanceHistoryDto,
   UserRegistrationHistory,
   UserListItem,
   ChangeUserRoleRequest,
@@ -917,5 +918,36 @@ export const useCalculateAgentPlanPrice = (agentId: number | null, planCode: str
     queryKey: [ADMIN_QUERY_KEY, 'agents', 'plan-price', agentId, planCode],
     queryFn: () => adminRepository.calculateAgentPlanPrice(agentId!, planCode),
     enabled: !!agentId && !!planCode,
+  });
+};
+
+export const useFinanceHistory = (period: string = '1M') => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'dashboard', 'financeHistory', period],
+    queryFn: async () => {
+      try {
+        return await adminRepository.getFinanceHistory(period);
+      } catch (error) {
+        console.error('Error fetching finance history:', error);
+        return {
+          labels: [],
+          revenue: [],
+          subscriptions: [],
+          transactions: [],
+          period,
+          summary: {
+            totalRevenue: 0,
+            totalSubscriptions: 0,
+            totalTransactions: 0,
+            revenueGrowth: 0,
+            subscriptionsGrowth: 0,
+            transactionsGrowth: 0,
+          },
+        } as FinanceHistoryDto;
+      }
+    },
+    staleTime: 0, // No caché - datos frescos siempre
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 };
