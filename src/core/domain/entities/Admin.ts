@@ -1007,3 +1007,37 @@ export interface InmobiliariaFilter {
   sort?: string;
 }
 
+// ================== Central Discount Management ==================
+
+export interface CentralDiscountDto {
+  id: number;
+  code: string;
+  discountPercentage: number;
+  customPrice?: number;
+  source: 'DISCOUNT_CODE' | 'AGENT' | 'DEVELOPER' | 'AGENCY_PLAN' | 'USER';
+  sourceLabel: string;
+  entityType: string;
+  entityName: string;
+  entityId?: number;
+  status: string;
+  usageCount: number;
+  maxUsage: number;
+  createdAt: string;
+  expiresAt?: string;
+  updatedAt?: string;
+  notes?: string;
+  applicability: string;
+  assignedBy?: number;
+  assignedByName?: string;
+}
+
+export interface CentralDiscountSummary {
+  total: number;
+  active: number;
+  expired: number;
+  inactive: number;
+  users: number;
+  agents: number;
+  developers: number;
+}
+
