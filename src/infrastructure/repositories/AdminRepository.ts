@@ -16,6 +16,7 @@ import {
   DashboardStats,
   UserStats,
   FinanceStats,
+  FinanceHistoryDto,
   UserRegistrationHistory,
   UserListItem,
   ChangeUserRoleRequest,
@@ -55,6 +56,8 @@ import {
   CreateInmobiliariaRequest,
   UpdateInmobiliariaRequest,
   AssignAgentToInmobiliariaRequest,
+  CentralDiscountDto,
+  CentralDiscountSummary,
 } from '@/core/domain/entities/Admin';
 import { PropertyReport } from '@/core/domain/entities/Moderation';
 import {
@@ -710,7 +713,7 @@ export class AdminRepository implements IAdminRepository {
     }));
   }
 
-  async getSubscriptionSalesHistory(period: string = '6months'): Promise<{ labels: string[], revenue: number[], subscriptions: number[] }> {
+  async getFinanceHistory(period: string = '1M'): Promise<FinanceHistoryDto> {
     const response = await axiosClient.get(`${this.basePath}/dashboard/stats/finance/history`, {
       params: { period }
     });
@@ -1017,6 +1020,26 @@ export class AdminRepository implements IAdminRepository {
 
   async addAdminDeveloperAgent(developerId: number, agentId: number): Promise<DeveloperAgentAssociation> {
     const response = await axiosClient.post(`${this.basePath}/admin/developers/${developerId}/agents`, { agentId });
+    return response.data;
+  }
+
+  // ================== Central Discount Management ==================
+
+  async getCentralDiscounts(params: {
+    source?: string;
+    status?: string;
+    search?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    page?: number;
+    size?: number;
+  }): Promise<PaginatedResponse<CentralDiscountDto>> {
+    const response = await axiosClient.get('/admin/central-discounts', { params });
+    return response.data;
+  }
+
+  async getCentralDiscountSummary(): Promise<CentralDiscountSummary> {
+    const response = await axiosClient.get('/admin/central-discounts/summary');
     return response.data;
   }
 }

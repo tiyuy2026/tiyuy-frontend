@@ -35,9 +35,9 @@ export function PaymentConfirmationClient({ paymentId }: Props) {
       queryClient.invalidateQueries({ queryKey: ['properties'] });
       queryClient.removeQueries({ queryKey: ['subscription', 'active'] });
 
-      // 3. Redirigir al dashboard después de 3 segundos
+      // 3. Redirigir a plans después de 3 segundos para ver el plan activado
       const timer = setTimeout(() => {
-        router.push('/my-properties');
+        router.push('/dashboard/plans');
       }, 3000);
 
       return () => clearTimeout(timer);
@@ -60,10 +60,10 @@ export function PaymentConfirmationClient({ paymentId }: Props) {
               Redirigiendo en 3 segundos...
             </p>
             <button
-              onClick={() => router.push('/my-properties')}
+              onClick={() => router.push('/dashboard/plans')}
               className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
             >
-              Ir a mis propiedades ahora
+              Ver mi plan ahora
             </button>
           </>
         ) : (

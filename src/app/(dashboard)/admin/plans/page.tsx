@@ -18,7 +18,7 @@ import {
 import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { adminRepository } from '@/infrastructure/repositories/AdminRepository';
 import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/Card';
-import { RevenueChart } from '@/presentation/components/admin/RevenueChart/RevenueChart';
+import { RealtimeFinanceChart } from '@/presentation/components/admin/RealtimeFinanceChart/RealtimeFinanceChart';
 import { TrendingUp, CreditCard, Users, RefreshCw, DollarSign } from 'lucide-react';
 import {
   FinanceStatsDto,
@@ -389,13 +389,13 @@ export default function PlansPage() {
         <CardHeader className="border-b border-gray-50 bg-white py-4">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-lg font-bold text-gray-800">Historial de Ingresos</CardTitle>
-              <p className="text-xs text-gray-500">Visualización de ventas de planes por mes</p>
+              <CardTitle className="text-lg font-bold text-gray-800">Historial Financiero en Tiempo Real</CardTitle>
+              <p className="text-xs text-gray-500">Ingresos, suscripciones y transacciones - Datos reales del backend</p>
             </div>
           </div>
         </CardHeader>
         <CardContent className="p-6 bg-white">
-          <RevenueChart />
+          <RealtimeFinanceChart />
         </CardContent>
       </Card>
 
@@ -419,7 +419,7 @@ export default function PlansPage() {
             <p className="text-sm">No hay planes disponibles</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {plans.map((plan: any) => (
               <PlanCard
                 key={plan.id}

@@ -1,373 +1,334 @@
 /**
  * Admin Discount Codes Page
  * Complete discount code management with RBAC
+ * Includes centralized view of all discounts from all sources
+ * Premium SaaS dashboard design
  */
 
 'use client';
 
-import { useState } from 'react';
-import { useDiscountCodes, useCreateDiscountCode, useUpdateDiscountCode, useDeleteDiscountCode } from '@/presentation/hooks/useAdmin';
+import { useState, useCallback } from 'react';
+import { useDiscountCodes, useCreateDiscountCode, useUpdateDiscountCode, useDeleteDiscountCode, useCentralDiscounts, useCentralDiscountSummary } from '@/presentation/hooks/useAdmin';
 import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/Card';
 import { Modal } from '@/presentation/components/ui/Modal';
 import { Input } from '@/presentation/components/ui/Input';
 import { Button } from '@/presentation/components/ui/Button';
 import { LoadingState, EmptyState, ErrorState } from '@/presentation/components/admin/AdminUIStates';
-import { DiscountCode, CreateDiscountCodeRequest, UpdateDiscountCodeRequest, DiscountApplicability, DiscountCodeStatus } from '@/core/domain/entities/Admin';
+import { DiscountCode, CreateDiscountCodeRequest, UpdateDiscountCodeRequest, DiscountApplicability, DiscountCodeStatus, CentralDiscountDto } from '@/core/domain/entities/Admin';
+import UniversalDiscountApplier from './components/UniversalDiscountApplier';
+import DiscountKPIs from './components/DiscountKPIs';
+import DiscountStatusSection from './components/DiscountStatusSection';
+import RecentActivitySection from './components/RecentActivitySection';
 
-export default function DiscountsPage() {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedDiscount, setSelectedDiscount] = useState<DiscountCode | null>(null);
+type TabView = 'codes' | 'central';
+
+// ==================== Helper Components ====================
+
+const StatusBadge = ({ status }: { status: string }) => {
+  const colors: Record<string, string> = {
+    ACTIVE: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+    INACTIVE: 'bg-gray-100 text-gray-600 border-gray-200',
+    EXPIRED: 'bg-amber-100 text-amber-800 border-amber-200',
+    EXHAUSTED: 'bg-red-100 text-red-800 border-red-200',
+    CANCELLED: 'bg-red-100 text-red-800 border-red-200',
+    USED: 'bg-blue-100 text-blue-800 border-blue-200',
+    DEPLETED: 'bg-red-100 text-red-800 border-red-200',
+  };
+
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${colors[status] || 'bg-gray-100 text-gray-600 border-gray-200'}`}>
+      {status}
+    </span>
+  );
+};
+
+const SourceBadge = ({ source, sourceLabel }: { source: string; sourceLabel: string }) => {
+  const colors: Record<string, string> = {
+    DISCOUNT_CODE: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+    AGENT: 'bg-cyan-100 text-cyan-800 border-cyan-200',
+    DEVELOPER: 'bg-violet-100 text-violet-800 border-violet-200',
+    AGENCY_PLAN: 'bg-orange-100 text-orange-800 border-orange-200',
+    USER: 'bg-blue-100 text-blue-800 border-blue-200',
+  };
+
+  return (
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${colors[source] || 'bg-gray-100 text-gray-600 border-gray-200'}`}>
+      {sourceLabel}
+    </span>
+  );
+};
+
+// ==================== Central Discounts View ====================
+
+function CentralDiscountsView() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [sourceFilter, setSourceFilter] = useState<string>('ALL');
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [page, setPage] = useState(0);
+  const pageSize = 20;
 
-  const { hasPermission } = usePermissions();
-  const canManageDiscounts = hasPermission('DISCOUNTS_MANAGE');
-  const canCreateDiscounts = hasPermission('DISCOUNTS_CREATE');
+  const { data: discountsData, isLoading, error, refetch } = useCentralDiscounts({
+    source: sourceFilter === 'ALL' ? undefined : sourceFilter,
+    status: statusFilter === 'ALL' ? undefined : statusFilter,
+    search: searchQuery || undefined,
+    page,
+    size: pageSize,
+  });
 
-  const { data: discountsData, isLoading, error, refetch } = useDiscountCodes({ page: 0, size: 50 });
-  const createMutation = useCreateDiscountCode();
-  const updateMutation = useUpdateDiscountCode();
-  const deleteMutation = useDeleteDiscountCode();
+  const { data: summary } = useCentralDiscountSummary();
 
-  // Filter discounts based on search and status
-  const filteredDiscounts = discountsData?.content?.filter(discount => {
-    const matchesSearch = discount.code.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || discount.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  }) || [];
+  const discounts = discountsData?.content || [];
+  const totalElements = discountsData?.totalElements || 0;
+  const totalPages = discountsData?.totalPages || 0;
 
-  const handleCreateDiscount = async (formData: CreateDiscountCodeRequest) => {
-    try {
-      await createMutation.mutateAsync(formData);
-      setIsCreateModalOpen(false);
-      refetch();
-    } catch (error) {
-      console.error('Failed to create discount:', error);
-    }
-  };
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setPage(0);
+  }, []);
 
-  const handleEditDiscount = (discount: DiscountCode) => {
-    setSelectedDiscount(discount);
-    setIsEditModalOpen(true);
-  };
+  const sourceOptions = [
+    { value: 'ALL', label: 'Todos' },
+    { value: 'DISCOUNT_CODE', label: 'Codigos' },
+    { value: 'AGENT', label: 'Agentes' },
+    { value: 'DEVELOPER', label: 'Inmobiliarias' },
+    { value: 'AGENCY_PLAN', label: 'Planes' },
+    { value: 'USER', label: 'Usuarios' },
+  ];
 
-  const handleUpdateDiscount = async (formData: UpdateDiscountCodeRequest) => {
-    if (!selectedDiscount) return;
-    
-    try {
-      await updateMutation.mutateAsync({
-        codeId: selectedDiscount.id,
-        request: formData
-      });
-      setIsEditModalOpen(false);
-      setSelectedDiscount(null);
-      refetch();
-    } catch (error) {
-      console.error('Failed to update discount:', error);
-    }
-  };
-
-  const handleDeleteDiscount = async (discountId: number) => {
-    if (!confirm('Are you sure you want to delete this discount code?')) return;
-    
-    try {
-      await deleteMutation.mutateAsync(discountId);
-      refetch();
-    } catch (error) {
-      console.error('Failed to delete discount:', error);
-    }
-  };
-
-  const handleToggleStatus = async (discount: DiscountCode) => {
-    const newStatus = discount.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-    await handleUpdateDiscount({ status: newStatus });
-  };
-
-  if (isLoading) {
-    return <LoadingState message="Loading discount codes..." />;
-  }
-
-  if (error) {
-    return <ErrorState 
-      message="Failed to load discount codes. Please try again." 
-      retry={refetch}
-    />;
-  }
-
-  if (filteredDiscounts.length === 0) {
-    return (
-      <EmptyState
-        title="No discount codes found"
-        description={searchQuery || statusFilter !== 'all' 
-          ? "Try adjusting your search or filter criteria." 
-          : "Get started by creating your first discount code."
-        }
-        action={canCreateDiscounts ? {
-          label: "Create Discount Code",
-          onClick: () => setIsCreateModalOpen(true)
-        } : undefined}
-      />
-    );
-  }
+  const statusOptions = [
+    { value: 'ALL', label: 'Todos' },
+    { value: 'ACTIVE', label: 'Activos' },
+    { value: 'INACTIVE', label: 'Inactivos' },
+    { value: 'EXPIRED', label: 'Vencidos' },
+    { value: 'EXHAUSTED', label: 'Agotados' },
+    { value: 'USED', label: 'Usados' },
+  ];
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Discount Codes</h2>
-          <p className="text-gray-600">Manage promotional discount codes and campaigns</p>
+      {/* Summary Cards */}
+      {summary && (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Total</p>
+            <p className="text-xl font-bold text-gray-900 mt-1">{summary.total}</p>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Activos</p>
+            <p className="text-xl font-bold text-emerald-600 mt-1">{summary.active}</p>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Inactivos</p>
+            <p className="text-xl font-bold text-gray-500 mt-1">{summary.inactive}</p>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Vencidos</p>
+            <p className="text-xl font-bold text-amber-600 mt-1">{summary.expired}</p>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Usuarios</p>
+            <p className="text-xl font-bold text-blue-600 mt-1">{summary.users}</p>
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Agentes</p>
+            <p className="text-xl font-bold text-cyan-600 mt-1">{summary.agents}</p>
+          </div>
         </div>
-        {canCreateDiscounts && (
-          <Button onClick={() => setIsCreateModalOpen(true)}>
-            Create Discount Code
-          </Button>
-        )}
-      </div>
+      )}
 
       {/* Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex gap-4">
-            <Input
-              placeholder="Search discount codes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1"
-            />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="all">All Status</option>
-              <option value="ACTIVE">Active</option>
-              <option value="INACTIVE">Inactive</option>
-              <option value="EXPIRED">Expired</option>
-              <option value="DEPLETED">Depleted</option>
-            </select>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Discount Codes Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredDiscounts.map((discount) => (
-          <Card key={discount.id} className="relative">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{discount.code}</CardTitle>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  discount.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                  discount.status === 'INACTIVE' ? 'bg-gray-100 text-gray-800' :
-                  discount.status === 'EXPIRED' ? 'bg-red-100 text-red-800' :
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {discount.status}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Discount:</span>
-                  <span className="font-semibold text-green-600">{discount.discountPercentage}%</span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Usage:</span>
-                  <span className="text-sm">
-                    {discount.currentUsage} / {discount.usageLimit}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Applicability:</span>
-                  <span className="text-sm">{discount.applicability.replace('_', ' ')}</span>
-                </div>
-
-                {discount.endDate && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Expires:</span>
-                    <span className="text-sm">
-                      {new Date(discount.endDate).toLocaleDateString()}
-                    </span>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex gap-2 pt-3 border-t">
-                  {canManageDiscounts && (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditDiscount(discount)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleToggleStatus(discount)}
-                      >
-                        {discount.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDeleteDiscount(discount.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        Delete
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1">
+          <Input
+            placeholder="Buscar por codigo, asignado..."
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+        </div>
+        <select
+          value={sourceFilter}
+          onChange={(e) => { setSourceFilter(e.target.value); setPage(0); }}
+          className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+        >
+          {sourceOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+        <select
+          value={statusFilter}
+          onChange={(e) => { setStatusFilter(e.target.value); setPage(0); }}
+          className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+        >
+          {statusOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
       </div>
 
-      {/* Create/Edit Modals */}
-      <DiscountCodeModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreateDiscount}
-        title="Create Discount Code"
-      />
+      {/* Table */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-100">
+                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Codigo</th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Origen</th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Descuento</th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Asignado a</th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Estado</th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Usos</th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Creado</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12">
+                    <LoadingState message="Cargando descuentos..." />
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12">
+                    <ErrorState message="Error al cargar descuentos" retry={refetch} />
+                  </td>
+                </tr>
+              ) : discounts.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12">
+                    <EmptyState title="No se encontraron descuentos" />
+                  </td>
+                </tr>
+              ) : (
+                discounts.map((discount: CentralDiscountDto, index: number) => (
+                  <tr key={discount.id ?? index} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <span className="text-sm font-medium text-gray-900">{discount.code || '-'}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <SourceBadge source={discount.source} sourceLabel={discount.sourceLabel || discount.source} />
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm font-semibold text-gray-900">{discount.discountPercentage}%</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm text-gray-600">{discount.assignedByName || '-'}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <StatusBadge status={discount.status} />
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm text-gray-600">
+                        {discount.usageCount ?? 0}/{discount.maxUsage ?? '∞'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm text-gray-400">
+                        {discount.createdAt ? new Date(discount.createdAt).toLocaleDateString('es-PE') : '-'}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
-      {selectedDiscount && (
-        <DiscountCodeModal
-          isOpen={isEditModalOpen}
-          onClose={() => {
-            setIsEditModalOpen(false);
-            setSelectedDiscount(null);
-          }}
-          onSubmit={handleUpdateDiscount}
-          title="Edit Discount Code"
-          discount={selectedDiscount}
-        />
-      )}
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+            <span className="text-sm text-gray-400">
+              Pagina {page + 1} de {totalPages} ({totalElements} resultados)
+            </span>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(Math.max(0, page - 1))}
+                disabled={page === 0}
+              >
+                Anterior
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+                disabled={page >= totalPages - 1}
+              >
+                Siguiente
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-// Discount Code Modal Component
-interface DiscountCodeModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: any) => void;
-  title: string;
-  discount?: DiscountCode;
-}
+// ==================== Main Page ====================
 
-function DiscountCodeModal({ isOpen, onClose, onSubmit, title, discount }: DiscountCodeModalProps) {
-  const [formData, setFormData] = useState({
-    code: discount?.code || '',
-    discountPercentage: discount?.discountPercentage || 10,
-    applicability: discount?.applicability || 'GLOBAL' as DiscountApplicability,
-    usageLimit: discount?.usageLimit || 100,
-    singleUse: discount?.singleUse || false,
-    startDate: discount?.startDate ? new Date(discount.startDate).toISOString().split('T')[0] : '',
-    endDate: discount?.endDate ? new Date(discount.endDate).toISOString().split('T')[0] : '',
-    applicablePlan: discount?.applicablePlan || undefined,
-    minimumAmount: discount?.minimumAmount || undefined,
-    maximumDiscount: discount?.maximumDiscount || undefined,
-  });
+export default function DiscountsPage() {
+  const [activeTab, setActiveTab] = useState<TabView>('codes');
+  const { hasPermission } = usePermissions();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
-
-  if (!isOpen) return null;
+  const canManageDiscounts = hasPermission('DISCOUNTS_MANAGE');
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-lg p-6 max-w-md w-full">
-        <h3 className="text-lg font-semibold mb-4">{title}</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="Discount Code"
-            value={formData.code}
-            onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-            required
-            disabled={!!discount} // Don't allow editing code after creation
-          />
-          
-          <Input
-            label="Discount Percentage"
-            type="number"
-            min="1"
-            max="100"
-            value={formData.discountPercentage}
-            onChange={(e) => setFormData({ ...formData, discountPercentage: Number(e.target.value) })}
-            required
-          />
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Applicability</label>
-            <select
-              value={formData.applicability}
-              onChange={(e) => setFormData({ ...formData, applicability: e.target.value as DiscountApplicability })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="GLOBAL">Global</option>
-              <option value="USER_SPECIFIC">User Specific</option>
-              <option value="AGENCY_SPECIFIC">Agency Specific</option>
-              <option value="PLAN_SPECIFIC">Plan Specific</option>
-              <option value="PROJECT_SPECIFIC">Project Specific</option>
-            </select>
-          </div>
-
-          <Input
-            label="Usage Limit"
-            type="number"
-            min="1"
-            value={formData.usageLimit}
-            onChange={(e) => setFormData({ ...formData, usageLimit: Number(e.target.value) })}
-            required
-          />
-
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="singleUse"
-              checked={formData.singleUse}
-              onChange={(e) => setFormData({ ...formData, singleUse: e.target.checked })}
-              className="mr-2"
-            />
-            <label htmlFor="singleUse" className="text-sm text-gray-700">Single use only</label>
-          </div>
-
-          <Input
-            label="Start Date"
-            type="date"
-            value={formData.startDate}
-            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-          />
-
-          <Input
-            label="End Date (optional)"
-            type="date"
-            value={formData.endDate}
-            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-          />
-
-          <div className="flex gap-3 pt-4">
-            <Button type="submit" className="flex-1">
-              {discount ? 'Update' : 'Create'} Discount Code
-            </Button>
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-              Cancel
-            </Button>
-          </div>
-        </form>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* ==================== HEADER ==================== */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Descuentos</h1>
+          <p className="text-sm text-gray-400 mt-1">Gestion de codigos de descuento y promociones</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button
+            variant={activeTab === 'codes' ? 'primary' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('codes')}
+            className="rounded-xl"
+          >
+            Aplicador
+          </Button>
+          <Button
+            variant={activeTab === 'central' ? 'primary' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('central')}
+            className="rounded-xl"
+          >
+            Gestion Centralizada
+          </Button>
+        </div>
       </div>
-    </Modal>
+
+      {/* ==================== KPIs SUPERIORES ==================== */}
+      <div className="mb-12">
+        <DiscountKPIs />
+      </div>
+
+      {/* ==================== CONTENIDO PRINCIPAL ==================== */}
+      {activeTab === 'codes' ? (
+        <div className="space-y-12">
+          {/* Aplicador Universal */}
+          <section>
+            <UniversalDiscountApplier />
+          </section>
+
+          {/* Estados de Descuentos */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <DiscountStatusSection />
+            <div />
+          </div>
+
+          {/* Actividad Reciente - full width con paginacion */}
+          <section>
+            <RecentActivitySection />
+          </section>
+        </div>
+      ) : (
+        <CentralDiscountsView />
+      )}
+    </div>
   );
 }

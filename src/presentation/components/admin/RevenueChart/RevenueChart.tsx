@@ -36,7 +36,7 @@ interface RevenueChartProps {
 export function RevenueChart({ period = '6months' }: RevenueChartProps) {
   const { data: chartData, isLoading } = useQuery({
     queryKey: ['admin', 'finance', 'history', period],
-    queryFn: () => adminRepository.getSubscriptionSalesHistory(period)
+    queryFn: () => adminRepository.getFinanceHistory(period)
   });
 
   const chartJsData = {
@@ -49,6 +49,25 @@ export function RevenueChart({ period = '6months' }: RevenueChartProps) {
         borderColor: '#3b82f6',
         borderWidth: 1,
         borderRadius: 4,
+        yAxisID: 'y',
+      },
+      {
+        label: 'Suscripciones',
+        data: chartData?.subscriptions || [],
+        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+        borderColor: '#10b981',
+        borderWidth: 1,
+        borderRadius: 4,
+        yAxisID: 'y1',
+      },
+      {
+        label: 'Transacciones',
+        data: chartData?.transactions || [],
+        backgroundColor: 'rgba(139, 92, 246, 0.8)',
+        borderColor: '#8b5cf6',
+        borderWidth: 1,
+        borderRadius: 4,
+        yAxisID: 'y1',
       }
     ],
   };
@@ -58,7 +77,14 @@ export function RevenueChart({ period = '6months' }: RevenueChartProps) {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false,
+        display: true,
+        position: 'top',
+        labels: {
+          color: '#374151',
+          font: { size: 12 },
+          usePointStyle: true,
+          padding: 15,
+        },
       },
       tooltip: {
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -67,9 +93,14 @@ export function RevenueChart({ period = '6months' }: RevenueChartProps) {
         borderColor: '#e5e7eb',
         borderWidth: 1,
         padding: 12,
-        displayColors: false,
+        displayColors: true,
         callbacks: {
-          label: (context: any) => `S/ ${context.parsed.y.toLocaleString()}`,
+          label: (context: any) => {
+            if (context.dataset.label === 'Ingresos (S/)') {
+              return `${context.dataset.label}: S/ ${context.parsed.y.toLocaleString()}`;
+            }
+            return `${context.dataset.label}: ${context.parsed.y.toLocaleString()}`;
+          },
         },
       },
     },
@@ -79,12 +110,39 @@ export function RevenueChart({ period = '6months' }: RevenueChartProps) {
         ticks: { color: '#9ca3af', font: { size: 11 } },
       },
       y: {
+        type: 'linear',
+        display: true,
+        position: 'left',
         beginAtZero: true,
         grid: { color: '#f3f4f6', drawBorder: false },
         ticks: {
           color: '#9ca3af',
           font: { size: 11 },
           callback: (value: any) => `S/ ${value.toLocaleString()}`,
+        },
+        title: {
+          display: true,
+          text: 'Ingresos (S/)',
+          color: '#3b82f6',
+          font: { size: 11, weight: 'bold' },
+        },
+      },
+      y1: {
+        type: 'linear',
+        display: true,
+        position: 'right',
+        beginAtZero: true,
+        grid: { display: false },
+        ticks: {
+          color: '#9ca3af',
+          font: { size: 11 },
+          callback: (value: any) => value.toLocaleString(),
+        },
+        title: {
+          display: true,
+          text: 'Cantidad',
+          color: '#10b981',
+          font: { size: 11, weight: 'bold' },
         },
       },
     },

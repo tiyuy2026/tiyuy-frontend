@@ -12,6 +12,7 @@ import {
   DashboardStats,
   UserStats,
   FinanceStats,
+  FinanceHistoryDto,
   UserRegistrationHistory,
   UserListItem,
   ChangeUserRoleRequest,
@@ -917,5 +918,64 @@ export const useCalculateAgentPlanPrice = (agentId: number | null, planCode: str
     queryKey: [ADMIN_QUERY_KEY, 'agents', 'plan-price', agentId, planCode],
     queryFn: () => adminRepository.calculateAgentPlanPrice(agentId!, planCode),
     enabled: !!agentId && !!planCode,
+  });
+};
+
+export const useFinanceHistory = (period: string = '1M') => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'dashboard', 'financeHistory', period],
+    queryFn: async () => {
+      try {
+        return await adminRepository.getFinanceHistory(period);
+      } catch (error) {
+        console.error('Error fetching finance history:', error);
+        return {
+          labels: [],
+          revenue: [],
+          subscriptions: [],
+          transactions: [],
+          period,
+          summary: {
+            totalRevenue: 0,
+            totalSubscriptions: 0,
+            totalTransactions: 0,
+            revenueGrowth: 0,
+            subscriptionsGrowth: 0,
+            transactionsGrowth: 0,
+          },
+        } as FinanceHistoryDto;
+      }
+    },
+    staleTime: 0, // No caché - datos frescos siempre
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  });
+};
+
+// ================== Central Discount Management Hooks ==================
+
+export const useCentralDiscounts = (params: {
+  source?: string;
+  status?: string;
+  search?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  page?: number;
+  size?: number;
+}) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'central-discounts', params],
+    queryFn: () => adminRepository.getCentralDiscounts(params),
+    staleTime: 30000,
+    refetchOnWindowFocus: true,
+  });
+};
+
+export const useCentralDiscountSummary = () => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'central-discounts', 'summary'],
+    queryFn: () => adminRepository.getCentralDiscountSummary(),
+    staleTime: 30000,
+    refetchOnWindowFocus: true,
   });
 };

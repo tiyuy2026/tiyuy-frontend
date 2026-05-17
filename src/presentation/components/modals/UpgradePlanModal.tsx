@@ -243,18 +243,20 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
 
   const createPreferenceAndCheckout = async (plan: SubscriptionPlan, subscriptionId: string) => {
     try {
-      const token = authStorage.getToken(); // ← usa authStorage, no localStorage directo
+      const token = authStorage.getToken();
       
-      console.log('📝 Creando preferencia a través del backend...');
-      console.log('🔑 Token JWT:', token ? 'Presente' : 'Ausente');
+      console.log('Creando preferencia de MercadoPago...');
+      console.log('Token JWT:', token ? 'Presente' : 'Ausente');
+      console.log('Subscription ID:', subscriptionId);
+      console.log('Plan:', plan.name, '- Precio:', plan.price);
       
       const response = await fetch(
-        `/finance/mercadopago/create-preference`,
+        `/api/finance/mercadopago/create-preference`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,  // ← JWT correcto
+            'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify({
             subscriptionId: subscriptionId.toString(),
@@ -264,32 +266,33 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
         }
       );
 
+      console.log('Respuesta status:', response.status, response.statusText);
+
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Error del backend:', response.status, errorText);
-        toast.error('Error al crear preferencia de pago');
+        console.error('Error creando preferencia:', response.status, errorText);
+        toast.error(`Error ${response.status}: No se pudo crear preferencia de pago`);
         return;
       }
 
       const data = await response.json();
-      console.log('DATA COMPLETA:', data); // ← DEBUG
+      console.log('Datos recibidos:', data);
       
-      // FIX: Todos los nombres posibles
       const url = data.sandbox_init_point || data.sandboxInitPoint || 
                   data.init_point || data.initPoint;
       
-      console.log('URL FINAL:', url);
+      console.log('URL de pago:', url);
 
       if (url) {
-        window.open(url, '_blank');
+        window.location.href = url;
       } else {
-        console.error('NO URL:', Object.keys(data));
-        toast.error('No se recibió URL de pago');
+        console.error('No se encontro URL. Keys disponibles:', Object.keys(data));
+        toast.error('El servidor no devolvio URL de pago');
       }
 
     } catch (error) {
-      console.error('Error:', error);
-      toast.error('Error al iniciar el pago');
+      console.error('Error en createPreferenceAndCheckout:', error);
+      toast.error('Error al iniciar pago: ' + (error as any).message);
     }
   };
 
@@ -313,7 +316,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
       } else {
         // Último recurso: abrir manualmente
         const checkoutUrl = `https://www.mercadopago.com/checkout/v1/redirect?preference_id=${response.id}`;
-        window.open(checkoutUrl, '_blank');
+        window.location.href = checkoutUrl;
       }
     } catch (error) {
       console.error('Error abriendo checkout:', error);
@@ -333,7 +336,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
       // Como último recurso, construir URL manual
       console.log('Construyendo URL manual como fallback');
       const manualUrl = `https://www.mercadopago.com/checkout/v1/redirect?preference_id=${Math.random().toString(36).substring(2, 9)}`;
-      window.open(manualUrl, '_blank');
+      window.location.href = manualUrl;
     }
   };
 

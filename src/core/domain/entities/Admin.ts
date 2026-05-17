@@ -843,6 +843,22 @@ export interface FinanceStatsDto {
   totalWalletBalance: number;
 }
 
+export interface FinanceHistoryDto {
+  labels: string[];
+  revenue: number[];
+  subscriptions: number[];
+  transactions: number[];
+  period: string;
+  summary: {
+    totalRevenue: number;
+    totalSubscriptions: number;
+    totalTransactions: number;
+    revenueGrowth: number;
+    subscriptionsGrowth: number;
+    transactionsGrowth: number;
+  };
+}
+
 // Admin sidebar section
 export interface AdminSidebarSection {
   title: string;
@@ -990,3 +1006,38 @@ export interface InmobiliariaFilter {
   size?: number;
   sort?: string;
 }
+
+// ================== Central Discount Management ==================
+
+export interface CentralDiscountDto {
+  id: number;
+  code: string;
+  discountPercentage: number;
+  customPrice?: number;
+  source: 'DISCOUNT_CODE' | 'AGENT' | 'DEVELOPER' | 'AGENCY_PLAN' | 'USER';
+  sourceLabel: string;
+  entityType: string;
+  entityName: string;
+  entityId?: number;
+  status: string;
+  usageCount: number;
+  maxUsage: number;
+  createdAt: string;
+  expiresAt?: string;
+  updatedAt?: string;
+  notes?: string;
+  applicability: string;
+  assignedBy?: number;
+  assignedByName?: string;
+}
+
+export interface CentralDiscountSummary {
+  total: number;
+  active: number;
+  expired: number;
+  inactive: number;
+  users: number;
+  agents: number;
+  developers: number;
+}
+

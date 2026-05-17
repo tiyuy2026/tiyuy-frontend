@@ -409,7 +409,10 @@ export default function PlansPage() {
     }, {
       onSuccess: async (subscription) => {
         try {
+          console.log('Suscripcion creada:', subscription);
           const token = authStorage.getToken();
+          console.log('Token:', token ? 'Presente' : 'Ausente');
+          
           const response = await fetch(
             `/api/finance/mercadopago/create-preference`,
             {
@@ -426,22 +429,31 @@ export default function PlansPage() {
             }
           );
 
+          console.log('Respuesta create-preference:', response.status);
+
           if (!response.ok) {
-            toast.error('Error al crear preferencia de pago');
+            const errorText = await response.text();
+            console.error('Error create-preference:', response.status, errorText);
+            toast.error(`Error ${response.status} al crear preferencia`);
             return;
           }
 
           const data = await response.json();
+          console.log('Datos preferencia:', data);
           const url = data.sandbox_init_point || data.sandboxInitPoint ||
                       data.init_point || data.initPoint;
 
+          console.log('URL pago:', url);
+
           if (url) {
-            window.location.href = url; // misma pestaña, no se bloquea
+            window.location.href = url;
           } else {
-            toast.error('No se recibió URL de pago');
+            console.error('Sin URL. Keys:', Object.keys(data));
+            toast.error('No se recibio URL de pago');
           }
         } catch (error) {
-          toast.error('Error al iniciar el pago');
+          console.error('Error pago:', error);
+          toast.error('Error al iniciar pago: ' + (error as any).message);
         }
       },
       onError: (error: any) => {
