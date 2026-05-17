@@ -99,11 +99,14 @@ export class FinanceRepository implements IFinanceRepository {
     return response.data;
   }
 
-  async subscribeToPlan(planId: string, paymentMethod: 'CARD' | 'MERCADOPAGO', discountCode?: string): Promise<ActiveSubscription> {
+  async subscribeToPlan(planId: string | number, paymentMethod: 'CARD' | 'MERCADOPAGO', discountCode?: string): Promise<ActiveSubscription> {
     // planId puede ser un número (ID del plan) o un string (tier)
     // El backend espera el tier como string (BASIC, PREMIUM, etc.)
     // Si planId es un número, necesitamos convertirlo al tier correspondiente
     let tier: string;
+    
+    // Convertir planId a string primero
+    const planIdStr = String(planId);
     
     // Mapeo de IDs de plan a tiers del backend
     const planIdToTier: Record<string, string> = {
@@ -115,19 +118,20 @@ export class FinanceRepository implements IFinanceRepository {
     };
     
     // Si planId ya es un tier válido, usarlo directamente
-    if (['FREE', 'BASIC', 'PREMIUM', 'ENTERPRISE_TRIAL', 'ENTERPRISE'].includes(planId.toUpperCase())) {
-      tier = planId.toUpperCase();
-    } else if (planIdToTier[planId]) {
+    if (['FREE', 'BASIC', 'PREMIUM', 'ENTERPRISE_TRIAL', 'ENTERPRISE'].includes(planIdStr.toUpperCase())) {
+      tier = planIdStr.toUpperCase();
+    } else if (planIdToTier[planIdStr]) {
       // Si es un ID numérico, convertir al tier correspondiente
-      tier = planIdToTier[planId];
+      tier = planIdToTier[planIdStr];
     } else {
       // Fallback: usar el planId tal como está (asumiendo que ya es un tier)
-      tier = planId;
+      tier = planIdStr;
     }
     
     const body: any = {
       tier: tier,
       paymentMethod,
+      activateImmediately: false, // No activar inmediatamente, esperar notificacion de MercadoPago
     };
     
     if (discountCode) {
