@@ -42,6 +42,13 @@ export const tiyuyColors = {
     900: '#111827',
   },
   
+  // Colores de Marca (Tiyuy Green)
+  brand: {
+    DEFAULT: '#4A9A3E',
+    light: '#5dae4c',
+    dark: '#3d8b35',
+  },
+  
   // Colores de Éxito y Error
   success: '#22c55e',
   warning: '#f59e0b', 
@@ -77,6 +84,7 @@ export const tiyuyTheme = {
     colors: {
       'tiyuy': tiyuyColors.primary,
       'tiyuy-green': tiyuyColors.secondary,
+      'brand': tiyuyColors.brand,
     },
     boxShadow: {
       'tiyuy': '0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06)',

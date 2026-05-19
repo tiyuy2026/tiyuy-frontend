@@ -9,6 +9,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        brand: {
+          DEFAULT: '#4A9A3E',
+          light: '#5dae4c',
+          dark: '#3d8b35',
+        },
+      },
       animation: {
         blob: 'blob 7s infinite',
       },

@@ -457,7 +457,7 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
                   <svg className="w-20 h-12" viewBox="0 0 80 48">
-                    <polyline fill="none" stroke="#22c55e" strokeWidth="2" points="0,40 20,35 40,20 60,25 80,10" />
+                    <polyline fill="none" stroke="brand" strokeWidth="2" points="0,40 20,35 40,20 60,25 80,10" />
                   </svg>
                 </div>
               </div>
@@ -477,7 +477,7 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
                   <svg className="w-20 h-12" viewBox="0 0 80 48">
-                    <polyline fill="none" stroke="#22c55e" strokeWidth="2" points="0,35 20,30 40,25 60,20 80,15" />
+                    <polyline fill="none" stroke="brand" strokeWidth="2" points="0,35 20,30 40,25 60,20 80,15" />
                   </svg>
                 </div>
               </div>
@@ -497,7 +497,7 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
                   <svg className="w-20 h-12" viewBox="0 0 80 48">
-                    <polyline fill="none" stroke="#22c55e" strokeWidth="2" points="0,38 20,32 40,28 60,22 80,18" />
+                    <polyline fill="none" stroke="brand" strokeWidth="2" points="0,38 20,32 40,28 60,22 80,18" />
                   </svg>
                 </div>
               </div>

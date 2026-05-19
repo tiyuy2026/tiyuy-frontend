@@ -36,7 +36,7 @@ export default function AboutTiyuyContent() {
           <div className="max-w-4xl mx-auto">
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
               TIYUY - Transformando el
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-600">
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#4A9A3E] to-[#3d8b35]">
                 mercado inmobiliario peruano
               </span>
             </h1>
@@ -48,14 +48,14 @@ export default function AboutTiyuyContent() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
                 onClick={() => scrollToSection('compromiso')}
-                className="bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                className="bg-gradient-to-r from-[#4A9A3E] to-[#3d8b35] text-white px-8 py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 Únete al equipo TIYUY
                 <ArrowRight className="inline-block w-5 h-5 ml-2" />
               </button>
               <Link 
                 href="/"
-                className="bg-white text-blue-600 border-2 border-blue-600 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-50 transition-all duration-300"
+                className="bg-white text-[#4A9A3E] border-2 border-[#4A9A3E] px-8 py-4 rounded-xl text-lg font-semibold hover:bg-[#4A9A3E]/5 transition-all duration-300"
               >
                 Explora propiedades
               </Link>
@@ -97,7 +97,7 @@ export default function AboutTiyuyContent() {
             </div>
             
             <div className="relative">
-              <div className="bg-gradient-to-r from-blue-100 to-teal-100 rounded-2xl p-8">
+              <div className="bg-gradient-to-r from-[#4A9A3E]/10 to-[#3d8b35]/10 rounded-2xl p-8">
                 <div className="aspect-video bg-white rounded-xl flex items-center justify-center">
                   <div className="text-center">
                     <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
@@ -123,7 +123,7 @@ export default function AboutTiyuyContent() {
           
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="bg-white rounded-2xl p-8 shadow-lg">
-              <div className="aspect-video bg-gradient-to-r from-blue-100 to-teal-100 rounded-xl flex items-center justify-center">
+              <div className="aspect-video bg-gradient-to-r from-[#4A9A3E]/10 to-[#3d8b35]/10 rounded-xl flex items-center justify-center">
                 <div className="text-center">
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     {[1, 2, 3, 4].map((i) => (
@@ -138,7 +138,7 @@ export default function AboutTiyuyContent() {
             <div>
               <p className="text-lg text-gray-700 mb-6 leading-relaxed">
                 En TIYUY entendimos que el problema no era técnico, era humano. 
-                Creamos una plataforma donde <span className="font-bold text-blue-600">CUALQUIER PERSONA</span> puede publicar su propiedad en 5 minutos.
+                Creamos una plataforma donde <span className="font-bold text-[#4A9A3E]">CUALQUIER PERSONA</span> puede publicar su propiedad en 5 minutos.
               </p>
               
               <p className="text-lg text-gray-700 mb-8 leading-relaxed">
@@ -152,7 +152,7 @@ export default function AboutTiyuyContent() {
                   {icon: Heart, title: 'Dueños pequeños sin barreras', desc: 'Acceso universal' }
                 ].map((item, index) => (
                   <div key={index} className="flex items-center space-x-4 bg-white p-4 rounded-lg shadow-sm">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-600 to-teal-600 rounded-lg flex items-center justify-center">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-[#4A9A3E] to-[#3d8b35] rounded-lg flex items-center justify-center">
                       <item.icon className="w-6 h-6 text-white" />
                     </div>
                     <div>
@@ -182,21 +182,21 @@ export default function AboutTiyuyContent() {
                 icon: Home,
                 title: 'Dueños pequeños',
                 description: 'Un usuario común solo puede publicar una propiedad gratis',
-                color: 'from-blue-500 to-blue-600',
+                color: 'from-[#4A9A3E] to-[#3d8b35]',
                 link: '/my-properties/new'
               },
               {
                 icon: Users,
                 title: 'Familias buscando hogar',
                 description: 'Propiedades verificadas, roomies con identidad',
-                color: 'from-teal-500 to-teal-600',
+                color: 'from-[#4A9A3E] to-[#3d8b35]',
                 link: '/rent/departamentos/lima'
               },
               {
                 icon: Building,
                 title: 'Agentes independientes',
                 description: 'Sin comisiones abusivas, publica ilimitado',
-                color: 'from-purple-500 to-purple-600',
+                color: 'from-[#4A9A3E] to-[#3d8b35]',
                 link: '/plans'
               }
             ].map((segment, index) => (
@@ -253,7 +253,7 @@ export default function AboutTiyuyContent() {
               }
             ].map((feature, index) => (
               <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-[#4A9A3E] to-[#3d8b35] rounded-xl flex items-center justify-center mx-auto mb-4">
                   <feature.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{feature.title}</h3>
@@ -265,21 +265,21 @@ export default function AboutTiyuyContent() {
       </section>
 
       {/* COMPROMISO TIYUY */}
-      <section id="compromiso" className="py-20 bg-gradient-to-r from-blue-600 to-teal-600">
+      <section id="compromiso" className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-8">
+          <h2 className="text-4xl font-bold text-gray-900 mb-8">
             Nuestro compromiso con Perú
           </h2>
           
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
-            <p className="text-xl text-white leading-relaxed mb-6">
+          <div className="bg-[#4A9A3E]/5 rounded-2xl p-8 mb-8">
+            <p className="text-xl text-gray-700 leading-relaxed mb-6">
               TIYUY no es otra app. Es la plataforma que el mercado peruano merece:
               Fácil de usar, transparente, justa. Hecha por peruanos para peruanos.
             </p>
             
             <div className="flex flex-wrap justify-center gap-4 mb-8">
               {['Confiable', 'Humano', 'Accesible', 'Seguro', 'Transparente'].map((value, index) => (
-                <span key={index} className="bg-white/20 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                <span key={index} className="bg-[#4A9A3E]/10 text-[#4A9A3E] px-4 py-2 rounded-full text-sm font-semibold">
                   {value}
                 </span>
               ))}
@@ -288,7 +288,7 @@ export default function AboutTiyuyContent() {
           
           <Link 
             href="/"
-            className="bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-xl inline-flex items-center"
+            className="bg-white text-[#4A9A3E] px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-xl inline-flex items-center"
           >
             Forma parte de TIYUY
             <ArrowRight className="inline-block w-5 h-5 ml-2" />

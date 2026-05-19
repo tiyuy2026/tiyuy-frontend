@@ -72,7 +72,7 @@ export default function NotificationsPage() {
   if (authLoading || !isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
       </div>
     );
   }
@@ -85,11 +85,11 @@ export default function NotificationsPage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="p-2.5 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl shadow-lg shadow-teal-500/25">
+                <div className="p-2.5 bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl shadow-lg shadow-brand-500/25">
                   <Bell className="w-5 h-5 text-white" />
                 </div>
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#4A9A3E] text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
@@ -109,7 +109,7 @@ export default function NotificationsPage() {
               {unreadCount > 0 && (
                 <button
                   onClick={handleMarkAllAsRead}
-                  className="flex items-center gap-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 transition-colors text-sm font-medium"
+                  className="flex items-center gap-2 px-4 py-2 bg-brand-50 text-brand-700 rounded-lg hover:bg-brand-100 transition-colors text-sm font-medium"
                 >
                   <CheckCheck className="w-4 h-4" />
                   Marcar todo
@@ -128,8 +128,8 @@ export default function NotificationsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-red-100 rounded-lg">
-                <Bell className="w-6 h-6 text-red-600" />
+              <div className="p-3 bg-[#4A9A3E]/10 rounded-lg">
+                <Bell className="w-6 h-6 text-[#4A9A3E]" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">{unreadCount}</p>
@@ -139,8 +139,8 @@ export default function NotificationsPage() {
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Clock className="w-6 h-6 text-blue-600" />
+              <div className="p-3 bg-[#4A9A3E]/10 rounded-lg">
+                <Clock className="w-6 h-6 text-[#4A9A3E]" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">{recentNotifications.length}</p>
@@ -169,26 +169,26 @@ export default function NotificationsPage() {
               onClick={() => setActiveTab('recent')}
               className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 text-sm font-medium transition-all relative ${
                 activeTab === 'recent' 
-                  ? 'text-teal-600' 
+                  ? 'text-brand-600' 
                   : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
               }`}
             >
               <Clock className="w-4 h-4" />
               Notificaciones Recientes
               {recentNotifications.length > 0 && (
-                <span className="ml-1 px-2 py-0.5 bg-red-100 text-red-600 rounded-full text-xs font-bold">
+                <span className="ml-1 px-2 py-0.5 bg-[#4A9A3E]/10 text-[#4A9A3E] rounded-full text-xs font-bold">
                   {recentNotifications.length}
                 </span>
               )}
               {activeTab === 'recent' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-500" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-500" />
               )}
             </button>
             <button
               onClick={() => setActiveTab('history')}
               className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 text-sm font-medium transition-all relative ${
                 activeTab === 'history' 
-                  ? 'text-teal-600' 
+                  ? 'text-brand-600' 
                   : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
               }`}
             >
@@ -200,7 +200,7 @@ export default function NotificationsPage() {
                 </span>
               )}
               {activeTab === 'history' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-500" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-500" />
               )}
             </button>
           </div>
@@ -209,7 +209,7 @@ export default function NotificationsPage() {
           <div className="p-6">
             {isLoading ? (
               <div className="flex items-center justify-center py-16">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-teal-600"></div>
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-600"></div>
               </div>
             ) : activeTab === 'recent' ? (
               recentNotifications.length === 0 ? (
@@ -292,7 +292,7 @@ function NotificationCard({ notification, onMarkAsRead, isHistory }: Notificatio
   const getIconColors = (type: string) => {
     switch (type) {
       case 'ADMIN_NOTIFICATION':
-        return 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-red-500/30';
+        return 'bg-gradient-to-br from-[#4A9A3E] to-[#3d8b35] text-white shadow-[#4A9A3E]/30';
       case 'EVENT_CREATED':
       case 'EVENT_UPDATED':
       case 'EVENT_REMINDER':
@@ -301,9 +301,9 @@ function NotificationCard({ notification, onMarkAsRead, isHistory }: Notificatio
       case 'FAVORITE':
         return 'bg-gradient-to-br from-pink-500 to-pink-600 text-white shadow-pink-500/30';
       case 'PROPERTY_PUBLISHED':
-        return 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-green-500/30';
+        return 'bg-gradient-to-br from-[#4A9A3E] to-[#3d8b35] text-white shadow-[#4A9A3E]/30';
       default:
-        return 'bg-gradient-to-br from-teal-500 to-teal-600 text-white shadow-teal-500/30';
+        return 'bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-brand-500/30';
     }
   };
 
@@ -349,7 +349,7 @@ function NotificationCard({ notification, onMarkAsRead, isHistory }: Notificatio
                 {notification.title}
               </h3>
               {!notification.read && !isHistory && (
-                <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full">
+                <span className="px-2 py-0.5 bg-[#4A9A3E]/10 text-[#4A9A3E] text-xs font-bold rounded-full">
                   NUEVO
                 </span>
               )}
@@ -367,7 +367,7 @@ function NotificationCard({ notification, onMarkAsRead, isHistory }: Notificatio
           {!notification.read && !isHistory && (
             <button
               onClick={() => onMarkAsRead(notification.id)}
-              className="flex-shrink-0 p-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+              className="flex-shrink-0 p-2 text-brand-600 hover:bg-brand-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
               title="Marcar como leída"
             >
               <Check className="w-5 h-5" />
