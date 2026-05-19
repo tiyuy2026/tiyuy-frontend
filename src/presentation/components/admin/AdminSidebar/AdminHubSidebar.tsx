@@ -45,7 +45,8 @@ interface NavItem {
 
 export function GitHubSidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [expandedSections, setExpandedSections] = useState<string[]>(['dashboard', 'analytics', 'user-management', 'property-management', 'communications', 'finance', 'campaigns', 'admin-management']);
+  const [expandedSections, setExpandedSections] = useState<string[]>(['dashboard', 'analytics', 'user-management', 'property-management', 'communications', 'finance', 'marketing', 'admin-management']);
+
   const { hasPermission } = usePermissions();
   const pathname = usePathname();
 
@@ -314,28 +315,52 @@ export function GitHubSidebar() {
         }
       ]
     },
-    // Campaign Management
+    // Marketing Module
     {
-      id: 'campaigns',
-      label: 'Campanias de Marketing',
+      id: 'marketing',
+      label: 'Marketing',
       icon: <Megaphone className="w-4 h-4" />,
+      path: '/admin/campaigns',
       children: [
         {
-          id: 'campaign-list',
-          label: 'Lista de Campanias',
-          icon: <Calendar className="w-4 h-4" />,
-          path: '/admin/campaigns',
+          id: 'marketing-dashboard',
+          label: 'Panel de Marketing',
+          icon: <BarChart3 className="w-4 h-4" />,
+          path: '/admin/marketing',
           requiredPermissions: ['COMMUNICATIONS_MANAGE']
         },
         {
-          id: 'create-campaign',
-          label: 'Crear Campania',
+          id: 'marketing-campaigns',
+          label: 'Campanias',
           icon: <Calendar className="w-4 h-4" />,
-          path: '/admin/campaigns?action=create',
+          path: '/admin/marketing/campaigns',
+          requiredPermissions: ['COMMUNICATIONS_MANAGE']
+        },
+        {
+          id: 'marketing-banners',
+          label: 'Banners',
+          icon: <Target className="w-4 h-4" />,
+          path: '/admin/marketing/banners',
+          requiredPermissions: ['COMMUNICATIONS_MANAGE']
+        },
+        {
+          id: 'marketing-pricing',
+          label: 'Precios',
+          icon: <DollarSign className="w-4 h-4" />,
+          path: '/admin/marketing/pricing',
+          requiredPermissions: ['COMMUNICATIONS_MANAGE']
+        },
+        {
+          id: 'marketing-festive',
+          label: 'Campanias Festivas',
+          icon: <Calendar className="w-4 h-4" />,
+          path: '/admin/marketing/festive',
           requiredPermissions: ['COMMUNICATIONS_MANAGE']
         }
       ]
     },
+
+
     // Admin Management (SuperAdmin only)
     {
       id: 'admin-management',

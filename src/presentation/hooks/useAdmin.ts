@@ -979,3 +979,189 @@ export const useCentralDiscountSummary = () => {
     refetchOnWindowFocus: true,
   });
 };
+
+// ================== Marketing Module Hooks ==================
+
+export const useMarketingStats = () => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'marketing', 'stats'],
+    queryFn: () => adminRepository.getMarketingStats(),
+    staleTime: 30000,
+    refetchOnWindowFocus: true,
+  });
+};
+
+export const usePromotionCampaigns = (params?: { page?: number; size?: number; status?: string }) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'marketing', 'campaigns', params],
+    queryFn: () => adminRepository.getPromotionCampaigns(params),
+    staleTime: 30000,
+    refetchOnWindowFocus: true,
+  });
+};
+
+export const usePromotionCampaignById = (id: number | null) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'marketing', 'campaigns', id],
+    queryFn: () => adminRepository.getPromotionCampaignById(id!),
+    enabled: !!id,
+    staleTime: 30000,
+  });
+};
+
+export const useCreatePromotionCampaign = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (request: import('@/core/domain/entities/Admin').CreatePromotionCampaignRequest) =>
+      adminRepository.createPromotionCampaign(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'campaigns'] });
+    },
+  });
+};
+
+export const useUpdatePromotionCampaign = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, request }: { id: number; request: import('@/core/domain/entities/Admin').UpdatePromotionCampaignRequest }) =>
+      adminRepository.updatePromotionCampaign(id, request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'campaigns'] });
+    },
+  });
+};
+
+export const useDeletePromotionCampaign = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => adminRepository.deletePromotionCampaign(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'campaigns'] });
+    },
+  });
+};
+
+export const useCampaignPricingList = (params?: { page?: number; size?: number }) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'marketing', 'pricing', params],
+    queryFn: () => adminRepository.getCampaignPricingList(params),
+    staleTime: 30000,
+    refetchOnWindowFocus: true,
+  });
+};
+
+export const useCreateCampaignPricing = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (request: import('@/core/domain/entities/Admin').CreateCampaignPricingRequest) =>
+      adminRepository.createCampaignPricing(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'pricing'] });
+    },
+  });
+};
+
+export const useUpdateCampaignPricing = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, request }: { id: number; request: Partial<import('@/core/domain/entities/Admin').CreateCampaignPricingRequest> }) =>
+      adminRepository.updateCampaignPricing(id, request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'pricing'] });
+    },
+  });
+};
+
+export const useDeleteCampaignPricing = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => adminRepository.deleteCampaignPricing(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'pricing'] });
+    },
+  });
+};
+
+export const useBanners = (params?: { page?: number; size?: number; location?: string }) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'marketing', 'banners', params],
+    queryFn: () => adminRepository.getBanners(params),
+    staleTime: 30000,
+    refetchOnWindowFocus: true,
+  });
+};
+
+export const useCreateBanner = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (request: import('@/core/domain/entities/Admin').CreateBannerRequest) =>
+      adminRepository.createBanner(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'banners'] });
+    },
+  });
+};
+
+export const useUpdateBanner = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, request }: { id: number; request: Partial<import('@/core/domain/entities/Admin').CreateBannerRequest> }) =>
+      adminRepository.updateBanner(id, request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'banners'] });
+    },
+  });
+};
+
+export const useDeleteBanner = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => adminRepository.deleteBanner(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'banners'] });
+    },
+  });
+};
+
+export const useFestiveCampaigns = (params?: { page?: number; size?: number }) => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'marketing', 'festive', params],
+    queryFn: () => adminRepository.getFestiveCampaigns(params),
+    staleTime: 30000,
+    refetchOnWindowFocus: true,
+  });
+};
+
+export const useCreateFestiveCampaign = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (request: import('@/core/domain/entities/Admin').CreateFestiveCampaignRequest) =>
+      adminRepository.createFestiveCampaign(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'festive'] });
+    },
+  });
+};
+
+export const useUpdateFestiveCampaign = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, request }: { id: number; request: Partial<import('@/core/domain/entities/Admin').CreateFestiveCampaignRequest> }) =>
+      adminRepository.updateFestiveCampaign(id, request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'festive'] });
+    },
+  });
+};
+
+export const useDeleteFestiveCampaign = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => adminRepository.deleteFestiveCampaign(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'festive'] });
+    },
+  });
+};
+
+

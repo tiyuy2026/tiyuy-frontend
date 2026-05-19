@@ -1,408 +1,117 @@
 /**
- * Admin Campaigns Page
- * Complete campaign management with RBAC
+ * Admin Marketing Hub Page
+ * Central hub for all marketing management (campaigns, banners, pricing, festive)
  */
 
 'use client';
 
-import { useState } from 'react';
-import { useCampaigns, useCreateCampaign, useUpdateCampaign, useDeleteCampaign } from '@/presentation/hooks/useAdmin';
-import { useDiscountCodes } from '@/presentation/hooks/useAdmin';
-import { usePermissions } from '@/presentation/hooks/usePermissions';
-import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/Card';
-import { Modal } from '@/presentation/components/ui/Modal';
-import { Input } from '@/presentation/components/ui/Input';
-import { Button } from '@/presentation/components/ui/Button';
-import { LoadingState, EmptyState, ErrorState } from '@/presentation/components/admin/AdminUIStates';
-import { Campaign, CreateCampaignRequest, UpdateCampaignRequest, CampaignStatus, DiscountCode } from '@/core/domain/entities/Admin';
+import { useMarketingStats } from '@/presentation/hooks/useAdmin';
+import { Card } from '@/presentation/components/ui/Card';
+import Link from 'next/link';
 
-export default function CampaignsPage() {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-
-  const { hasPermission } = usePermissions();
-  const canManageDiscounts = hasPermission('DISCOUNTS_MANAGE');
-  const canCreateDiscounts = hasPermission('DISCOUNTS_CREATE');
-
-  const { data: campaignsData, isLoading, error, refetch } = useCampaigns({ page: 0, size: 50 });
-  const { data: discountsData } = useDiscountCodes({ page: 0, size: 100 });
-  const createMutation = useCreateCampaign();
-  const updateMutation = useUpdateCampaign();
-  const deleteMutation = useDeleteCampaign();
-
-  // Filter campaigns based on search and status
-  const filteredCampaigns = campaignsData?.content?.filter(campaign => {
-    const matchesSearch = campaign.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || campaign.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  }) || [];
-
-  const handleCreateCampaign = async (formData: CreateCampaignRequest) => {
-    try {
-      await createMutation.mutateAsync(formData);
-      setIsCreateModalOpen(false);
-      refetch();
-    } catch (error) {
-      console.error('Failed to create campaign:', error);
-    }
-  };
-
-  const handleEditCampaign = (campaign: Campaign) => {
-    setSelectedCampaign(campaign);
-    setIsEditModalOpen(true);
-  };
-
-  const handleUpdateCampaign = async (formData: UpdateCampaignRequest) => {
-    if (!selectedCampaign) return;
-    
-    try {
-      await updateMutation.mutateAsync({
-        campaignId: selectedCampaign.id,
-        request: formData
-      });
-      setIsEditModalOpen(false);
-      setSelectedCampaign(null);
-      refetch();
-    } catch (error) {
-      console.error('Failed to update campaign:', error);
-    }
-  };
-
-  const handleDeleteCampaign = async (campaignId: number) => {
-    if (!confirm('Are you sure you want to delete this campaign?')) return;
-    
-    try {
-      await deleteMutation.mutateAsync(campaignId);
-      refetch();
-    } catch (error) {
-      console.error('Failed to delete campaign:', error);
-    }
-  };
-
-  const handleToggleStatus = async (campaign: Campaign) => {
-    const newStatus = campaign.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-    await handleUpdateCampaign({ status: newStatus });
-  };
+export default function AdminMarketingHubPage() {
+  const { data: stats, isLoading } = useMarketingStats();
 
   if (isLoading) {
-    return <LoadingState message="Loading campaigns..." />;
-  }
-
-  if (error) {
-    return <ErrorState 
-      message="Failed to load campaigns. Please try again." 
-      retry={refetch}
-    />;
-  }
-
-  if (filteredCampaigns.length === 0) {
     return (
-      <EmptyState
-        title="No campaigns found"
-        description={searchQuery || statusFilter !== 'all' 
-          ? "Try adjusting your search or filter criteria." 
-          : "Get started by creating your first promotional campaign."
-        }
-        action={canCreateDiscounts ? {
-          label: "Create Campaign",
-          onClick: () => setIsCreateModalOpen(true)
-        } : undefined}
-      />
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Marketing</h1>
+          <p className="text-gray-500 mt-1">Gestion de campanas, banners, precios y campanas festivas</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-24 rounded-xl bg-gray-100 animate-pulse" />
+          ))}
+        </div>
+      </div>
     );
   }
 
+  const kpiCards = [
+    { label: 'Campanas Activas', value: stats?.activeCampaigns ?? 0, total: stats?.totalCampaigns ?? 0, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { label: 'Banners Activos', value: stats?.activeBanners ?? 0, total: stats?.totalBanners ?? 0, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Campanas Festivas', value: stats?.activeFestiveCampaigns ?? 0, total: stats?.totalFestiveCampaigns ?? 0, color: 'text-purple-600', bg: 'bg-purple-50' },
+    { label: 'Ingresos Totales', value: stats?.totalRevenue ?? 0, color: 'text-amber-600', bg: 'bg-amber-50', prefix: '$' },
+  ];
+
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Campaigns</h2>
-          <p className="text-gray-600">Manage promotional campaigns and marketing initiatives</p>
-        </div>
-        {canCreateDiscounts && (
-          <Button onClick={() => setIsCreateModalOpen(true)}>
-            Create Campaign
-          </Button>
-        )}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Marketing</h1>
+        <p className="text-gray-500 mt-1">Gestion de campanas, banners, precios y campanas festivas</p>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex gap-4">
-            <Input
-              placeholder="Search campaigns..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1"
-            />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="all">All Status</option>
-              <option value="SCHEDULED">Scheduled</option>
-              <option value="ACTIVE">Active</option>
-              <option value="EXPIRED">Expired</option>
-              <option value="INACTIVE">Inactive</option>
-            </select>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Campaigns Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCampaigns.map((campaign) => (
-          <Card key={campaign.id} className="relative">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{campaign.title}</CardTitle>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  campaign.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                  campaign.status === 'SCHEDULED' ? 'bg-blue-100 text-blue-800' :
-                  campaign.status === 'EXPIRED' ? 'bg-red-100 text-red-800' :
-                  campaign.status === 'INACTIVE' ? 'bg-gray-100 text-gray-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {campaign.status}
-                </span>
-              </div>
-              {campaign.description && (
-                <p className="text-sm text-gray-600 mt-1">{campaign.description}</p>
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Discount Code:</span>
-                  <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
-                    {campaign.discountCodeCode || 'N/A'}
-                  </span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Target Audience:</span>
-                  <span className="text-sm">{campaign.targetAudience?.replace('_', ' ') || 'N/A'}</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Usage:</span>
-                  <span className="text-sm">{campaign.usageCount || 0} uses</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Revenue:</span>
-                  <span className="text-sm font-semibold text-green-600">
-                    ${(campaign.revenueGenerated || 0).toLocaleString()}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Auto Apply:</span>
-                  <span className="text-sm">{campaign.autoApply ? 'Yes' : 'No'}</span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Start Date:</span>
-                  <span className="text-sm">
-                    {new Date(campaign.startDate).toLocaleDateString()}
-                  </span>
-                </div>
-
-                {campaign.endDate && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">End Date:</span>
-                    <span className="text-sm">
-                      {new Date(campaign.endDate).toLocaleDateString()}
-                    </span>
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex gap-2 pt-3 border-t">
-                  {canManageDiscounts && (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditCampaign(campaign)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleToggleStatus(campaign)}
-                      >
-                        {campaign.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDeleteCampaign(campaign.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        Delete
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </CardContent>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {kpiCards.map((kpi) => (
+          <Card key={kpi.label} className={`${kpi.bg} border-0 p-4`}>
+            <p className="text-sm text-gray-600 font-medium">{kpi.label}</p>
+            <p className={`text-2xl font-bold mt-1 ${kpi.color}`}>
+              {kpi.prefix || ''}{typeof kpi.value === 'number' ? kpi.value.toLocaleString('es-PE') : kpi.value}
+            </p>
+            {'total' in kpi && (
+              <p className="text-xs text-gray-400 mt-1">
+                de {kpi.total} totales
+              </p>
+            )}
           </Card>
         ))}
       </div>
 
-      {/* Create/Edit Modals */}
-      <CampaignModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreateCampaign}
-        title="Create Campaign"
-        availableDiscounts={discountsData?.content || []}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Link href="/admin/marketing" className="block">
+          <Card className="p-6 hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-blue-500">
+            <h3 className="text-lg font-semibold text-gray-900">Panel de Marketing</h3>
+            <p className="text-sm text-gray-500 mt-2">Vista general con metricas detalladas de rendimiento</p>
+            <div className="mt-4 flex gap-4 text-sm text-gray-600">
+              <span>CTR: {stats?.averageCTR != null ? `${(stats.averageCTR).toFixed(2)}%` : '0%'}</span>
 
-      {selectedCampaign && (
-        <CampaignModal
-          isOpen={isEditModalOpen}
-          onClose={() => {
-            setIsEditModalOpen(false);
-            setSelectedCampaign(null);
-          }}
-          onSubmit={handleUpdateCampaign}
-          title="Edit Campaign"
-          campaign={selectedCampaign}
-          availableDiscounts={discountsData?.content || []}
-        />
-      )}
-    </div>
-  );
-}
+              <span>Conversiones: {stats?.totalConversions?.toLocaleString('es-PE') ?? 0}</span>
+            </div>
+          </Card>
+        </Link>
 
-// Campaign Modal Component
-interface CampaignModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: any) => void;
-  title: string;
-  campaign?: Campaign;
-  availableDiscounts: DiscountCode[];
-}
+        <Link href="/admin/marketing/campaigns" className="block">
+          <Card className="p-6 hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-emerald-500">
+            <h3 className="text-lg font-semibold text-gray-900">Campanas</h3>
+            <p className="text-sm text-gray-500 mt-2">Crea y administra campanas promocionales</p>
+            <div className="mt-4 flex gap-4 text-sm text-gray-600">
+              <span>{stats?.activeCampaigns ?? 0} activas</span>
+              <span>{stats?.pendingApproval ?? 0} pendientes</span>
+            </div>
+          </Card>
+        </Link>
 
-function CampaignModal({ isOpen, onClose, onSubmit, title, campaign, availableDiscounts }: CampaignModalProps) {
-  const [formData, setFormData] = useState({
-    title: campaign?.title || campaign?.name || '',
-    description: campaign?.description || '',
-    discountCodeId: campaign?.discountCodeId || 0,
-    startDate: campaign?.startDate ? new Date(campaign.startDate).toISOString().split('T')[0] : '',
-    endDate: campaign?.endDate ? new Date(campaign.endDate).toISOString().split('T')[0] : '',
-    targetAudience: campaign?.targetAudience || 'ALL' as any,
-    autoApply: campaign?.autoApply ?? true,
-  });
+        <Link href="/admin/marketing/banners" className="block">
+          <Card className="p-6 hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-amber-500">
+            <h3 className="text-lg font-semibold text-gray-900">Banners</h3>
+            <p className="text-sm text-gray-500 mt-2">Administra los banners publicitarios del sitio</p>
+            <div className="mt-4 flex gap-4 text-sm text-gray-600">
+              <span>{stats?.activeBanners ?? 0} activos</span>
+              <span>{stats?.totalBanners ?? 0} totales</span>
+            </div>
+          </Card>
+        </Link>
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
+        <Link href="/admin/marketing/pricing" className="block">
+          <Card className="p-6 hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-purple-500">
+            <h3 className="text-lg font-semibold text-gray-900">Precios</h3>
+            <p className="text-sm text-gray-500 mt-2">Configura los precios por ubicacion de campanas</p>
+          </Card>
+        </Link>
 
-  if (!isOpen) return null;
+        <Link href="/admin/marketing/festive" className="block">
+          <Card className="p-6 hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-rose-500">
+            <h3 className="text-lg font-semibold text-gray-900">Campanas Festivas</h3>
+            <p className="text-sm text-gray-500 mt-2">Crea campanas especiales para fechas festivas</p>
+            <div className="mt-4 flex gap-4 text-sm text-gray-600">
+              <span>{stats?.activeFestiveCampaigns ?? 0} activas</span>
 
-  return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-lg p-6 max-w-md w-full">
-        <h3 className="text-lg font-semibold mb-4">{title}</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="Campaign Name"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            required
-          />
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Discount Code</label>
-            <select
-              value={formData.discountCodeId}
-              onChange={(e) => setFormData({ ...formData, discountCodeId: Number(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">Select a discount code</option>
-              {availableDiscounts
-                .filter(discount => discount.status === 'ACTIVE')
-                .map(discount => (
-                  <option key={discount.id} value={discount.id}>
-                    {discount.code} - {discount.discountPercentage}% OFF
-                  </option>
-                ))
-              }
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Target Audience</label>
-            <select
-              value={formData.targetAudience}
-              onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="ALL">All Users</option>
-              <option value="NEW_USERS">New Users</option>
-              <option value="EXISTING_USERS">Existing Users</option>
-              <option value="SUBSCRIBERS">Subscribers</option>
-            </select>
-          </div>
-
-          <Input
-            label="Start Date"
-            type="date"
-            value={formData.startDate}
-            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-            required
-          />
-
-          <Input
-            label="End Date (optional)"
-            type="date"
-            value={formData.endDate}
-            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-          />
-
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="autoApply"
-              checked={formData.autoApply}
-              onChange={(e) => setFormData({ ...formData, autoApply: e.target.checked })}
-              className="mr-2"
-            />
-            <label htmlFor="autoApply" className="text-sm text-gray-700">Auto-apply discount</label>
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <Button type="submit" className="flex-1">
-              {campaign ? 'Update' : 'Create'} Campaign
-            </Button>
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-              Cancel
-            </Button>
-          </div>
-        </form>
+            </div>
+          </Card>
+        </Link>
       </div>
-    </Modal>
+    </div>
   );
 }

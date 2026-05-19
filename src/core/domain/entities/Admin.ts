@@ -1041,3 +1041,145 @@ export interface CentralDiscountSummary {
   developers: number;
 }
 
+// ================== Marketing Module Types ==================
+
+export interface MarketingStats {
+  totalCampaigns: number;
+  activeCampaigns: number;
+  pendingApproval: number;
+  expiredCampaigns: number;
+  totalBanners: number;
+  activeBanners: number;
+  totalFestiveCampaigns: number;
+  activeFestiveCampaigns: number;
+  totalRevenue: number;
+  totalImpressions: number;
+  totalClicks: number;
+  totalLeads: number;
+  totalConversions: number;
+  averageCTR: number;
+}
+
+
+
+export interface PromotionCampaign {
+  id: number;
+  name: string;
+  description?: string;
+  type: string;
+  status: string;
+  startDate: string;
+  endDate?: string;
+  budget?: number;
+  spent?: number;
+  targetAudience?: string;
+  placementLocations?: string[];
+  impressions?: number;
+  clicks?: number;
+  conversions?: number;
+  ctr?: number;
+  conversionRate?: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreatePromotionCampaignRequest {
+  name: string;
+  description?: string;
+  type: string;
+  startDate: string;
+  endDate?: string;
+  budget?: number;
+  targetAudience?: string;
+  placementLocations?: string[];
+}
+
+export interface UpdatePromotionCampaignRequest {
+  name?: string;
+  description?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+  budget?: number;
+  targetAudience?: string;
+  placementLocations?: string[];
+}
+
+export interface CampaignPricing {
+  id: number;
+  name: string;
+  description?: string;
+  placementLocation: string;
+  pricePerDay: number;
+  pricePerWeek: number;
+  pricePerMonth: number;
+  currency: string;
+  isActive: boolean;
+  maxDurationDays?: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateCampaignPricingRequest {
+  name: string;
+  description?: string;
+  placementLocation: string;
+  pricePerDay: number;
+  pricePerWeek: number;
+  pricePerMonth: number;
+  currency?: string;
+  maxDurationDays?: number;
+}
+
+export interface Banner {
+  id: number;
+  title: string;
+  description?: string;
+  imageUrl: string;
+  linkUrl?: string;
+  placementLocation: string;
+  startDate: string;
+  endDate?: string;
+  isActive: boolean;
+  impressions?: number;
+  clicks?: number;
+  ctr?: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateBannerRequest {
+  title: string;
+  description?: string;
+  imageUrl: string;
+  linkUrl?: string;
+  placementLocation: string;
+  startDate: string;
+  endDate?: string;
+}
+
+export interface FestiveCampaign {
+  id: number;
+  name: string;
+  description?: string;
+  theme?: string;
+  startDate: string;
+  endDate: string;
+  discountPercentage?: number;
+  bannerImageUrl?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateFestiveCampaignRequest {
+  name: string;
+  description?: string;
+  theme?: string;
+  startDate: string;
+  endDate: string;
+  discountPercentage?: number;
+  bannerImageUrl?: string;
+}
+
+

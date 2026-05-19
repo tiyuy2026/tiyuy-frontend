@@ -58,7 +58,18 @@ import {
   AssignAgentToInmobiliariaRequest,
   CentralDiscountDto,
   CentralDiscountSummary,
+  MarketingStats,
+  PromotionCampaign,
+  CreatePromotionCampaignRequest,
+  UpdatePromotionCampaignRequest,
+  CampaignPricing,
+  CreateCampaignPricingRequest,
+  Banner,
+  CreateBannerRequest,
+  FestiveCampaign,
+  CreateFestiveCampaignRequest,
 } from '@/core/domain/entities/Admin';
+
 import { PropertyReport } from '@/core/domain/entities/Moderation';
 import {
   AgentDiscount,
@@ -1042,7 +1053,98 @@ export class AdminRepository implements IAdminRepository {
     const response = await axiosClient.get('/admin/central-discounts/summary');
     return response.data;
   }
+
+  // ================== Marketing Module ==================
+
+  async getMarketingStats(): Promise<MarketingStats> {
+    const response = await axiosClient.get('/v1/admin/marketing/stats');
+    return response.data;
+  }
+
+  async getPromotionCampaigns(params?: { page?: number; size?: number; status?: string }): Promise<PaginatedResponse<PromotionCampaign>> {
+    const response = await axiosClient.get('/v1/admin/marketing/campaigns', { params });
+    return response.data;
+  }
+
+  async getPromotionCampaignById(id: number): Promise<PromotionCampaign> {
+    const response = await axiosClient.get(`/v1/admin/marketing/campaigns/${id}`);
+    return response.data;
+  }
+
+  async createPromotionCampaign(request: CreatePromotionCampaignRequest): Promise<PromotionCampaign> {
+    const response = await axiosClient.post('/v1/admin/marketing/campaigns', request);
+    return response.data;
+  }
+
+  async updatePromotionCampaign(id: number, request: UpdatePromotionCampaignRequest): Promise<PromotionCampaign> {
+    const response = await axiosClient.put(`/v1/admin/marketing/campaigns/${id}`, request);
+    return response.data;
+  }
+
+  async deletePromotionCampaign(id: number): Promise<void> {
+    await axiosClient.delete(`/v1/admin/marketing/campaigns/${id}`);
+  }
+
+  async getCampaignPricingList(params?: { page?: number; size?: number }): Promise<PaginatedResponse<CampaignPricing>> {
+    const response = await axiosClient.get('/v1/admin/marketing/pricing', { params });
+    return response.data;
+  }
+
+  async createCampaignPricing(request: CreateCampaignPricingRequest): Promise<CampaignPricing> {
+    const response = await axiosClient.post('/v1/admin/marketing/pricing', request);
+    return response.data;
+  }
+
+  async updateCampaignPricing(id: number, request: Partial<CreateCampaignPricingRequest>): Promise<CampaignPricing> {
+    const response = await axiosClient.put(`/v1/admin/marketing/pricing/${id}`, request);
+    return response.data;
+  }
+
+  async deleteCampaignPricing(id: number): Promise<void> {
+    await axiosClient.delete(`/v1/admin/marketing/pricing/${id}`);
+  }
+
+  async getBanners(params?: { page?: number; size?: number; location?: string }): Promise<PaginatedResponse<Banner>> {
+    const response = await axiosClient.get('/v1/admin/marketing/banners', { params });
+    return response.data;
+  }
+
+  async createBanner(request: CreateBannerRequest): Promise<Banner> {
+    const response = await axiosClient.post('/v1/admin/marketing/banners', request);
+    return response.data;
+  }
+
+  async updateBanner(id: number, request: Partial<CreateBannerRequest>): Promise<Banner> {
+    const response = await axiosClient.put(`/v1/admin/marketing/banners/${id}`, request);
+    return response.data;
+  }
+
+  async deleteBanner(id: number): Promise<void> {
+    await axiosClient.delete(`/v1/admin/marketing/banners/${id}`);
+  }
+
+  async getFestiveCampaigns(params?: { page?: number; size?: number }): Promise<PaginatedResponse<FestiveCampaign>> {
+    const response = await axiosClient.get('/v1/admin/marketing/festive', { params });
+    return response.data;
+  }
+
+  async createFestiveCampaign(request: CreateFestiveCampaignRequest): Promise<FestiveCampaign> {
+    const response = await axiosClient.post('/v1/admin/marketing/festive', request);
+    return response.data;
+  }
+
+  async updateFestiveCampaign(id: number, request: Partial<CreateFestiveCampaignRequest>): Promise<FestiveCampaign> {
+    const response = await axiosClient.put(`/v1/admin/marketing/festive/${id}`, request);
+    return response.data;
+  }
+
+  async deleteFestiveCampaign(id: number): Promise<void> {
+    await axiosClient.delete(`/v1/admin/marketing/festive/${id}`);
+  }
+
 }
 
 // Export singleton instance
 export const adminRepository = new AdminRepository();
+
+

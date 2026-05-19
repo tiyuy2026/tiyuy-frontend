@@ -55,5 +55,81 @@ export function usePublicAgentProfile(slug: string) {
   });
 }
 
+// ================== Agent Marketing Hooks ==================
+
+const AGENT_MARKETING_KEY = ['agent', 'marketing'];
+
+export function useAgentMarketingStats() {
+  const { user } = useAuthStore();
+  return useQuery({
+    queryKey: [...AGENT_MARKETING_KEY, 'stats'],
+    queryFn: () => agentRepo.getMarketingStats(),
+    enabled: user?.role === 'AGENT',
+    staleTime: 30000,
+  });
+}
+
+export function useAgentMyCampaigns(params?: { page?: number; size?: number }) {
+  const { user } = useAuthStore();
+  return useQuery({
+    queryKey: [...AGENT_MARKETING_KEY, 'campaigns', params],
+    queryFn: () => agentRepo.getMyCampaigns(params),
+    enabled: user?.role === 'AGENT',
+    staleTime: 30000,
+  });
+}
+
+export function useAgentCreateCampaign() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (request: import('@/core/domain/entities/Admin').CreatePromotionCampaignRequest) =>
+      agentRepo.createMyCampaign(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...AGENT_MARKETING_KEY, 'campaigns'] });
+      toast.success('Campana creada exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al crear campana');
+    },
+  });
+}
+
+export function useAgentMyBanners() {
+  const { user } = useAuthStore();
+  return useQuery({
+    queryKey: [...AGENT_MARKETING_KEY, 'banners'],
+    queryFn: () => agentRepo.getMyBanners(),
+    enabled: user?.role === 'AGENT',
+    staleTime: 30000,
+  });
+}
+
+export function useAgentCreateBanner() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (request: import('@/core/domain/entities/Admin').CreateBannerRequest) =>
+      agentRepo.createMyBanner(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...AGENT_MARKETING_KEY, 'banners'] });
+      toast.success('Banner creado exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al crear banner');
+    },
+  });
+}
+
+export function useAgentPricingList() {
+  const { user } = useAuthStore();
+  return useQuery({
+    queryKey: [...AGENT_MARKETING_KEY, 'pricing'],
+    queryFn: () => agentRepo.getPricingList(),
+    enabled: user?.role === 'AGENT',
+    staleTime: 30000,
+  });
+}
+
 // Re-export Agent type for use in components
 export type { Agent };
+
+
