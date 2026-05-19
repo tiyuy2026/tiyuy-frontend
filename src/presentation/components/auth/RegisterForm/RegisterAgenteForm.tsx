@@ -116,31 +116,34 @@ export const RegisterAgenteForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (googleData) {
-        await authRepository.loginWithGoogle(
-          googleData.email,
-          formData.firstName || googleData.firstName,
-          formData.lastName || googleData.lastName,
-          googleData.uid,
-        );
-        window.location.href = '/dashboard';
-        return;
-      }
+      const email = googleData ? googleData.email : formData.email;
+      const password = googleData ? crypto.randomUUID() : formData.password;
+      const firstName = googleData ? (formData.firstName || googleData.firstName) : formData.firstName;
+      const lastName = googleData ? (formData.lastName || googleData.lastName) : formData.lastName;
+
+      // 1. Registrar usuario
       await register({
-        email: formData.email,
-        password: formData.password,
+        email,
+        password,
         phone: formData.phone,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        firstName,
+        lastName,
         dni: formData.dni,
         role: 'AGENT',
       });
-      try {
-        await agentRepo.updateProfile({
-          licenseNumber: formData.licenseNumber,
-          agency: formData.agency || undefined,
-        });
-      } catch { /* no bloqueante */ }
+
+      // 2. Guardar datos profesionales del agente (licenseNumber, agency)
+      if (formData.licenseNumber || formData.agency) {
+        try {
+          await agentRepo.updateProfile({
+            licenseNumber: formData.licenseNumber,
+            agency: formData.agency || undefined,
+          });
+        } catch { /* no bloqueante */ }
+      }
+
+      // 3. Redirigir al dashboard
+      window.location.href = '/dashboard';
     } catch { /* expuesto via error */ }
   };
 
@@ -156,6 +159,8 @@ export const RegisterAgenteForm: React.FC = () => {
     const { name, value } = e.target;
     if (name === 'phone') {
       setFormData((prev) => ({ ...prev, [name]: value.replace(/\D/g, '').slice(0, 9) }));
+    } else if (name === 'licenseNumber') {
+      setFormData((prev) => ({ ...prev, [name]: value.replace(/\D/g, '').slice(0, 10) }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -171,7 +176,7 @@ export const RegisterAgenteForm: React.FC = () => {
       if (googleUserData) {
         setGoogleData(googleUserData);
         setFormData({
-          email: '',
+          email: googleUserData.email,
           password: '',
           confirmPassword: '',
           firstName: googleUserData.firstName,

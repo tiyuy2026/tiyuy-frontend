@@ -110,23 +110,17 @@ export const RegisterUsuarioForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (googleData) {
-      // Registro con Google: usar loginWithGoogle (el backend registra o loguea con uid)
-      await authRepository.loginWithGoogle(
-        googleData.email,
-        formData.firstName || googleData.firstName,
-        formData.lastName || googleData.lastName,
-        googleData.uid,
-      );
-      window.location.href = '/dashboard';
-      return;
-    }
+    const email = googleData ? googleData.email : formData.email;
+    const password = googleData ? crypto.randomUUID() : formData.password;
+    const firstName = googleData ? (formData.firstName || googleData.firstName) : formData.firstName;
+    const lastName = googleData ? (formData.lastName || googleData.lastName) : formData.lastName;
+
     await register({
-      email: formData.email,
+      email,
+      password,
       phone: formData.phone,
-      password: formData.password,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
+      firstName,
+      lastName,
       dni: formData.dni,
       role: 'USER',
     });
@@ -159,7 +153,7 @@ export const RegisterUsuarioForm: React.FC = () => {
       if (googleUserData) {
         setGoogleData(googleUserData);
         setFormData({
-          email: '',
+          email: googleUserData.email,
           password: '',
           confirmPassword: '',
           firstName: googleUserData.firstName,

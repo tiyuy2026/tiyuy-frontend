@@ -47,8 +47,8 @@ export const useUserValidation = () => {
     }
 
     try {
-      const response = await axiosClient.post('/auth/check-email', {
-        data: { email }
+      const response = await axiosClient.post('/auth/google-check-email', {
+        email
       });
 
       const data = response.data;
