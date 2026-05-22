@@ -96,13 +96,17 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
 
   const isFiltered = resolvedSearchParams.filtered === '1';
 
+  const MAIN_PROVINCES = ['Lima', 'Arequipa', 'Trujillo', 'Callao'];
+  const isMainProvince = MAIN_PROVINCES.includes(district);
+  const isAllPeru = district.toLowerCase() === 'peru';
+
   const filters = {
     transactionType: 'RENT' as const,
     sort: 'createdAt,desc',
     page: resolvedSearchParams.page ? Number(resolvedSearchParams.page) : 0,
     size: 9, // Cambiado de 20 a 9 para mostrar 3x3 grid
     type: propertyType as any,
-    district,
+    ...(isAllPeru ? {} : isMainProvince ? { province: district } : { district }),
     ...(isFiltered
       ? {
           minPrice: resolvedSearchParams.minPrice ? Number(resolvedSearchParams.minPrice) : undefined,
