@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_NO_WARNINGS=1 next dev",
+    "dev:turbo": "cross-env NODE_NO_WARNINGS=1 next dev",
     "build": "cross-env TURBOPACK=0 next build",
     "start": "next start",
     "lint": "eslint"
@@ -36,7 +37,7 @@
     "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.3.0",
     "typescript": "^5"
   }
 }

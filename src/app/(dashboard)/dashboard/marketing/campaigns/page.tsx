@@ -1,31 +1,26 @@
 /**
- * Marketing Campaigns Page
- * CRUD for promotion campaigns
+ * Developer Marketing Campaigns Page
+ * Developers can create and manage their own promotion campaigns
  */
 
 'use client';
 
 import { useState } from 'react';
-import { usePromotionCampaigns, useCreatePromotionCampaign, useUpdatePromotionCampaign, useDeletePromotionCampaign } from '@/presentation/hooks/useAdmin';
+import { useDeveloperMyCampaigns, useDeveloperCreateCampaign } from '@/presentation/hooks/useDeveloper';
 import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/Card';
 import { Modal } from '@/presentation/components/ui/Modal';
 import { Input } from '@/presentation/components/ui/Input';
 import { Button } from '@/presentation/components/ui/Button';
 import { LoadingState, EmptyState, ErrorState } from '@/presentation/components/admin/AdminUIStates';
-import { PromotionCampaign, CreatePromotionCampaignRequest, UpdatePromotionCampaignRequest } from '@/core/domain/entities/Admin';
+import { PromotionCampaign, CreatePromotionCampaignRequest } from '@/core/domain/entities/Admin';
 
-
-export default function MarketingCampaignsPage() {
+export default function DeveloperMarketingCampaignsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<PromotionCampaign | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  const { data: campaignsData, isLoading, error, refetch } = usePromotionCampaigns({ page: 0, size: 50 });
-  const createMutation = useCreatePromotionCampaign();
-  const updateMutation = useUpdatePromotionCampaign();
-  const deleteMutation = useDeletePromotionCampaign();
+  const { data: campaignsData, isLoading, error, refetch } = useDeveloperMyCampaigns({ page: 0, size: 50 });
+  const createMutation = useDeveloperCreateCampaign();
 
   const campaignsList = Array.isArray(campaignsData) ? campaignsData : (campaignsData?.content || []);
   const filteredCampaigns = campaignsList.filter((campaign: PromotionCampaign) => {
@@ -41,76 +36,28 @@ export default function MarketingCampaignsPage() {
       setIsCreateModalOpen(false);
       refetch();
     } catch (error) {
-      console.error('Error al crear campania:', error);
+      console.error('Failed to create campaign:', error);
     }
   };
 
-  const handleEdit = (campaign: PromotionCampaign) => {
-    setSelectedCampaign(campaign);
-    setIsEditModalOpen(true);
-  };
-
-  const handleUpdate = async (formData: UpdatePromotionCampaignRequest) => {
-    if (!selectedCampaign) return;
-    try {
-      await updateMutation.mutateAsync({ id: selectedCampaign.id, request: formData });
-
-      setIsEditModalOpen(false);
-      setSelectedCampaign(null);
-      refetch();
-    } catch (error) {
-      console.error('Error al actualizar campania:', error);
-    }
-  };
-
-  const handleDelete = async (campaignId: number) => {
-    if (!confirm('¿Estas seguro de eliminar esta campania?')) return;
-    try {
-      await deleteMutation.mutateAsync(campaignId);
-      refetch();
-    } catch (error) {
-      console.error('Error al eliminar campania:', error);
-    }
-  };
-
-  const handleToggleStatus = async (campaign: PromotionCampaign) => {
-    const newStatus = campaign.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-    try {
-      if (!selectedCampaign) {
-        setSelectedCampaign(campaign);
-      }
-      await updateMutation.mutateAsync({ id: campaign.id, request: { status: newStatus } });
-      refetch();
-    } catch (error) {
-      console.error('Error al cambiar estado:', error);
-    }
-  };
-
-  if (isLoading) return <LoadingState message="Cargando campanias..." />;
-  if (error) return <ErrorState message="Error al cargar campanias." retry={refetch} />;
+  if (isLoading) return <LoadingState message="Cargando campanas..." />;
+  if (error) return <ErrorState message="Error al cargar campanas." retry={refetch} />;
 
   if (filteredCampaigns.length === 0) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Campanias de Marketing</h2>
-            <p className="text-gray-600">Administra campanias promocionales</p>
-          </div>
-          <Button onClick={() => setIsCreateModalOpen(true)}>Crear Campania</Button>
-        </div>
+      <>
         <EmptyState
-          title="Sin campanias"
-          description={searchQuery || statusFilter !== 'all' ? "Ajusta tu busqueda." : "Crea tu primera campania promocional."}
-          action={{ label: "Crear Campania", onClick: () => setIsCreateModalOpen(true) }}
+          title="Sin campanas"
+          description={searchQuery || statusFilter !== 'all' ? "Ajusta tu busqueda." : "Crea tu primera campana promocional."}
+          action={{ label: "Crear Campana", onClick: () => setIsCreateModalOpen(true) }}
         />
         <CampaignModal
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           onSubmit={handleCreate}
-          title="Crear Campania"
+          title="Crear Campana"
         />
-      </div>
+      </>
     );
   }
 
@@ -118,17 +65,17 @@ export default function MarketingCampaignsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Campanias de Marketing</h2>
-          <p className="text-gray-600">Administra campanias promocionales</p>
+          <h2 className="text-2xl font-bold text-gray-900">Mis Campanas</h2>
+          <p className="text-gray-600">Administra tus campanas promocionales</p>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)}>Crear Campania</Button>
+        <Button onClick={() => setIsCreateModalOpen(true)}>Crear Campana</Button>
       </div>
 
       <Card>
         <CardContent className="p-4">
           <div className="flex gap-4">
             <Input
-              placeholder="Buscar campanias..."
+              placeholder="Buscar campanas..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1"
@@ -149,7 +96,7 @@ export default function MarketingCampaignsPage() {
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCampaigns.map((campaign) => (
+        {filteredCampaigns.map((campaign: PromotionCampaign) => (
           <Card key={campaign.id} className="relative">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
@@ -193,13 +140,6 @@ export default function MarketingCampaignsPage() {
                   <span className="text-gray-600">Rendimiento:</span>
                   <span className="text-sm">{campaign.impressions || 0} imp / {campaign.clicks || 0} clics</span>
                 </div>
-                <div className="flex gap-2 pt-3 border-t">
-                  <Button variant="outline" size="sm" onClick={() => handleEdit(campaign)}>Editar</Button>
-                  <Button variant="outline" size="sm" onClick={() => handleToggleStatus(campaign)}>
-                    {campaign.status === 'ACTIVE' ? 'Desactivar' : 'Activar'}
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleDelete(campaign.id)} className="text-red-600">Eliminar</Button>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -210,18 +150,8 @@ export default function MarketingCampaignsPage() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreate}
-        title="Crear Campania"
+        title="Crear Campana"
       />
-
-      {selectedCampaign && (
-        <CampaignModal
-          isOpen={isEditModalOpen}
-          onClose={() => { setIsEditModalOpen(false); setSelectedCampaign(null); }}
-          onSubmit={(data) => handleUpdate(data)}
-          title="Editar Campania"
-          campaign={selectedCampaign}
-        />
-      )}
     </div>
   );
 }
@@ -231,21 +161,20 @@ interface CampaignModalProps {
   onClose: () => void;
   onSubmit: (data: any) => void;
   title: string;
-  campaign?: PromotionCampaign;
 }
 
-function CampaignModal({ isOpen, onClose, onSubmit, title, campaign }: CampaignModalProps) {
+function CampaignModal({ isOpen, onClose, onSubmit, title }: CampaignModalProps) {
   const [formData, setFormData] = useState({
-    title: campaign?.title || '',
-    description: campaign?.description || '',
-    promotionType: campaign?.promotionType || 'BANNER',
-    placementLocation: campaign?.placementLocation || 'HOME_BANNER',
-    startDate: campaign?.startDate ? new Date(campaign.startDate).toISOString().split('T')[0] : '',
-    endDate: campaign?.endDate ? new Date(campaign.endDate).toISOString().split('T')[0] : '',
-    pricePaid: campaign?.pricePaid || 0,
-    currency: campaign?.currency || 'USD',
-    imageUrl: campaign?.imageUrl || '',
-    linkUrl: campaign?.linkUrl || '',
+    title: '',
+    description: '',
+    promotionType: 'BANNER',
+    placementLocation: 'HOME_MAIN',
+    startDate: '',
+    endDate: '',
+    pricePaid: 0,
+    currency: 'PEN',
+    imageUrl: '',
+    linkUrl: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -309,7 +238,7 @@ function CampaignModal({ isOpen, onClose, onSubmit, title, campaign }: CampaignM
           <Input label="URL de Imagen" value={formData.imageUrl} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })} />
           <Input label="URL de Destino" value={formData.linkUrl} onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })} />
           <div className="flex gap-3 pt-4">
-            <Button type="submit" className="flex-1">{campaign ? 'Actualizar' : 'Crear'} Campania</Button>
+            <Button type="submit" className="flex-1">Crear Campana</Button>
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
           </div>
         </form>

@@ -1,12 +1,12 @@
 /**
- * Agent Marketing Banners Page
- * Agents can create and manage their own banners
+ * Developer Marketing Banners Page
+ * Developers can create and manage their own banners
  */
 
 'use client';
 
 import { useState } from 'react';
-import { useAgentMyBanners, useAgentCreateBanner } from '@/presentation/hooks/useAgent';
+import { useDeveloperMyBanners, useDeveloperCreateBanner } from '@/presentation/hooks/useDeveloper';
 import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/Card';
 import { Modal } from '@/presentation/components/ui/Modal';
 import { Input } from '@/presentation/components/ui/Input';
@@ -14,11 +14,11 @@ import { Button } from '@/presentation/components/ui/Button';
 import { LoadingState, EmptyState, ErrorState } from '@/presentation/components/admin/AdminUIStates';
 import { Banner, CreateBannerRequest } from '@/core/domain/entities/Admin';
 
-export default function AgentMarketingBannersPage() {
+export default function DeveloperMarketingBannersPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  const { data: banners, isLoading, error, refetch } = useAgentMyBanners();
-  const createMutation = useAgentCreateBanner();
+  const { data: banners, isLoading, error, refetch } = useDeveloperMyBanners();
+  const createMutation = useDeveloperCreateBanner();
 
   const handleCreate = async (formData: CreateBannerRequest) => {
     try {

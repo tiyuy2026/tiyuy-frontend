@@ -21,15 +21,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Conectar con el backend real usando ruta relativa
+    // Conectar con el backend real
     try {
-      const response = await fetch(`/api/auth/forgot-password`, {
+      const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080/api';
+      const response = await fetch(`${backendUrl}/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email }),
       });
+
 
       console.log(`Backend response: ${response.status}`);
 

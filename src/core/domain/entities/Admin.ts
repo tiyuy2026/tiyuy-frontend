@@ -1064,16 +1064,18 @@ export interface MarketingStats {
 
 export interface PromotionCampaign {
   id: number;
-  name: string;
+  title: string;
   description?: string;
-  type: string;
+  promotionType: string;
   status: string;
   startDate: string;
   endDate?: string;
-  budget?: number;
-  spent?: number;
-  targetAudience?: string;
-  placementLocations?: string[];
+  pricePaid?: number;
+  currency?: string;
+  imageUrl?: string;
+  linkUrl?: string;
+  placementLocation: string;
+  displayOrder?: number;
   impressions?: number;
   clicks?: number;
   conversions?: number;
@@ -1084,51 +1086,53 @@ export interface PromotionCampaign {
 }
 
 export interface CreatePromotionCampaignRequest {
-  name: string;
+  promotionType: string;
+  title: string;
   description?: string;
-  type: string;
+  imageUrl?: string;
+  linkUrl?: string;
+  placementLocation: string;
   startDate: string;
-  endDate?: string;
-  budget?: number;
-  targetAudience?: string;
-  placementLocations?: string[];
+  endDate: string;
+  pricePaid: number;
+  currency?: string;
+  displayOrder?: number;
 }
 
 export interface UpdatePromotionCampaignRequest {
-  name?: string;
+  title?: string;
   description?: string;
   status?: string;
   startDate?: string;
   endDate?: string;
-  budget?: number;
-  targetAudience?: string;
-  placementLocations?: string[];
+  pricePaid?: number;
+  currency?: string;
+  placementLocation?: string;
 }
 
 export interface CampaignPricing {
   id: number;
   name: string;
   description?: string;
-  placementLocation: string;
-  pricePerDay: number;
-  pricePerWeek: number;
-  pricePerMonth: number;
-  currency: string;
+  promotionType: string;
+  durationDays: number;
+  pricePen: number;
+  priceUsd: number;
   isActive: boolean;
-  maxDurationDays?: number;
+  displayOrder?: number;
   createdAt: string;
   updatedAt?: string;
 }
 
 export interface CreateCampaignPricingRequest {
+  promotionType: string;
   name: string;
   description?: string;
-  placementLocation: string;
-  pricePerDay: number;
-  pricePerWeek: number;
-  pricePerMonth: number;
-  currency?: string;
-  maxDurationDays?: number;
+  durationDays: number;
+  pricePen: number;
+  priceUsd: number;
+  isActive?: boolean;
+  displayOrder?: number;
 }
 
 export interface Banner {
@@ -1137,7 +1141,8 @@ export interface Banner {
   description?: string;
   imageUrl: string;
   linkUrl?: string;
-  placementLocation: string;
+  placement: string;
+  displayOrder?: number;
   startDate: string;
   endDate?: string;
   isActive: boolean;
@@ -1153,7 +1158,8 @@ export interface CreateBannerRequest {
   description?: string;
   imageUrl: string;
   linkUrl?: string;
-  placementLocation: string;
+  placement: string;
+  displayOrder?: number;
   startDate: string;
   endDate?: string;
 }
@@ -1162,11 +1168,15 @@ export interface FestiveCampaign {
   id: number;
   name: string;
   description?: string;
-  theme?: string;
+  festiveType: string;
+  bannerUrl?: string;
   startDate: string;
   endDate: string;
   discountPercentage?: number;
-  bannerImageUrl?: string;
+  specialPricePen?: number;
+  specialPriceUsd?: number;
+  maxParticipants?: number;
+  termsAndConditions?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt?: string;
@@ -1175,11 +1185,15 @@ export interface FestiveCampaign {
 export interface CreateFestiveCampaignRequest {
   name: string;
   description?: string;
-  theme?: string;
+  festiveType: string;
+  bannerUrl?: string;
   startDate: string;
   endDate: string;
   discountPercentage?: number;
-  bannerImageUrl?: string;
+  specialPricePen?: number;
+  specialPriceUsd?: number;
+  maxParticipants?: number;
+  termsAndConditions?: string;
 }
 
 

@@ -10,8 +10,9 @@ interface ProjectCardProps {
 export function ProjectCard({ project }: ProjectCardProps) {
   const formatPrice = (price: number) => `Desde S/ ${price.toLocaleString()}`;
   
-  // SIMPLE: Usar la primera imagen del array como portada
-  const coverImage = project.images?.[0] || null;
+  // Intentar con coverImageUrl primero (campo directo), luego con images array
+  const coverImage = (project as any).coverImageUrl || project.images?.[0] || null;
+
 
   // Helper to render lifecycle status badge
   const renderLifecycleBadge = () => {

@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { UpgradePlanModal } from '@/presentation/components/modals/UpgradePlanModal';
+import { PlanExpiredModal } from '@/presentation/components/modals/PlanExpiredModal';
 import { useQueryClient } from '@tanstack/react-query';
 import { PropertyRepository } from '@/infrastructure/repositories/PropertyRepository';
 
@@ -23,6 +24,7 @@ export default function MyPropertiesPage() {
   const [activeTab, setActiveTab] = useState<'ALL' | 'PUBLISHED' | 'DRAFT' | 'RENTED' | 'SOLD' | 'PAUSED' | 'INACTIVE'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showPlanExpiredModal, setShowPlanExpiredModal] = useState(false);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
   const [previousPlan, setPreviousPlan] = useState<string | null>(null);
   const queryClient = useQueryClient();
@@ -201,7 +203,7 @@ export default function MyPropertiesPage() {
       return;
     }
     if (!canPublish) {
-      setShowUpgradeModal(true);
+      setShowPlanExpiredModal(true);
       return;
     }
     
@@ -209,11 +211,12 @@ export default function MyPropertiesPage() {
       onError: (error: any) => {
         const status = error?.response?.status;
         if (status === 402) {
-          setShowUpgradeModal(true);
+          setShowPlanExpiredModal(true);
         }
       }
     });
   };
+
 
   const goToPublishedHistory = () => {
     setSearchTerm('');
@@ -531,7 +534,7 @@ export default function MyPropertiesPage() {
                       {property.status === 'PAUSED' && (
                         <button
                           onClick={() => handlePublish(property.id)}
-                          disabled={publishMutation.isPending || !canPublish}
+                          disabled={publishMutation.isPending}
                           className="px-3 py-1 bg-amber-600 text-white text-sm rounded hover:bg-amber-700 disabled:bg-gray-400"
                         >
                           {publishMutation.isPending ? 'Reactivando...' : 'Reactivar'}
@@ -542,12 +545,13 @@ export default function MyPropertiesPage() {
                       {property.status === 'DRAFT' && (
                         <button
                           onClick={() => handlePublish(property.id)}
-                          disabled={publishMutation.isPending || !canPublish}
+                          disabled={publishMutation.isPending}
                           className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:bg-gray-400"
                         >
                           {publishMutation.isPending ? 'Publicando...' : 'Publicar'}
                         </button>
                       )}
+
                       
                       {/* Featured property button */}
                       {property.status === 'PUBLISHED' && !property.isFeatured && (
@@ -609,7 +613,14 @@ export default function MyPropertiesPage() {
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
       />
+      
+      {/* Plan expired modal */}
+      <PlanExpiredModal 
+        isOpen={showPlanExpiredModal}
+        onClose={() => setShowPlanExpiredModal(false)}
+      />
     </ProtectedRoute>
+
   );
 }
 

@@ -97,7 +97,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
           formDataUpload.append('type', 'blueprints');
 
           try {
-            const response = await fetch(`/properties/${propertyId}/photos`, {
+            const response = await fetch(`/api/properties/${propertyId}/photos`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}` },
               body: formDataUpload,
@@ -127,7 +127,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
           formDataUpload.append('type', 'blueprints');
 
           try {
-            const response = await fetch(`/properties/${propertyId}/photos`, {
+            const response = await fetch(`/api/properties/${propertyId}/photos`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}` },
               body: formDataUpload,
@@ -199,7 +199,7 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
       }, 500);
 
       // Usar ruta relativa - Vercel actúa como puente
-      const uploadUrl = `/properties/${propertyId}/photos`;
+      const uploadUrl = `/api/properties/${propertyId}/photos`;
 
       console.log(`Enviando POST a: ${uploadUrl}`);
 
@@ -398,7 +398,6 @@ export function ProjectMultimediaStep({ formData, onChange, propertyId, unitBlue
                         src={render}
                         className="w-full h-full object-cover"
                         controls
-                        muted
                         playsInline
                       >
                         Tu navegador no soporta el tag de video.

@@ -22,8 +22,10 @@ export default function AgentMarketingCampaignsPage() {
   const { data: campaignsData, isLoading, error, refetch } = useAgentMyCampaigns({ page: 0, size: 50 });
   const createMutation = useAgentCreateCampaign();
 
-  const filteredCampaigns = (campaignsData?.content || []).filter((campaign: PromotionCampaign) => {
-    const matchesSearch = campaign.name.toLowerCase().includes(searchQuery.toLowerCase());
+  const campaignsList = Array.isArray(campaignsData) ? campaignsData : (campaignsData?.content || []);
+  const filteredCampaigns = campaignsList.filter((campaign: PromotionCampaign) => {
+    const name = campaign.title || '';
+    const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || campaign.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -43,11 +45,19 @@ export default function AgentMarketingCampaignsPage() {
 
   if (filteredCampaigns.length === 0) {
     return (
-      <EmptyState
-        title="Sin campanas"
-        description={searchQuery || statusFilter !== 'all' ? "Ajusta tu busqueda." : "Crea tu primera campana promocional."}
-        action={{ label: "Crear Campana", onClick: () => setIsCreateModalOpen(true) }}
-      />
+      <>
+        <EmptyState
+          title="Sin campanas"
+          description={searchQuery || statusFilter !== 'all' ? "Ajusta tu busqueda." : "Crea tu primera campana promocional."}
+          action={{ label: "Crear Campana", onClick: () => setIsCreateModalOpen(true) }}
+        />
+        <CampaignModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSubmit={handleCreate}
+          title="Crear Campana"
+        />
+      </>
     );
   }
 
@@ -90,7 +100,7 @@ export default function AgentMarketingCampaignsPage() {
           <Card key={campaign.id} className="relative">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{campaign.name}</CardTitle>
+                <CardTitle className="text-lg">{campaign.title}</CardTitle>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                   campaign.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
                   campaign.status === 'SCHEDULED' ? 'bg-blue-100 text-blue-800' :
@@ -104,11 +114,11 @@ export default function AgentMarketingCampaignsPage() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Tipo:</span>
-                  <span className="text-sm">{campaign.type}</span>
+                  <span className="text-sm">{campaign.promotionType}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Audiencia:</span>
-                  <span className="text-sm">{campaign.targetAudience || 'General'}</span>
+                  <span className="text-gray-600">Ubicacion:</span>
+                  <span className="text-sm">{campaign.placementLocation}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Inicio:</span>
@@ -120,10 +130,10 @@ export default function AgentMarketingCampaignsPage() {
                     <span className="text-sm">{new Date(campaign.endDate).toLocaleDateString()}</span>
                   </div>
                 )}
-                {campaign.budget && (
+                {campaign.pricePaid && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Presupuesto:</span>
-                    <span className="text-sm font-semibold">${campaign.budget.toLocaleString()}</span>
+                    <span className="text-gray-600">Precio:</span>
+                    <span className="text-sm font-semibold">{campaign.currency || 'USD'} {campaign.pricePaid.toLocaleString()}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
@@ -155,22 +165,25 @@ interface CampaignModalProps {
 
 function CampaignModal({ isOpen, onClose, onSubmit, title }: CampaignModalProps) {
   const [formData, setFormData] = useState({
-    name: '',
+    title: '',
     description: '',
-    type: 'DISPLAY',
+    promotionType: 'BANNER',
+    placementLocation: 'HOME_MAIN',
     startDate: '',
     endDate: '',
-    budget: 0,
-    targetAudience: 'ALL',
-    placementLocations: '',
+    pricePaid: 0,
+    currency: 'PEN',
+    imageUrl: '',
+    linkUrl: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
       ...formData,
-      budget: Number(formData.budget),
-      placementLocations: formData.placementLocations ? formData.placementLocations.split(',').map(s => s.trim()) : [],
+      pricePaid: Number(formData.pricePaid),
+      startDate: formData.startDate ? new Date(formData.startDate).toISOString() : null,
+      endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null,
     });
   };
 
@@ -181,33 +194,49 @@ function CampaignModal({ isOpen, onClose, onSubmit, title }: CampaignModalProps)
       <div className="bg-white rounded-lg p-6 max-w-md w-full">
         <h3 className="text-lg font-semibold mb-4">{title}</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input label="Nombre" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+          <Input label="Titulo" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Descripcion</label>
             <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
-            <select value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
-              <option value="DISPLAY">Display</option>
-              <option value="SEARCH">Busqueda</option>
-              <option value="SOCIAL">Redes Sociales</option>
-              <option value="EMAIL">Email</option>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Promocion</label>
+            <select value={formData.promotionType} onChange={(e) => setFormData({ ...formData, promotionType: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              <option value="BANNER">Banner</option>
+              <option value="SLIDER">Slider</option>
+              <option value="HOME_SPOTLIGHT">Spotlight Principal</option>
+              <option value="FEATURED_PROPERTY">Propiedad Destacada</option>
+              <option value="FEATURED_PROJECT">Proyecto Destacado</option>
+              <option value="RECOMMENDED">Recomendado</option>
+              <option value="PREMIUM_AD">Anuncio Premium</option>
+              <option value="SEARCH_BOOST">Boost en Busqueda</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicacion</label>
+            <select value={formData.placementLocation} onChange={(e) => setFormData({ ...formData, placementLocation: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              <option value="HOME_MAIN">Home - Principal</option>
+              <option value="HOME_SPOTLIGHT">Home - Spotlight</option>
+              <option value="HOME_BANNER">Home - Banner</option>
+              <option value="SEARCH_RESULTS">Resultados de Busqueda</option>
+              <option value="PROPERTY_DETAIL">Detalle de Propiedad</option>
+              <option value="PROJECT_DETAIL">Detalle de Proyecto</option>
+              <option value="PROPERTY_LIST">Lista de Propiedades</option>
+              <option value="PROJECT_LIST">Lista de Proyectos</option>
+              <option value="SIDEBAR">Barra Lateral</option>
+              <option value="SLIDER">Slider</option>
+              <option value="BANNER_TOP">Banner Superior</option>
+              <option value="BANNER_BOTTOM">Banner Inferior</option>
+              <option value="RECOMMENDED">Recomendado</option>
+              <option value="CATEGORY_PAGE">Pagina de Categoria</option>
             </select>
           </div>
           <Input label="Fecha Inicio" type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} required />
-          <Input label="Fecha Fin" type="date" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} />
-          <Input label="Presupuesto" type="number" value={formData.budget} onChange={(e) => setFormData({ ...formData, budget: Number(e.target.value) })} />
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Audiencia</label>
-            <select value={formData.targetAudience} onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
-              <option value="ALL">Todos</option>
-              <option value="NEW_USERS">Nuevos Usuarios</option>
-              <option value="EXISTING_USERS">Usuarios Existentes</option>
-              <option value="SUBSCRIBERS">Suscriptores</option>
-            </select>
-          </div>
-          <Input label="Ubicaciones (separadas por coma)" value={formData.placementLocations} onChange={(e) => setFormData({ ...formData, placementLocations: e.target.value })} />
+          <Input label="Fecha Fin" type="date" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} required />
+          <Input label="Precio" type="number" value={formData.pricePaid} onChange={(e) => setFormData({ ...formData, pricePaid: Number(e.target.value) })} required />
+          <Input label="Moneda" value={formData.currency} onChange={(e) => setFormData({ ...formData, currency: e.target.value })} />
+          <Input label="URL de Imagen" value={formData.imageUrl} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })} />
+          <Input label="URL de Destino" value={formData.linkUrl} onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })} />
           <div className="flex gap-3 pt-4">
             <Button type="submit" className="flex-1">Crear Campana</Button>
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>

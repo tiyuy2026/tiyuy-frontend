@@ -17,6 +17,7 @@ import { ProjectInfoStep } from './ProjectInfoStep';
 import { ProjectUnitsStep } from './ProjectUnitsStep';
 import { ProjectTimelineStep } from './ProjectTimelineStep';
 import { UpgradePlanModal } from '@/presentation/components/modals/UpgradePlanModal';
+import { PlanExpiredModal } from '@/presentation/components/modals/PlanExpiredModal';
 import { useMyProperties } from '@/presentation/hooks/useProperties';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { authStorage } from '@/infrastructure/storage/auth-storage';
@@ -65,6 +66,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
   const [currentStep, setCurrentStep] = useState(1);
   const [createdPropertyId, setCreatedPropertyId] = useState<number | undefined>(property?.id);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showPlanExpiredModal, setShowPlanExpiredModal] = useState(false);
 
   const { data: myPropertiesData } = useMyProperties();
   const { data: activeSubscription } = useActiveSubscription();
@@ -506,59 +508,86 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
   const handleSubmit = async () => {
     if (mode === 'create' && formType === 'project' && createdPropertyId) {
       
-      // Verificar si puede publicar (gratis o con suscripción)
-      if (canPublish) {
-        //  Tiene derecho a publicar (primer proyecto gratis o suscripción activa)
-        try {
-          // Primero actualizar el proyecto con los datos multimedia
-          const token = authStorage.getToken() || localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token');
-          
-          const updateData = {
-            ...prepareProjectData(formData),
-            images: formData.images || [],
-            blueprints: formData.blueprints || [],
-            renders: formData.renders || [],
-            // 🔍 FIX: Si no hay coverImageUrl pero hay imágenes, usar la primera como portada
-            coverImageUrl: formData.coverImageUrl || (formData.images && formData.images.length > 0 ? formData.images[0] : '')
-          };
-          
-          console.log('📤 Actualizando proyecto con multimedia y portada:', {
-            id: createdPropertyId,
-            coverImage: updateData.coverImageUrl,
-            imagesCount: updateData.images?.length
-          });
-          
-          // Usar rutas relativas - Vercel actúa como puente
-          const updateUrl = `/projects/${createdPropertyId}`;
-          const publishUrl = `/projects/${createdPropertyId}/publish`;
-      
+      // Siempre guardar como borrador primero (sin importar el plan)
+      try {
+        // Primero actualizar el proyecto con los datos multimedia
+        const token = authStorage.getToken() || localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token');
+        
+        const updateData = {
+          ...prepareProjectData(formData),
+          images: formData.images || [],
+          blueprints: formData.blueprints || [],
+          renders: formData.renders || [],
+          // 🔍 FIX: Si no hay coverImageUrl pero hay imágenes, usar la primera como portada
+          coverImageUrl: formData.coverImageUrl || (formData.images && formData.images.length > 0 ? formData.images[0] : '')
+        };
+        
+        console.log('📤 Actualizando proyecto con multimedia y portada:', {
+          id: createdPropertyId,
+          coverImage: updateData.coverImageUrl,
+          imagesCount: updateData.images?.length
+        });
+        
+        // Usar rutas relativas - Vercel actúa como puente
+        const updateUrl = `/api/projects/${createdPropertyId}`;
+        const publishUrl = `/api/projects/${createdPropertyId}/publish`;
+    
 
-          // 1. Primero actualizar multimedia
-          const updateResponse = await fetch(updateUrl, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(updateData),
-          });
+        // 1. Primero actualizar multimedia
+        const updateResponse = await fetch(updateUrl, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(updateData),
+        });
 
-          if (updateResponse.ok) {
-            console.log(' Proyecto actualizado correctamente');
-            toast.success('¡Proyecto guardado como borrador! 📝');
-            
-            // 2. Redirigir a la página de edición para que el usuario pueda publicar después
-            router.push(`/my-projects/${createdPropertyId}/edit`);
-          } else {
-            const error = await updateResponse.json();
-            toast.error(error.message || 'Error al guardar el proyecto');
+        if (updateResponse.ok) {
+          console.log(' Proyecto actualizado correctamente');
+          
+          // 2. Si puede publicar, publicar también
+          if (canPublish) {
+            try {
+              const publishResponse = await fetch(publishUrl, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                },
+              });
+              
+              if (publishResponse.ok) {
+                toast.success('¡Proyecto publicado! 🎉');
+                router.push('/my-projects');
+                return;
+
+              } else {
+                const publishError = await publishResponse.json();
+                console.warn('No se pudo publicar automáticamente:', publishError);
+                // Si falla la publicación, al menos se guardó como borrador
+              }
+            } catch (publishError) {
+              console.warn('Error al publicar:', publishError);
+              // Si falla la publicación, al menos se guardó como borrador
+            }
           }
-        } catch (error) {
-          toast.error('Error al publicar el proyecto');
+          
+          // Si llegó aquí: se guardó como borrador (no se pudo o no se debía publicar)
+          if (!canPublish) {
+            // Mostrar modal de plan expirado y redirigir a lista de proyectos
+            setShowPlanExpiredModal(true);
+            router.push('/my-projects');
+          } else {
+            toast.success('¡Proyecto guardado como borrador! 📝');
+            router.push('/my-projects');
+          }
+
+        } else {
+          const error = await updateResponse.json();
+          toast.error(error.message || 'Error al guardar el proyecto');
         }
-      } else {
-        //  No puede publicar → mostrar modal de upgrade
-        setShowUpgradeModal(true);
+      } catch (error) {
+        toast.error('Error al guardar el proyecto');
       }
     } else if (mode === 'create' && formType === 'project' && !createdPropertyId) {
       // Crear proyecto y redirigir (se creó como DRAFT en handleNext)
@@ -623,6 +652,8 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
   return (
     <>
       <UpgradePlanModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+      <PlanExpiredModal isOpen={showPlanExpiredModal} onClose={() => setShowPlanExpiredModal(false)} />
+
 
       {/* ── STEP HEADER ── */}
       <div className="mb-8">

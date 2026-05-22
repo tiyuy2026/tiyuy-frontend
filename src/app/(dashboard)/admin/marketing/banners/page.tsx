@@ -20,14 +20,14 @@ export default function MarketingBannersPage() {
   const [selectedBanner, setSelectedBanner] = useState<Banner | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: bannersData, isLoading, error, refetch } = useBanners({ page: 0, size: 50 });
+  const { data: bannersData, isLoading, error, refetch } = useBanners();
   const createMutation = useCreateBanner();
   const updateMutation = useUpdateBanner();
   const deleteMutation = useDeleteBanner();
 
-  const filteredBanners = bannersData?.content?.filter(banner =>
+  const filteredBanners = (bannersData || []).filter(banner =>
     banner.title.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  );
 
   const handleCreate = async (formData: CreateBannerRequest) => {
     try {
@@ -76,11 +76,19 @@ export default function MarketingBannersPage() {
 
   if (filteredBanners.length === 0) {
     return (
-      <EmptyState
-        title="Sin banners"
-        description={searchQuery ? "Ajusta tu busqueda." : "Crea tu primer banner publicitario."}
-        action={{ label: "Crear Banner", onClick: () => setIsCreateModalOpen(true) }}
-      />
+      <>
+        <EmptyState
+          title="Sin banners"
+          description={searchQuery ? "Ajusta tu busqueda." : "Crea tu primer banner publicitario."}
+          action={{ label: "Crear Banner", onClick: () => setIsCreateModalOpen(true) }}
+        />
+        <BannerModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSubmit={handleCreate}
+          title="Crear Banner"
+        />
+      </>
     );
   }
 
@@ -120,7 +128,7 @@ export default function MarketingBannersPage() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Ubicacion:</span>
-                  <span className="text-sm">{banner.placementLocation}</span>
+                  <span className="text-sm">{banner.placement}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Inicio:</span>
@@ -188,14 +196,18 @@ function BannerModal({ isOpen, onClose, onSubmit, title, banner }: BannerModalPr
     description: banner?.description || '',
     imageUrl: banner?.imageUrl || '',
     linkUrl: banner?.linkUrl || '',
-    placementLocation: banner?.placementLocation || 'HOME_TOP',
+    placement: banner?.placement || 'HOME_BANNER',
     startDate: banner?.startDate ? new Date(banner.startDate).toISOString().split('T')[0] : '',
     endDate: banner?.endDate ? new Date(banner.endDate).toISOString().split('T')[0] : '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({
+      ...formData,
+      startDate: formData.startDate ? new Date(formData.startDate).toISOString() : null,
+      endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null,
+    });
   };
 
   if (!isOpen) return null;
@@ -214,12 +226,21 @@ function BannerModal({ isOpen, onClose, onSubmit, title, banner }: BannerModalPr
           <Input label="URL de Destino" value={formData.linkUrl} onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })} />
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Ubicacion</label>
-            <select value={formData.placementLocation} onChange={(e) => setFormData({ ...formData, placementLocation: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
-              <option value="HOME_TOP">Home - Superior</option>
-              <option value="HOME_MIDDLE">Home - Medio</option>
-              <option value="HOME_BOTTOM">Home - Inferior</option>
+            <select value={formData.placement} onChange={(e) => setFormData({ ...formData, placement: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              <option value="HOME_MAIN">Home - Principal</option>
+              <option value="HOME_SPOTLIGHT">Home - Spotlight</option>
+              <option value="HOME_BANNER">Home - Banner</option>
+              <option value="SEARCH_RESULTS">Resultados de Busqueda</option>
+              <option value="PROPERTY_DETAIL">Detalle de Propiedad</option>
+              <option value="PROJECT_DETAIL">Detalle de Proyecto</option>
+              <option value="PROPERTY_LIST">Lista de Propiedades</option>
+              <option value="PROJECT_LIST">Lista de Proyectos</option>
               <option value="SIDEBAR">Barra Lateral</option>
-              <option value="POPUP">Pop-up</option>
+              <option value="SLIDER">Slider</option>
+              <option value="BANNER_TOP">Banner Superior</option>
+              <option value="BANNER_BOTTOM">Banner Inferior</option>
+              <option value="RECOMMENDED">Recomendado</option>
+              <option value="CATEGORY_PAGE">Pagina de Categoria</option>
             </select>
           </div>
           <Input label="Fecha Inicio" type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} required />

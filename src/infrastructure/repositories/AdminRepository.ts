@@ -1085,8 +1085,8 @@ export class AdminRepository implements IAdminRepository {
     await axiosClient.delete(`/v1/admin/marketing/campaigns/${id}`);
   }
 
-  async getCampaignPricingList(params?: { page?: number; size?: number }): Promise<PaginatedResponse<CampaignPricing>> {
-    const response = await axiosClient.get('/v1/admin/marketing/pricing', { params });
+  async getCampaignPricingList(params?: { page?: number; size?: number }): Promise<CampaignPricing[]> {
+    const response = await axiosClient.get('/v1/admin/marketing/pricing');
     return response.data;
   }
 
@@ -1104,8 +1104,8 @@ export class AdminRepository implements IAdminRepository {
     await axiosClient.delete(`/v1/admin/marketing/pricing/${id}`);
   }
 
-  async getBanners(params?: { page?: number; size?: number; location?: string }): Promise<PaginatedResponse<Banner>> {
-    const response = await axiosClient.get('/v1/admin/marketing/banners', { params });
+  async getBanners(params?: { page?: number; size?: number; location?: string }): Promise<Banner[]> {
+    const response = await axiosClient.get('/v1/admin/marketing/banners');
     return response.data;
   }
 
@@ -1123,8 +1123,8 @@ export class AdminRepository implements IAdminRepository {
     await axiosClient.delete(`/v1/admin/marketing/banners/${id}`);
   }
 
-  async getFestiveCampaigns(params?: { page?: number; size?: number }): Promise<PaginatedResponse<FestiveCampaign>> {
-    const response = await axiosClient.get('/v1/admin/marketing/festive', { params });
+  async getFestiveCampaigns(params?: { page?: number; size?: number }): Promise<FestiveCampaign[]> {
+    const response = await axiosClient.get('/v1/admin/marketing/festive');
     return response.data;
   }
 

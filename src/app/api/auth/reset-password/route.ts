@@ -33,9 +33,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Conectar con el backend real usando ruta relativa
+    // Conectar con el backend real
     try {
-      const response = await fetch(`/api/auth/reset-password`, {
+      const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080/api';
+      const response = await fetch(`${backendUrl}/auth/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

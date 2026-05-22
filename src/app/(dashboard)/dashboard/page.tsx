@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, Flame, Home, MessageSquare, Users, Diamond, User, Lock,
-  ChevronDown, LogOut, Building
+  ChevronDown, LogOut, Building, Megaphone
 } from 'lucide-react';
 import { useActiveSubscription } from '@/presentation/hooks/useFinance';
 import { DashboardHeader } from '@/presentation/components/dashboard/DashboardHeader';
@@ -151,6 +151,22 @@ function DashboardSidebar({
             <Building className="w-5 h-5" />
             <span>Mis Agentes</span>
             {pathname === '/dashboard/agents' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
+          </Link>
+        )}
+
+        {/* Marketing - Normal Link (AGENT and DEVELOPER) */}
+        {(userRole === 'AGENT' || userRole === 'DEVELOPER') && (
+          <Link
+            href="/dashboard/marketing"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+              pathname === '/dashboard/marketing'
+                ? 'bg-teal-50 text-teal-700 font-medium'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            }`}
+          >
+            <Megaphone className="w-5 h-5" />
+            <span>Marketing</span>
+            {pathname === '/dashboard/marketing' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
           </Link>
         )}
 
@@ -406,6 +422,12 @@ export default function DashboardPage() {
                   <div className="text-orange-600 text-2xl mb-2">Wallet</div>
                   <h3 className="font-semibold">Wallet</h3>
                   <p className="text-sm text-gray-600">Credits and payments</p>
+                </Link>
+                
+                <Link href="/dashboard/marketing" className="bg-indigo-50 p-4 rounded-lg hover:bg-indigo-100 transition-colors">
+                  <div className="text-indigo-600 text-2xl mb-2">Marketing</div>
+                  <h3 className="font-semibold">Marketing</h3>
+                  <p className="text-sm text-gray-600">Promociona tus proyectos</p>
                 </Link>
                 
                 <Link href="/plans" className="bg-red-50 p-4 rounded-lg hover:bg-red-100 transition-colors">
