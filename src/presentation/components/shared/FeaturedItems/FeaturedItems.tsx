@@ -121,25 +121,16 @@ export function FeaturedItems<T>({
     return (
       <div className="relative">
         <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex gap-6 pb-4">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="w-[320px] flex-shrink-0">
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse">
-                  <div className="w-full h-64 bg-gradient-to-br from-gray-200 to-gray-300" />
-                  <div className="p-5 space-y-3">
-                    <div className="flex justify-between">
-                      <div className="h-4 bg-gray-300 rounded-full w-16" />
-                      <div className="h-4 bg-gray-300 rounded-full w-20" />
-                    </div>
-                    <div className="h-6 bg-gray-300 rounded w-3/4" />
-                    <div className="flex gap-4">
-                      <div className="h-4 bg-gray-300 rounded w-8" />
-                      <div className="h-4 bg-gray-300 rounded w-8" />
-                    </div>
-                    <div className="flex justify-between pt-4 border-t border-gray-200">
-                      <div className="h-4 bg-gray-300 rounded w-24" />
-                      <div className="h-4 bg-gray-300 rounded w-16" />
-                    </div>
+          <div className="flex gap-4 sm:gap-5 md:gap-6 pb-4 w-max mx-auto">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className="w-[85vw] sm:w-[280px] md:w-[320px] lg:w-[240px] xl:w-[190px] 2xl:w-[220px] flex-shrink-0">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
+                  <div className="w-full aspect-square bg-gray-200" />
+                  <div className="p-4 space-y-3">
+                    <div className="h-4 bg-gray-200 rounded-full w-24" />
+                    <div className="h-4 bg-gray-200 rounded w-full" />
+                    <div className="h-4 bg-gray-200 rounded w-2/3" />
+                    <div className="h-5 bg-gray-200 rounded w-20 mt-2" />
                   </div>
                 </div>
               </div>
@@ -165,7 +156,6 @@ export function FeaturedItems<T>({
           className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
         >
           <span>Reintentar</span>
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
       </div>
     );
@@ -202,34 +192,34 @@ export function FeaturedItems<T>({
   }
 
   return (
-    <div className="w-full relative">
+    <div className="w-full relative group/carousel">
       
       {/* Flechas de navegación */}
       <button
         onClick={scrollLeft}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg border border-gray-200 hover:bg-white transition-all duration-200"
+        className="absolute left-0 top-[40%] -translate-y-1/2 -translate-x-4 z-20 bg-white shadow-md border border-gray-100 rounded-full p-2 hover:scale-105 transition-all duration-200 opacity-0 group-hover/carousel:opacity-100 disabled:opacity-0"
         aria-label="Scroll izquierda"
       >
-        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
       </button>
 
       <button
         onClick={scrollRight}
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg border border-gray-200 hover:bg-white transition-all duration-200"
+        className="absolute right-0 top-[40%] -translate-y-1/2 translate-x-4 z-20 bg-white shadow-md border border-gray-100 rounded-full p-2 hover:scale-105 transition-all duration-200 opacity-0 group-hover/carousel:opacity-100 disabled:opacity-0"
         aria-label="Scroll derecha"
       >
-        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </button>
       
       {/* Horizontal scroll container */}
-      <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-hide">
-        <div className="flex gap-6 pb-4 min-w-max">
+      <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
+        <div className="flex gap-4 sm:gap-5 md:gap-6 pb-4 w-max mx-auto">
           {items.map((item: any) => (
-            <div key={item.id} className="w-[320px] flex-shrink-0">
+            <div key={item.id} className="w-[85vw] sm:w-[280px] md:w-[320px] lg:w-[240px] xl:w-[190px] 2xl:w-[220px] flex-shrink-0 snap-start">
               <ItemCard item={item} />
             </div>
           ))}
