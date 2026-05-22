@@ -20,15 +20,15 @@ export default function MarketingPricingPage() {
   const [selectedPricing, setSelectedPricing] = useState<CampaignPricing | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: pricingData, isLoading, error, refetch } = useCampaignPricingList({ page: 0, size: 50 });
+  const { data: pricingData, isLoading, error, refetch } = useCampaignPricingList();
   const createMutation = useCreateCampaignPricing();
   const updateMutation = useUpdateCampaignPricing();
   const deleteMutation = useDeleteCampaignPricing();
 
-  const filteredPricing = pricingData?.content?.filter(p =>
+  const filteredPricing = (pricingData || []).filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.placementLocation.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+    (p.promotionType && p.promotionType.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   const handleCreate = async (formData: CreateCampaignPricingRequest) => {
     try {
@@ -76,11 +76,19 @@ export default function MarketingPricingPage() {
 
   if (filteredPricing.length === 0) {
     return (
-      <EmptyState
-        title="Sin precios configurados"
-        description={searchQuery ? "Ajusta tu busqueda." : "Configura el primer precio por ubicacion."}
-        action={{ label: "Crear Precio", onClick: () => setIsCreateModalOpen(true) }}
-      />
+      <>
+        <EmptyState
+          title="Sin precios configurados"
+          description={searchQuery ? "Ajusta tu busqueda." : "Configura el primer precio por ubicacion."}
+          action={{ label: "Crear Precio", onClick: () => setIsCreateModalOpen(true) }}
+        />
+        <PricingModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSubmit={handleCreate}
+          title="Crear Precio"
+        />
+      </>
     );
   }
 
@@ -119,33 +127,25 @@ export default function MarketingPricingPage() {
             <CardContent>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Ubicacion:</span>
-                  <span className="text-sm font-medium">{pricing.placementLocation}</span>
+                  <span className="text-gray-600">Tipo:</span>
+                  <span className="text-sm font-medium">{pricing.promotionType}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Precio/Dia:</span>
+                  <span className="text-gray-600">Precio PEN:</span>
                   <span className="text-sm font-semibold text-green-600">
-                    {pricing.currency || 'USD'} {pricing.pricePerDay.toLocaleString()}
+                    S/ {pricing.pricePen.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Precio/Semana:</span>
+                  <span className="text-gray-600">Precio USD:</span>
                   <span className="text-sm font-semibold text-green-600">
-                    {pricing.currency || 'USD'} {pricing.pricePerWeek.toLocaleString()}
+                    $ {pricing.priceUsd.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Precio/Mes:</span>
-                  <span className="text-sm font-semibold text-green-600">
-                    {pricing.currency || 'USD'} {pricing.pricePerMonth.toLocaleString()}
-                  </span>
+                  <span className="text-gray-600">Duracion:</span>
+                  <span className="text-sm">{pricing.durationDays} dias</span>
                 </div>
-                {pricing.maxDurationDays && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Duracion Max:</span>
-                    <span className="text-sm">{pricing.maxDurationDays} dias</span>
-                  </div>
-                )}
                 <div className="flex gap-2 pt-3 border-t">
                   <Button variant="outline" size="sm" onClick={() => handleEdit(pricing)}>Editar</Button>
                   <Button variant="outline" size="sm" onClick={() => handleToggleStatus(pricing)}>
@@ -191,22 +191,19 @@ function PricingModal({ isOpen, onClose, onSubmit, title, pricing }: PricingModa
   const [formData, setFormData] = useState({
     name: pricing?.name || '',
     description: pricing?.description || '',
-    placementLocation: pricing?.placementLocation || 'HOME_TOP',
-    pricePerDay: pricing?.pricePerDay || 0,
-    pricePerWeek: pricing?.pricePerWeek || 0,
-    pricePerMonth: pricing?.pricePerMonth || 0,
-    currency: pricing?.currency || 'USD',
-    maxDurationDays: pricing?.maxDurationDays || 30,
+    promotionType: pricing?.promotionType || 'BANNER',
+    durationDays: pricing?.durationDays || 30,
+    pricePen: pricing?.pricePen || 0,
+    priceUsd: pricing?.priceUsd || 0,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
       ...formData,
-      pricePerDay: Number(formData.pricePerDay),
-      pricePerWeek: Number(formData.pricePerWeek),
-      pricePerMonth: Number(formData.pricePerMonth),
-      maxDurationDays: Number(formData.maxDurationDays),
+      durationDays: Number(formData.durationDays),
+      pricePen: Number(formData.pricePen),
+      priceUsd: Number(formData.priceUsd),
     });
   };
 
@@ -223,22 +220,21 @@ function PricingModal({ isOpen, onClose, onSubmit, title, pricing }: PricingModa
             <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={2} className="w-full px-3 py-2 border border-gray-300 rounded-lg" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicacion</label>
-            <select value={formData.placementLocation} onChange={(e) => setFormData({ ...formData, placementLocation: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
-              <option value="HOME_TOP">Home - Superior</option>
-              <option value="HOME_MIDDLE">Home - Medio</option>
-              <option value="HOME_BOTTOM">Home - Inferior</option>
-              <option value="SIDEBAR">Barra Lateral</option>
-              <option value="POPUP">Pop-up</option>
-              <option value="SEARCH_RESULTS">Resultados de Busqueda</option>
-              <option value="PROPERTY_DETAIL">Detalle de Propiedad</option>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Promocion</label>
+            <select value={formData.promotionType} onChange={(e) => setFormData({ ...formData, promotionType: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              <option value="BANNER">Banner</option>
+              <option value="SLIDER">Slider</option>
+              <option value="HOME_SPOTLIGHT">Spotlight Principal</option>
+              <option value="FEATURED_PROPERTY">Propiedad Destacada</option>
+              <option value="FEATURED_PROJECT">Proyecto Destacado</option>
+              <option value="RECOMMENDED">Recomendado</option>
+              <option value="PREMIUM_AD">Anuncio Premium</option>
+              <option value="SEARCH_BOOST">Boost en Busqueda</option>
             </select>
           </div>
-          <Input label="Precio por Dia" type="number" value={formData.pricePerDay} onChange={(e) => setFormData({ ...formData, pricePerDay: Number(e.target.value) })} required />
-          <Input label="Precio por Semana" type="number" value={formData.pricePerWeek} onChange={(e) => setFormData({ ...formData, pricePerWeek: Number(e.target.value) })} required />
-          <Input label="Precio por Mes" type="number" value={formData.pricePerMonth} onChange={(e) => setFormData({ ...formData, pricePerMonth: Number(e.target.value) })} required />
-          <Input label="Moneda" value={formData.currency} onChange={(e) => setFormData({ ...formData, currency: e.target.value })} />
-          <Input label="Duracion Max (dias)" type="number" value={formData.maxDurationDays} onChange={(e) => setFormData({ ...formData, maxDurationDays: Number(e.target.value) })} />
+          <Input label="Precio PEN (S/)" type="number" value={formData.pricePen} onChange={(e) => setFormData({ ...formData, pricePen: Number(e.target.value) })} required />
+          <Input label="Precio USD ($)" type="number" value={formData.priceUsd} onChange={(e) => setFormData({ ...formData, priceUsd: Number(e.target.value) })} required />
+          <Input label="Duracion (dias)" type="number" value={formData.durationDays} onChange={(e) => setFormData({ ...formData, durationDays: Number(e.target.value) })} required />
           <div className="flex gap-3 pt-4">
             <Button type="submit" className="flex-1">{pricing ? 'Actualizar' : 'Crear'} Precio</Button>
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>

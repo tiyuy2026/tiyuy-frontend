@@ -1,19 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { useProjects } from '@/presentation/hooks/useProjects';
+import { useActiveSubscription } from '@/presentation/hooks/useFinance';
 import { TrialGuard } from '@/presentation/components/guards/TrialGuard/TrialGuard';
 import { TrialWarningBanner } from '@/presentation/components/guards/TrialGuard/TrialWarningBanner';
+import { PlanExpiredModal } from '@/presentation/components/modals/PlanExpiredModal';
 import { toast } from '@/presentation/store/toastStore';
 
 export default function MyProjectsPage() {
   const { user } = useAuthStore();
   const { myProjects, publishProject, featureProject, deleteProject } = useProjects();
+  const { data: activeSubscription } = useActiveSubscription();
   const [activeTab, setActiveTab] = useState<'ALL' | 'DRAFT' | 'PUBLISHED' | 'PAUSED' | 'COMPLETED'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showPlanExpiredModal, setShowPlanExpiredModal] = useState(false);
+
 
   // Query para obtener proyectos
   const { data: projectsData, isLoading, refetch } = myProjects(0, 20);
@@ -23,8 +28,29 @@ export default function MyProjectsPage() {
   const featureMutation = featureProject();
   const deleteMutation = deleteProject();
 
+  // Calculate if user can publish
+  const publishedProjectsCount = useMemo(() => {
+    return (projectsData?.content || []).filter((p: any) => p.status === 'PUBLISHED').length;
+  }, [projectsData]);
+
+  const canPublish = useMemo(() => {
+    if (activeSubscription) {
+      // Has plan: use plan logic (remainingPublications)
+      return activeSubscription.remainingPublications > 0;
+    }
+    
+    // WITHOUT SUBSCRIPTION: up to 1 FREE PUBLISHED project
+    // Once user publishes 1 project, FREE is permanently blocked
+    return publishedProjectsCount < 1;
+  }, [activeSubscription, publishedProjectsCount]);
+
+
   // Function to publish project
   const handlePublish = async (projectId: number) => {
+    if (!canPublish) {
+      setShowPlanExpiredModal(true);
+      return;
+    }
     try {
       await publishMutation.mutateAsync(projectId);
       toast.success('Proyecto publicado exitosamente!');
@@ -32,6 +58,7 @@ export default function MyProjectsPage() {
       toast.error(error.message || 'Error al publicar proyecto');
     }
   };
+
 
   // Function to feature project
   const handleFeature = async (projectId: number) => {
@@ -367,6 +394,7 @@ export default function MyProjectsPage() {
                           >
                             {publishMutation.isPending ? 'Publicando...' : 'Publicar'}
                           </button>
+
                           <button
                             onClick={() => handleDelete(project.id)}
                             disabled={deleteMutation.isPending}
@@ -386,6 +414,8 @@ export default function MyProjectsPage() {
                           >
                             {publishMutation.isPending ? 'Reactivando...' : 'Reactivar'}
                           </button>
+
+
                           <button
                             onClick={() => handleDelete(project.id)}
                             disabled={deleteMutation.isPending}
@@ -431,6 +461,14 @@ export default function MyProjectsPage() {
         </div>
       </div>
       </TrialGuard>
+      
+      {/* Plan expired modal */}
+      <PlanExpiredModal 
+        isOpen={showPlanExpiredModal}
+        onClose={() => setShowPlanExpiredModal(false)}
+      />
     </ProtectedRoute>
   );
 }
+
+

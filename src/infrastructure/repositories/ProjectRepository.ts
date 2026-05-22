@@ -136,13 +136,48 @@ export class ProjectRepository implements IProjectRepository {
 
     const response = await publicApiClient.get(`/projects/search?${params}`);
     
+    // Mapear media a images y coverImageUrl solo si el backend devuelve media como array de objetos
+    const content = (response.data.content || []).map((project: any) => {
+      // Si ya viene coverImageUrl, usarlo directamente
+      if (project.coverImageUrl) {
+        return project;
+      }
+      // Si ya viene images como array de strings, usarlo directamente
+      if (project.images && Array.isArray(project.images) && project.images.length > 0 && typeof project.images[0] === 'string') {
+        return project;
+      }
+      // Si viene media como array de objetos, mapearlo
+      const media: Array<{ url: string; mediaType: string; displayOrder: number }> = project.media || [];
+      if (media.length > 0) {
+        const photos = media
+          .filter((m: any) => m.mediaType === 'PHOTO')
+          .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
+          .map((m: any) => m.url);
+        return {
+          ...project,
+          coverImageUrl: photos[0] || null,
+          images: photos,
+          renders: media
+            .filter((m: any) => m.mediaType === 'VIDEO' || m.mediaType === 'RENDER')
+            .map((m: any) => m.url),
+          blueprints: media
+            .filter((m: any) => m.mediaType === 'BLUEPRINT' || m.mediaType === 'PDF')
+            .map((m: any) => m.url),
+        };
+      }
+      return project;
+    });
+
+
+    
     return {
-      content: response.data.content || [],
+      content,
       totalElements: response.data.totalElements || 0,
       totalPages: response.data.totalPages || 0,
       page: response.data.number || 0,
       size: response.data.size || 20,
     };
+
   }
 
   /**
@@ -345,14 +380,49 @@ export class ProjectRepository implements IProjectRepository {
 
       const response = await publicApiClient.get(`/projects/featured?${params.toString()}`);
       
+      // Mapear media a images y coverImageUrl solo si el backend devuelve media como array de objetos
+      const content = (response.data.content || []).map((project: any) => {
+        // Si ya viene coverImageUrl, usarlo directamente
+        if (project.coverImageUrl) {
+          return project;
+        }
+        // Si ya viene images como array de strings, usarlo directamente
+        if (project.images && Array.isArray(project.images) && project.images.length > 0 && typeof project.images[0] === 'string') {
+          return project;
+        }
+        // Si viene media como array de objetos, mapearlo
+        const media: Array<{ url: string; mediaType: string; displayOrder: number }> = project.media || [];
+        if (media.length > 0) {
+          const photos = media
+            .filter((m: any) => m.mediaType === 'PHOTO')
+            .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
+            .map((m: any) => m.url);
+          return {
+            ...project,
+            coverImageUrl: photos[0] || null,
+            images: photos,
+            renders: media
+              .filter((m: any) => m.mediaType === 'VIDEO' || m.mediaType === 'RENDER')
+              .map((m: any) => m.url),
+            blueprints: media
+              .filter((m: any) => m.mediaType === 'BLUEPRINT' || m.mediaType === 'PDF')
+              .map((m: any) => m.url),
+          };
+        }
+        return project;
+      });
+      
       return {
-        content: response.data.content || [],
+        content,
         totalElements: response.data.totalElements || 0,
         totalPages: response.data.totalPages || 0,
         page: response.data.number || 0,
         size: response.data.size || 5,
       };
+
     } catch (error) {
+
+
       console.error('Error loading featured projects:', error);
       
       // Si es un error de red, log específico

@@ -94,7 +94,7 @@ export function ProjectMultimediaStep({ formData, onChange, projectId, unitBluep
           formDataUpload.append('type', 'BLUEPRINT');
 
           try {
-            const response = await fetch(`/projects/${projectId}/upload`, {
+            const response = await fetch(`/api/projects/${projectId}/upload`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}` },
               body: formDataUpload,
@@ -124,7 +124,7 @@ export function ProjectMultimediaStep({ formData, onChange, projectId, unitBluep
           formDataUpload.append('type', 'BLUEPRINT');
 
           try {
-            const response = await fetch(`/projects/${projectId}/upload`, {
+            const response = await fetch(`/api/projects/${projectId}/upload`, {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}` },
               body: formDataUpload,
@@ -194,7 +194,7 @@ export function ProjectMultimediaStep({ formData, onChange, projectId, unitBluep
       }, 500);
 
       // Usar ruta relativa - Vercel actúa como puente
-      const uploadUrl = `/projects/${projectId}/upload`;
+      const uploadUrl = `/api/projects/${projectId}/upload`;
 
       console.log(`Enviando POST a: ${uploadUrl}`);
 
@@ -392,7 +392,7 @@ export function ProjectMultimediaStep({ formData, onChange, projectId, unitBluep
                         src={render}
                         className="w-full h-full object-cover"
                         controls
-                        muted
+                        playsInline
                       />
                     ) : (
                       <img

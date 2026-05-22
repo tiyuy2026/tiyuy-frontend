@@ -1,16 +1,16 @@
 /**
- * Agent Marketing Pricing Page
- * Agents can view campaign pricing
+ * Developer Marketing Pricing Page
+ * Developers can view campaign pricing
  */
 
 'use client';
 
-import { useAgentPricingList } from '@/presentation/hooks/useAgent';
+import { useDeveloperPricingList } from '@/presentation/hooks/useDeveloper';
 import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/Card';
 import { LoadingState, EmptyState, ErrorState } from '@/presentation/components/admin/AdminUIStates';
 
-export default function AgentMarketingPricingPage() {
-  const { data: pricingList, isLoading, error, refetch } = useAgentPricingList();
+export default function DeveloperMarketingPricingPage() {
+  const { data: pricingList, isLoading, error, refetch } = useDeveloperPricingList();
 
   if (isLoading) return <LoadingState message="Cargando precios..." />;
   if (error) return <ErrorState message="Error al cargar precios." retry={refetch} />;

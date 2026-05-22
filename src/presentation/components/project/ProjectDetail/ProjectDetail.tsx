@@ -180,7 +180,6 @@ const unitsByBedrooms = useMemo(() => {
                 <video
                   ref={videoRef}
                   src={video}
-                  muted
                   loop
                   playsInline
                   className="w-full h-full object-cover"

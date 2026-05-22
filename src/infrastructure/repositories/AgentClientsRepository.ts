@@ -13,7 +13,7 @@ import {
   ClientFilter
 } from '@/core/domain/entities/Client';
 
-const BASE_URL = '/api/agent/clients';
+const BASE_URL = '/v1/agent/clients';
 
 export class AgentClientsRepository implements IAgentClientsRepository {
   

@@ -139,15 +139,15 @@ export interface IAdminRepository {
   createPromotionCampaign(request: import('@/core/domain/entities/Admin').CreatePromotionCampaignRequest): Promise<import('@/core/domain/entities/Admin').PromotionCampaign>;
   updatePromotionCampaign(id: number, request: import('@/core/domain/entities/Admin').UpdatePromotionCampaignRequest): Promise<import('@/core/domain/entities/Admin').PromotionCampaign>;
   deletePromotionCampaign(id: number): Promise<void>;
-  getCampaignPricingList(params?: { page?: number; size?: number }): Promise<PaginatedResponse<import('@/core/domain/entities/Admin').CampaignPricing>>;
+  getCampaignPricingList(params?: { page?: number; size?: number }): Promise<import('@/core/domain/entities/Admin').CampaignPricing[]>;
   createCampaignPricing(request: import('@/core/domain/entities/Admin').CreateCampaignPricingRequest): Promise<import('@/core/domain/entities/Admin').CampaignPricing>;
   updateCampaignPricing(id: number, request: Partial<import('@/core/domain/entities/Admin').CreateCampaignPricingRequest>): Promise<import('@/core/domain/entities/Admin').CampaignPricing>;
   deleteCampaignPricing(id: number): Promise<void>;
-  getBanners(params?: { page?: number; size?: number; location?: string }): Promise<PaginatedResponse<import('@/core/domain/entities/Admin').Banner>>;
+  getBanners(params?: { page?: number; size?: number; location?: string }): Promise<import('@/core/domain/entities/Admin').Banner[]>;
   createBanner(request: import('@/core/domain/entities/Admin').CreateBannerRequest): Promise<import('@/core/domain/entities/Admin').Banner>;
   updateBanner(id: number, request: Partial<import('@/core/domain/entities/Admin').CreateBannerRequest>): Promise<import('@/core/domain/entities/Admin').Banner>;
   deleteBanner(id: number): Promise<void>;
-  getFestiveCampaigns(params?: { page?: number; size?: number }): Promise<PaginatedResponse<import('@/core/domain/entities/Admin').FestiveCampaign>>;
+  getFestiveCampaigns(params?: { page?: number; size?: number }): Promise<import('@/core/domain/entities/Admin').FestiveCampaign[]>;
   createFestiveCampaign(request: import('@/core/domain/entities/Admin').CreateFestiveCampaignRequest): Promise<import('@/core/domain/entities/Admin').FestiveCampaign>;
   updateFestiveCampaign(id: number, request: Partial<import('@/core/domain/entities/Admin').CreateFestiveCampaignRequest>): Promise<import('@/core/domain/entities/Admin').FestiveCampaign>;
   deleteFestiveCampaign(id: number): Promise<void>;
