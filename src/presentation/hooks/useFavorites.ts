@@ -12,10 +12,17 @@ export function useFavoriteStatus(propertyId: number) {
   const { favoritesMap, setFavorite } = useFavoriteStore();
   const queryClient = useQueryClient();
 
+  // Verificar si hay token de autenticación
+  const hasToken = typeof window !== 'undefined' && (
+    localStorage.getItem('tiyuy-auth-token') ||
+    localStorage.getItem('token') ||
+    localStorage.getItem('auth-token')
+  );
+
   const query = useQuery({
     queryKey: ['favorite', propertyId],
     queryFn: () => repo.check(propertyId),
-    enabled: !!propertyId,
+    enabled: !!propertyId && !!hasToken,
     // En v5: usa placeholderData para inicializar desde store
     placeholderData: favoritesMap[propertyId] ?? false,
   });
