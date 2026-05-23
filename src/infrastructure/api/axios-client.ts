@@ -7,7 +7,7 @@ const serverBaseURL = process.env.BACKEND_URL
 const baseURL =
   typeof window === 'undefined'
     ? serverBaseURL
-    : (process.env.NEXT_PUBLIC_API_URL || '/api');
+    : (process.env.NEXT_PUBLIC_API_URL || 'http://152.70.129.43:8080/api');
 
 export const axiosClient = axios.create({
   baseURL,
