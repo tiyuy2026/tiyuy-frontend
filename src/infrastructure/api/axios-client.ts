@@ -1,10 +1,12 @@
 import axios from 'axios';
 
+// En el navegador (cliente), usar '/api' para que pase por el proxy de Next.js
+// En SSR (servidor), usar la URL directa del backend
 const baseURL = typeof window === 'undefined'
   ? (process.env.BACKEND_URL                    // Vercel SSR: usa BACKEND_URL
       || process.env.NEXT_PUBLIC_API_URL         // fallback
       || 'http://localhost:8080/api')             // Local SSR
-  : (process.env.NEXT_PUBLIC_API_URL || '/api'); // Browser: siempre /api 
+  : '/api'; // Browser: siempre pasa por el proxy de Next.js
                                
 export const axiosClient = axios.create({
   baseURL,
@@ -42,13 +44,21 @@ axiosClient.interceptors.response.use(
   }
 );
 
-// Retry interceptor for public client
+// Retry interceptor for public client (también maneja errores de red)
 publicApiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.code === 'ECONNABORTED' && error.config && !error.config.__retry) {
+    const shouldRetry = (error.code === 'ECONNABORTED' || 
+                        error.code === 'ERR_NETWORK' || 
+                        error.code === 'ECONNREFUSED' ||
+                        !error.response) && 
+                        error.config && 
+                        !error.config.__retry;
+    
+    if (shouldRetry) {
       error.config.__retry = true;
-      console.log(' Reintentando request (Render cold start)...');
+      console.log(' Reintentando request público (Render cold start / Network error)...', error.code);
+      await new Promise(resolve => setTimeout(resolve, 2000));
       return publicApiClient.request(error.config);
     }
     return Promise.reject(error);
