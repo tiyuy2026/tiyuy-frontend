@@ -59,22 +59,19 @@ function StatCard({ title, value, growth, icon, iconBg, iconColor, subtitle }: S
   const isPositive = growth !== undefined && growth >= 0;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 p-5 group">
-      <div className="flex items-start justify-between mb-3">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconBg} ${iconColor} transition-transform group-hover:scale-105`}>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <div className="flex items-start justify-between mb-2">
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${iconBg} ${iconColor}`}>
           {icon}
         </div>
         {growth !== undefined && (
-          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-            isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
-          }`}>
-            {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-            <span>{formatGrowth(growth)}</span>
-          </div>
+          <span className={`text-xs font-medium ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
+            {isPositive ? '↑' : '↓'} {formatGrowth(growth)}
+          </span>
         )}
       </div>
-      <p className="text-2xl font-bold text-gray-900 tracking-tight mb-1">{value}</p>
-      <p className="text-sm text-gray-500 font-medium">{title}</p>
+      <p className="text-2xl font-bold text-gray-900 mt-3 mb-1">{value}</p>
+      <p className="text-sm text-gray-500">{title}</p>
       {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
     </div>
   );
@@ -146,16 +143,15 @@ function ActivityFeedItem({ item }: { item: ActivityItem }) {
   const Icon = c.icon;
 
   return (
-    <div className="flex items-start gap-3 py-3 group hover:bg-gray-50/50 rounded-lg px-3 -mx-3 transition-colors">
+    <div className="flex items-start gap-3 py-2.5">
       <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${c.bg} ${c.color}`}>
         <Icon className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 truncate">{item.user}</p>
+        <p className={`text-sm font-medium ${c.color}`}>{c.label}</p>
         <p className="text-xs text-gray-500">
-          {c.label}
-          {item.amount && <span className="font-medium text-gray-700"> · {item.amount}</span>}
-          {item.plan && <span> · {item.plan}</span>}
+          {item.user}
+          {item.plan && <span> – {item.plan}</span>}
         </p>
       </div>
       <span className="text-xs text-gray-400 shrink-0">{item.time}</span>
@@ -395,7 +391,7 @@ export function FinanceDashboardClient() {
   }
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-4 pb-8">
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
@@ -404,15 +400,15 @@ export function FinanceDashboardClient() {
             Resumen financiero completo de la plataforma
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-white rounded-xl border border-gray-100 shadow-sm p-1">
+        <div className="flex items-center gap-1">
           {dateRanges.map((range) => (
             <button
               key={range.key}
               onClick={() => setDateRange(range.key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+              className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
                 dateRange === range.key
-                  ? 'bg-gray-900 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                  ? 'bg-teal-500 text-white'
+                  : 'text-gray-400 hover:text-gray-600'
               }`}
             >
               {range.label}
@@ -474,10 +470,10 @@ export function FinanceDashboardClient() {
       </div>
 
       {/* ── Charts Section ─────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Line Chart - Monthly Revenue */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-base font-semibold text-gray-900">Ingresos Mensuales</h3>
               <p className="text-sm text-gray-500">Evolución de ingresos y suscripciones</p>
@@ -493,7 +489,7 @@ export function FinanceDashboardClient() {
               </div>
             </div>
           </div>
-          <div className="h-72">
+          <div className="h-60">
             {historyLoading ? (
               <div className="h-full flex items-center justify-center">
                 <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
@@ -703,6 +699,11 @@ export function FinanceDashboardClient() {
                 )}
               </tbody>
             </table>
+          </div>
+          <div className="px-6 py-3 text-center border-t border-gray-50">
+            <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
+              Ver todas las transacciones →
+            </button>
           </div>
         </div>
 
