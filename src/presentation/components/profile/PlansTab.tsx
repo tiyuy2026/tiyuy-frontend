@@ -87,7 +87,8 @@ export const PlansTab: React.FC<PlansTabProps> = ({ user }) => {
               body: JSON.stringify({
                 subscriptionId: subscription.id.toString(),
                 title: `Plan ${selectedPlan.name}`,
-                unitPrice: selectedPlan.price
+                unitPrice: selectedPlan.price,
+                frontendUrl: window.location.origin
               })
             }
           );

@@ -424,7 +424,8 @@ export default function PlansPage() {
               body: JSON.stringify({
                 subscriptionId: subscription.id.toString(),
                 title: `Plan ${selectedPlan.name}`,
-                unitPrice: finalPrice
+                unitPrice: finalPrice,
+                frontendUrl: window.location.origin
               })
             }
           );

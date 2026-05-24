@@ -92,9 +92,10 @@ export class FinanceRepository implements IFinanceRepository {
     return response.data;
   }
 
-  async createMercadoPagoPreference(subscriptionId: string): Promise<any> {
+  async createMercadoPagoPreference(subscriptionId: string, frontendUrl?: string): Promise<any> {
     const response = await apiClient.post('/finance/mercadopago/create-preference', {
       subscriptionId,
+      frontendUrl: frontendUrl || window.location.origin,
     });
     return response.data;
   }

@@ -261,7 +261,8 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
           body: JSON.stringify({
             subscriptionId: subscriptionId.toString(),
             title: `Plan ${plan.name}`,
-            unitPrice: plan.price
+            unitPrice: plan.price,
+            frontendUrl: window.location.origin
           })
         }
       );
