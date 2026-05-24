@@ -12,6 +12,9 @@ import {
   useFinanceStats,
   useFinanceHistory,
   useFinanceDashboard,
+  useFailedPaymentsList,
+  usePendingSubscriptionsList,
+  useTopPayersList,
   useAdminSubscriptions,
   useSubscriptionPlans,
 } from '@/presentation/hooks/useAdmin';
@@ -203,9 +206,14 @@ export function FinanceDashboardClient() {
   // ── Data Hooks ──
   const { data: financeStats } = useFinanceStats();
   const { data: history, isLoading: historyLoading } = useFinanceHistory(dateRange);
-  const { data: dashboardData, isLoading: transactionsLoading } = useFinanceDashboard();
+  const { data: dashboardData, isLoading: dashboardLoading } = useFinanceDashboard();
+  const { data: failedPaymentsData } = useFailedPaymentsList();
+  const { data: pendingSubsData } = usePendingSubscriptionsList();
+  const { data: topPayersData } = useTopPayersList();
   const { data: subscriptionsData } = useAdminSubscriptions(undefined, { page: 0, size: 100 });
   const { data: plansData } = useSubscriptionPlans();
+
+  const transactionsLoading = dashboardLoading;
 
   // ── Derived Stats ──
   const stats = useMemo(() => {
@@ -262,10 +270,17 @@ export function FinanceDashboardClient() {
   const activityFeed = useMemo(() => {
     const items: ActivityItem[] = [];
     const dashboard = (dashboardData || {}) as Record<string, any>;
-    const failedPaymentsList = Array.isArray(dashboard.failedPayments) ? dashboard.failedPayments : [];
-    const pendingSubs = Array.isArray(dashboard.pendingSubscriptions) ? dashboard.pendingSubscriptions : [];
-    const activeSubs = Array.isArray(subscriptionsData) ? subscriptionsData : [];
+    const failedPaymentsList = Array.isArray(failedPaymentsData) && failedPaymentsData.length > 0
+      ? failedPaymentsData
+      : Array.isArray(dashboard.failedPayments) ? dashboard.failedPayments : [];
+    const pendingSubs = Array.isArray(pendingSubsData) && pendingSubsData.length > 0
+      ? pendingSubsData
+      : Array.isArray(dashboard.pendingSubscriptions) ? dashboard.pendingSubscriptions : [];
+    const topPayersList = Array.isArray(topPayersData) && topPayersData.length > 0
+      ? topPayersData
+      : Array.isArray(dashboard.topPayers) ? dashboard.topPayers : [];
 
+    // Pagos rechazados (failedPayments)
     failedPaymentsList.slice(0, 3).forEach((t: any) => {
       items.push({
         id: `rejected-${t.pago_id || t.id}`,
@@ -279,6 +294,7 @@ export function FinanceDashboardClient() {
       });
     });
 
+    // Pagos pendientes (pendingSubscriptions)
     pendingSubs.slice(0, 3).forEach((t: any) => {
       items.push({
         id: `pending-${t.suscripcion_id || t.id}`,
@@ -292,28 +308,36 @@ export function FinanceDashboardClient() {
       });
     });
 
-    activeSubs.slice(0, 4).forEach((s: any) => {
+    // Pagos aprobados (topPayers como fuente de transacciones completadas)
+    topPayersList.slice(0, 4).forEach((t: any) => {
       items.push({
-        id: `sub-${s.plan || Math.random()}`,
-        type: 'new_subscription',
-        user: `${s.suscripciones_activas || 0} activas`,
-        plan: s.plan,
-        time: s.proxima_expiracion
-          ? new Date(s.proxima_expiracion).toLocaleDateString('es-PE', { month: 'short', day: 'numeric' })
+        id: `approved-${t.email || Math.random()}`,
+        type: 'payment_approved',
+        user: t.nombre_usuario || t.email || 'Usuario',
+        amount: formatCurrency(Number(t.total_pagado_soles) || 0),
+        plan: t.plan,
+        time: t.ultimo_pago
+          ? new Date(t.ultimo_pago).toLocaleDateString('es-PE', { month: 'short', day: 'numeric' })
           : '',
       });
     });
 
     return items.slice(0, 10);
-  }, [dashboardData, subscriptionsData]);
+  }, [dashboardData, failedPaymentsData, pendingSubsData, topPayersData]);
 
   // ── Transactions ──
   const transactions = useMemo(() => {
     const items: any[] = [];
     const dashboard = (dashboardData || {}) as Record<string, any>;
-    const failedPaymentsList = Array.isArray(dashboard.failedPayments) ? dashboard.failedPayments : [];
-    const pendingSubs = Array.isArray(dashboard.pendingSubscriptions) ? dashboard.pendingSubscriptions : [];
-    const topPayers = Array.isArray(dashboard.topPayers) ? dashboard.topPayers : [];
+    const failedPaymentsList = Array.isArray(failedPaymentsData) && failedPaymentsData.length > 0
+      ? failedPaymentsData
+      : Array.isArray(dashboard.failedPayments) ? dashboard.failedPayments : [];
+    const pendingSubs = Array.isArray(pendingSubsData) && pendingSubsData.length > 0
+      ? pendingSubsData
+      : Array.isArray(dashboard.pendingSubscriptions) ? dashboard.pendingSubscriptions : [];
+    const topPayers = Array.isArray(topPayersData) && topPayersData.length > 0
+      ? topPayersData
+      : Array.isArray(dashboard.topPayers) ? dashboard.topPayers : [];
 
     failedPaymentsList.forEach((t: any) => {
       items.push({
@@ -354,7 +378,7 @@ export function FinanceDashboardClient() {
     return items
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 10);
-  }, [dashboardData]);
+  }, [dashboardData, failedPaymentsData, pendingSubsData, topPayersData]);
 
   // ── Date Range Options ──
   const dateRanges = [
