@@ -202,7 +202,10 @@ function CustomPieTooltip({ active, payload }: any) {
 // ─── Main Dashboard Component ───────────────────────────────────────────────
 export function FinanceDashboardClient() {
   const [dateRange, setDateRange] = useState('30D');
-  const [visibleCount, setVisibleCount] = useState(5);
+  const [txPage, setTxPage] = useState(0);
+  const [activityPage, setActivityPage] = useState(0);
+  const TX_PER_PAGE = 5;
+  const ACTIVITY_PER_PAGE = 5;
 
   // ── Data Hooks ──
   const { data: financeStats } = useFinanceStats();
@@ -219,7 +222,8 @@ export function FinanceDashboardClient() {
   // Reset pagination when date range changes
   const handleDateRangeChange = useCallback((range: string) => {
     setDateRange(range);
-    setVisibleCount(5);
+    setTxPage(0);
+    setActivityPage(0);
   }, []);
 
   // ── Derived Stats ──
@@ -409,12 +413,21 @@ export function FinanceDashboardClient() {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [dashboardData, failedPaymentsData, pendingSubsData, topPayersData]);
 
-  // Transacciones visibles según paginación
+  // Transacciones visibles según página actual
   const visibleTransactions = useMemo(() => {
-    return transactions.slice(0, visibleCount);
-  }, [transactions, visibleCount]);
+    const start = txPage * TX_PER_PAGE;
+    return transactions.slice(start, start + TX_PER_PAGE);
+  }, [transactions, txPage]);
 
-  const hasMore = visibleCount < transactions.length;
+  const totalTxPages = Math.max(1, Math.ceil(transactions.length / TX_PER_PAGE));
+
+  // Actividad visible según página actual
+  const visibleActivity = useMemo(() => {
+    const start = activityPage * ACTIVITY_PER_PAGE;
+    return activityFeed.slice(start, start + ACTIVITY_PER_PAGE);
+  }, [activityFeed, activityPage]);
+
+  const totalActivityPages = Math.max(1, Math.ceil(activityFeed.length / ACTIVITY_PER_PAGE));
 
   // ── Date Range Options ──
   const dateRanges = [
@@ -735,15 +748,22 @@ export function FinanceDashboardClient() {
               </tbody>
             </table>
           </div>
-          {/* Ver más — paginación incremental */}
-          {hasMore && (
-            <div className="px-5 py-3 border-t border-gray-50 text-center">
-              <button
-                onClick={() => setVisibleCount(prev => prev + 5)}
-                className="text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
-              >
-                Ver {Math.min(5, transactions.length - visibleCount)} más de {transactions.length - visibleCount} restantes →
-              </button>
+          {/* Paginación por páginas */}
+          {totalTxPages > 1 && (
+            <div className="px-5 py-3 border-t border-gray-50 flex items-center justify-center gap-1">
+              {Array.from({ length: totalTxPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setTxPage(i)}
+                  className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${
+                    txPage === i
+                      ? 'bg-teal-500 text-white shadow-sm'
+                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
             </div>
           )}
         </div>
@@ -765,11 +785,29 @@ export function FinanceDashboardClient() {
                 <p className="text-xs text-gray-400">No hay actividad reciente</p>
               </div>
             ) : (
-              activityFeed.map((item) => (
+              visibleActivity.map((item) => (
                 <ActivityFeedItem key={item.id} item={item} />
               ))
             )}
           </div>
+          {/* Paginación por páginas */}
+          {totalActivityPages > 1 && (
+            <div className="pt-3 border-t border-gray-50 flex items-center justify-center gap-1">
+              {Array.from({ length: totalActivityPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActivityPage(i)}
+                  className={`w-7 h-7 rounded-lg text-xs font-medium transition-all ${
+                    activityPage === i
+                      ? 'bg-teal-500 text-white shadow-sm'
+                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
       </div>
