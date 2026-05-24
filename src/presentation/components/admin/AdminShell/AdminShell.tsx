@@ -90,7 +90,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { label: 'Planes', href: '/admin/plans', icon: Layers },
       { label: 'Descuentos', href: '/admin/discounts', icon: Tag },
-      { label: 'Marketing', href: '/admin/marketing', icon: Megaphone },
+      { label: 'Campañas', href: '/admin/campaigns', icon: Megaphone },
       { label: 'Finanzas', href: '/admin/finance', icon: DollarSign },
     ],
   },
