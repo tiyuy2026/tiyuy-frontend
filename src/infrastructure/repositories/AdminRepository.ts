@@ -598,6 +598,41 @@ export class AdminRepository implements IAdminRepository {
     return response.data;
   }
 
+  async getFinanceDashboard(): Promise<any> {
+    const response = await axiosClient.get(`${this.basePath}/reports/dashboard`);
+    return response.data;
+  }
+
+  async getPaymentsSummary(): Promise<any> {
+    const response = await axiosClient.get(`${this.basePath}/reports/payments/summary`);
+    return response.data;
+  }
+
+  async getFailedPaymentsList(): Promise<any[]> {
+    const response = await axiosClient.get(`${this.basePath}/reports/payments/failed`);
+    return response.data;
+  }
+
+  async getTopPayersList(): Promise<any[]> {
+    const response = await axiosClient.get(`${this.basePath}/reports/users/top-payers`);
+    return response.data;
+  }
+
+  async getPendingSubscriptionsList(): Promise<any[]> {
+    const response = await axiosClient.get(`${this.basePath}/reports/subscriptions/pending-activation`);
+    return response.data;
+  }
+
+  async getMonthlyRevenuesList(): Promise<any[]> {
+    const response = await axiosClient.get(`${this.basePath}/reports/revenues/monthly`);
+    return response.data;
+  }
+
+  async getActiveSubscriptionsList(): Promise<any[]> {
+    const response = await axiosClient.get(`${this.basePath}/reports/subscriptions/active`);
+    return response.data;
+  }
+
   async refundTransaction(transactionId: number, reason: string): Promise<void> {
     await axiosClient.post(`${this.basePath}/reports/subscriptions/${transactionId}/cancel?reason=${encodeURIComponent(reason)}`);
   }

@@ -1164,4 +1164,55 @@ export const useDeleteFestiveCampaign = () => {
   });
 };
 
+// ─── Finance Dashboard Hooks ────────────────────────────────────────────────
+
+export const useFinanceDashboard = () => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'finance', 'dashboard'],
+    queryFn: () => adminRepository.getFinanceDashboard(),
+  });
+};
+
+export const usePaymentsSummary = () => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'finance', 'payments-summary'],
+    queryFn: () => adminRepository.getPaymentsSummary(),
+  });
+};
+
+export const useFailedPaymentsList = () => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'finance', 'failed-payments'],
+    queryFn: () => adminRepository.getFailedPaymentsList(),
+  });
+};
+
+export const useTopPayersList = () => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'finance', 'top-payers'],
+    queryFn: () => adminRepository.getTopPayersList(),
+  });
+};
+
+export const usePendingSubscriptionsList = () => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'finance', 'pending-subscriptions'],
+    queryFn: () => adminRepository.getPendingSubscriptionsList(),
+  });
+};
+
+export const useMonthlyRevenuesList = () => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'finance', 'monthly-revenues'],
+    queryFn: () => adminRepository.getMonthlyRevenuesList(),
+  });
+};
+
+export const useActiveSubscriptionsList = () => {
+  return useQuery({
+    queryKey: [ADMIN_QUERY_KEY, 'finance', 'active-subscriptions'],
+    queryFn: () => adminRepository.getActiveSubscriptionsList(),
+  });
+};
+
 

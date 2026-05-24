@@ -11,7 +11,7 @@ import { useState, useMemo } from 'react';
 import {
   useFinanceStats,
   useFinanceHistory,
-  usePaymentTransactions,
+  useFinanceDashboard,
   useAdminSubscriptions,
   useSubscriptionPlans,
 } from '@/presentation/hooks/useAdmin';
@@ -203,7 +203,7 @@ export function FinanceDashboardClient() {
   // ── Data Hooks ──
   const { data: financeStats } = useFinanceStats();
   const { data: history, isLoading: historyLoading } = useFinanceHistory(dateRange);
-  const { data: dashboardData, isLoading: transactionsLoading } = usePaymentTransactions(undefined, { page: 0, size: 10 });
+  const { data: dashboardData, isLoading: transactionsLoading } = useFinanceDashboard();
   const { data: subscriptionsData } = useAdminSubscriptions(undefined, { page: 0, size: 100 });
   const { data: plansData } = useSubscriptionPlans();
 
