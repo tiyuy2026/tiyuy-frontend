@@ -45,3 +45,20 @@ body {
   @apply w-full px-3 py-2 border border-gray-300 rounded-lg text-sm
          focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white;
 }
+
+/* Perfect carousel sizing to fit exactly N cards and prevent half-cards leaking */
+@media (min-width: 640px) {
+  .carousel-wrapper { max-width: calc(2 * 280px + 3.25rem); }
+}
+@media (min-width: 768px) {
+  .carousel-wrapper { max-width: calc(2 * 330px + 3.5rem); }
+}
+@media (min-width: 1024px) {
+  .carousel-wrapper { max-width: calc(3 * 280px + 5rem); }
+}
+@media (min-width: 1280px) {
+  .carousel-wrapper { max-width: calc(5 * 210px + 8rem); }
+}
+@media (min-width: 1536px) {
+  .carousel-wrapper { max-width: calc(6 * 230px + 9.5rem); }
+}

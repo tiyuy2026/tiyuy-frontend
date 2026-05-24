@@ -182,7 +182,6 @@ async getById(id: number): Promise<Property> {
         params: {
           page,
           size,
-          isFeatured: true,
           sort: 'createdAt,desc'
         },
         timeout: 120000, // Aumentar timeout a 2 minutos
