@@ -36,6 +36,8 @@ import {
   ChevronDown,
   ChevronRight,
   DollarSign,
+  ImageIcon,
+  Gift,
 } from 'lucide-react';
 
 interface GitHubShellProps {
@@ -91,6 +93,9 @@ const NAV_SECTIONS: NavSection[] = [
       { label: 'Planes', href: '/admin/plans', icon: Layers },
       { label: 'Descuentos', href: '/admin/discounts', icon: Tag },
       { label: 'Campañas', href: '/admin/campaigns', icon: Megaphone },
+      { label: 'Banners', href: '/admin/campaigns/banners', icon: ImageIcon },
+      { label: 'Campañas Festivas', href: '/admin/campaigns/festive', icon: Gift },
+      { label: 'Precios', href: '/admin/campaigns/pricing', icon: DollarSign },
       { label: 'Finanzas', href: '/admin/finance', icon: DollarSign },
     ],
   },

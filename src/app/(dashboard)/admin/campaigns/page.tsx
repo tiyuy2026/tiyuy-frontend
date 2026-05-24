@@ -185,6 +185,7 @@ export default function AdminCampaignsDashboard() {
   const router = useRouter();
   const [chartPeriod, setChartPeriod] = useState<'Diario' | 'Semanal' | 'Mensual'>('Diario');
   const [statusFilter, setStatusFilter] = useState('Todos los estados');
+  const [showStatusMenu, setShowStatusMenu] = useState(false);
 
   // ── ALL DATA FROM REAL BACKEND APIs ──────────────────────────────────────
   const { data: stats, isLoading: statsLoading } = useMarketingStats();
@@ -412,22 +413,47 @@ export default function AdminCampaignsDashboard() {
           <p className="text-sm text-gray-500 mt-0.5">Resumen general de actividades y rendimiento de campañas</p>
         </div>
         <div className="flex items-center gap-3">
-          {/* Date range picker */}
+          {/* Date range picker - dinámico */}
           <button className="flex items-center gap-2 px-3.5 py-2 bg-white rounded-xl border border-gray-200 shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
             <Calendar className="w-4 h-4 text-gray-400" />
             <span>
-              {new Date(Date.now() - 30 * 86400000).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })}
-              {' – '}
-              {new Date().toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })}
+              {(() => {
+                const now = new Date();
+                const start = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+                return `${start.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })} – ${now.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })}`;
+              })()}
             </span>
             <ChevronDown className="w-4 h-4 text-gray-400" />
           </button>
-          {/* Status filter */}
-          <button className="flex items-center gap-2 px-3.5 py-2 bg-white rounded-xl border border-gray-200 shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-            <SlidersHorizontal className="w-4 h-4 text-gray-400" />
-            <span>{statusFilter}</span>
-            <ChevronDown className="w-4 h-4 text-gray-400" />
-          </button>
+          {/* Status filter - funcional */}
+          <div className="relative">
+            <button
+              onClick={() => setShowStatusMenu(!showStatusMenu)}
+              className="flex items-center gap-2 px-3.5 py-2 bg-white rounded-xl border border-gray-200 shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <SlidersHorizontal className="w-4 h-4 text-gray-400" />
+              <span>{statusFilter}</span>
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+            </button>
+            {showStatusMenu && (
+              <div className="absolute right-0 mt-1 w-48 bg-white rounded-xl border border-gray-200 shadow-lg z-50 py-1">
+                {['Todos los estados', 'ACTIVE', 'INACTIVE', 'SCHEDULED', 'EXPIRED', 'PENDING'].map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => {
+                      setStatusFilter(s);
+                      setShowStatusMenu(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                      statusFilter === s ? 'text-teal-600 font-semibold bg-teal-50' : 'text-gray-700'
+                    }`}
+                  >
+                    {s === 'Todos los estados' ? 'Todos los estados' : s.charAt(0) + s.slice(1).toLowerCase()}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           {/* CTA */}
           <button
           onClick={() => router.push('/admin/campaigns/list')}
