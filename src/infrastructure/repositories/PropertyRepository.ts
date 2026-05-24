@@ -1,4 +1,4 @@
-import { axiosClient } from '../api/axios-client';
+import { axiosClient, publicApiClient } from '../api/axios-client';
 import { ENDPOINTS } from '../api/endpoints';
 import { IPropertyRepository, CreatePropertyData, UpdatePropertyData } from '@/core/domain/repositories/IPropertyRepository';
 import { Property, PropertySummary, PropertyMedia } from '@/core/domain/entities/Property';
@@ -178,13 +178,13 @@ async getById(id: number): Promise<Property> {
 
   async getFeaturedProperties(page = 0, size = 4): Promise<PropertySearchResult> {
     try {
-      const response = await axiosClient.get(ENDPOINTS.PROPERTIES.SEARCH, {
+      const response = await publicApiClient.get(ENDPOINTS.PROPERTIES.SEARCH, {
         params: {
           page,
           size,
           sort: 'createdAt,desc'
         },
-        timeout: 120000, // Aumentar timeout a 2 minutos
+        timeout: 120000,
       });
 
       return {
