@@ -7,7 +7,6 @@ import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { useToggleUserStatus } from '@/presentation/hooks/useAdmin';
 import { Button } from '@/presentation/components/ui/Button';
 import { Card } from '@/presentation/components/ui/Card';
-import { Modal } from '@/presentation/components/ui/Modal';
 import { AdminTable } from '@/presentation/components/admin/AdminTable/AdminTable';
 import FilterDropdown from '@/presentation/components/ui/FilterDropdown';
 import AgentDetailsModal from './components/AgentDetailsModal';
@@ -89,14 +88,13 @@ export default function AgentsPage() {
     { value: 'all', label: 'Todos los planes' },
     { value: 'ENTERPRISE', label: 'Plan Empresarial' },
     { value: 'ENTERPRISE_TRIAL', label: 'Prueba Empresarial' },
-    { value: 'PREMIUM', label: 'Plan Pro' },
+    { value: 'PRO', label: 'Plan Pro' },
     { value: 'BASIC', label: 'Plan Básico' },
     { value: 'FREE', label: 'Plan Gratis' }
   ];
 
   const { hasPermission } = usePermissions();
   const canManageAgents = hasPermission('USERS_UPDATE');
-  const canManageDiscounts = hasPermission('DISCOUNTS_MANAGE');
 
   const params: PaginationParams = { page: currentPage - 1, size: pageSize };
 
@@ -116,17 +114,6 @@ export default function AgentsPage() {
   const handleViewAgentStats = (agent: AgentListItem) => {
     setSelectedAgent(agent);
     setIsStatsModalOpen(true);
-  };
-
-  const handleViewPlanDetails = () => {
-    // Show detailed breakdown of plan distribution
-    console.log('Viewing plan details');
-  };
-
-  const handleViewAllFreeAgents = () => {
-    // Filter to show only free agents
-    setPlanFilter('FREE');
-    setCurrentPage(1);
   };
 
   const handleToggleStatus = async (agent: AgentListItem) => {
@@ -239,8 +226,7 @@ export default function AgentsPage() {
     const labels = dashboardStats?.revenueChart?.labels || [];
     const revenue = dashboardStats?.revenueChart?.revenue || [];
     
-    // Slice data based on period
-    let sliceCount = 6; // default 30D
+    let sliceCount = 6;
     if (chartPeriod === '7D') sliceCount = 7;
     else if (chartPeriod === '3M') sliceCount = 12;
     else if (chartPeriod === '6M') sliceCount = 24;
@@ -273,8 +259,6 @@ export default function AgentsPage() {
       ]
     };
   };
-
-  const revenueChartData = getRevenueChartData();
 
   const planDistributionData = {
     labels: dashboardStats?.planDistribution?.labels || [],
@@ -407,7 +391,7 @@ export default function AgentsPage() {
     }
   ];
 
-  // Table actions - working buttons
+  // Table actions
   const actions = [
     {
       label: 'Ver',
@@ -426,43 +410,6 @@ export default function AgentsPage() {
     }] : [])
   ];
 
-  // Filter options
-  const filterOptions = [
-    {
-      key: 'status',
-      label: 'Estado',
-      type: 'select' as const,
-      options: [
-        { value: 'all', label: 'Todos los estados' },
-        { value: 'active', label: 'Activo' },
-        { value: 'inactive', label: 'Inactivo' }
-      ]
-    },
-    {
-      key: 'verification',
-      label: 'Verificacion',
-      type: 'select' as const,
-      options: [
-        { value: 'all', label: 'Todos' },
-        { value: 'verified', label: 'Verificado' },
-        { value: 'unverified', label: 'Pendiente' }
-      ]
-    },
-    {
-      key: 'plan',
-      label: 'Plan',
-      type: 'select' as const,
-      options: [
-        { value: 'all', label: 'Todos los planes' },
-        { value: 'ENTERPRISE', label: 'Plan Empresarial (S/399)' },
-        { value: 'ENTERPRISE_TRIAL', label: 'Prueba Empresarial (S/299)' },
-        { value: 'PREMIUM', label: 'Plan Pro (S/99)' },
-        { value: 'BASIC', label: 'Plan Basico (S/29)' },
-        { value: 'FREE', label: 'Plan Gratis' }
-      ]
-    }
-  ];
-
   const handleFilterChange = (filters: Record<string, any>) => {
     if (filters.verification !== undefined) {
       setVerificationFilter(filters.verification);
@@ -477,7 +424,6 @@ export default function AgentsPage() {
   };
 
   const handleExport = () => {
-    // Export filtered agents to CSV
     const csvContent = [
       ['ID', 'Nombre', 'Email', 'Estado', 'Plan', 'Ingresos Mes'].join(','),
       ...filteredAgents.map(a => [a.id, `${a.firstName} ${a.lastName}`, a.email, a.enabled ? 'Activo' : 'Inactivo', a.currentPlan, a.monthRevenue].join(','))
@@ -519,53 +465,24 @@ export default function AgentsPage() {
       <div className="grid grid-cols-6 gap-4">
         {statsCards.map((stat, index) => {
           const meta = STAT_META[index];
-
           return (
-            <Card
-              key={index}
-              className="bg-white border border-gray-200 rounded-2xl shadow-sm px-4 py-2 min-h-[100px]"
-            >
+            <Card key={index} className="bg-white border border-gray-200 rounded-2xl shadow-sm px-4 py-2 min-h-[100px]">
               <div className="flex h-full flex-col">
-                {/* Header */}
                 <div className="flex items-start justify-between">
                   <div className={`w-9 h-9 rounded-lg ${meta.bg} flex items-center justify-center`}>
-                    <span className={meta.color}>
-                      <stat.Icon />
-                    </span>
+                    <span className={meta.color}><stat.Icon /></span>
                   </div>
-
-                  <button className="text-gray-400 hover:text-gray-600 leading-none">
-                    ⋮
-                  </button>
+                  <button className="text-gray-400 hover:text-gray-600 leading-none">⋮</button>
                 </div>
-
-                {/* Body */}
                 <div className="mt-1.5 flex-1 flex flex-col">
-                  <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider leading-tight">
-                    {stat.title}
-                  </p>
-
+                  <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider leading-tight">{stat.title}</p>
                   <div className="mt-0.5 flex items-end gap-1 leading-none">
-                    <span className="text-[18px] font-bold text-gray-900">
-                      {stat.prefix}{stat.value.toLocaleString()}
-                    </span>
-                    {stat.valueSuffix && (
-                      <span className="text-[18px] font-bold text-gray-700">
-                        {stat.valueSuffix}
-                      </span>
-                    )}
+                    <span className="text-[18px] font-bold text-gray-900">{stat.prefix}{stat.value.toLocaleString()}</span>
+                    {stat.valueSuffix && <span className="text-[18px] font-bold text-gray-700">{stat.valueSuffix}</span>}
                   </div>
-
                   <div className="mt-0.5 flex items-center justify-between gap-2">
-                    <span className="text-[11px] text-gray-500 leading-none">
-                      {stat.subtitle}
-                    </span>
-
-                    <span
-                      className={`text-[11px] font-semibold whitespace-nowrap ${
-                        stat.trendUp ? 'text-green-600' : 'text-red-600'
-                      }`}
-                    >
+                    <span className="text-[11px] text-gray-500 leading-none">{stat.subtitle}</span>
+                    <span className={`text-[11px] font-semibold whitespace-nowrap ${stat.trendUp ? 'text-green-600' : 'text-red-600'}`}>
                       {stat.trendUp ? '↑' : '↓'} {stat.trend.replace('+', '')}
                     </span>
                   </div>
@@ -576,24 +493,15 @@ export default function AgentsPage() {
         })}
       </div>
 
-      {/* Charts Section - 12 column grid layout */}
+      {/* Charts Section */}
       <div className="grid grid-cols-12 gap-6">
-
-        {/* Main Revenue Chart - Takes 7 columns */}
         <Card className="col-span-12 lg:col-span-7 p-6 h-[380px]">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-gray-900">Ingresos generados por agentes (para la plataforma)</h3>
             <div className="flex gap-1">
               {['7D', '30D', '3M', '6M', '1A'].map((period) => (
-                <button
-                  key={period}
-                  onClick={() => setChartPeriod(period)}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-lg transition-colors ${
-                    chartPeriod === period
-                      ? 'bg-teal-600 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
+                <button key={period} onClick={() => setChartPeriod(period)}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-lg transition-colors ${chartPeriod === period ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
                   {period}
                 </button>
               ))}
@@ -608,20 +516,11 @@ export default function AgentsPage() {
           </div>
         </Card>
 
-        {/* Right Column - Plan Distribution and Lost Potential */}
         <div className="col-span-12 lg:col-span-5 grid grid-cols-2 gap-4">
-          {/* Plan Distribution */}
           <Card className="p-4 h-[380px]">
             <h3 className="text-sm font-semibold text-gray-900 mb-3">Monetizacion por tipo de plan</h3>
             <div className="h-28 flex items-center justify-center relative">
-              <Doughnut
-                data={planDistributionData}
-                options={{
-                  maintainAspectRatio: false,
-                  cutout: '60%',
-                  plugins: { legend: { display: false } }
-                }}
-              />
+              <Doughnut data={planDistributionData} options={{ maintainAspectRatio: false, cutout: '60%', plugins: { legend: { display: false } } }} />
               <div className="absolute text-center">
                 <p className="text-xl font-bold">{dashboardStats?.planDistribution?.total || 0}</p>
                 <p className="text-xs text-gray-500">Agentes</p>
@@ -632,37 +531,24 @@ export default function AgentsPage() {
                 const value = dashboardStats?.planDistribution?.values[index] || 0;
                 const total = dashboardStats?.planDistribution?.total || 1;
                 const percentage = Math.round((value / total) * 100);
-                const planCodes = ['ENTERPRISE', 'PREMIUM', 'BASIC', 'FREE'];
+                const planCodes = ['ENTERPRISE', 'PRO', 'BASIC', 'FREE'];
                 const colors = ['#0d9488', '#f59e0b', '#9ca3af'];
                 return (
-                  <div
-                    key={label}
-                    className="flex items-center justify-between text-xs cursor-pointer hover:bg-gray-50 p-1 rounded"
-                    onClick={() => {
-                      setPlanFilter(planCodes[index] || 'all');
-                      setCurrentPage(1);
-                    }}
-                  >
+                  <div key={label} className="flex items-center justify-between text-xs cursor-pointer hover:bg-gray-50 p-1 rounded"
+                    onClick={() => { setPlanFilter(planCodes[index] || 'all'); setCurrentPage(1); }}>
                     <span className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: colors[index] || '#9ca3af' }}></span>
                       {label}
                     </span>
-                    <span className="text-gray-500">
-                      {value} ({percentage}%)
-                    </span>
+                    <span className="text-gray-500">{value} ({percentage}%)</span>
                   </div>
                 );
               })}
             </div>
-            <button
-              className="w-full mt-2 px-3 py-1.5 text-xs text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50"
-              onClick={() => setIsPlanDetailsModalOpen(true)}
-            >
-              Ver detalles
-            </button>
+            <button className="w-full mt-2 px-3 py-1.5 text-xs text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50"
+              onClick={() => setIsPlanDetailsModalOpen(true)}>Ver detalles</button>
           </Card>
 
-          {/* Lost Potential */}
           <Card className="p-4 h-[380px]">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-gray-900">Potencial perdido</h3>
@@ -674,9 +560,7 @@ export default function AgentsPage() {
               {(dashboardStats?.freeAgentList || []).slice(0, 4).map((agent) => (
                 <div key={agent.agentId} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-xs font-medium text-gray-600">
-                      {agent.initials}
-                    </div>
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-xs font-medium text-gray-600">{agent.initials}</div>
                     <div>
                       <p className="text-xs font-medium text-gray-900">{agent.firstName} {agent.lastName}</p>
                       <p className="text-xs text-gray-500">Sin plan activo</p>
@@ -686,12 +570,8 @@ export default function AgentsPage() {
                 </div>
               ))}
             </div>
-            <button
-              className="w-full mt-3 px-3 py-1.5 text-xs text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50"
-              onClick={() => setIsFreeAgentsModalOpen(true)}
-            >
-              Ver todos ({dashboardStats?.freeAgents || 0})
-            </button>
+            <button className="w-full mt-3 px-3 py-1.5 text-xs text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50"
+              onClick={() => setIsFreeAgentsModalOpen(true)}>Ver todos ({dashboardStats?.freeAgents || 0})</button>
           </Card>
         </div>
       </div>
@@ -699,47 +579,20 @@ export default function AgentsPage() {
       {/* Filters */}
       <div className="flex items-center gap-4">
         <div className="relative flex-1">
-          <input
-            type="text"
-            placeholder="Buscar inmobiliaria..."
-            value={searchQuery}
+          <input type="text" placeholder="Buscar inmobiliaria..." value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <span className="absolute left-3 top-2.5 text-gray-400">Search</span>
+            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
         </div>
-        
-        <FilterDropdown
-          value={statusFilter}
-          options={statusOptions}
-          onChange={(value) => handleFilterChange({ status: value })}
-        />
-
-        <FilterDropdown
-          value={verificationFilter}
-          options={verificationOptions}
-          onChange={(value) => handleFilterChange({ verification: value })}
-        />
-
-        <FilterDropdown
-          value={planFilter}
-          options={planOptions}
-          onChange={(value) => handleFilterChange({ plan: value })}
-        />
-        
-        <button 
-          className="px-4 py-2 border border-gray-200 rounded-lg text-sm flex items-center gap-2 hover:bg-gray-50"
-          onClick={() => setShowFilters(!showFilters)}
-        >
-          <span>⚡</span> Filtros
-        </button>
-        
-        <button 
-          className="px-4 py-2 border border-gray-200 rounded-lg text-sm flex items-center gap-2 hover:bg-gray-50"
-          onClick={handleExport}
-        >
-          <span>⬇</span> Exportar
-        </button>
+        <FilterDropdown value={statusFilter} options={statusOptions} onChange={(value) => handleFilterChange({ status: value })} />
+        <FilterDropdown value={verificationFilter} options={verificationOptions} onChange={(value) => handleFilterChange({ verification: value })} />
+        <FilterDropdown value={planFilter} options={planOptions} onChange={(value) => handleFilterChange({ plan: value })} />
+        <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm flex items-center gap-2 hover:bg-gray-50"
+          onClick={() => setShowFilters(!showFilters)}><span>⚡</span> Filtros</button>
+        <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm flex items-center gap-2 hover:bg-gray-50"
+          onClick={handleExport}><span>⬇</span> Exportar</button>
       </div>
 
       {/* Advanced Filters Panel */}
@@ -747,45 +600,25 @@ export default function AgentsPage() {
         <Card className="p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-medium">Filtros Avanzados</h3>
-            <button 
-              className="text-gray-400 hover:text-gray-600"
-              onClick={() => setShowFilters(false)}
-            >
-              ✕
-            </button>
+            <button className="text-gray-400 hover:text-gray-600" onClick={() => setShowFilters(false)}>✕</button>
           </div>
           <div className="grid grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">Fecha desde</label>
-              <input 
-                type="date" 
-                className="w-full px-3 py-2 border rounded-lg text-sm"
-                onChange={(e) => setDateRange({ ...dateRange, start: new Date(e.target.value) })}
-              />
+              <input type="date" className="w-full px-3 py-2 border rounded-lg text-sm"
+                onChange={(e) => setDateRange({ ...dateRange, start: new Date(e.target.value) })} />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Fecha hasta</label>
-              <input 
-                type="date" 
-                className="w-full px-3 py-2 border rounded-lg text-sm"
-                onChange={(e) => setDateRange({ ...dateRange, end: new Date(e.target.value) })}
-              />
+              <input type="date" className="w-full px-3 py-2 border rounded-lg text-sm"
+                onChange={(e) => setDateRange({ ...dateRange, end: new Date(e.target.value) })} />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Ingresos minimo</label>
-              <input 
-                type="number" 
-                placeholder="0"
-                className="w-full px-3 py-2 border rounded-lg text-sm"
-              />
+              <input type="number" placeholder="0" className="w-full px-3 py-2 border rounded-lg text-sm" />
             </div>
             <div className="flex items-end">
-              <button 
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
-                onClick={() => refetch()}
-              >
-                Aplicar filtros
-              </button>
+              <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg text-sm" onClick={() => refetch()}>Aplicar filtros</button>
             </div>
           </div>
         </Card>
@@ -820,40 +653,24 @@ export default function AgentsPage() {
         }}
       />
 
-      {/* Stats Modal */}
+      {/* Modals */}
       {selectedAgent && (
-        <AgentStatsModal
-          agent={selectedAgent}
-          isOpen={isStatsModalOpen}
+        <AgentStatsModal agent={selectedAgent} isOpen={isStatsModalOpen}
           onClose={() => setIsStatsModalOpen(false)}
-          onViewDetails={() => { setIsStatsModalOpen(false); setIsViewModalOpen(true); }}
-        />
+          onViewDetails={() => { setIsStatsModalOpen(false); setIsViewModalOpen(true); }} />
       )}
-
-      {/* Agent Details Modal */}
       {selectedAgent && (
-        <AgentDetailsModal
-          agent={selectedAgent}
-          isOpen={isViewModalOpen}
-          onClose={() => setIsViewModalOpen(false)}
-        />
+        <AgentDetailsModal agent={selectedAgent} isOpen={isViewModalOpen}
+          onClose={() => setIsViewModalOpen(false)} />
       )}
-
-      {/* Plan Details Modal */}
-      <PlanDetailsModal
-        isOpen={isPlanDetailsModalOpen}
+      <PlanDetailsModal isOpen={isPlanDetailsModalOpen}
         onClose={() => setIsPlanDetailsModalOpen(false)}
-        planDistribution={dashboardStats?.planDistribution}
-      />
-
-      {/* Free Agents Modal */}
-      <FreeAgentsModal
-        isOpen={isFreeAgentsModalOpen}
+        planDistribution={dashboardStats?.planDistribution} />
+      <FreeAgentsModal isOpen={isFreeAgentsModalOpen}
         onClose={() => setIsFreeAgentsModalOpen(false)}
         freeAgentList={dashboardStats?.freeAgentList}
         lostPotentialRevenue={dashboardStats?.lostPotentialRevenue}
-        freeAgentsCount={dashboardStats?.freeAgents}
-      />
+        freeAgentsCount={dashboardStats?.freeAgents} />
     </div>
   );
 }
