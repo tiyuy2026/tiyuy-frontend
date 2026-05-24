@@ -15,7 +15,6 @@ import {
   useAdminSubscriptions,
   useSubscriptionPlans,
 } from '@/presentation/hooks/useAdmin';
-import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { tiyuyColors } from '@/styles/tiyuy-colors';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -197,7 +196,6 @@ function CustomPieTooltip({ active, payload }: any) {
 // ─── Main Dashboard Component ───────────────────────────────────────────────
 export function FinanceDashboardClient() {
   const [dateRange, setDateRange] = useState('6M');
-  const { hasPermission } = usePermissions();
 
   // ── Data Hooks ──
   const { data: financeStats } = useFinanceStats();
@@ -205,8 +203,6 @@ export function FinanceDashboardClient() {
   const { data: dashboardData, isLoading: transactionsLoading } = usePaymentTransactions(undefined, { page: 0, size: 10 });
   const { data: subscriptionsData } = useAdminSubscriptions(undefined, { page: 0, size: 100 });
   const { data: plansData } = useSubscriptionPlans();
-
-  const canViewFinance = hasPermission('FINANCE_VIEW');
 
   // ── Derived Stats ──
   const stats = useMemo(() => {
@@ -374,21 +370,6 @@ export function FinanceDashboardClient() {
     { key: '6M', label: '6 meses' },
     { key: '1Y', label: '1 año' },
   ];
-
-  // ── Access Denied ──
-  if (!canViewFinance) {
-    return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-2xl flex items-center justify-center">
-            <DollarSign className="w-8 h-8 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Acceso Restringido</h3>
-          <p className="text-gray-500">No tienes permisos para ver información financiera.</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4 pb-8">
