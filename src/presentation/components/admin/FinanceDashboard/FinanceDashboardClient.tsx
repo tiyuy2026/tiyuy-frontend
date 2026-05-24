@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   useFinanceStats,
   useFinanceHistory,
@@ -202,6 +202,7 @@ function CustomPieTooltip({ active, payload }: any) {
 // ─── Main Dashboard Component ───────────────────────────────────────────────
 export function FinanceDashboardClient() {
   const [dateRange, setDateRange] = useState('30D');
+  const [visibleCount, setVisibleCount] = useState(5);
 
   // ── Data Hooks ──
   const { data: financeStats } = useFinanceStats();
@@ -214,6 +215,12 @@ export function FinanceDashboardClient() {
   const { data: plansData } = useSubscriptionPlans();
 
   const transactionsLoading = dashboardLoading;
+
+  // Reset pagination when date range changes
+  const handleDateRangeChange = useCallback((range: string) => {
+    setDateRange(range);
+    setVisibleCount(5);
+  }, []);
 
   // ── Derived Stats ──
   const stats = useMemo(() => {
@@ -269,6 +276,8 @@ export function FinanceDashboardClient() {
   // ── Activity Feed ──
   const activityFeed = useMemo(() => {
     const items: ActivityItem[] = [];
+    const now = new Date();
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const dashboard = (dashboardData || {}) as Record<string, any>;
     const failedPaymentsList = Array.isArray(failedPaymentsData) && failedPaymentsData.length > 0
       ? failedPaymentsData
@@ -280,49 +289,67 @@ export function FinanceDashboardClient() {
       ? topPayersData
       : Array.isArray(dashboard.topPayers) ? dashboard.topPayers : [];
 
-    // Pagos rechazados (failedPayments)
-    failedPaymentsList.slice(0, 3).forEach((t: any) => {
-      items.push({
-        id: `rejected-${t.pago_id || t.id}`,
-        type: 'payment_rejected',
-        user: t.email || 'Usuario',
-        amount: formatCurrency(Number(t.monto_intentado) || 0),
-        time: t.fecha_intento
-          ? new Date(t.fecha_intento).toLocaleDateString('es-PE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-          : '',
-        plan: undefined,
-      });
-    });
+    // Helper para filtrar por últimas 24h
+    const isWithin24h = (dateStr: string) => {
+      if (!dateStr) return true;
+      const d = new Date(dateStr);
+      return d >= twentyFourHoursAgo;
+    };
 
-    // Pagos pendientes (pendingSubscriptions)
-    pendingSubs.slice(0, 3).forEach((t: any) => {
-      items.push({
-        id: `pending-${t.suscripcion_id || t.id}`,
-        type: 'payment_pending',
-        user: t.email || 'Usuario',
-        amount: formatCurrency(Number(t.precio_final) || 0),
-        plan: t.plan,
-        time: t.fecha_creacion
-          ? new Date(t.fecha_creacion).toLocaleDateString('es-PE', { month: 'short', day: 'numeric' })
-          : '',
+    // Pagos rechazados (failedPayments) - filtrar últimas 24h
+    failedPaymentsList
+      .filter((t: any) => isWithin24h(t.fecha_intento))
+      .forEach((t: any) => {
+        items.push({
+          id: `rejected-${t.pago_id || t.id}`,
+          type: 'payment_rejected',
+          user: t.email || 'Usuario',
+          amount: formatCurrency(Number(t.monto_intentado) || 0),
+          time: t.fecha_intento
+            ? new Date(t.fecha_intento).toLocaleDateString('es-PE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+            : '',
+          plan: undefined,
+        });
       });
-    });
 
-    // Pagos aprobados (topPayers como fuente de transacciones completadas)
-    topPayersList.slice(0, 4).forEach((t: any) => {
-      items.push({
-        id: `approved-${t.email || Math.random()}`,
-        type: 'payment_approved',
-        user: t.nombre_usuario || t.email || 'Usuario',
-        amount: formatCurrency(Number(t.total_pagado_soles) || 0),
-        plan: t.plan,
-        time: t.ultimo_pago
-          ? new Date(t.ultimo_pago).toLocaleDateString('es-PE', { month: 'short', day: 'numeric' })
-          : '',
+    // Pagos pendientes (pendingSubscriptions) - filtrar últimas 24h
+    pendingSubs
+      .filter((t: any) => isWithin24h(t.fecha_creacion))
+      .forEach((t: any) => {
+        items.push({
+          id: `pending-${t.suscripcion_id || t.id}`,
+          type: 'payment_pending',
+          user: t.email || 'Usuario',
+          amount: formatCurrency(Number(t.precio_final) || 0),
+          plan: t.plan,
+          time: t.fecha_creacion
+            ? new Date(t.fecha_creacion).toLocaleDateString('es-PE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+            : '',
+        });
       });
-    });
 
-    return items.slice(0, 10);
+    // Pagos aprobados (topPayers) - filtrar últimas 24h
+    topPayersList
+      .filter((t: any) => isWithin24h(t.ultimo_pago))
+      .forEach((t: any) => {
+        items.push({
+          id: `approved-${t.email || Math.random()}`,
+          type: 'payment_approved',
+          user: t.nombre_usuario || t.email || 'Usuario',
+          amount: formatCurrency(Number(t.total_pagado_soles) || 0),
+          plan: t.plan,
+          time: t.ultimo_pago
+            ? new Date(t.ultimo_pago).toLocaleDateString('es-PE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+            : '',
+        });
+      });
+
+    // Ordenar por fecha descendente (más reciente primero)
+    return items.sort((a, b) => {
+      const dateA = a.time ? new Date(a.time).getTime() : 0;
+      const dateB = b.time ? new Date(b.time).getTime() : 0;
+      return dateB - dateA;
+    });
   }, [dashboardData, failedPaymentsData, pendingSubsData, topPayersData]);
 
   // ── Transactions ──
@@ -379,9 +406,15 @@ export function FinanceDashboardClient() {
     });
 
     return items
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 5);
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [dashboardData, failedPaymentsData, pendingSubsData, topPayersData]);
+
+  // Transacciones visibles según paginación
+  const visibleTransactions = useMemo(() => {
+    return transactions.slice(0, visibleCount);
+  }, [transactions, visibleCount]);
+
+  const hasMore = visibleCount < transactions.length;
 
   // ── Date Range Options ──
   const dateRanges = [
@@ -403,12 +436,12 @@ export function FinanceDashboardClient() {
             Resumen financiero completo de la plataforma
           </p>
         </div>
-        {/* Tabs de rango — estilo imagen: sin contenedor pill, botones simples */}
+        {/* Tabs de rango — filtran transacciones y resetean paginación */}
         <div className="flex items-center gap-0.5">
           {dateRanges.map((range) => (
             <button
               key={range.key}
-              onClick={() => setDateRange(range.key)}
+              onClick={() => handleDateRangeChange(range.key)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                 dateRange === range.key
                   ? 'bg-teal-500 text-white shadow-sm'
@@ -637,15 +670,14 @@ export function FinanceDashboardClient() {
               <h3 className="text-sm font-semibold text-gray-900">Transacciones Recientes</h3>
               <p className="text-xs text-gray-500">Últimas transacciones registradas</p>
             </div>
-            <button className="text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors">
-              Ver todas
-            </button>
+            <span className="text-xs text-gray-400 font-medium">
+              {transactions.length} en total
+            </span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-50">
-                  <th className="text-left px-5 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">ID</th>
                   <th className="text-left px-5 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Usuario</th>
                   <th className="text-left px-5 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Plan</th>
                   <th className="text-right px-5 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Monto</th>
@@ -657,21 +689,20 @@ export function FinanceDashboardClient() {
               <tbody className="divide-y divide-gray-50">
                 {transactionsLoading ? (
                   <tr>
-                    <td colSpan={7} className="px-5 py-10 text-center">
+                    <td colSpan={6} className="px-5 py-10 text-center">
                       <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
                     </td>
                   </tr>
-                ) : transactions.length === 0 ? (
+                ) : visibleTransactions.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-5 py-10 text-center">
+                    <td colSpan={6} className="px-5 py-10 text-center">
                       <DollarSign className="w-8 h-8 text-gray-200 mx-auto mb-2" />
                       <p className="text-xs text-gray-400">No hay transacciones recientes</p>
                     </td>
                   </tr>
                 ) : (
-                  transactions.map((t: any) => (
+                  visibleTransactions.map((t: any) => (
                     <tr key={t.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-5 py-3 text-xs font-mono text-gray-400">#{String(t.id).slice(0, 8)}</td>
                       <td className="px-5 py-3">
                         <span className="text-xs font-medium text-gray-900">{t.userEmail || '—'}</span>
                       </td>
@@ -704,11 +735,14 @@ export function FinanceDashboardClient() {
               </tbody>
             </table>
           </div>
-          {/* Ver todas — centrado abajo */}
-          {transactions.length > 0 && (
+          {/* Ver más — paginación incremental */}
+          {hasMore && (
             <div className="px-5 py-3 border-t border-gray-50 text-center">
-              <button className="text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors">
-                Ver todas las transacciones →
+              <button
+                onClick={() => setVisibleCount(prev => prev + 5)}
+                className="text-xs font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
+              >
+                Ver {Math.min(5, transactions.length - visibleCount)} más de {transactions.length - visibleCount} restantes →
               </button>
             </div>
           )}
