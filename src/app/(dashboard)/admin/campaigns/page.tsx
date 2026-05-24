@@ -7,6 +7,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   useMarketingStats,
   usePromotionCampaigns,
@@ -181,6 +182,7 @@ function ActivityItem({ icon, iconBg, iconColor, title, subtitle, time }: {
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 export default function AdminCampaignsDashboard() {
+  const router = useRouter();
   const [chartPeriod, setChartPeriod] = useState<'Diario' | 'Semanal' | 'Mensual'>('Diario');
   const [statusFilter, setStatusFilter] = useState('Todos los estados');
 
@@ -427,7 +429,10 @@ export default function AdminCampaignsDashboard() {
             <ChevronDown className="w-4 h-4 text-gray-400" />
           </button>
           {/* CTA */}
-          <button className="flex items-center gap-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
+          <button
+            onClick={() => router.push('/admin/marketing/campaigns')}
+            className="flex items-center gap-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
+          >
             <Zap className="w-4 h-4" /> Nueva Campaña
           </button>
         </div>
@@ -680,7 +685,10 @@ export default function AdminCampaignsDashboard() {
           <div>
             <h3 className="text-base font-semibold text-gray-900">Campañas Activas</h3>
           </div>
-          <button className="text-sm font-semibold text-teal-600 hover:text-teal-700 transition-colors">
+          <button
+            onClick={() => router.push('/admin/marketing/campaigns')}
+            className="text-sm font-semibold text-teal-600 hover:text-teal-700 transition-colors"
+          >
             Ver todas las campañas →
           </button>
         </div>
