@@ -37,7 +37,7 @@ export function PaymentConfirmationClient({ paymentId }: Props) {
 
       // 3. Redirigir a plans después de 3 segundos para ver el plan activado
       const timer = setTimeout(() => {
-        router.push('/dashboard/plans');
+        router.push('/plans');
       }, 3000);
 
       return () => clearTimeout(timer);
@@ -60,7 +60,7 @@ export function PaymentConfirmationClient({ paymentId }: Props) {
               Redirigiendo en 3 segundos...
             </p>
             <button
-              onClick={() => router.push('/dashboard/plans')}
+              onClick={() => router.push('/plans')}
               className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
             >
               Ver mi plan ahora
