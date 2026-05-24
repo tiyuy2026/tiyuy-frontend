@@ -465,10 +465,10 @@ export function FinanceDashboardClient() {
         />
       </div>
 
-      {/* ── Charts Section — 3 columnas en una fila ────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* ── Charts Section — 4 columnas en una fila ────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
 
-        {/* Line Chart - ocupa 2/3 */}
+        {/* Line Chart - ocupa 2/4 */}
         <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
           <div className="flex items-center justify-between mb-3">
             <div>
@@ -549,11 +549,8 @@ export function FinanceDashboardClient() {
           </div>
         </div>
 
-        {/* Right Column — Pie + Resumen Rápido en 1/3, apilados verticalmente */}
-        <div className="flex flex-col gap-4">
-
-          {/* Pie Chart */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex-1">
+        {/* Pie Chart */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
             <h3 className="text-sm font-semibold text-gray-900 mb-0.5">Ingresos por Plan</h3>
             <p className="text-xs text-gray-500 mb-3">Distribución de ingresos</p>
             <div className="h-32">
@@ -620,8 +617,6 @@ export function FinanceDashboardClient() {
               </div>
             </div>
           </div>
-
-        </div>
       </div>
 
       {/* ── Transactions Table + Activity Feed ─────────────────────────── */}
