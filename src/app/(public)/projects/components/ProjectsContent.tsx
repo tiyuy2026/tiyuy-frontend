@@ -59,7 +59,7 @@ export default function ProjectsContent() {
               </p>
             </div>
             
-            <FeaturedProjects />
+            <FeaturedProjects hideViewAll />
           </div>
         </div>
       </section>
