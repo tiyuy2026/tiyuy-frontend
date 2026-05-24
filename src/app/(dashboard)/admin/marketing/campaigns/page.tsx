@@ -1,19 +1,25 @@
 /**
  * Marketing Campaigns Page
- * CRUD for promotion campaigns
+ * Premium SaaS-style CRUD for promotion campaigns
  */
 
 'use client';
 
 import { useState } from 'react';
 import { usePromotionCampaigns, useCreatePromotionCampaign, useUpdatePromotionCampaign, useDeletePromotionCampaign } from '@/presentation/hooks/useAdmin';
-import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/Card';
 import { Modal } from '@/presentation/components/ui/Modal';
 import { Input } from '@/presentation/components/ui/Input';
-import { Button } from '@/presentation/components/ui/Button';
 import { LoadingState, EmptyState, ErrorState } from '@/presentation/components/admin/AdminUIStates';
 import { PromotionCampaign, CreatePromotionCampaignRequest, UpdatePromotionCampaignRequest } from '@/core/domain/entities/Admin';
+import { Megaphone, Plus, Search, Edit3, Trash2, Eye, EyeOff } from 'lucide-react';
 
+const STATUS_STYLES: Record<string, string> = {
+  ACTIVE: 'bg-emerald-50 text-emerald-700',
+  INACTIVE: 'bg-gray-100 text-gray-600',
+  SCHEDULED: 'bg-blue-50 text-blue-700',
+  EXPIRED: 'bg-red-50 text-red-700',
+  PENDING: 'bg-amber-50 text-amber-700',
+};
 
 export default function MarketingCampaignsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -41,7 +47,7 @@ export default function MarketingCampaignsPage() {
       setIsCreateModalOpen(false);
       refetch();
     } catch (error) {
-      console.error('Error al crear campania:', error);
+      console.error('Error al crear campaña:', error);
     }
   };
 
@@ -54,31 +60,27 @@ export default function MarketingCampaignsPage() {
     if (!selectedCampaign) return;
     try {
       await updateMutation.mutateAsync({ id: selectedCampaign.id, request: formData });
-
       setIsEditModalOpen(false);
       setSelectedCampaign(null);
       refetch();
     } catch (error) {
-      console.error('Error al actualizar campania:', error);
+      console.error('Error al actualizar campaña:', error);
     }
   };
 
   const handleDelete = async (campaignId: number) => {
-    if (!confirm('¿Estas seguro de eliminar esta campania?')) return;
+    if (!confirm('¿Estás seguro de eliminar esta campaña?')) return;
     try {
       await deleteMutation.mutateAsync(campaignId);
       refetch();
     } catch (error) {
-      console.error('Error al eliminar campania:', error);
+      console.error('Error al eliminar campaña:', error);
     }
   };
 
   const handleToggleStatus = async (campaign: PromotionCampaign) => {
     const newStatus = campaign.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
     try {
-      if (!selectedCampaign) {
-        setSelectedCampaign(campaign);
-      }
       await updateMutation.mutateAsync({ id: campaign.id, request: { status: newStatus } });
       refetch();
     } catch (error) {
@@ -86,123 +88,141 @@ export default function MarketingCampaignsPage() {
     }
   };
 
-  if (isLoading) return <LoadingState message="Cargando campanias..." />;
-  if (error) return <ErrorState message="Error al cargar campanias." retry={refetch} />;
+  if (isLoading) return <LoadingState message="Cargando campañas..." />;
+  if (error) return <ErrorState message="Error al cargar campañas." retry={refetch} />;
 
   if (filteredCampaigns.length === 0) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 pb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Campanias de Marketing</h2>
-            <p className="text-gray-600">Administra campanias promocionales</p>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Campañas de Marketing</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Administra campañas promocionales</p>
           </div>
-          <Button onClick={() => setIsCreateModalOpen(true)}>Crear Campania</Button>
+          <button onClick={() => setIsCreateModalOpen(true)} className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-sm font-medium rounded-xl hover:shadow-md transition-all">
+            <Plus className="w-4 h-4" /> Crear Campaña
+          </button>
         </div>
         <EmptyState
-          title="Sin campanias"
-          description={searchQuery || statusFilter !== 'all' ? "Ajusta tu busqueda." : "Crea tu primera campania promocional."}
-          action={{ label: "Crear Campania", onClick: () => setIsCreateModalOpen(true) }}
+          title="Sin campañas"
+          description={searchQuery || statusFilter !== 'all' ? "Ajusta tu búsqueda." : "Crea tu primera campaña promocional."}
+          action={{ label: "Crear Campaña", onClick: () => setIsCreateModalOpen(true) }}
         />
         <CampaignModal
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           onSubmit={handleCreate}
-          title="Crear Campania"
+          title="Crear Campaña"
         />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 pb-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Campanias de Marketing</h2>
-          <p className="text-gray-600">Administra campanias promocionales</p>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Campañas de Marketing</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Administra campañas promocionales</p>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)}>Crear Campania</Button>
+        <button onClick={() => setIsCreateModalOpen(true)} className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-sm font-medium rounded-xl hover:shadow-md transition-all">
+          <Plus className="w-4 h-4" /> Crear Campaña
+        </button>
       </div>
 
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex gap-4">
-            <Input
-              placeholder="Buscar campanias..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1"
-            />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="all">Todos</option>
-              <option value="ACTIVE">Activas</option>
-              <option value="INACTIVE">Inactivas</option>
-              <option value="SCHEDULED">Programadas</option>
-              <option value="EXPIRED">Expiradas</option>
-            </select>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Search + Filter */}
+      <div className="flex gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            placeholder="Buscar campañas..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
+          />
+        </div>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
+        >
+          <option value="all">Todos</option>
+          <option value="ACTIVE">Activas</option>
+          <option value="INACTIVE">Inactivas</option>
+          <option value="SCHEDULED">Programadas</option>
+          <option value="EXPIRED">Expiradas</option>
+        </select>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredCampaigns.map((campaign) => (
-          <Card key={campaign.id} className="relative">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{campaign.title}</CardTitle>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  campaign.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                  campaign.status === 'SCHEDULED' ? 'bg-blue-100 text-blue-800' :
-                  campaign.status === 'EXPIRED' ? 'bg-red-100 text-red-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>{campaign.status}</span>
-              </div>
-              {campaign.description && <p className="text-sm text-gray-600 mt-1">{campaign.description}</p>}
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Tipo:</span>
-                  <span className="text-sm">{campaign.promotionType}</span>
+          <div key={campaign.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 hover:shadow-md transition-all">
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                  campaign.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-600' :
+                  campaign.status === 'SCHEDULED' ? 'bg-blue-50 text-blue-600' :
+                  campaign.status === 'EXPIRED' ? 'bg-red-50 text-red-600' :
+                  'bg-gray-100 text-gray-400'
+                }`}>
+                  <Megaphone className="w-4 h-4" />
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Ubicacion:</span>
-                  <span className="text-sm">{campaign.placementLocation}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Inicio:</span>
-                  <span className="text-sm">{new Date(campaign.startDate).toLocaleDateString()}</span>
-                </div>
-                {campaign.endDate && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Fin:</span>
-                    <span className="text-sm">{new Date(campaign.endDate).toLocaleDateString()}</span>
-                  </div>
-                )}
-                {campaign.pricePaid && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Precio:</span>
-                    <span className="text-sm font-semibold">{campaign.currency || 'USD'} {campaign.pricePaid.toLocaleString()}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Rendimiento:</span>
-                  <span className="text-sm">{campaign.impressions || 0} imp / {campaign.clicks || 0} clics</span>
-                </div>
-                <div className="flex gap-2 pt-3 border-t">
-                  <Button variant="outline" size="sm" onClick={() => handleEdit(campaign)}>Editar</Button>
-                  <Button variant="outline" size="sm" onClick={() => handleToggleStatus(campaign)}>
-                    {campaign.status === 'ACTIVE' ? 'Desactivar' : 'Activar'}
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleDelete(campaign.id)} className="text-red-600">Eliminar</Button>
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900">{campaign.title}</h3>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[campaign.status] || 'bg-gray-100 text-gray-600'}`}>
+                    {campaign.status}
+                  </span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            {campaign.description && (
+              <p className="text-xs text-gray-500 mb-3 line-clamp-2">{campaign.description}</p>
+            )}
+            <div className="space-y-1.5 text-xs">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Tipo</span>
+                <span className="font-medium text-gray-700">{campaign.promotionType}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Ubicación</span>
+                <span className="font-medium text-gray-700">{campaign.placementLocation}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Inicio</span>
+                <span className="font-medium text-gray-700">{new Date(campaign.startDate).toLocaleDateString('es-PE')}</span>
+              </div>
+              {campaign.endDate && (
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Fin</span>
+                  <span className="font-medium text-gray-700">{new Date(campaign.endDate).toLocaleDateString('es-PE')}</span>
+                </div>
+              )}
+              {campaign.pricePaid && (
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Precio</span>
+                  <span className="font-semibold text-gray-900">{campaign.currency || 'USD'} {campaign.pricePaid.toLocaleString()}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-gray-400">Rendimiento</span>
+                <span className="font-medium text-gray-700">{(campaign.impressions || 0).toLocaleString('es-PE')} imp / {(campaign.clicks || 0).toLocaleString('es-PE')} clics</span>
+              </div>
+            </div>
+            <div className="flex gap-2 mt-3 pt-3 border-t border-gray-50">
+              <button onClick={() => handleEdit(campaign)} className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+                <Edit3 className="w-3 h-3" /> Editar
+              </button>
+              <button onClick={() => handleToggleStatus(campaign)} className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+                {campaign.status === 'ACTIVE' ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                {campaign.status === 'ACTIVE' ? 'Desactivar' : 'Activar'}
+              </button>
+              <button onClick={() => handleDelete(campaign.id)} className="inline-flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
+                <Trash2 className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
         ))}
       </div>
 
@@ -210,7 +230,7 @@ export default function MarketingCampaignsPage() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreate}
-        title="Crear Campania"
+        title="Crear Campaña"
       />
 
       {selectedCampaign && (
@@ -218,7 +238,7 @@ export default function MarketingCampaignsPage() {
           isOpen={isEditModalOpen}
           onClose={() => { setIsEditModalOpen(false); setSelectedCampaign(null); }}
           onSubmit={(data) => handleUpdate(data)}
-          title="Editar Campania"
+          title="Editar Campaña"
           campaign={selectedCampaign}
         />
       )}
@@ -262,17 +282,17 @@ function CampaignModal({ isOpen, onClose, onSubmit, title, campaign }: CampaignM
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-lg p-6 max-w-md w-full">
-        <h3 className="text-lg font-semibold mb-4">{title}</h3>
+      <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input label="Titulo" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
+          <Input label="Título" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Descripcion</label>
-            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Promocion</label>
-            <select value={formData.promotionType} onChange={(e) => setFormData({ ...formData, promotionType: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Promoción</label>
+            <select value={formData.promotionType} onChange={(e) => setFormData({ ...formData, promotionType: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all">
               <option value="BANNER">Banner</option>
               <option value="SLIDER">Slider</option>
               <option value="HOME_SPOTLIGHT">Spotlight Principal</option>
@@ -280,16 +300,16 @@ function CampaignModal({ isOpen, onClose, onSubmit, title, campaign }: CampaignM
               <option value="FEATURED_PROJECT">Proyecto Destacado</option>
               <option value="RECOMMENDED">Recomendado</option>
               <option value="PREMIUM_AD">Anuncio Premium</option>
-              <option value="SEARCH_BOOST">Boost en Busqueda</option>
+              <option value="SEARCH_BOOST">Boost en Búsqueda</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicacion</label>
-            <select value={formData.placementLocation} onChange={(e) => setFormData({ ...formData, placementLocation: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación</label>
+            <select value={formData.placementLocation} onChange={(e) => setFormData({ ...formData, placementLocation: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all">
               <option value="HOME_MAIN">Home - Principal</option>
               <option value="HOME_SPOTLIGHT">Home - Spotlight</option>
               <option value="HOME_BANNER">Home - Banner</option>
-              <option value="SEARCH_RESULTS">Resultados de Busqueda</option>
+              <option value="SEARCH_RESULTS">Resultados de Búsqueda</option>
               <option value="PROPERTY_DETAIL">Detalle de Propiedad</option>
               <option value="PROJECT_DETAIL">Detalle de Proyecto</option>
               <option value="PROPERTY_LIST">Lista de Propiedades</option>
@@ -299,7 +319,7 @@ function CampaignModal({ isOpen, onClose, onSubmit, title, campaign }: CampaignM
               <option value="BANNER_TOP">Banner Superior</option>
               <option value="BANNER_BOTTOM">Banner Inferior</option>
               <option value="RECOMMENDED">Recomendado</option>
-              <option value="CATEGORY_PAGE">Pagina de Categoria</option>
+              <option value="CATEGORY_PAGE">Página de Categoría</option>
             </select>
           </div>
           <Input label="Fecha Inicio" type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} required />
@@ -309,8 +329,12 @@ function CampaignModal({ isOpen, onClose, onSubmit, title, campaign }: CampaignM
           <Input label="URL de Imagen" value={formData.imageUrl} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })} />
           <Input label="URL de Destino" value={formData.linkUrl} onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })} />
           <div className="flex gap-3 pt-4">
-            <Button type="submit" className="flex-1">{campaign ? 'Actualizar' : 'Crear'} Campania</Button>
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
+            <button type="submit" className="flex-1 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-sm font-medium rounded-xl hover:shadow-md transition-all">
+              {campaign ? 'Actualizar' : 'Crear'} Campaña
+            </button>
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 bg-gray-50 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-100 transition-all">
+              Cancelar
+            </button>
           </div>
         </form>
       </div>
