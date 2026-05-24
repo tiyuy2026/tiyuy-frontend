@@ -573,33 +573,33 @@ export class AdminRepository implements IAdminRepository {
   async getAdminSubscriptions(
     status?: string,
     pagination?: PaginationParams
-  ): Promise<PaginatedResponse<any>> {
+  ): Promise<any> {
     const searchParams = new URLSearchParams();
     if (status) searchParams.append('status', status);
     if (pagination?.page !== undefined) searchParams.append('page', pagination.page.toString());
     if (pagination?.size !== undefined) searchParams.append('size', pagination.size.toString());
     if (pagination?.sort) searchParams.append('sort', pagination.sort);
 
-    const response = await axiosClient.get(`/finance/subscriptions/admin?${searchParams.toString()}`);
+    const response = await axiosClient.get(`${this.basePath}/reports/subscriptions/active?${searchParams.toString()}`);
     return response.data;
   }
 
   async getPaymentTransactions(
     status?: string,
     pagination?: PaginationParams
-  ): Promise<PaginatedResponse<any>> {
+  ): Promise<any> {
     const searchParams = new URLSearchParams();
     if (status) searchParams.append('status', status);
     if (pagination?.page !== undefined) searchParams.append('page', pagination.page.toString());
     if (pagination?.size !== undefined) searchParams.append('size', pagination.size.toString());
     if (pagination?.sort) searchParams.append('sort', pagination.sort);
 
-    const response = await axiosClient.get(`/finance/transactions/admin?${searchParams.toString()}`);
+    const response = await axiosClient.get(`${this.basePath}/reports/dashboard?${searchParams.toString()}`);
     return response.data;
   }
 
   async refundTransaction(transactionId: number, reason: string): Promise<void> {
-    await axiosClient.post(`/finance/transactions/${transactionId}/refund`, { reason });
+    await axiosClient.post(`${this.basePath}/reports/subscriptions/${transactionId}/cancel?reason=${encodeURIComponent(reason)}`);
   }
 
   // Automation

@@ -206,7 +206,7 @@ export function FinanceDashboardClient() {
   // ── Data Hooks ──
   const { data: financeStats } = useFinanceStats();
   const { data: history, isLoading: historyLoading } = useFinanceHistory(dateRange);
-  const { data: transactionsData, isLoading: transactionsLoading } = usePaymentTransactions(undefined, { page: 0, size: 10 });
+  const { data: dashboardData, isLoading: transactionsLoading } = usePaymentTransactions(undefined, { page: 0, size: 10 });
   const { data: subscriptionsData } = useAdminSubscriptions(undefined, { page: 0, size: 100 });
   const { data: plansData } = useSubscriptionPlans();
 
@@ -214,17 +214,22 @@ export function FinanceDashboardClient() {
 
   // ── Derived Stats ──
   const stats = useMemo(() => {
-    const transactions = transactionsData?.content || [];
-    const subscriptions = subscriptionsData?.content || [];
+    // Dashboard data from /admin/reports/dashboard - it's a Map<string, object>, not PaginatedResponse
+    const dashboard = (dashboardData || {}) as Record<string, any>;
+    const summary = dashboard.summary || {};
+    const failedPaymentsList = Array.isArray(dashboard.failedPayments) ? dashboard.failedPayments : [];
+    const pendingSubscriptions = Array.isArray(dashboard.pendingSubscriptions) ? dashboard.pendingSubscriptions : [];
+    
+    // Subscriptions data from /admin/reports/subscriptions/active - it's a List, not PaginatedResponse
+    const subscriptions = Array.isArray(subscriptionsData) ? subscriptionsData : [];
 
-    const totalRevenue = financeStats?.totalRevenue ?? 0;
+    const totalRevenue = financeStats?.totalRevenue ?? summary?.monto_total_soles ?? 0;
     const monthlyRevenue = financeStats?.revenueThisMonth ?? 0;
-    const activeSubscriptions = financeStats?.activeSubscriptions ?? subscriptions.filter(s => s.status === 'ACTIVE').length;
-    const totalCommissions = transactions
-      .filter(t => t.type === 'PAYMENT' && t.status === 'COMPLETED')
-      .reduce((sum, t) => sum + t.amount * 0.1, 0);
-    const pendingPayments = transactions.filter(t => t.status === 'PENDING').length;
-    const failedPayments = transactions.filter(t => t.status === 'FAILED').length;
+    const activeSubscriptions = financeStats?.activeSubscriptions ?? 
+      subscriptions.reduce((sum: number, s: any) => sum + (Number(s.suscripciones_activas) || 0), 0);
+    const totalCommissions = Number(summary?.monto_total_soles ?? 0) * 0.1;
+    const pendingPayments = Number(summary?.pagos_pendientes ?? pendingSubscriptions.length ?? 0);
+    const failedPayments = Number(summary?.pagos_fallidos ?? failedPaymentsList.length ?? 0);
 
     return {
       totalRevenue,
@@ -240,7 +245,7 @@ export function FinanceDashboardClient() {
       pendingGrowth: -3.1,
       failedGrowth: -2.4,
     };
-  }, [financeStats, transactionsData, subscriptionsData, history]);
+  }, [financeStats, dashboardData, subscriptionsData, history]);
 
   // ── Chart Data ──
   const lineChartData = useMemo(() => {
@@ -272,54 +277,98 @@ export function FinanceDashboardClient() {
   // ── Activity Feed Data ──
   const activityFeed = useMemo(() => {
     const items: ActivityItem[] = [];
-    const transactions = transactionsData?.content || [];
+    
+    // Build activity from dashboard data
+    const dashboard = (dashboardData || {}) as Record<string, any>;
+    const failedPaymentsList = Array.isArray(dashboard.failedPayments) ? dashboard.failedPayments : [];
+    const pendingSubs = Array.isArray(dashboard.pendingSubscriptions) ? dashboard.pendingSubscriptions : [];
+    const activeSubs = Array.isArray(subscriptionsData) ? subscriptionsData : [];
 
-    transactions.slice(0, 8).forEach((t: any) => {
-      const time = new Date(t.createdAt).toLocaleDateString('es-PE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      if (t.status === 'COMPLETED' || t.status === 'APPROVED') {
-        items.push({
-          id: `approved-${t.id}`,
-          type: 'payment_approved',
-          user: t.userEmail || 'Usuario',
-          amount: formatCurrency(t.amount),
-          time,
-        });
-      } else if (t.status === 'FAILED' || t.status === 'REJECTED') {
-        items.push({
-          id: `rejected-${t.id}`,
-          type: 'payment_rejected',
-          user: t.userEmail || 'Usuario',
-          amount: formatCurrency(t.amount),
-          time,
-        });
-      } else if (t.status === 'PENDING') {
-        items.push({
-          id: `pending-${t.id}`,
-          type: 'payment_pending',
-          user: t.userEmail || 'Usuario',
-          amount: formatCurrency(t.amount),
-          time,
-        });
-      }
-    });
-
-    // Add some subscription events
-    const subscriptions = subscriptionsData?.content || [];
-    subscriptions.slice(0, 3).forEach((s: any) => {
+    failedPaymentsList.slice(0, 3).forEach((t: any) => {
       items.push({
-        id: `sub-${s.id}`,
-        type: 'new_subscription',
-        user: s.userEmail || 'Usuario',
-        plan: s.tier,
-        time: new Date(s.createdAt).toLocaleDateString('es-PE', { month: 'short', day: 'numeric' }),
+        id: `rejected-${t.pago_id || t.id}`,
+        type: 'payment_rejected',
+        user: t.email || 'Usuario',
+        amount: formatCurrency(Number(t.monto_intentado) || 0),
+        time: t.fecha_intento ? new Date(t.fecha_intento).toLocaleDateString('es-PE', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '',
       });
     });
 
-    return items.sort((a, b) => b.time.localeCompare(a.time)).slice(0, 10);
-  }, [transactionsData, subscriptionsData]);
+    pendingSubs.slice(0, 3).forEach((t: any) => {
+      items.push({
+        id: `pending-${t.suscripcion_id || t.id}`,
+        type: 'payment_pending',
+        user: t.email || 'Usuario',
+        amount: formatCurrency(Number(t.precio_final) || 0),
+        plan: t.plan,
+        time: t.fecha_creacion ? new Date(t.fecha_creacion).toLocaleDateString('es-PE', { month: 'short', day: 'numeric' }) : '',
+      });
+    });
+
+    activeSubs.slice(0, 4).forEach((s: any) => {
+      items.push({
+        id: `sub-${s.plan || Math.random()}`,
+        type: 'new_subscription',
+        user: `${s.suscripciones_activas || 0} activas`,
+        plan: s.plan,
+        time: s.proxima_expiracion ? new Date(s.proxima_expiracion).toLocaleDateString('es-PE', { month: 'short', day: 'numeric' }) : '',
+      });
+    });
+
+    return items.slice(0, 10);
+  }, [dashboardData, subscriptionsData]);
 
   // ── Transactions for Table ──
-  const transactions = transactionsData?.content || [];
+  // Build transactions from dashboard data
+  const transactions = useMemo(() => {
+    const items: any[] = [];
+    const dashboard = (dashboardData || {}) as Record<string, any>;
+    const failedPaymentsList = Array.isArray(dashboard.failedPayments) ? dashboard.failedPayments : [];
+    const pendingSubs = Array.isArray(dashboard.pendingSubscriptions) ? dashboard.pendingSubscriptions : [];
+    const monthlyRevenues = Array.isArray(dashboard.monthlyRevenues) ? dashboard.monthlyRevenues : [];
+    const topPayers = Array.isArray(dashboard.topPayers) ? dashboard.topPayers : [];
+
+    // Map failed payments as transactions
+    failedPaymentsList.forEach((t: any) => {
+      items.push({
+        id: t.pago_id || `failed-${Math.random()}`,
+        userEmail: t.email || '—',
+        type: 'PAYMENT',
+        amount: Number(t.monto_intentado) || 0,
+        status: 'FAILED',
+        paymentMethod: t.metodo_pago || '—',
+        createdAt: t.fecha_intento || new Date().toISOString(),
+      });
+    });
+
+    // Map top payers as completed transactions
+    topPayers.forEach((t: any) => {
+      items.push({
+        id: `payer-${t.email || Math.random()}`,
+        userEmail: t.nombre_usuario || t.email || '—',
+        type: 'PAYMENT',
+        amount: Number(t.total_pagado_soles) || 0,
+        status: 'COMPLETED',
+        paymentMethod: t.metodos_usados || '—',
+        createdAt: t.ultimo_pago || new Date().toISOString(),
+      });
+    });
+
+    // Map pending subscriptions
+    pendingSubs.forEach((t: any) => {
+      items.push({
+        id: `pending-${t.suscripcion_id || Math.random()}`,
+        userEmail: t.email || '—',
+        type: t.plan || 'SUBSCRIPTION',
+        amount: Number(t.precio_final) || 0,
+        status: 'PENDING',
+        paymentMethod: '—',
+        createdAt: t.fecha_creacion || new Date().toISOString(),
+      });
+    });
+
+    return items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 10);
+  }, [dashboardData]);
 
   // ── Date Range Options ──
   const dateRanges = [
@@ -551,7 +600,7 @@ export function FinanceDashboardClient() {
               <div className="flex items-center justify-between py-2 border-b border-gray-50">
                 <span className="text-sm text-gray-500">Total Transacciones</span>
                 <span className="text-sm font-semibold text-gray-900">
-                  {financeStats?.totalTransactions ?? transactionsData?.totalElements ?? 0}
+                  {financeStats?.totalTransactions ?? 0}
                 </span>
               </div>
               <div className="flex items-center justify-between py-2 border-b border-gray-50">
@@ -569,7 +618,7 @@ export function FinanceDashboardClient() {
               <div className="flex items-center justify-between py-2">
                 <span className="text-sm text-gray-500">Total Suscripciones</span>
                 <span className="text-sm font-semibold text-gray-900">
-                  {financeStats?.totalSubscriptions ?? subscriptionsData?.totalElements ?? 0}
+                  {financeStats?.totalSubscriptions ?? (Array.isArray(subscriptionsData) ? subscriptionsData.length : 0)}
                 </span>
               </div>
             </div>
