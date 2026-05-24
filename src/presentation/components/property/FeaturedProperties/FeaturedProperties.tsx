@@ -6,7 +6,11 @@ import { PropertyCard } from '../PropertyCard/PropertyCard';
 import { PropertySummary } from '@/core/domain/entities/Property';
 import { PropertyRepository } from '@/infrastructure/repositories/PropertyRepository';
 
-export function FeaturedProperties() {
+interface FeaturedPropertiesProps {
+  hideViewAll?: boolean;
+}
+
+export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesProps = {}) {
   const [properties, setProperties] = useState<PropertySummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,13 +21,13 @@ export function FeaturedProperties() {
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -340, behavior: 'smooth' });
+      scrollContainerRef.current.scrollBy({ left: -scrollContainerRef.current.clientWidth, behavior: 'smooth' });
     }
   };
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 340, behavior: 'smooth' });
+      scrollContainerRef.current.scrollBy({ left: scrollContainerRef.current.clientWidth, behavior: 'smooth' });
     }
   };
 
@@ -36,7 +40,7 @@ export function FeaturedProperties() {
         console.log('🔍 Cargando propiedades destacadas...');
         
         // Cargar propiedades destacadas (isFeatured: true)
-        const result = await propertyRepo.getFeaturedProperties(0, 8); // Aumentamos a 8 para más variedad
+        const result = await propertyRepo.getFeaturedProperties(0, 15);
         console.log('✅ Propiedades destacadas recibidas:', result);
         setProperties(result.properties || []);
         
@@ -44,7 +48,7 @@ export function FeaturedProperties() {
         if (!result.properties || result.properties.length === 0) {
           console.log('⚠️ No hay propiedades destacadas, cargando propiedades recientes...');
           try {
-            const recentResult = await propertyRepo.getMyProperties(0, 8);
+            const recentResult = await propertyRepo.getMyProperties(0, 15);
             console.log('✅ Propiedades recientes recibidas:', recentResult);
             setProperties(recentResult.properties || []);
           } catch (recentError) {
@@ -69,7 +73,7 @@ export function FeaturedProperties() {
     const interval = setInterval(() => {
       const refreshProperties = async () => {
         try {
-          const result = await propertyRepo.getFeaturedProperties(0, 8);
+          const result = await propertyRepo.getFeaturedProperties(0, 15);
           if (result.properties && result.properties.length > 0) {
             setProperties(result.properties);
           }
@@ -87,8 +91,9 @@ export function FeaturedProperties() {
   if (isLoading) {
     return (
       <div className="relative">
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex gap-4 sm:gap-5 md:gap-6 pb-4 w-max mx-auto">
+        <div className="flex overflow-x-auto scrollbar-hide">
+          <div className="flex-1 min-w-0" />
+          <div className="flex gap-4 sm:gap-5 md:gap-6 pb-4 px-4 flex-shrink-0">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <div key={i} className="w-[85vw] sm:w-[280px] md:w-[320px] lg:w-[240px] xl:w-[190px] 2xl:w-[220px] flex-shrink-0">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
@@ -103,6 +108,7 @@ export function FeaturedProperties() {
               </div>
             ))}
           </div>
+          <div className="flex-1 min-w-0" />
         </div>
       </div>
     );
@@ -141,12 +147,22 @@ export function FeaturedProperties() {
   }
 
   return (
-    <div className="w-full relative group/carousel">
+    <>
+      <style>{`
+        .carousel-wrapper-dynamic {
+          max-width: calc(2 * 280px + 8.25rem);
+        }
+        @media (min-width: 768px) { .carousel-wrapper-dynamic { max-width: calc(2 * 330px + 10.5rem); } }
+        @media (min-width: 1024px) { .carousel-wrapper-dynamic { max-width: calc(3 * 280px + 12rem); } }
+        @media (min-width: 1280px) { .carousel-wrapper-dynamic { max-width: calc(5 * 210px + 15rem); } }
+        @media (min-width: 1536px) { .carousel-wrapper-dynamic { max-width: calc(6 * 230px + 16.5rem); } }
+      `}</style>
+      <div className="w-full mx-auto relative group/carousel carousel-wrapper-dynamic px-12 md:px-16">
 
       {/* Flechas de navegación */}
       <button
         onClick={scrollLeft}
-        className="absolute left-0 top-[40%] -translate-y-1/2 -translate-x-4 z-20 bg-white shadow-md border border-gray-100 rounded-full p-2 hover:scale-105 transition-all duration-200 opacity-0 group-hover/carousel:opacity-100 disabled:opacity-0"
+        className="absolute -left-4 md:-left-8 top-[35%] -translate-y-1/2 z-20 bg-white shadow-md border border-gray-100 rounded-full p-2 hover:scale-105 transition-all duration-200 opacity-0 group-hover/carousel:opacity-100 disabled:opacity-0"
         aria-label="Scroll izquierda"
       >
         <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,7 +172,7 @@ export function FeaturedProperties() {
 
       <button
         onClick={scrollRight}
-        className="absolute right-0 top-[40%] -translate-y-1/2 translate-x-4 z-20 bg-white shadow-md border border-gray-100 rounded-full p-2 hover:scale-105 transition-all duration-200 opacity-0 group-hover/carousel:opacity-100 disabled:opacity-0"
+        className="absolute -right-4 md:-right-8 top-[35%] -translate-y-1/2 z-20 bg-white shadow-md border border-gray-100 rounded-full p-2 hover:scale-105 transition-all duration-200 opacity-0 group-hover/carousel:opacity-100 disabled:opacity-0"
         aria-label="Scroll derecha"
       >
         <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,15 +181,30 @@ export function FeaturedProperties() {
       </button>
       
       {/* Horizontal scroll container */}
-      <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
-        <div className="flex gap-4 sm:gap-5 md:gap-6 pb-4 w-max mx-auto">
+      <div ref={scrollContainerRef} className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
+        <div className="flex-1 min-w-0" />
+        <div className="flex gap-4 sm:gap-5 md:gap-6 pb-4 pl-4 flex-shrink-0">
           {properties.map((property) => (
-            <div key={property.id} className="w-[85vw] sm:w-[280px] md:w-[320px] lg:w-[240px] xl:w-[190px] 2xl:w-[220px] flex-shrink-0 snap-start">
+            <div key={property.id} className="w-[85vw] sm:w-[280px] md:w-[330px] lg:w-[280px] xl:w-[210px] 2xl:w-[230px] flex-shrink-0 snap-start">
               <PropertyCard property={property} />
             </div>
           ))}
+          {/* Tarjeta de Ver Todas */}
+          {!hideViewAll && (
+            <div className="w-[85vw] sm:w-[280px] md:w-[330px] lg:w-[280px] xl:w-[210px] 2xl:w-[230px] flex-shrink-0 snap-start">
+              <Link href="/properties" className="flex flex-col items-center justify-center h-full min-h-[250px] w-full bg-gray-50 hover:bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 transition-colors group">
+                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </div>
+                <span className="text-gray-600 font-medium group-hover:text-blue-600 transition-colors text-center px-4">Ver todas las<br/>propiedades</span>
+              </Link>
+            </div>
+          )}
+          <div className="w-4 flex-shrink-0" />
         </div>
+        <div className="flex-1 min-w-0" />
       </div>
     </div>
+    </>
   );
 }

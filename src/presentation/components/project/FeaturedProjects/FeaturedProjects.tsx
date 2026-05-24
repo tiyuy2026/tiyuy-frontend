@@ -17,7 +17,7 @@ export function FeaturedProjects() {
     <FeaturedItems
       repository={projectRepo}
       ItemCard={ProjectCardWrapper}
-      itemName="proyectos"
+      itemName="proyecto"
       emptyMessage="No hay proyectos destacados disponibles"
       emptyIcon="🏢"
       emptyAction={{

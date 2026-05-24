@@ -376,9 +376,10 @@ export class ProjectRepository implements IProjectRepository {
     try {
       const params = new URLSearchParams();
       if (district) params.append('district', district);
-      params.append('size', '5');
+      params.append('size', '15');
+      params.append('sort', 'createdAt,desc');
 
-      const response = await publicApiClient.get(`/projects/featured?${params.toString()}`);
+      const response = await publicApiClient.get(`/projects/search?${params.toString()}`);
       
       // Mapear media a images y coverImageUrl solo si el backend devuelve media como array de objetos
       const content = (response.data.content || []).map((project: any) => {
