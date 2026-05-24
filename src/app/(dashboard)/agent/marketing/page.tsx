@@ -70,10 +70,6 @@ export default function AgentMarketingDashboardPage() {
               <p className="font-medium text-gray-900">Gestionar Banners</p>
               <p className="text-sm text-gray-500">Administra tus banners publicitarios</p>
             </Link>
-            <Link href="/agent/marketing/pricing" className="block p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-              <p className="font-medium text-gray-900">Ver Precios</p>
-              <p className="text-sm text-gray-500">Consulta los precios por ubicacion</p>
-            </Link>
           </div>
         </Card>
 

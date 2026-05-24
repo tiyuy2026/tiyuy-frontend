@@ -36,12 +36,10 @@ export default function DashboardMarketingPage() {
     ? [
         { href: '/agent/marketing/campaigns', label: 'Mis Campañas', icon: Megaphone, desc: 'Crea y administra campañas', color: 'bg-blue-50 text-blue-600' },
         { href: '/agent/marketing/banners', label: 'Mis Banners', icon: Image, desc: 'Administra tus banners', color: 'bg-purple-50 text-purple-600' },
-        { href: '/agent/marketing/pricing', label: 'Ver Precios', icon: DollarSign, desc: 'Consulta precios por ubicación', color: 'bg-green-50 text-green-600' },
       ]
     : [
         { href: '/dashboard/marketing/campaigns', label: 'Mis Campañas', icon: Megaphone, desc: 'Crea y administra campañas', color: 'bg-blue-50 text-blue-600' },
         { href: '/dashboard/marketing/banners', label: 'Mis Banners', icon: Image, desc: 'Administra tus banners', color: 'bg-purple-50 text-purple-600' },
-        { href: '/dashboard/marketing/pricing', label: 'Ver Precios', icon: DollarSign, desc: 'Consulta precios por ubicación', color: 'bg-green-50 text-green-600' },
       ];
 
   if (isLoading) {

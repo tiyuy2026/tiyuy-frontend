@@ -86,10 +86,69 @@ export function useAgentCreateCampaign() {
       agentRepo.createMyCampaign(request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [...AGENT_MARKETING_KEY, 'campaigns'] });
-      toast.success('Campana creada exitosamente');
+      toast.success('Campaña creada exitosamente');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al crear campana');
+      toast.error(error.response?.data?.message || 'Error al crear campaña');
+    },
+  });
+}
+
+export function useAgentUpdateCampaign() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: import('@/core/domain/entities/Admin').UpdatePromotionCampaignRequest }) =>
+      agentRepo.updateMyCampaign(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...AGENT_MARKETING_KEY, 'campaigns'] });
+      toast.success('Campaña actualizada exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al actualizar campaña');
+    },
+  });
+}
+
+export function useAgentDeleteCampaign() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => agentRepo.deleteMyCampaign(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...AGENT_MARKETING_KEY, 'campaigns'] });
+      toast.success('Campaña eliminada exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al eliminar campaña');
+    },
+  });
+}
+
+export function useAgentPayCampaign() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, paymentRequest }: { id: number; paymentRequest: any }) =>
+      agentRepo.payForCampaign(id, paymentRequest),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...AGENT_MARKETING_KEY, 'campaigns'] });
+      toast.success('Pago procesado exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al procesar pago');
+    },
+  });
+}
+
+export function useAgentRenewCampaign() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, paymentRequest }: { id: number; paymentRequest: any }) =>
+      agentRepo.renewCampaign(id, paymentRequest),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...AGENT_MARKETING_KEY, 'campaigns'] });
+      toast.success('Campaña renovada exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al renovar campaña');
     },
   });
 }
@@ -119,6 +178,35 @@ export function useAgentCreateBanner() {
   });
 }
 
+export function useAgentUpdateBanner() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: import('@/core/domain/entities/Admin').CreateBannerRequest }) =>
+      agentRepo.updateMyBanner(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...AGENT_MARKETING_KEY, 'banners'] });
+      toast.success('Banner actualizado exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al actualizar banner');
+    },
+  });
+}
+
+export function useAgentDeleteBanner() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => agentRepo.deleteMyBanner(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...AGENT_MARKETING_KEY, 'banners'] });
+      toast.success('Banner eliminado exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al eliminar banner');
+    },
+  });
+}
+
 export function useAgentPricingList() {
   const { user } = useAuthStore();
   return useQuery({
@@ -131,5 +219,3 @@ export function useAgentPricingList() {
 
 // Re-export Agent type for use in components
 export type { Agent };
-
-

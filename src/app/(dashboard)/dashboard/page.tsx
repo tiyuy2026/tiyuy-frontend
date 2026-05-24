@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, Flame, Home, MessageSquare, Users, Diamond, User, Lock,
-  ChevronDown, LogOut, Building, Megaphone
+  ChevronDown, LogOut, Building, Megaphone, Image, DollarSign, ChevronRight
 } from 'lucide-react';
 import { useActiveSubscription } from '@/presentation/hooks/useFinance';
 import { DashboardHeader } from '@/presentation/components/dashboard/DashboardHeader';
@@ -154,20 +154,9 @@ function DashboardSidebar({
           </Link>
         )}
 
-        {/* Marketing - Normal Link (AGENT and DEVELOPER) */}
+        {/* Marketing - Expandable Submenu (AGENT and DEVELOPER) */}
         {(userRole === 'AGENT' || userRole === 'DEVELOPER') && (
-          <Link
-            href="/dashboard/marketing"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-              pathname === '/dashboard/marketing'
-                ? 'bg-teal-50 text-teal-700 font-medium'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-            }`}
-          >
-            <Megaphone className="w-5 h-5" />
-            <span>Marketing</span>
-            {pathname === '/dashboard/marketing' && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
-          </Link>
+          <MarketingSubmenu userRole={userRole} pathname={pathname} />
         )}
 
         {/* Plans - Normal Link */}
@@ -203,6 +192,65 @@ function DashboardSidebar({
         </div>
       </nav>
     </aside>
+  );
+}
+
+// ─── Marketing Submenu Expandible ────────────────────────────────────────────
+
+function MarketingSubmenu({ userRole, pathname }: { userRole: string; pathname: string }) {
+  const [expanded, setExpanded] = useState(true);
+  const basePath = userRole === 'AGENT' ? '/agent/marketing' : '/dashboard/marketing';
+
+  // Agent/Developer solo ven: Dashboard, Campañas y Banners (Precios solo admin)
+  const subItems = [
+    { label: 'Dashboard', href: basePath, icon: LayoutDashboard },
+    { label: 'Campañas', href: `${basePath}/campaigns`, icon: Megaphone },
+    { label: 'Banners', href: `${basePath}/banners`, icon: Image },
+  ];
+
+  const isActive = subItems.some((si) => pathname.startsWith(si.href));
+
+  return (
+    <div>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${
+          isActive
+            ? 'bg-teal-50 text-teal-700 font-medium'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <Megaphone className="w-5 h-5" />
+        <span className="flex-1">Marketing</span>
+        <ChevronDown
+          className={`w-4 h-4 transition-transform duration-200 ${
+            expanded ? 'rotate-0' : '-rotate-90'
+          }`}
+        />
+      </button>
+
+      {expanded && (
+        <div className="ml-4 mt-1 space-y-0.5 border-l-2 border-teal-100 pl-3">
+          {subItems.map((item) => {
+            const isSubActive = pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${
+                  isSubActive
+                    ? 'bg-teal-50 text-teal-700 font-medium'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                <item.icon className="w-4 h-4" />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
 

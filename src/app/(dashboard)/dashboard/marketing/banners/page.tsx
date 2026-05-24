@@ -1,17 +1,20 @@
 /**
  * Developer Marketing Banners Page
- * Developers can create and manage their own banners
+ * Developers can create, edit, and delete their banners
  */
 
 'use client';
 
 import { useState } from 'react';
-import { useDeveloperMyBanners, useDeveloperCreateBanner } from '@/presentation/hooks/useDeveloper';
-import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/Card';
-import { Modal } from '@/presentation/components/ui/Modal';
-import { Input } from '@/presentation/components/ui/Input';
+import {
+  useDeveloperMyBanners,
+  useDeveloperCreateBanner,
+  useDeveloperUpdateBanner,
+  useDeveloperDeleteBanner,
+} from '@/presentation/hooks/useDeveloper';
 import { Button } from '@/presentation/components/ui/Button';
 import { LoadingState, EmptyState, ErrorState } from '@/presentation/components/admin/AdminUIStates';
+import { BannerCard } from '@/presentation/components/marketing/BannerCard';
 import { Banner, CreateBannerRequest } from '@/core/domain/entities/Admin';
 
 export default function DeveloperMarketingBannersPage() {
@@ -19,6 +22,8 @@ export default function DeveloperMarketingBannersPage() {
 
   const { data: banners, isLoading, error, refetch } = useDeveloperMyBanners();
   const createMutation = useDeveloperCreateBanner();
+  const updateMutation = useDeveloperUpdateBanner();
+  const deleteMutation = useDeveloperDeleteBanner();
 
   const handleCreate = async (formData: CreateBannerRequest) => {
     try {
@@ -28,6 +33,16 @@ export default function DeveloperMarketingBannersPage() {
     } catch (error) {
       console.error('Failed to create banner:', error);
     }
+  };
+
+  const handleEdit = async (id: number, data: CreateBannerRequest) => {
+    await updateMutation.mutateAsync({ id, data });
+    refetch();
+  };
+
+  const handleDelete = async (id: number) => {
+    await deleteMutation.mutateAsync(id);
+    refetch();
   };
 
   if (isLoading) return <LoadingState message="Cargando banners..." />;
@@ -65,40 +80,14 @@ export default function DeveloperMarketingBannersPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {bannerList.map((banner: Banner) => (
-          <Card key={banner.id} className="relative overflow-hidden">
-            {banner.imageUrl && (
-              <div className="h-40 bg-gray-100 overflow-hidden">
-                <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-cover" />
-              </div>
-            )}
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{banner.title}</CardTitle>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  banner.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {banner.isActive ? 'Activo' : 'Inactivo'}
-                </span>
-              </div>
-              {banner.description && <p className="text-sm text-gray-600 mt-1">{banner.description}</p>}
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Ubicacion:</span>
-                  <span className="text-sm">{banner.placement}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Clics:</span>
-                  <span className="text-sm">{banner.clicks || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Impresiones:</span>
-                  <span className="text-sm">{banner.impressions || 0}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <BannerCard
+            key={banner.id}
+            banner={banner}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            isDeleting={deleteMutation.isPending}
+            isUpdating={updateMutation.isPending}
+          />
         ))}
       </div>
 
@@ -138,44 +127,113 @@ function BannerModal({ isOpen, onClose, onSubmit, title }: BannerModalProps) {
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-lg p-6 max-w-md w-full">
-        <h3 className="text-lg font-semibold mb-4">{title}</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input label="Titulo" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Descripcion</label>
-            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={2} className="w-full px-3 py-2 border border-gray-300 rounded-lg" />
-          </div>
-          <Input label="URL de Imagen" value={formData.imageUrl} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })} required />
-          <Input label="URL de Destino" value={formData.linkUrl} onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })} />
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicacion</label>
-            <select value={formData.placement} onChange={(e) => setFormData({ ...formData, placement: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
-              <option value="HOME_MAIN">Home - Principal</option>
-              <option value="HOME_SPOTLIGHT">Home - Spotlight</option>
-              <option value="HOME_BANNER">Home - Banner</option>
-              <option value="SEARCH_RESULTS">Resultados de Busqueda</option>
-              <option value="PROPERTY_DETAIL">Detalle de Propiedad</option>
-              <option value="PROJECT_DETAIL">Detalle de Proyecto</option>
-              <option value="PROPERTY_LIST">Lista de Propiedades</option>
-              <option value="PROJECT_LIST">Lista de Proyectos</option>
-              <option value="SIDEBAR">Barra Lateral</option>
-              <option value="SLIDER">Slider</option>
-              <option value="BANNER_TOP">Banner Superior</option>
-              <option value="BANNER_BOTTOM">Banner Inferior</option>
-              <option value="RECOMMENDED">Recomendado</option>
-              <option value="CATEGORY_PAGE">Pagina de Categoria</option>
-            </select>
-          </div>
-          <Input label="Fecha Inicio" type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} />
-          <Input label="Fecha Fin" type="date" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} />
-          <div className="flex gap-3 pt-4">
-            <Button type="submit" className="flex-1">Crear Banner</Button>
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
-          </div>
-        </form>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-teal-600 to-cyan-500 rounded-t-2xl">
+          <h2 className="text-2xl font-bold text-white">{title}</h2>
+          <button onClick={onClose} className="text-white/80 hover:text-white transition-colors">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Título</label>
+              <input
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                required
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 text-gray-700"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={2}
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 text-gray-700"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">URL de Imagen</label>
+              <input
+                value={formData.imageUrl}
+                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                required
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 text-gray-700"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">URL de Destino</label>
+              <input
+                value={formData.linkUrl}
+                onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 text-gray-700"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación</label>
+              <select
+                value={formData.placement}
+                onChange={(e) => setFormData({ ...formData, placement: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 text-gray-700"
+              >
+                <option value="HOME_MAIN">Home - Principal</option>
+                <option value="HOME_SPOTLIGHT">Home - Spotlight</option>
+                <option value="HOME_BANNER">Home - Banner</option>
+                <option value="SEARCH_RESULTS">Resultados de Búsqueda</option>
+                <option value="PROPERTY_DETAIL">Detalle de Propiedad</option>
+                <option value="PROJECT_DETAIL">Detalle de Proyecto</option>
+                <option value="PROPERTY_LIST">Lista de Propiedades</option>
+                <option value="PROJECT_LIST">Lista de Proyectos</option>
+                <option value="SIDEBAR">Barra Lateral</option>
+                <option value="SLIDER">Slider</option>
+                <option value="BANNER_TOP">Banner Superior</option>
+                <option value="BANNER_BOTTOM">Banner Inferior</option>
+                <option value="RECOMMENDED">Recomendado</option>
+                <option value="CATEGORY_PAGE">Página de Categoría</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Inicio</label>
+              <input
+                type="date"
+                value={formData.startDate}
+                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 text-gray-700"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha Fin</label>
+              <input
+                type="date"
+                value={formData.endDate}
+                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 text-gray-700"
+              />
+            </div>
+            <div className="flex gap-3 pt-4">
+              <button
+                type="submit"
+                className="flex-1 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-teal-600 to-cyan-500 text-white hover:shadow-lg hover:-translate-y-0.5"
+              >
+                Crear Banner
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 px-4 py-3 border-2 border-gray-300 text-gray-600 hover:bg-gray-50"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </Modal>
+    </div>
   );
 }

@@ -1111,12 +1111,15 @@ export interface CreatePromotionCampaignRequest {
 export interface UpdatePromotionCampaignRequest {
   title?: string;
   description?: string;
+  imageUrl?: string;
+  linkUrl?: string;
   status?: string;
   startDate?: string;
   endDate?: string;
   pricePaid?: number;
   currency?: string;
   placementLocation?: string;
+  displayOrder?: number;
 }
 
 export interface CampaignPricing {

@@ -43,6 +43,65 @@ export function useDeveloperCreateCampaign() {
   });
 }
 
+export function useDeveloperUpdateCampaign() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: import('@/core/domain/entities/Admin').UpdatePromotionCampaignRequest }) =>
+      developerRepo.updateMyCampaign(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...DEVELOPER_MARKETING_KEY, 'campaigns'] });
+      toast.success('Campaña actualizada exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al actualizar campaña');
+    },
+  });
+}
+
+export function useDeveloperDeleteCampaign() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => developerRepo.deleteMyCampaign(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...DEVELOPER_MARKETING_KEY, 'campaigns'] });
+      toast.success('Campaña eliminada exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al eliminar campaña');
+    },
+  });
+}
+
+export function useDeveloperPayCampaign() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, paymentRequest }: { id: number; paymentRequest: any }) =>
+      developerRepo.payForCampaign(id, paymentRequest),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...DEVELOPER_MARKETING_KEY, 'campaigns'] });
+      toast.success('Pago procesado exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al procesar pago');
+    },
+  });
+}
+
+export function useDeveloperRenewCampaign() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, paymentRequest }: { id: number; paymentRequest: any }) =>
+      developerRepo.renewCampaign(id, paymentRequest),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...DEVELOPER_MARKETING_KEY, 'campaigns'] });
+      toast.success('Campaña renovada exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al renovar campaña');
+    },
+  });
+}
+
 export function useDeveloperMyBanners() {
   const { user } = useAuthStore();
   return useQuery({
@@ -64,6 +123,35 @@ export function useDeveloperCreateBanner() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Error al crear banner');
+    },
+  });
+}
+
+export function useDeveloperUpdateBanner() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: import('@/core/domain/entities/Admin').CreateBannerRequest }) =>
+      developerRepo.updateMyBanner(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...DEVELOPER_MARKETING_KEY, 'banners'] });
+      toast.success('Banner actualizado exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al actualizar banner');
+    },
+  });
+}
+
+export function useDeveloperDeleteBanner() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => developerRepo.deleteMyBanner(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...DEVELOPER_MARKETING_KEY, 'banners'] });
+      toast.success('Banner eliminado exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al eliminar banner');
     },
   });
 }

@@ -1,18 +1,25 @@
 /**
  * Agent Marketing Campaigns Page
- * Agents can create and manage their own promotion campaigns
+ * Agents can create, edit, delete, and renew their promotion campaigns
  */
 
 'use client';
 
 import { useState } from 'react';
-import { useAgentMyCampaigns, useAgentCreateCampaign } from '@/presentation/hooks/useAgent';
-import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/Card';
+import {
+  useAgentMyCampaigns,
+  useAgentCreateCampaign,
+  useAgentUpdateCampaign,
+  useAgentDeleteCampaign,
+  useAgentRenewCampaign,
+} from '@/presentation/hooks/useAgent';
+import { Card, CardContent } from '@/presentation/components/ui/Card';
 import { Modal } from '@/presentation/components/ui/Modal';
 import { Input } from '@/presentation/components/ui/Input';
 import { Button } from '@/presentation/components/ui/Button';
 import { LoadingState, EmptyState, ErrorState } from '@/presentation/components/admin/AdminUIStates';
-import { PromotionCampaign, CreatePromotionCampaignRequest } from '@/core/domain/entities/Admin';
+import { CampaignCard } from '@/presentation/components/marketing/CampaignCard';
+import { PromotionCampaign, CreatePromotionCampaignRequest, UpdatePromotionCampaignRequest } from '@/core/domain/entities/Admin';
 
 export default function AgentMarketingCampaignsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -21,6 +28,9 @@ export default function AgentMarketingCampaignsPage() {
 
   const { data: campaignsData, isLoading, error, refetch } = useAgentMyCampaigns({ page: 0, size: 50 });
   const createMutation = useAgentCreateCampaign();
+  const updateMutation = useAgentUpdateCampaign();
+  const deleteMutation = useAgentDeleteCampaign();
+  const renewMutation = useAgentRenewCampaign();
 
   const campaignsList = Array.isArray(campaignsData) ? campaignsData : (campaignsData?.content || []);
   const filteredCampaigns = campaignsList.filter((campaign: PromotionCampaign) => {
@@ -40,22 +50,37 @@ export default function AgentMarketingCampaignsPage() {
     }
   };
 
-  if (isLoading) return <LoadingState message="Cargando campanas..." />;
-  if (error) return <ErrorState message="Error al cargar campanas." retry={refetch} />;
+  const handleEdit = async (id: number, data: UpdatePromotionCampaignRequest) => {
+    await updateMutation.mutateAsync({ id, data });
+    refetch();
+  };
+
+  const handleDelete = async (id: number) => {
+    await deleteMutation.mutateAsync(id);
+    refetch();
+  };
+
+  const handleRenew = async (id: number) => {
+    await renewMutation.mutateAsync({ id, paymentRequest: { paymentMethod: 'WALLET' } });
+    refetch();
+  };
+
+  if (isLoading) return <LoadingState message="Cargando campañas..." />;
+  if (error) return <ErrorState message="Error al cargar campañas." retry={refetch} />;
 
   if (filteredCampaigns.length === 0) {
     return (
       <>
         <EmptyState
-          title="Sin campanas"
-          description={searchQuery || statusFilter !== 'all' ? "Ajusta tu busqueda." : "Crea tu primera campana promocional."}
-          action={{ label: "Crear Campana", onClick: () => setIsCreateModalOpen(true) }}
+          title="Sin campañas"
+          description={searchQuery || statusFilter !== 'all' ? "Ajusta tu búsqueda." : "Crea tu primera campaña promocional."}
+          action={{ label: "Crear Campaña", onClick: () => setIsCreateModalOpen(true) }}
         />
         <CampaignModal
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           onSubmit={handleCreate}
-          title="Crear Campana"
+          title="Crear Campaña"
         />
       </>
     );
@@ -65,17 +90,17 @@ export default function AgentMarketingCampaignsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Mis Campanas</h2>
-          <p className="text-gray-600">Administra tus campanas promocionales</p>
+          <h2 className="text-2xl font-bold text-gray-900">Mis Campañas</h2>
+          <p className="text-gray-600">Administra tus campañas promocionales</p>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)}>Crear Campana</Button>
+        <Button onClick={() => setIsCreateModalOpen(true)}>Crear Campaña</Button>
       </div>
 
       <Card>
         <CardContent className="p-4">
           <div className="flex gap-4">
             <Input
-              placeholder="Buscar campanas..."
+              placeholder="Buscar campañas..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="flex-1"
@@ -87,9 +112,11 @@ export default function AgentMarketingCampaignsPage() {
             >
               <option value="all">Todos</option>
               <option value="ACTIVE">Activas</option>
-              <option value="INACTIVE">Inactivas</option>
+              <option value="PENDING_APPROVAL">Pendientes</option>
               <option value="SCHEDULED">Programadas</option>
               <option value="EXPIRED">Expiradas</option>
+              <option value="REJECTED">Rechazadas</option>
+              <option value="INACTIVE">Inactivas</option>
             </select>
           </div>
         </CardContent>
@@ -97,52 +124,16 @@ export default function AgentMarketingCampaignsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCampaigns.map((campaign: PromotionCampaign) => (
-          <Card key={campaign.id} className="relative">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{campaign.title}</CardTitle>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  campaign.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                  campaign.status === 'SCHEDULED' ? 'bg-blue-100 text-blue-800' :
-                  campaign.status === 'EXPIRED' ? 'bg-red-100 text-red-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>{campaign.status}</span>
-              </div>
-              {campaign.description && <p className="text-sm text-gray-600 mt-1">{campaign.description}</p>}
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Tipo:</span>
-                  <span className="text-sm">{campaign.promotionType}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Ubicacion:</span>
-                  <span className="text-sm">{campaign.placementLocation}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Inicio:</span>
-                  <span className="text-sm">{new Date(campaign.startDate).toLocaleDateString()}</span>
-                </div>
-                {campaign.endDate && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Fin:</span>
-                    <span className="text-sm">{new Date(campaign.endDate).toLocaleDateString()}</span>
-                  </div>
-                )}
-                {campaign.pricePaid && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Precio:</span>
-                    <span className="text-sm font-semibold">{campaign.currency || 'USD'} {campaign.pricePaid.toLocaleString()}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Rendimiento:</span>
-                  <span className="text-sm">{campaign.impressions || 0} imp / {campaign.clicks || 0} clics</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <CampaignCard
+            key={campaign.id}
+            campaign={campaign}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onRenew={handleRenew}
+            isDeleting={deleteMutation.isPending}
+            isUpdating={updateMutation.isPending}
+            isRenewing={renewMutation.isPending}
+          />
         ))}
       </div>
 
@@ -150,7 +141,7 @@ export default function AgentMarketingCampaignsPage() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreate}
-        title="Crear Campana"
+        title="Crear Campaña"
       />
     </div>
   );
@@ -194,13 +185,13 @@ function CampaignModal({ isOpen, onClose, onSubmit, title }: CampaignModalProps)
       <div className="bg-white rounded-lg p-6 max-w-md w-full">
         <h3 className="text-lg font-semibold mb-4">{title}</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input label="Titulo" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
+          <Input label="Título" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Descripcion</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
             <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Promocion</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Promoción</label>
             <select value={formData.promotionType} onChange={(e) => setFormData({ ...formData, promotionType: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
               <option value="BANNER">Banner</option>
               <option value="SLIDER">Slider</option>
@@ -209,16 +200,16 @@ function CampaignModal({ isOpen, onClose, onSubmit, title }: CampaignModalProps)
               <option value="FEATURED_PROJECT">Proyecto Destacado</option>
               <option value="RECOMMENDED">Recomendado</option>
               <option value="PREMIUM_AD">Anuncio Premium</option>
-              <option value="SEARCH_BOOST">Boost en Busqueda</option>
+              <option value="SEARCH_BOOST">Boost en Búsqueda</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicacion</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación</label>
             <select value={formData.placementLocation} onChange={(e) => setFormData({ ...formData, placementLocation: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg">
               <option value="HOME_MAIN">Home - Principal</option>
               <option value="HOME_SPOTLIGHT">Home - Spotlight</option>
               <option value="HOME_BANNER">Home - Banner</option>
-              <option value="SEARCH_RESULTS">Resultados de Busqueda</option>
+              <option value="SEARCH_RESULTS">Resultados de Búsqueda</option>
               <option value="PROPERTY_DETAIL">Detalle de Propiedad</option>
               <option value="PROJECT_DETAIL">Detalle de Proyecto</option>
               <option value="PROPERTY_LIST">Lista de Propiedades</option>
@@ -228,7 +219,7 @@ function CampaignModal({ isOpen, onClose, onSubmit, title }: CampaignModalProps)
               <option value="BANNER_TOP">Banner Superior</option>
               <option value="BANNER_BOTTOM">Banner Inferior</option>
               <option value="RECOMMENDED">Recomendado</option>
-              <option value="CATEGORY_PAGE">Pagina de Categoria</option>
+              <option value="CATEGORY_PAGE">Página de Categoría</option>
             </select>
           </div>
           <Input label="Fecha Inicio" type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} required />
@@ -238,7 +229,7 @@ function CampaignModal({ isOpen, onClose, onSubmit, title }: CampaignModalProps)
           <Input label="URL de Imagen" value={formData.imageUrl} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })} />
           <Input label="URL de Destino" value={formData.linkUrl} onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })} />
           <div className="flex gap-3 pt-4">
-            <Button type="submit" className="flex-1">Crear Campana</Button>
+            <Button type="submit" className="flex-1">Crear Campaña</Button>
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
           </div>
         </form>
