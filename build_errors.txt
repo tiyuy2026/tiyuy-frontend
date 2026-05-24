@@ -1,0 +1,1 @@
+[31m[1m⨯[22m[39m Unable to acquire lock at [36mc:\Users\WasynApp\Tiyuy-frontend\.next\lock[39m, is another instance of [36mnext build[39m running?

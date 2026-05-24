@@ -1058,6 +1058,13 @@ export interface MarketingStats {
   totalLeads: number;
   totalConversions: number;
   averageCTR: number;
+  impressionsGrowth?: number;
+  conversionsGrowth?: number;
+  conversionRateGrowth?: number;
+  clicksGrowth?: number;
+  revenueGrowth?: number;
+  ctrGrowth?: number;
+  leadsGrowth?: number;
 }
 
 
@@ -1073,6 +1080,7 @@ export interface PromotionCampaign {
   pricePaid?: number;
   currency?: string;
   imageUrl?: string;
+  thumbnailUrl?: string;
   linkUrl?: string;
   placementLocation: string;
   displayOrder?: number;
@@ -1081,6 +1089,7 @@ export interface PromotionCampaign {
   conversions?: number;
   ctr?: number;
   conversionRate?: number;
+  revenue?: number;
   createdAt: string;
   updatedAt?: string;
 }
@@ -1148,6 +1157,7 @@ export interface Banner {
   isActive: boolean;
   impressions?: number;
   clicks?: number;
+  conversions?: number;
   ctr?: number;
   createdAt: string;
   updatedAt?: string;
