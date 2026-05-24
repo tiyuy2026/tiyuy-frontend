@@ -296,6 +296,17 @@ export default function PlansPage() {
 
   const isPlanExhausted = (plan: SubscriptionPlan) => {
     const planTier = getPlanTierCode(plan.id);
+    
+    // ENTERPRISE y ENTERPRISE_TRIAL son para proyectos, no tienen límite de publicaciones
+    // Solo se agotan si expiran
+    if (planTier === 'ENTERPRISE' || planTier === 'ENTERPRISE_TRIAL') {
+      if (!activeSubscription) return false;
+      const currentTier = (activeSubscription as any).tier || activeSubscription.plan?.id;
+      if (currentTier !== planTier) return false;
+      const expirationDate = activeSubscription.expiresAt;
+      return expirationDate && new Date(expirationDate) <= new Date();
+    }
+
     // FREE plan special case: permanently blocked after first use
     if (planTier === 'FREE') {
       // If user has any published property, FREE is permanently blocked
@@ -311,7 +322,7 @@ export default function PlansPage() {
       return false;
     }
 
-    // For paid plans, only evaluate if there's an active subscription
+    // For paid plans (BASIC, PREMIUM), only evaluate if there's an active subscription
     if (!activeSubscription) return false;
 
     // Get current plan tier, remaining publications, and expiration date
