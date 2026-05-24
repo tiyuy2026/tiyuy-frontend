@@ -339,11 +339,12 @@ export function FinanceDashboardClient() {
       ? topPayersData
       : Array.isArray(dashboard.topPayers) ? dashboard.topPayers : [];
 
+    // Pagos fallidos - tienen pago_id real
     failedPaymentsList.forEach((t: any) => {
       items.push({
         id: t.pago_id || `failed-${Math.random()}`,
         userEmail: t.email || '—',
-        type: t.plan || 'PAYMENT',
+        type: '—', // failedPayments no tiene plan
         amount: Number(t.monto_intentado) || 0,
         status: 'FAILED',
         paymentMethod: t.metodo_pago || '—',
@@ -351,11 +352,12 @@ export function FinanceDashboardClient() {
       });
     });
 
+    // Top pagadores - son transacciones completadas (no tienen plan individual)
     topPayers.forEach((t: any) => {
       items.push({
-        id: `payer-${t.email || Math.random()}`,
+        id: `TXN-${String(t.email || '').slice(0, 4).toUpperCase()}${Math.floor(Math.random() * 1000)}`,
         userEmail: t.nombre_usuario || t.email || '—',
-        type: t.plan || 'PAYMENT',
+        type: '—', // topPayers no tiene plan por transacción
         amount: Number(t.total_pagado_soles) || 0,
         status: 'COMPLETED',
         paymentMethod: t.metodos_usados || '—',
@@ -363,9 +365,10 @@ export function FinanceDashboardClient() {
       });
     });
 
+    // Suscripciones pendientes - tienen suscripcion_id y plan real
     pendingSubs.forEach((t: any) => {
       items.push({
-        id: `pending-${t.suscripcion_id || Math.random()}`,
+        id: t.suscripcion_id || `pending-${Math.random()}`,
         userEmail: t.email || '—',
         type: t.plan || 'SUBSCRIPTION',
         amount: Number(t.precio_final) || 0,
@@ -377,7 +380,7 @@ export function FinanceDashboardClient() {
 
     return items
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 10);
+      .slice(0, 5);
   }, [dashboardData, failedPaymentsData, pendingSubsData, topPayersData]);
 
   // ── Date Range Options ──
