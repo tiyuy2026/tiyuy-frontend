@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { publicApiClient } from '@/infrastructure/api/axios-client';
 
 export const useForgotPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -10,23 +11,16 @@ export const useForgotPassword = () => {
     setError(null);
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (response.ok) {
-        setIsSuccess(true);
-      } else {
-        const data = await response.json();
-        setError(data.message || 'Error al enviar el email de recuperación');
-      }
-    } catch (err) {
+      // Usar axiosClient directamente para evitar el route handler de Next.js
+      // y conectar directo al backend (ya incluye /api en baseURL)
+      await publicApiClient.post('/auth/forgot-password', { email });
+      setIsSuccess(true);
+    } catch (err: any) {
       console.error('Error en recuperación de contraseña:', err);
-      setError('Error de conexión. Inténtalo nuevamente');
+      const message = err.response?.data?.message 
+        || err.response?.data 
+        || 'Error de conexión. Inténtalo nuevamente';
+      setError(message);
     } finally {
       setIsLoading(false);
     }

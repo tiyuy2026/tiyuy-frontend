@@ -5,6 +5,7 @@ import { Button, Input } from '@/presentation/components/ui';
 import { AuthErrorBanner, PasswordStrengthIndicator } from '@/presentation/components/auth/shared';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { publicApiClient } from '@/infrastructure/api/axios-client';
 
 export const ResetPasswordForm: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -61,32 +62,23 @@ export const ResetPasswordForm: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          token, 
-          password,
-          confirmPassword 
-        }),
+      // Usar axiosClient directamente para evitar el route handler de Next.js
+      await publicApiClient.post('/auth/reset-password', {
+        token,
+        password,
+        confirmPassword
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setIsSuccess(true);
-        // Redirigir al login después de 3 segundos
-        setTimeout(() => {
-          router.push('/login');
-        }, 3000);
-      } else {
-        setError(data.message || 'Error al restablecer la contraseña');
-      }
-    } catch (error) {
-      console.error('Error en reset password:', error);
-      setError('Error de conexión. Inténtalo nuevamente');
+      setIsSuccess(true);
+      // Redirigir al login después de 3 segundos
+      setTimeout(() => {
+        router.push('/login');
+      }, 3000);
+    } catch (err: any) {
+      console.error('Error en reset password:', err);
+      const message = err.response?.data?.message
+        || err.response?.data
+        || 'Error de conexión. Inténtalo nuevamente';
+      setError(message);
     } finally {
       setIsLoading(false);
     }
