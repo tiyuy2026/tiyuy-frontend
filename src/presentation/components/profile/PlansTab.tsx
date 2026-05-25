@@ -104,8 +104,9 @@ export const PlansTab: React.FC<PlansTabProps> = ({ user }) => {
 
           const data = await response.json();
           console.log('Datos de preferencia:', data);
-          const url = data.sandbox_init_point || data.sandboxInitPoint ||
-                      data.init_point || data.initPoint;
+          // Usar init_point (producción) primero. sandbox_init_point solo para pruebas.
+          const url = data.init_point || data.initPoint ||
+                      data.sandbox_init_point || data.sandboxInitPoint;
 
           console.log('URL de pago:', url);
 

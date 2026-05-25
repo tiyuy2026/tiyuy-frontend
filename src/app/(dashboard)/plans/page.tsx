@@ -452,8 +452,9 @@ export default function PlansPage() {
 
           const data = await response.json();
           console.log('Datos preferencia:', data);
-          const url = data.sandbox_init_point || data.sandboxInitPoint ||
-                      data.init_point || data.initPoint;
+          // Usar init_point (producción) primero. sandbox_init_point solo para pruebas.
+          const url = data.init_point || data.initPoint ||
+                      data.sandbox_init_point || data.sandboxInitPoint;
 
           console.log('URL pago:', url);
 
