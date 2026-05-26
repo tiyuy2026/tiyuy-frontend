@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { PropertyCard } from '../PropertyCard/PropertyCard';
 import { PropertySummary } from '@/core/domain/entities/Property';
+import { PropertyFilter } from '@/core/domain/entities/PropertyFilter';
 import { PropertyRepository } from '@/infrastructure/repositories/PropertyRepository';
 
 interface FeaturedPropertiesProps {
@@ -14,6 +15,7 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
   const [properties, setProperties] = useState<PropertySummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isRecommended, setIsRecommended] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Crear instancia del repositorio
@@ -32,10 +34,45 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
   };
 
   useEffect(() => {
-    const loadFeaturedProperties = async () => {
+    const loadProperties = async () => {
       try {
         setIsLoading(true);
         setError(null);
+        
+        // Intentar cargar recomendaciones basadas en la última búsqueda
+        const lastSearchRaw = localStorage.getItem('lastSearch');
+        if (lastSearchRaw) {
+          try {
+            const lastSearch = JSON.parse(lastSearchRaw);
+            console.log('🔍 Última búsqueda encontrada:', lastSearch);
+            
+            const filters: PropertyFilter = {
+              transactionType: lastSearch.transactionType || 'sale',
+              type: lastSearch.type || 'departamentos',
+              district: lastSearch.district || '',
+              page: 0,
+              size: 15,
+              sort: 'createdAt,desc',
+            };
+            
+            const result = await propertyRepo.search(filters);
+            
+            if (result.properties && result.properties.length > 0) {
+              console.log('✅ Propiedades recomendadas recibidas:', result.properties.length);
+              setProperties(result.properties);
+              setIsRecommended(true);
+              return;
+            } else {
+              console.log('⚠️ No hay propiedades similares a tu búsqueda');
+              setProperties([]);
+              setIsRecommended(true);
+              return;
+            }
+          } catch (searchError) {
+            console.log('❌ Error buscando recomendaciones:', searchError);
+            // Fall through a featured properties
+          }
+        }
         
         console.log('🔍 Cargando propiedades destacadas...');
         
@@ -43,6 +80,7 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
         const result = await propertyRepo.getFeaturedProperties(0, 15);
         console.log('✅ Propiedades destacadas recibidas:', result);
         setProperties(result.properties || []);
+        setIsRecommended(false);
         
         // Si no hay propiedades destacadas, cargar propiedades recientes
         if (!result.properties || result.properties.length === 0) {
@@ -65,7 +103,7 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
       }
     };
 
-    loadFeaturedProperties();
+    loadProperties();
   }, []);
 
   // Refrescar propiedades cada 30 segundos
@@ -134,6 +172,18 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
   }
 
   if (properties.length === 0) {
+    if (isRecommended) {
+      return (
+        <div className="text-center py-20 bg-gradient-to-br from-amber-50 to-orange-100 rounded-2xl">
+          <h3 className="text-2xl font-bold text-gray-800 mb-3">
+            No tenemos recomendaciones disponibles
+          </h3>
+          <p className="text-gray-600 text-lg mb-6 max-w-md mx-auto">
+            No encontramos propiedades similares a tu búsqueda. Intenta con otros criterios o vuelve más tarde.
+          </p>
+        </div>
+      );
+    }
     return (
       <div className="text-center py-20 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl">
         <h3 className="text-2xl font-bold text-gray-800 mb-3">
@@ -148,6 +198,17 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
 
   return (
     <>
+      {isRecommended && (
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 bg-brand-light text-brand px-4 py-2 rounded-full text-sm font-semibold mb-3 border border-brand/10">
+            <span>🎯</span>
+            <span>RECOMENDACIONES</span>
+          </div>
+          <h3 className="text-2xl xl:text-3xl font-bold text-foreground">
+            Más recomendaciones para ti
+          </h3>
+        </div>
+      )}
       <style>{`
         .carousel-wrapper-dynamic {
           max-width: calc(2 * 280px + 8.25rem);

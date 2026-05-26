@@ -3,10 +3,10 @@
 import { FeaturedItems } from '@/presentation/components/shared/FeaturedItems/FeaturedItems';
 import { ProjectRepository } from '@/infrastructure/repositories/ProjectRepository';
 import { ProjectCard } from '../ProjectCard/ProjectCard';
-import { Project } from '@/core/domain/entities/Project';
+import { ProjectSummary } from '@/core/domain/entities/Project';
 
 // Wrapper component to adapt props from FeaturedItems format to ProjectCard format
-const ProjectCardWrapper = ({ item }: { item: Project }) => (
+const ProjectCardWrapper = ({ item }: { item: ProjectSummary }) => (
   <ProjectCard project={item} />
 );
 
@@ -18,7 +18,7 @@ export function FeaturedProjects() {
       repository={projectRepo}
       ItemCard={ProjectCardWrapper}
       itemName="proyecto"
-      emptyMessage="No hay proyectos destacados disponibles"
+      emptyMessage="No tenemos recomendaciones disponibles"
       emptyIcon="🏢"
       emptyAction={{
         text: "Crear Proyecto",

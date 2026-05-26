@@ -300,9 +300,11 @@ export class AdminRepository implements IAdminRepository {
   }
 
   async toggleFeaturedProperty(propertyId: number, featured: boolean): Promise<void> {
-    const params = new URLSearchParams();
-    params.append('featured', featured.toString());
-    await axiosClient.put(`${this.basePath}/properties/${propertyId}/featured?${params.toString()}`);
+    if (featured) {
+      await axiosClient.post(`/featured/properties/${propertyId}`);
+    } else {
+      await axiosClient.delete(`/featured/properties/${propertyId}`);
+    }
   }
 
   async deletePropertyAsAdmin(propertyId: number, reason?: string): Promise<void> {
@@ -477,7 +479,11 @@ export class AdminRepository implements IAdminRepository {
   }
 
   async toggleFeaturedProject(projectId: number, featured: boolean): Promise<void> {
-    await axiosClient.put(`${this.basePath}/projects/${projectId}/featured?featured=${featured}`);
+    if (featured) {
+      await axiosClient.post(`/featured/projects/${projectId}`);
+    } else {
+      await axiosClient.delete(`/featured/projects/${projectId}`);
+    }
   }
 
   async deleteProject(projectId: number, reason?: string): Promise<void> {

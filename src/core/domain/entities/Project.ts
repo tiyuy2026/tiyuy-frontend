@@ -79,6 +79,34 @@ export interface ProjectUnit {
   blueprintImage?: string; // Plano de la unidad
 }
 
+export interface ProjectSummary {
+  id: number;
+  slug: string;
+  name: string;
+  type: 'INDUSTRIAL' | 'COMMERCIAL' | 'MIXED_USE' | 'RESIDENTIAL';
+  phase: 'PRE_SALE' | 'SALE' | 'DELIVERY';
+  status: ProjectStatus;
+  priceFrom: number;
+  priceTo?: number;
+  currency: 'PEN' | 'USD';
+  district: string;
+  province: string;
+  region: string;
+  areaFrom?: number;
+  areaTo?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  totalUnits: number;
+  availableUnits: number;
+  coverImageUrl?: string;
+  isFeatured: boolean;
+  isVerified: boolean;
+  viewsCount: number;
+  // Lifecycle fields for subscription management
+  lifecycleStatus?: ProjectLifecycleStatus;
+  remainingGraceDays?: number;
+}
+
 export interface ProjectFull extends Project {
   developer: {
     id: number;

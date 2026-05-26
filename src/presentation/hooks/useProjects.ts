@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProjectRepository } from '@/infrastructure/repositories/ProjectRepository';
 import { 
   Project, 
+  ProjectSummary,
   ProjectFull, 
   ProjectUnit 
 } from '@/core/domain/entities/Project';
@@ -155,7 +156,8 @@ export const useProjects = () => {
 
   const useFeatureProject = () => {
     return useMutation({
-      mutationFn: (projectId: number) => projectRepo.featureProject(projectId),
+      mutationFn: ({ projectId, featured }: { projectId: number; featured: boolean }) => 
+        projectRepo.featureProject(projectId, featured),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.lists() });
         queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.details() });

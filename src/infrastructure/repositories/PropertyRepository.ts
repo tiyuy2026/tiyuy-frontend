@@ -178,24 +178,52 @@ async getById(id: number): Promise<Property> {
 
   async getFeaturedProperties(page = 0, size = 4): Promise<PropertySearchResult> {
     try {
-      const response = await publicApiClient.get(ENDPOINTS.PROPERTIES.SEARCH, {
-        params: {
-          page,
-          size,
-          sort: 'createdAt,desc'
-        },
+      const response = await publicApiClient.get('/properties/featured', {
         timeout: 120000,
       });
 
+      // El endpoint devuelve Page<PropertySummaryDto>
+      if (response.data) {
+        const content = response.data.content || response.data;
+        const properties = Array.isArray(content) ? content : [];
+        return {
+          properties: properties.map(PropertyMapper.toSummary),
+          pagination: {
+            currentPage: response.data.number || 0,
+            totalPages: response.data.totalPages || 1,
+            totalElements: response.data.totalElements || properties.length,
+            pageSize: properties.length || size,
+            hasNext: false,
+            hasPrevious: false,
+          },
+        };
+      }
+
+      // Fallback: si el endpoint devuelve content directamente
+      if (response.data && response.data.content) {
+        return {
+          properties: response.data.content.map(PropertyMapper.toSummary),
+          pagination: {
+            currentPage: response.data.number || 0,
+            totalPages: response.data.totalPages || 1,
+            totalElements: response.data.totalElements || 0,
+            pageSize: response.data.size || size,
+            hasNext: !response.data.last,
+            hasPrevious: !response.data.first,
+          },
+        };
+      }
+
+      // Si no hay datos, devolver vacío
       return {
-        properties: response.data.content.map(PropertyMapper.toSummary),
+        properties: [],
         pagination: {
-          currentPage: response.data.number,
-          totalPages: response.data.totalPages,
-          totalElements: response.data.totalElements,
-          pageSize: response.data.size,
-          hasNext: !response.data.last,
-          hasPrevious: !response.data.first,
+          currentPage: 0,
+          totalPages: 0,
+          totalElements: 0,
+          pageSize: size,
+          hasNext: false,
+          hasPrevious: false,
         },
       };
     } catch (error) {

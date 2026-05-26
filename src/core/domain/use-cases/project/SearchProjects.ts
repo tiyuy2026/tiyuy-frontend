@@ -1,5 +1,5 @@
 import { IProjectRepository } from '../../repositories/IProjectRepository';
-import { Project } from '../../entities/Project';
+import { ProjectSummary } from '../../entities/Project';
 
 export class SearchProjects {
   constructor(private projectRepository: IProjectRepository) {}
@@ -8,8 +8,8 @@ export class SearchProjects {
     district?: string;
     province?: string;
     region?: string;
-    type?: 'RESIDENTIAL' | 'COMMERCIAL' | 'MIXED';  // ✅ Literal types del backend
-    phase?: 'PRE_SALE' | 'SALE' | 'DELIVERY';      // ✅ Literal types del backend
+    type?: 'RESIDENTIAL' | 'COMMERCIAL' | 'MIXED';
+    phase?: 'PRE_SALE' | 'SALE' | 'DELIVERY';
     minPrice?: number;
     maxPrice?: number;
     isFeatured?: boolean;
@@ -18,11 +18,10 @@ export class SearchProjects {
     size?: number;
     sort?: string;
   }): Promise<{
-    content: Project[];
+    content: ProjectSummary[];
     totalElements: number;
     totalPages: number;
   }> {
-    // ✅ Convierte a los tipos exactos del repositorio
     const repoFilters = {
       ...filters,
       page: filters.page ?? 0,

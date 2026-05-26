@@ -1,18 +1,76 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Clock, AlertCircle } from 'lucide-react';
-import { Project } from '@/core/domain/entities/Project';  // Import del dominio
+import { BadgeCheck, Clock, AlertCircle, Star, MessageCircle } from 'lucide-react';
+import type { Project, ProjectSummary } from '@/core/domain/entities/Project';
 
 interface ProjectCardProps {
-  project: Project;
+  project: Project | ProjectSummary;
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
-  const formatPrice = (price: number) => `Desde S/ ${price.toLocaleString()}`;
-  
-  // Intentar con coverImageUrl primero (campo directo), luego con images array
-  const coverImage = (project as any).coverImageUrl || project.images?.[0] || null;
+interface RatingData {
+  averageRating: number;
+  totalRatings: number;
+}
 
+// Get slug from either Project or ProjectSummary
+function getProjectSlug(project: Project | ProjectSummary): string {
+  return project.slug ?? String(project.id);
+}
+
+const PROJECT_TYPE_LABELS: Record<string, string> = {
+  RESIDENTIAL: 'Proyecto Residencial',
+  COMMERCIAL: 'Proyecto Comercial',
+  MIXED_USE: 'Proyecto Mixto',
+  INDUSTRIAL: 'Proyecto Industrial',
+};
+
+const PHASE_LABELS: Record<string, string> = {
+  PRE_SALE: 'Preventa',
+  SALE: 'En venta',
+  DELIVERY: 'Entrega inmediata',
+};
+
+export function ProjectCard({ project }: ProjectCardProps) {
+  const [rating, setRating] = useState<RatingData | null>(null);
+  const [commentCount, setCommentCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchRating = async () => {
+      try {
+        const res = await fetch(`/api/projects/${project.id}/rating`);
+        if (res.ok) {
+          const data = await res.json();
+          setRating(data);
+        }
+      } catch {
+        // Silently fail
+      }
+    };
+    fetchRating();
+  }, [project.id]);
+
+  useEffect(() => {
+    const fetchCommentCount = async () => {
+      try {
+        const res = await fetch(`/api/projects/${project.id}/comments`);
+        if (res.ok) {
+          const data = await res.json();
+          const count = Array.isArray(data) ? data.length : 0;
+          setCommentCount(count);
+        }
+      } catch {
+        // Silently fail
+      }
+    };
+    fetchCommentCount();
+  }, [project.id]);
+
+  const formatPrice = (price: number, currency: string) => {
+    const symbol = currency === 'USD' ? '$' : 'S/';
+    return `${symbol} ${price.toLocaleString('es-PE')}`;
+  };
 
   // Helper to render lifecycle status badge
   const renderLifecycleBadge = () => {
@@ -50,25 +108,28 @@ export function ProjectCard({ project }: ProjectCardProps) {
   };
 
   return (
-    <Link href={`/projects/${project.slug}`} className="group flex flex-col w-full h-full cursor-pointer">
+    <div className="group flex flex-col w-full h-full cursor-pointer">
       {/* Imagen */}
-      <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-3">
-        {coverImage ? (
-          <Image
-            src={coverImage}
-            alt={project.name}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 320px"
-            priority={project.isFeatured}
+      <Link href={`/projects/${getProjectSlug(project)}`} className="relative w-full aspect-square rounded-xl overflow-hidden mb-3">
+        {project.coverImageUrl ? (
+          <img
+            src={`/api/images/proxy?url=${encodeURIComponent(project.coverImageUrl)}`}
+            alt={project.name || ''}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              console.error('Error loading cover image:', project.coverImageUrl);
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
+              e.currentTarget.parentElement!.innerHTML = '<span class="text-6xl">🏗️</span>';
+            }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-100">
-            <svg className="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4z" /></svg>
+            <span className="text-gray-400 text-6xl">🏗️</span>
           </div>
         )}
 
-        {/* Overlay gradient para contraste */}
+        {/* Overlay gradient para proteger el contraste de insignias */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent opacity-60" />
 
         {/* Badges */}
@@ -80,40 +141,55 @@ export function ProjectCard({ project }: ProjectCardProps) {
           )}
           {project.isVerified && (
             <div className="bg-white/95 backdrop-blur-sm text-gray-900 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
-              ✓ Verificado
+              <BadgeCheck className="w-3.5 h-3.5 text-blue-500" />
+              Verificado
             </div>
           )}
         </div>
 
         {/* Lifecycle status badge */}
         {renderLifecycleBadge()}
-      </div>
+      </Link>
 
       {/* Contenido */}
-      <div className="flex flex-col flex-grow">
+      <Link href={`/projects/${getProjectSlug(project)}`} className="flex flex-col flex-grow">
         <div className="flex justify-between items-start gap-2">
           <h3 className="text-[15px] font-semibold text-gray-900 line-clamp-1">
             {project.name}
           </h3>
+          <div className="flex items-center gap-1 text-[13px] text-gray-900 flex-shrink-0">
+            <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+            <span>{rating ? rating.averageRating.toFixed(1) : '—'}</span>
+          </div>
         </div>
 
         <p className="text-[14px] text-gray-500 line-clamp-1 mt-0.5">
-          {project.type === 'RESIDENTIAL' ? 'Proyecto Residencial' : 'Proyecto Comercial'} en {project.district}
+          {PROJECT_TYPE_LABELS[project.type] || 'Proyecto'} en {project.district}
         </p>
 
         <p className="text-[14px] text-gray-500 truncate mt-0.5">
-          {project.phase === 'PRE_SALE' ? 'Preventa' : project.phase === 'SALE' ? 'En venta' : 'Entrega'}
+          {PHASE_LABELS[project.phase] || project.phase}
           {' · '}
-          {project.availableUnits} unidades
+          {project.availableUnits} unid. disponibles
         </p>
 
-        <div className="mt-1.5 flex items-center gap-1">
-          <span className="text-[15px] text-gray-900">Desde</span>
-          <span className="text-[15px] font-semibold text-gray-900">
-            S/ {project.priceFrom.toLocaleString('es-PE')}
-          </span>
+        <div className="mt-1.5 flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <span className="text-[15px] text-gray-900">Desde</span>
+            <span className="text-[15px] font-semibold text-gray-900">
+              {formatPrice(project.priceFrom, project.currency)}
+            </span>
+          </div>
+          
+          {/* Contador de comentarios pequeño */}
+          {commentCount !== null && commentCount > 0 && (
+            <div className="flex items-center gap-1 text-xs text-gray-400">
+              <MessageCircle className="w-3 h-3" />
+              <span>{commentCount}</span>
+            </div>
+          )}
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 }

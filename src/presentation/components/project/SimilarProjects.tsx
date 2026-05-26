@@ -1,28 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Property, PropertySummary } from '@/core/domain/entities/Property';
-import { PropertyCard } from './PropertyCard/PropertyCard';
+import { Project, ProjectSummary } from '@/core/domain/entities/Project';
+import { ProjectCard } from './ProjectCard/ProjectCard';
 
-interface SimilarPropertiesProps {
-  currentProperty: Property;
+interface SimilarProjectsProps {
+  currentProject: Project;
   maxItems?: number;
 }
 
-interface SimilarPropertiesResponse {
-  properties: PropertySummary[];
+interface SimilarProjectsResponse {
+  projects: ProjectSummary[];
   totalResults: number;
   locationLevel: string;
-  transactionType: string;
+  projectType: string;
 }
 
-const TRANSACTION_LABELS: Record<string, string> = {
-  RENT: 'Alquiler',
-  SALE: 'Venta',
-};
-
-export function SimilarProperties({ currentProperty, maxItems = 6 }: SimilarPropertiesProps) {
-  const [data, setData] = useState<SimilarPropertiesResponse | null>(null);
+export function SimilarProjects({ currentProject, maxItems = 6 }: SimilarProjectsProps) {
+  const [data, setData] = useState<SimilarProjectsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -31,35 +26,24 @@ export function SimilarProperties({ currentProperty, maxItems = 6 }: SimilarProp
       try {
         setLoading(true);
         setError(false);
-        // Llamar al endpoint con filtros adicionales: precio similar y tamaño
-        const params = new URLSearchParams({
-          maxResults: String(maxItems),
-        });
         
-        // Agregar filtro de precio similar (+/- 30%)
-        if (currentProperty.price) {
-          const minPrice = Math.round(currentProperty.price * 0.7);
-          const maxPrice = Math.round(currentProperty.price * 1.3);
-          params.append('minPrice', String(minPrice));
-          params.append('maxPrice', String(maxPrice));
+        // Calcular filtros de precio similar (+/- 30%) y area similar (+/- 30%)
+        const params = new URLSearchParams();
+        params.set('maxResults', String(maxItems));
+        
+        if (currentProject.priceFrom) {
+          params.set('minPrice', String(Number(currentProject.priceFrom) * 0.7));
+          params.set('maxPrice', String(Number(currentProject.priceTo || currentProject.priceFrom) * 1.3));
+        }
+        if (currentProject.areaFrom) {
+          params.set('minArea', String(Number(currentProject.areaFrom) * 0.7));
+          params.set('maxArea', String(Number(currentProject.areaTo || currentProject.areaFrom) * 1.3));
         }
         
-        // Agregar filtro de tamaño similar (+/- 30%)
-        if (currentProperty.totalArea) {
-          const minArea = Math.round(currentProperty.totalArea * 0.7);
-          const maxArea = Math.round(currentProperty.totalArea * 1.3);
-          params.append('minArea', String(minArea));
-          params.append('maxArea', String(maxArea));
-        }
-        
-        // Agregar filtro de dormitorios similares
-        if (currentProperty.bedrooms) {
-          params.append('bedrooms', String(currentProperty.bedrooms));
-        }
-        
-        const res = await fetch(`/api/properties/${currentProperty.id}/similar?${params}`);
+        // Usar el nuevo endpoint con algoritmo progresivo
+        const res = await fetch(`/api/projects/${currentProject.id}/similar?${params.toString()}`);
         if (res.ok) {
-          const json: SimilarPropertiesResponse = await res.json();
+          const json: SimilarProjectsResponse = await res.json();
           setData(json);
         } else {
           setError(true);
@@ -71,14 +55,13 @@ export function SimilarProperties({ currentProperty, maxItems = 6 }: SimilarProp
       }
     };
     fetchSimilar();
-  }, [currentProperty.id, currentProperty.price, currentProperty.totalArea, currentProperty.bedrooms, maxItems]);
+  }, [currentProject.id, maxItems, currentProject.priceFrom, currentProject.priceTo, currentProject.areaFrom, currentProject.areaTo]);
 
-  // Estado de carga
   if (loading) {
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h3 className="text-base font-bold text-gray-900 mb-4">
-          Propiedades similares en {currentProperty.location?.district || 'la zona'}
+          Proyectos similares en {currentProject.district || 'la zona'}
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: Math.min(maxItems, 6) }).map((_, i) => (
@@ -96,12 +79,11 @@ export function SimilarProperties({ currentProperty, maxItems = 6 }: SimilarProp
     );
   }
 
-  // Error al cargar
   if (error) {
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h3 className="text-base font-bold text-gray-900 mb-4">
-          Propiedades similares
+          Proyectos similares
         </h3>
         <p className="text-gray-500 text-sm text-center py-8">
           No tenemos recomendaciones disponibles en este momento.
@@ -110,12 +92,11 @@ export function SimilarProperties({ currentProperty, maxItems = 6 }: SimilarProp
     );
   }
 
-  // Sin resultados
-  if (!data || data.properties.length === 0) {
+  if (!data || data.projects.length === 0) {
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h3 className="text-base font-bold text-gray-900 mb-4">
-          Propiedades similares
+          Proyectos similares
         </h3>
         <p className="text-gray-500 text-sm text-center py-8">
           No tenemos recomendaciones disponibles.
@@ -125,23 +106,22 @@ export function SimilarProperties({ currentProperty, maxItems = 6 }: SimilarProp
   }
 
   // Determinar el titulo segun el nivel de ubicacion alcanzado
-  const transactionLabel = TRANSACTION_LABELS[data.transactionType] || data.transactionType;
   const locationLabel = data.locationLevel !== 'nacional'
     ? `en ${data.locationLevel}`
-    : 'en todo el pais';
+    : 'en todo el país';
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
       <h3 className="text-base font-bold text-gray-900 mb-4">
-        Propiedades similares {locationLabel}
+        Proyectos similares {locationLabel}
       </h3>
       <p className="text-xs text-gray-400 mb-4">
-        {transactionLabel} - {data.totalResults} propiedad{data.totalResults !== 1 ? 'es' : ''} encontrada{data.totalResults !== 1 ? 's' : ''}
+        {data.totalResults} proyecto{data.totalResults !== 1 ? 's' : ''} encontrado{data.totalResults !== 1 ? 's' : ''}
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data.properties.map((p) => (
-          <PropertyCard key={p.id} property={p} />
+        {data.projects.map((p) => (
+          <ProjectCard key={p.id} project={p} />
         ))}
       </div>
     </div>

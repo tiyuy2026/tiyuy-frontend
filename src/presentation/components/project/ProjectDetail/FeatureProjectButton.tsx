@@ -53,7 +53,7 @@ export function FeatureProjectButton({
     
     try {
       const projectRepo = new ProjectRepository();
-      await projectRepo.featureProject(projectId);
+      await projectRepo.featureProject(projectId, true);
       
       toast.success('✅ ¡Proyecto destacado correctamente!');
       

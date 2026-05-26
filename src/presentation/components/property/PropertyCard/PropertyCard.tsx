@@ -1,14 +1,23 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, MapPin, Maximize, BedDouble, Bath, BadgeCheck, Star, AlertCircle, Clock } from 'lucide-react';
+import { Heart, MapPin, Maximize, BedDouble, Bath, BadgeCheck, Star, AlertCircle, Clock, MessageCircle } from 'lucide-react';
 import type { Property, PropertySummary } from '@/core/domain/entities/Property';
 import { FavoriteButton } from '@/presentation/components/shared/FavoriteButton';
 
 interface PropertyCardProps {
   property: Property | PropertySummary;
+}
+
+interface RatingData {
+  averageRating: number;
+  totalRatings: number;
+}
+
+interface CommentCountData {
+  count: number;
 }
 
 // Type guard to check if property is full Property (has seo)
@@ -25,7 +34,40 @@ function getPropertySlug(property: Property | PropertySummary): string {
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
-  
+  const [rating, setRating] = useState<RatingData | null>(null);
+  const [commentCount, setCommentCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchRating = async () => {
+      try {
+        const res = await fetch(`/api/properties/${property.id}/rating`);
+        if (res.ok) {
+          const data = await res.json();
+          setRating(data);
+        }
+      } catch {
+        // Silently fail - rating is not critical
+      }
+    };
+    fetchRating();
+  }, [property.id]);
+
+  useEffect(() => {
+    const fetchCommentCount = async () => {
+      try {
+        const res = await fetch(`/api/properties/${property.id}/comments`);
+        if (res.ok) {
+          const data = await res.json();
+          const count = Array.isArray(data) ? data.length : 0;
+          setCommentCount(count);
+        }
+      } catch {
+        // Silently fail
+      }
+    };
+    fetchCommentCount();
+  }, [property.id]);
+
   const PROPERTY_TYPE_LABELS: Record<string, string> = {
     APARTMENT: 'Departamento',
     HOUSE: 'Casa',
@@ -138,8 +180,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
             {PROPERTY_TYPE_LABELS[property.type] || 'Propiedad'} en {'location' in property ? property.location?.district : property.district || 'Ubicación'}
           </h3>
           <div className="flex items-center gap-1 text-[13px] text-gray-900 flex-shrink-0">
-            <Star className="w-3.5 h-3.5 fill-current" />
-            <span>4.9</span>
+            <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+            <span>{rating ? rating.averageRating.toFixed(1) : '—'}</span>
           </div>
         </div>
 
@@ -155,13 +197,23 @@ export function PropertyCard({ property }: PropertyCardProps) {
           ].filter(Boolean).join(' · ')}
         </p>
 
-        <div className="mt-1.5 flex items-center gap-1">
-          <span className="text-[15px] font-semibold text-gray-900">
-            {formatPrice(property.price, property.currency)}
-          </span>
-          <span className="text-[15px] text-gray-900">
-            {property.transactionType === 'RENT' ? ' / mes' : ''}
-          </span>
+        <div className="mt-1.5 flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <span className="text-[15px] font-semibold text-gray-900">
+              {formatPrice(property.price, property.currency)}
+            </span>
+            <span className="text-[15px] text-gray-900">
+              {property.transactionType === 'RENT' ? ' / mes' : ''}
+            </span>
+          </div>
+          
+          {/* Contador de comentarios pequeño */}
+          {commentCount !== null && commentCount > 0 && (
+            <div className="flex items-center gap-1 text-xs text-gray-400">
+              <MessageCircle className="w-3 h-3" />
+              <span>{commentCount}</span>
+            </div>
+          )}
         </div>
       </Link>
     </div>

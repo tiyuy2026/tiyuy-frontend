@@ -2,6 +2,7 @@ import { apiClient, publicApiClient } from '../api/axios-client';
 import { IProjectRepository } from '@/core/domain/repositories/IProjectRepository';
 import { 
   Project, 
+  ProjectSummary,
   ProjectFull, 
   ProjectUnit 
 } from '@/core/domain/entities/Project';
@@ -113,7 +114,7 @@ export class ProjectRepository implements IProjectRepository {
    * Búsqueda pública de proyectos (SEO + filtros) - Público
    */
   async searchProjects(filters: SearchFilters): Promise<{
-    content: Project[];
+    content: ProjectSummary[];
     totalElements: number;
     totalPages: number;
     page: number;
@@ -350,8 +351,9 @@ export class ProjectRepository implements IProjectRepository {
 
   /**
    * Destacar proyecto
+   * PATCH /projects/{id}/feature
    */
-  async featureProject(projectId: number): Promise<any> {
+  async featureProject(projectId: number, featured: boolean): Promise<any> {
     const response = await apiClient.patch(`/projects/${projectId}/feature`);
     return response.data;
   }
@@ -367,7 +369,7 @@ export class ProjectRepository implements IProjectRepository {
    * Obtener proyectos destacados - Público
    */
   async getFeaturedProjects(district?: string): Promise<{
-    content: Project[];
+    content: ProjectSummary[];
     totalElements: number;
     totalPages: number;
     page: number;
@@ -380,59 +382,55 @@ export class ProjectRepository implements IProjectRepository {
 
       const response = await publicApiClient.get(`/projects/featured?${params.toString()}`);
       
-      // Mapear media a images y coverImageUrl solo si el backend devuelve media como array de objetos
-      const content = (response.data.content || []).map((project: any) => {
-        // Si ya viene coverImageUrl, usarlo directamente
-        if (project.coverImageUrl) {
+      // El endpoint devuelve Page<ProjectSummaryResponse>
+      if (response.data && response.data.content) {
+        const content = (response.data.content || []).map((project: any) => {
+          if (project.coverImageUrl) return project;
+          const media: Array<{ url: string; mediaType: string; displayOrder: number }> = project.media || [];
+          if (media.length > 0) {
+            const photos = media
+              .filter((m: any) => m.mediaType === 'PHOTO')
+              .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
+              .map((m: any) => m.url);
+            return {
+              ...project,
+              coverImageUrl: photos[0] || null,
+              images: photos,
+              renders: media.filter((m: any) => m.mediaType === 'VIDEO' || m.mediaType === 'RENDER').map((m: any) => m.url),
+              blueprints: media.filter((m: any) => m.mediaType === 'BLUEPRINT' || m.mediaType === 'PDF').map((m: any) => m.url),
+            };
+          }
           return project;
-        }
-        // Si ya viene images como array de strings, usarlo directamente
-        if (project.images && Array.isArray(project.images) && project.images.length > 0 && typeof project.images[0] === 'string') {
-          return project;
-        }
-        // Si viene media como array de objetos, mapearlo
-        const media: Array<{ url: string; mediaType: string; displayOrder: number }> = project.media || [];
-        if (media.length > 0) {
-          const photos = media
-            .filter((m: any) => m.mediaType === 'PHOTO')
-            .sort((a: any, b: any) => a.displayOrder - b.displayOrder)
-            .map((m: any) => m.url);
-          return {
-            ...project,
-            coverImageUrl: photos[0] || null,
-            images: photos,
-            renders: media
-              .filter((m: any) => m.mediaType === 'VIDEO' || m.mediaType === 'RENDER')
-              .map((m: any) => m.url),
-            blueprints: media
-              .filter((m: any) => m.mediaType === 'BLUEPRINT' || m.mediaType === 'PDF')
-              .map((m: any) => m.url),
-          };
-        }
-        return project;
-      });
+        });
+        
+        return {
+          content,
+          totalElements: response.data.totalElements || 0,
+          totalPages: response.data.totalPages || 0,
+          page: response.data.number || 0,
+          size: response.data.size || 5,
+        };
+      }
       
+      // Si no hay rows ni content, devolver vacío
       return {
-        content,
-        totalElements: response.data.totalElements || 0,
-        totalPages: response.data.totalPages || 0,
-        page: response.data.number || 0,
-        size: response.data.size || 5,
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        page: 0,
+        size: 5,
       };
 
     } catch (error) {
-
-
       console.error('Error loading featured projects:', error);
       
-      // Si es un error de red, log específico
       if (error instanceof Error) {
         if (error.message.includes('Network Error')) {
-          console.error('🌐 Network Error - Backend might be down');
+          console.error(' Network Error - Backend might be down');
         } else if (error.message.includes('404')) {
-          console.error('🔍 Endpoint not found: /projects/featured');
+          console.error('Endpoint not found: /featured/projects');
         } else {
-          console.error('❌ Unknown error:', error.message);
+          console.error(' Unknown error:', error.message);
         }
       }
       
@@ -451,7 +449,7 @@ export class ProjectRepository implements IProjectRepository {
    * Obtener items destacados (alias para getFeaturedProjects)
    */
   async getFeaturedItems(district?: string): Promise<{
-    content: Project[];
+    content: ProjectSummary[];
     totalElements: number;
     totalPages: number;
     page: number;

@@ -5,9 +5,9 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { authStorage } from '@/infrastructure/storage/auth-storage';
 import { Lock, Star, MessageCircle, Loader2, ChevronDown, X, LogIn, UserPlus } from 'lucide-react';
-import { StarRating } from './StarRating';
+import { StarRating } from '../../property/PropertyDetail/StarRating';
 
-interface PropertyComment {
+interface ProjectComment {
   id: number;
   content: string;
   userName: string;
@@ -16,16 +16,15 @@ interface PropertyComment {
   rating?: number;
 }
 
-interface PropertyCommentsProps {
-  propertyId: number;
-  location: { latitude?: number; longitude?: number };
+interface ProjectCommentsProps {
+  projectId: number;
 }
 
 const COMMENTS_PER_PAGE = 5;
 
-export function PropertyComments({ propertyId, location }: PropertyCommentsProps) {
+export function ProjectComments({ projectId }: ProjectCommentsProps) {
   const router = useRouter();
-  const [comments, setComments] = useState<PropertyComment[]>([]);
+  const [comments, setComments] = useState<ProjectComment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [newComment, setNewComment] = useState('');
@@ -46,7 +45,7 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
     const fetchComments = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/properties/${propertyId}/comments`);
+        const response = await fetch(`/api/projects/${projectId}/comments`);
         if (response.ok) {
           const data = await response.json();
           const commentsArray = Array.isArray(data) ? data : [];
@@ -61,7 +60,7 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
     };
 
     fetchComments();
-  }, [propertyId]);
+  }, [projectId]);
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +74,7 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
     }
 
     try {
-      const response = await fetch(`/api/properties/${propertyId}/comments`, {
+      const response = await fetch(`/api/projects/${projectId}/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -137,7 +136,7 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
         <div className="bg-blue-50 rounded-lg p-4">
           <div className="flex items-center justify-between mb-3">
             <h4 className="font-semibold text-blue-800">
-              Comentarios de la zona
+              Comentarios del proyecto
               {totalComments > 0 && (
                 <span className="text-sm font-normal text-blue-600 ml-2">
                   ({totalComments} {totalComments === 1 ? 'comentario' : 'comentarios'})
@@ -174,7 +173,7 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
             <form onSubmit={handleSubmitComment} className="space-y-3">
               {/* Selector de estrellas con StarRating */}
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Califica esta propiedad:</span>
+                <span className="text-sm text-gray-600">Califica este proyecto:</span>
                 <StarRating
                   initialRating={newRating}
                   onRate={setNewRating}
@@ -186,7 +185,7 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Comparte tu experiencia sobre esta zona..."
+                placeholder="Comparte tu experiencia sobre este proyecto..."
                 className="w-full p-3 border border-blue-200 rounded-lg resize-none"
                 rows={3}
                 maxLength={500}
@@ -257,7 +256,7 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
           <div className="bg-gray-50 rounded-lg p-4 text-center">
             <p className="text-gray-600 flex items-center justify-center gap-2">
               <MessageCircle className="w-4 h-4" />
-              Sé el primero en comentar sobre esta zona
+              Sé el primero en comentar sobre este proyecto
             </p>
           </div>
         )}
@@ -284,7 +283,7 @@ export function PropertyComments({ propertyId, location }: PropertyCommentsProps
             </div>
 
             <h3 className="text-lg font-bold text-gray-900 text-center mb-2">
-              Comentar en esta propiedad
+              Comentar en este proyecto
             </h3>
             <p className="text-sm text-gray-500 text-center mb-6">
               Para dejar un comentario, necesitas una cuenta en Tiyuy.

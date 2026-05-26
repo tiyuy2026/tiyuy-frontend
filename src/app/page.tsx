@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Icon } from '@iconify/react'; // <-- Importamos Iconify para limpiar los SVGs viejos
+import { Icon } from '@iconify/react';
 import { Footer } from '@/presentation/components/layout/Footer/Footer';
 import { FeaturedProperties } from '@/presentation/components/property/FeaturedProperties/FeaturedProperties';
 import { FeaturedProjects } from '@/presentation/components/project/FeaturedProjects/FeaturedProjects';
@@ -60,11 +60,10 @@ export default function HomePage() {
     switch (tab) {
       case 'projects':
         return [
-          { value: 'departamentos', label: 'Departamentos' },
-          { value: 'casas', label: 'Casas' },
-          { value: 'oficinas', label: 'Oficinas' },
-          { value: 'locales', label: 'Locales Comerciales' },
-          { value: 'lotes', label: 'Lotes' },
+          { value: 'departamentos', label: 'Residencial' },
+          { value: 'locales', label: 'Comercial' },
+          { value: 'mixto', label: 'Mixto' },
+          { value: 'industrial', label: 'Industrial' },
         ];
       default:
         return [
@@ -102,20 +101,34 @@ export default function HomePage() {
     
     const params = new URLSearchParams();
     
-    if ((selectedPropertyType === 'departamentos' || selectedPropertyType === 'casas') && selectedBedrooms) {
-      params.append('bedrooms', selectedBedrooms);
-    }
-    
-    if (selectedPropertyType === 'habitaciones' && selectedBathrooms) {
-      params.append('bathrooms', selectedBathrooms);
-    }
-    
-    if (['oficinas', 'terrenos', 'lotes', 'locales'].includes(selectedPropertyType) && selectedMinArea) {
-      params.append('minArea', selectedMinArea);
+    if (activeTab !== 'projects') {
+      if ((selectedPropertyType === 'departamentos' || selectedPropertyType === 'casas') && selectedBedrooms) {
+        params.append('bedrooms', selectedBedrooms);
+      }
+      
+      if (selectedPropertyType === 'habitaciones' && selectedBathrooms) {
+        params.append('bathrooms', selectedBathrooms);
+      }
+      
+      if (['oficinas', 'terrenos', 'lotes', 'locales'].includes(selectedPropertyType) && selectedMinArea) {
+        params.append('minArea', selectedMinArea);
+      }
     }
     
     if (params.toString()) {
       url += `?${params.toString()}`;
+    }
+    
+    // Guardar búsqueda para recomendaciones
+    if (activeTab !== 'projects') {
+      localStorage.setItem('lastSearch', JSON.stringify({
+        transactionType: activeTab === 'rent' ? 'rent' : 'sale',
+        type: selectedPropertyType,
+        district: selectedLocation || '',
+        bedrooms: selectedBedrooms || '',
+        bathrooms: selectedBathrooms || '',
+        minArea: selectedMinArea || '',
+      }));
     }
     
     router.push(url);
@@ -197,7 +210,7 @@ export default function HomePage() {
                         ))}
                       </select>
 
-                      {(selectedPropertyType === 'departamentos' || selectedPropertyType === 'casas') ? (
+                      {activeTab !== 'projects' && (selectedPropertyType === 'departamentos' || selectedPropertyType === 'casas') ? (
                         <select 
                           value={selectedBedrooms}
                           onChange={(e) => setSelectedBedrooms(e.target.value)}
@@ -210,7 +223,7 @@ export default function HomePage() {
                           <option value="4">4 habitaciones</option>
                           <option value="5">5+ habitaciones</option>
                         </select>
-                      ) : selectedPropertyType === 'habitaciones' ? (
+                      ) : activeTab !== 'projects' && selectedPropertyType === 'habitaciones' ? (
                         <select 
                           value={selectedBathrooms}
                           onChange={(e) => setSelectedBathrooms(e.target.value)}
@@ -220,7 +233,7 @@ export default function HomePage() {
                           <option value="propio">Propio</option>
                           <option value="compartido">Compartido</option>
                         </select>
-                      ) : ['oficinas', 'terrenos', 'locales', 'lotes'].includes(selectedPropertyType) ? (
+                      ) : activeTab !== 'projects' && ['oficinas', 'terrenos', 'locales', 'lotes'].includes(selectedPropertyType) ? (
                         <input
                           type="number"
                           placeholder="Área mínima (m²)"
@@ -277,7 +290,7 @@ export default function HomePage() {
                 Publicar
               </Link>
               <Link
-                href="/#projects"
+                href="/projects/departamentos/lima"
                 className="py-4 text-base font-medium text-foreground/70 hover:text-brand hover:border-b-4 hover:border-brand transition-all"
               >
                 Proyectos
@@ -371,7 +384,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PROPIEDADES DESTACADAS */}
+      {/* PROPIEDADES DESTACADAS / RECOMENDACIONES */}
       <section className="py-20 bg-background">
         <div className="w-full px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">

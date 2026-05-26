@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ProjectRepository } from '@/infrastructure/repositories/ProjectRepository';
 import { ProjectCard } from '@/presentation/components/project/ProjectCard/ProjectCard';
-import { Project } from '@/core/domain/entities/Project';
+import { ProjectSummary } from '@/core/domain/entities/Project';
 
 export default function ProjectsFilterPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   

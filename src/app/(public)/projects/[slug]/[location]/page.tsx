@@ -1,94 +1,220 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { Metadata } from 'next';
 import { ProjectRepository } from '@/infrastructure/repositories/ProjectRepository';
-import { ProjectCard } from '@/presentation/components/project/ProjectCard/ProjectCard';
-import { Project } from '@/core/domain/entities/Project';
+import { Suspense } from 'react';
+import { ProjectSearchBar } from './ProjectSearchBar';
+import { ProjectFiltersClient } from './ProjectFiltersClient';
+import { ProjectGrid } from './ProjectGrid';
+import { Pagination } from './Pagination';
 
-export default function ProjectsFilterPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  const searchParams = useSearchParams();
+interface Props {
+  params: Promise<{
+    slug: string;
+    location: string;
+  }>;
+  searchParams: Promise<{
+    page?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    minArea?: string;
+    maxArea?: string;
+    phase?: string;
+    isFeatured?: string;
+    isVerified?: string;
+    filtered?: string;
+  }>;
+}
+
+const toLocationName = (slug: string) => {
+  const cleaned = decodeURIComponent(slug).replace(/-/g, ' ').trim();
+  if (!cleaned) return '';
+  return cleaned
+    .toLowerCase()
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+};
+
+const PROJECT_TYPE_MAP: Record<string, string> = {
+  'departamentos': 'RESIDENTIAL',
+  'residencial': 'RESIDENTIAL',
+  'casas': 'RESIDENTIAL',
+  'locales': 'COMMERCIAL',
+  'comercial': 'COMMERCIAL',
+  'mixto': 'MIXED_USE',
+  'industrial': 'INDUSTRIAL',
+};
+
+const PROJECT_TYPE_LABELS: Record<string, string> = {
+  'departamentos': 'Proyectos Residenciales',
+  'residencial': 'Proyectos Residenciales',
+  'casas': 'Proyectos Residenciales',
+  'locales': 'Proyectos Comerciales',
+  'comercial': 'Proyectos Comerciales',
+  'mixto': 'Proyectos Mixtos',
+  'industrial': 'Proyectos Industriales',
+};
+
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+
+  const projectTypeLabel = PROJECT_TYPE_LABELS[resolvedParams.slug] || 'Proyectos';
+  const location = toLocationName(resolvedParams.location);
+
+  const isFiltered = resolvedSearchParams.filtered === '1';
+
+  let title = `${projectTypeLabel} en ${location} | TIYUY`;
+  let description = `Descubre los mejores ${projectTypeLabel.toLowerCase()} en ${location}. Proyectos de vivienda e inversión con precios, fotos y detalles completos en TIYUY.`;
+
+  if (isFiltered) {
+    const filterParts = [];
+    if (resolvedSearchParams.minPrice || resolvedSearchParams.maxPrice) {
+      const minPrice = resolvedSearchParams.minPrice ? `desde S/.${resolvedSearchParams.minPrice}` : '';
+      const maxPrice = resolvedSearchParams.maxPrice ? `hasta S/.${resolvedSearchParams.maxPrice}` : '';
+      if (minPrice || maxPrice) filterParts.push(`${minPrice} ${maxPrice}`.trim());
+    }
+    if (resolvedSearchParams.phase) filterParts.push(`etapa ${resolvedSearchParams.phase}`);
+    if (resolvedSearchParams.minArea || resolvedSearchParams.maxArea) {
+      const minArea = resolvedSearchParams.minArea ? `desde ${resolvedSearchParams.minArea}m²` : '';
+      const maxArea = resolvedSearchParams.maxArea ? `hasta ${resolvedSearchParams.maxArea}m²` : '';
+      if (minArea || maxArea) filterParts.push(`${minArea} ${maxArea}`.trim());
+    }
+
+    if (filterParts.length > 0) {
+      title = `${projectTypeLabel} en ${location} - ${filterParts.join(', ')} | TIYUY`;
+      description = `Busca ${projectTypeLabel.toLowerCase()} en ${location} con ${filterParts.join(' y ')}. Encuentra el proyecto perfecto con filtros avanzados en TIYUY.`;
+    }
+  }
+
+  const canonicalUrl = `https://tiyuy.com/projects/${resolvedParams.slug}/${resolvedParams.location}${
+    isFiltered
+      ? '?' +
+        new URLSearchParams(
+          Object.entries(resolvedSearchParams).filter(([_, value]) => value !== undefined) as [string, string][]
+        ).toString()
+      : ''
+  }`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: canonicalUrl },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      type: 'website',
+      siteName: 'TIYUY',
+      locale: 'es_PE',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+  };
+}
+
+export default async function ProjectsCategoryPage({ params, searchParams }: Props) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+
   const projectRepo = new ProjectRepository();
 
-  useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        // Obtener filtros de la URL
-        const type = searchParams.get('type') || '';
-        const location = searchParams.get('location') || '';
-        const minArea = searchParams.get('minArea');
-        
-        // Construir filtros para la búsqueda
-        const filters: any = {
-          page: 0,
-          size: 50
-        };
-        
-        if (type) filters.type = type;
-        if (location) filters.location = location;
-        if (minArea) filters.minArea = parseInt(minArea);
-        
-        // Cargar proyectos con filtros
-        const result = await projectRepo.searchProjects(filters);
-        setProjects(result.content || []);
-        
-      } catch (err) {
-        console.error('Error cargando proyectos:', err);
-        setError('No se pudieron cargar los proyectos');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const projectType = PROJECT_TYPE_MAP[resolvedParams.slug];
+  const location = toLocationName(resolvedParams.location);
 
-    loadProjects();
-  }, [searchParams]);
+  const isFiltered = resolvedSearchParams.filtered === '1';
+
+  const MAIN_PROVINCES = ['Lima', 'Arequipa', 'Trujillo', 'Callao'];
+  const isMainProvince = MAIN_PROVINCES.includes(location);
+  const isAllPeru = location.toLowerCase() === 'peru';
+
+  const filters: any = {
+    sort: 'createdAt,desc',
+    page: resolvedSearchParams.page ? Number(resolvedSearchParams.page) : 0,
+    size: 9,
+    ...(projectType ? { type: projectType } : {}),
+    ...(isAllPeru ? {} : isMainProvince ? { province: location } : { district: location }),
+    ...(isFiltered
+      ? {
+          minPrice: resolvedSearchParams.minPrice ? Number(resolvedSearchParams.minPrice) : undefined,
+          maxPrice: resolvedSearchParams.maxPrice ? Number(resolvedSearchParams.maxPrice) : undefined,
+          minArea: resolvedSearchParams.minArea ? Number(resolvedSearchParams.minArea) : undefined,
+          maxArea: resolvedSearchParams.maxArea ? Number(resolvedSearchParams.maxArea) : undefined,
+          phase: resolvedSearchParams.phase || undefined,
+          isFeatured: resolvedSearchParams.isFeatured !== undefined ? resolvedSearchParams.isFeatured === 'true' : undefined,
+          isVerified: resolvedSearchParams.isVerified !== undefined ? resolvedSearchParams.isVerified === 'true' : undefined,
+        }
+      : {}),
+  };
+
+  const result = await projectRepo.searchProjects(filters);
+  const projectTypeLabel = PROJECT_TYPE_LABELS[resolvedParams.slug] || 'Proyectos';
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Proyectos Inmobiliarios
-          </h1>
-          <p className="text-gray-600">
-            Descubre los mejores proyectos de vivienda e inversión
-          </p>
+    <main className="min-h-screen bg-gray-50">
+      <div className="px-8 pt-6 pb-8">
+        {/* ── BARRA DE BÚSQUEDA SUPERIOR ── */}
+        <div className="mb-6">
+          <ProjectSearchBar projectType={resolvedParams.slug} location={location} />
         </div>
 
-        {isLoading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Cargando proyectos...</p>
+        {/* ── GRID: FILTROS SIDEBAR + RESULTADOS ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar filtros */}
+          <aside className="lg:col-span-1">
+            <div className="sticky top-4">
+              <Suspense fallback={
+                <div className="bg-white rounded-lg border border-gray-200 p-4 animate-pulse h-96" />
+              }>
+                <ProjectFiltersClient
+                  initialFilters={filters}
+                  projectType={resolvedParams.slug}
+                />
+              </Suspense>
+            </div>
+          </aside>
+
+          {/* Resultados */}
+          <div className="lg:col-span-3">
+            {/* Título de resultados */}
+            <div className="mb-4 flex items-center justify-between">
+              <h1 className="text-lg font-semibold text-gray-900">
+                {projectTypeLabel} en {location}
+                <span className="ml-2 text-sm font-normal text-gray-500">
+                  ({result.totalElements} proyectos)
+                </span>
+              </h1>
+            </div>
+
+            <ProjectGrid projects={result.content} />
+
+            {result.totalPages > 1 && (
+              <Pagination
+                pagination={{
+                  currentPage: result.page,
+                  totalPages: result.totalPages,
+                  hasNext: result.page < result.totalPages - 1,
+                  hasPrevious: result.page > 0,
+                }}
+              />
+            )}
           </div>
-        ) : error ? (
-          <div className="text-center py-12">
-            <div className="text-red-600 mb-4">{error}</div>
-            <button 
-              onClick={() => window.location.reload()}
-              className="text-teal-600 hover:text-teal-700 underline"
-            >
-              Reintentar
-            </button>
-          </div>
-        ) : projects.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600">No se encontraron proyectos con los filtros seleccionados.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </div>
-        )}
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

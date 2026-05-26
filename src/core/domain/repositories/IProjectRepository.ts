@@ -1,4 +1,4 @@
-import { Project, ProjectFull, ProjectUnit } from '../entities/Project';
+import { Project, ProjectSummary, ProjectFull, ProjectUnit } from '../entities/Project';
 
 /**
  * Interface del repositorio de Proyectos
@@ -43,7 +43,7 @@ export interface IProjectRepository {
     size?: number;
     sort?: string;
   }): Promise<{
-    content: Project[];
+    content: ProjectSummary[];
     totalElements: number;
     totalPages: number;
     page: number;
@@ -105,9 +105,9 @@ export interface IProjectRepository {
   publishProject(projectId: number): Promise<Project>;
 
   /**
-   * Destacar proyecto
+   * Destacar o quitar destacado de un proyecto
    */
-  featureProject(projectId: number): Promise<any>;
+  featureProject(projectId: number, featured: boolean): Promise<any>;
 
   /**
    * Eliminar proyecto

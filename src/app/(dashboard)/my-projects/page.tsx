@@ -63,7 +63,7 @@ export default function MyProjectsPage() {
   // Function to feature project
   const handleFeature = async (projectId: number) => {
     try {
-      await featureMutation.mutateAsync(projectId);
+      await featureMutation.mutateAsync({ projectId, featured: true });
       toast.success('Proyecto destacado exitosamente!');
     } catch (error: any) {
       toast.error(error.message || 'Error al destacar proyecto');

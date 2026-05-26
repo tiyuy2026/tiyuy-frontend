@@ -4,27 +4,24 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { LocationSearch } from '@/presentation/components/forms/LocationSearch/LocationSearch';
 
-export function SearchBar({ propertyType, district }: { propertyType: string; district: string }) {
+const PROJECT_TYPES = [
+  { value: 'departamentos', label: 'Residencial' },
+  { value: 'locales', label: 'Comercial' },
+  { value: 'mixto', label: 'Mixto' },
+  { value: 'industrial', label: 'Industrial' },
+];
+
+export function ProjectSearchBar({ projectType, location }: { projectType: string; location: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
-  const [transactionType, setTransactionType] = useState<'venta' | 'alquiler'>('alquiler');
-  const [selectedType, setSelectedType] = useState(propertyType);
+  const [selectedType, setSelectedType] = useState(projectType);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const tipos = [
-    { value: 'departamentos', label: 'Departamento' },
-    { value: 'casas', label: 'Casa' },
-    { value: 'terrenos', label: 'Terreno / Lote' },
-    { value: 'locales', label: 'Local comercial' },
-    { value: 'oficinas', label: 'Oficina comercial' },
-    { value: 'habitaciones', label: 'Habitación' },
-  ];
-
   useEffect(() => {
-    setSelectedType(propertyType);
-  }, [propertyType]);
+    setSelectedType(projectType);
+  }, [projectType]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -42,69 +39,29 @@ export function SearchBar({ propertyType, district }: { propertyType: string; di
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    const currentFilters = ['minPrice', 'maxPrice', 'bedrooms', 'bathrooms', 'minArea', 'maxArea', 'parking'];
-    
+    const currentFilters = ['minPrice', 'maxPrice', 'minArea', 'maxArea', 'phase'];
+
     currentFilters.forEach(filter => {
       if (searchParams.get(filter)) params.set(filter, searchParams.get(filter)!);
     });
 
     const slug = selectedLocation
       ? selectedLocation.mainText.toLowerCase().replace(/\s+/g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      : district;
+      : location;
 
     if (selectedLocation) params.set('filtered', '1');
-    
-    // Guardar búsqueda para recomendaciones en la home
-    localStorage.setItem('lastSearch', JSON.stringify({
-      transactionType: transactionType === 'venta' ? 'sale' : 'rent',
-      type: selectedType,
-      district: selectedLocation ? selectedLocation.mainText.toLowerCase() : district,
-      bedrooms: searchParams.get('bedrooms') || '',
-      bathrooms: searchParams.get('bathrooms') || '',
-      minArea: searchParams.get('minArea') || '',
-    }));
-    
-    const routeTransactionType = transactionType === 'venta' ? 'sale' : 'rent';
-    const finalUrl = `/${routeTransactionType}/${selectedType}/${slug}?${params.toString()}`;
-    
+
+    const finalUrl = `/projects/${selectedType}/${slug}?${params.toString()}`;
     window.location.href = finalUrl;
   };
 
-  const selectedLabel = tipos.find(t => t.value === selectedType)?.label || 'Tipo';
+  const selectedLabel = PROJECT_TYPES.find(t => t.value === selectedType)?.label || 'Tipo';
 
   return (
     <div className="w-full max-w-8xl mx-auto bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 antialiased text-gray-900">
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3 w-full">
 
-        <div className="flex shrink-0 border border-gray-300 rounded-xl overflow-hidden text-sm font-semibold h-12">
-          <button
-            onClick={() => setTransactionType('venta')}
-            className={`flex-1 lg:flex-none px-5 py-3 flex items-center justify-center gap-2 transition-colors ${
-              transactionType === 'venta' ? 'bg-brand text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            {transactionType === 'venta' && (
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            )}
-            Venta
-          </button>
-          <button
-            onClick={() => setTransactionType('alquiler')}
-            className={`flex-1 lg:flex-none px-5 py-3 flex items-center justify-center gap-2 border-l border-gray-300 transition-colors ${
-              transactionType === 'alquiler' ? 'bg-brand text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            {transactionType === 'alquiler' && (
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            )}
-            Alquiler
-          </button>
-        </div>
-
+        {/* Tipo de proyecto — dropdown */}
         <div className="relative shrink-0 h-12" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -118,14 +75,14 @@ export function SearchBar({ propertyType, district }: { propertyType: string; di
 
           {dropdownOpen && (
             <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50 w-full lg:min-w-[240px] py-2">
-              <p className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Tipo de inmueble</p>
+              <p className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Tipo de proyecto</p>
               <div className="max-h-60 overflow-y-auto">
-                {tipos.map((t) => (
+                {PROJECT_TYPES.map((t) => (
                   <button
                     key={t.value}
                     onClick={() => { 
                       setSelectedType(t.value); 
-                      localStorage.setItem('selectedPropertyType', t.value);
+                      localStorage.setItem('selectedProjectType', t.value);
                       setDropdownOpen(false); 
                     }}
                     className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left group"
@@ -146,8 +103,8 @@ export function SearchBar({ propertyType, district }: { propertyType: string; di
               <div className="border-t border-gray-100 mt-2 pt-2 px-3 pb-1 flex gap-2">
                 <button
                   onClick={() => {
-                    setSelectedType('');
-                    localStorage.removeItem('selectedPropertyType');
+                    setSelectedType('departamentos');
+                    localStorage.removeItem('selectedProjectType');
                     setDropdownOpen(false);
                   }}
                   className="flex-1 py-2 text-xs font-bold text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
@@ -165,15 +122,17 @@ export function SearchBar({ propertyType, district }: { propertyType: string; di
           )}
         </div>
 
+        {/* Input ubicación con Google Maps */}
         <div className="flex-1 min-w-0 h-12">
           <LocationSearch
             onLocationSelect={handleLocationSelect}
             placeholder="Distrito o zona..."
-            defaultValue={district}
+            defaultValue={location}
             className="w-full h-full"
           />
         </div>
 
+        {/* Botón BUSCAR */}
         <button
           onClick={handleSearch}
           className="h-12 px-10 bg-brand text-white rounded-xl text-sm font-bold hover:opacity-90 transition-opacity whitespace-nowrap shadow-sm shrink-0 flex items-center justify-center gap-2"

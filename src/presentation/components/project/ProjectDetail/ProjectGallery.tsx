@@ -1,0 +1,177 @@
+'use client';
+
+import { useState, useRef } from 'react';
+import Image from 'next/image';
+import { ProjectFull } from '@/core/domain/entities/Project';
+
+interface ProjectGalleryProps {
+  project: ProjectFull;
+  galleryImagesOnly: string[];
+  blueprints: string[];
+  video: string | null;
+}
+
+export function ProjectGallery({ project, galleryImagesOnly, blueprints, video }: ProjectGalleryProps) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showAllImages, setShowAllImages] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  return (
+    <>
+      {/* ── GALERÍA ── */}
+      <div className="relative grid grid-cols-4 grid-rows-2 gap-2 h-[480px] rounded-2xl overflow-hidden mb-2">
+        {/* ── IZQUIERDA: Video o imagen principal ── */}
+        <div
+          className="col-span-3 row-span-2 relative bg-gray-900 cursor-pointer"
+          onClick={() => {
+            if (video && videoRef.current) {
+              if (isPlaying) {
+                videoRef.current.pause();
+                setIsPlaying(false);
+              } else {
+                videoRef.current.play();
+                setIsPlaying(true);
+              }
+            }
+          }}
+        >
+          {video ? (
+            <>
+              <video
+                ref={videoRef}
+                src={video}
+                loop
+                playsInline
+                className="w-full h-full object-cover"
+                poster={galleryImagesOnly[0] || undefined}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+              />
+
+              {!isPlaying && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="bg-black/50 hover:bg-black/70 transition rounded-full p-5">
+                    <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </div>
+              )}
+
+              <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10 flex items-center gap-1">
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+                </svg>
+                VIDEO 360°
+              </span>
+            </>
+          ) : galleryImagesOnly[0] ? (
+            <Image
+              src={galleryImagesOnly[0]}
+              alt={`Imagen principal de ${project.name}`}
+              fill
+              className="object-cover"
+              priority
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-green-100 to-teal-200 flex items-center justify-center">
+              <svg className="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4h4v4H9z" />
+              </svg>
+            </div>
+          )}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+            <span className="text-white text-sm font-semibold">{project.name}</span>
+          </div>
+        </div>
+
+        {/* ── DERECHA: 2 imágenes en columna ── */}
+        {galleryImagesOnly.slice(1, 3).map((imageUrl, index) => (
+          <div
+            key={index + 1}
+            className="relative bg-gray-200 cursor-pointer group overflow-hidden"
+            onClick={() => { setCurrentImageIndex(index + 1); setShowAllImages(true); }}
+          >
+            <Image
+              src={imageUrl}
+              alt={`${project.name} - imagen ${index + 2}`}
+              fill
+              className="object-cover group-hover:brightness-90 transition duration-300"
+              sizes="25vw"
+            />
+          </div>
+        ))}
+
+        {galleryImagesOnly.length <= 1 && (
+          <>
+            <div className="w-full h-full bg-gray-100" />
+            <div className="w-full h-full bg-gray-100" />
+          </>
+        )}
+
+        <button
+          onClick={() => setShowAllImages(true)}
+          className="absolute bottom-3 right-3 bg-white text-gray-800 text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 hover:bg-gray-50 transition z-10"
+        >
+          🖼 Ver todas las fotos
+          {galleryImagesOnly.length > 0 && (
+            <span className="bg-gray-100 text-gray-600 rounded-full px-2 py-0.5">{galleryImagesOnly.length}</span>
+          )}
+          {blueprints.length > 0 && (
+            <span className="bg-gray-100 text-gray-600 rounded-full px-2 py-0.5">Planos: {blueprints.length}</span>
+          )}
+        </button>
+      </div>
+
+      {/* ── MODAL GALERÍA COMPLETA ── */}
+      {showAllImages && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+          <button
+            onClick={() => setShowAllImages(false)}
+            className="absolute top-4 right-4 text-white text-3xl hover:text-gray-300"
+          >
+            ✕
+          </button>
+
+          <div className="w-full max-w-5xl">
+            <div className="relative h-[60vh] mb-4">
+              {galleryImagesOnly[currentImageIndex] && (
+                <Image src={galleryImagesOnly[currentImageIndex]} alt="Galería" fill className="object-contain" />
+              )}
+              <button
+                onClick={() => setCurrentImageIndex(Math.max(0, currentImageIndex - 1))}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 transition"
+              >
+                ‹
+              </button>
+              <button
+                onClick={() => setCurrentImageIndex(Math.min(galleryImagesOnly.length - 1, currentImageIndex + 1))}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 transition"
+              >
+                ›
+              </button>
+              <span className="absolute bottom-2 right-2 text-white text-sm bg-black/50 px-2 py-1 rounded">
+                {currentImageIndex + 1} / {galleryImagesOnly.length}
+              </span>
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {galleryImagesOnly.map((img, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentImageIndex(index)}
+                  className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition ${
+                    index === currentImageIndex ? 'border-white' : 'border-transparent'
+                  }`}
+                >
+                  <Image src={img} alt={`thumb ${index}`} fill className="object-cover" />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

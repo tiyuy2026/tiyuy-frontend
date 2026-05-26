@@ -1,17 +1,22 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Property } from '@/core/domain/entities/Property';
 import { PropertyGallery } from '../PropertyGallery/PropertyGallery';
-import { PropertyLocation } from './PropertyLocation';
 import { PropertyQuickInfo } from './PropertyQuickInfo';
-import { SimilarProperties } from '../SimilarProperties';
-import { PersonalizedRecommendations } from '../PersonalizedRecommendations';
+import { PropertyLocation } from './PropertyLocation';
 import { ContactForm } from '../../shared/ContactForm/ContactForm';
+import { WhatsAppButton } from './WhatsAppButton';
 import { FavoriteButton } from '../../shared/FavoriteButton/FavoriteButton';
 import { ShareButton } from '../../shared/ShareButton/ShareButton';
-import { WhatsAppButton } from './WhatsAppButton';
+import { SimilarProperties } from '../SimilarProperties';
+import { PersonalizedRecommendations } from '../PersonalizedRecommendations';
 import { FeaturePropertyButton } from './FeaturePropertyButton';
-import { useAutoTrackCRMView } from '@/presentation/hooks/useCRMInteraction';
+import { Star } from 'lucide-react';
+import { StarRating } from './StarRating';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { authStorage } from '@/infrastructure/storage/auth-storage';
 
 interface PropertyDetailProps {
   property: Property;
@@ -33,7 +38,35 @@ const TRANSACTION_TYPE_LABELS: Record<string, string> = {
 
 export function PropertyDetail({ property }: PropertyDetailProps) {
   // Trackear vista en CRM automáticamente
-  useAutoTrackCRMView(property.id);
+  useEffect(() => {
+    if (!property.id) return;
+    const trackView = async () => {
+      try {
+        const token = authStorage.getToken();
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        await fetch(`/api/properties/${property.id}/view`, { method: 'POST', headers });
+      } catch { /* silently fail */ }
+    };
+    trackView();
+  }, [property.id]);
+
+  const [rating, setRating] = useState<{ averageRating: number; totalRatings: number } | null>(null);
+
+  useEffect(() => {
+    const fetchRating = async () => {
+      try {
+        const res = await fetch(`/api/properties/${property.id}/rating`);
+        if (res.ok) {
+          const data = await res.json();
+          setRating(data);
+        }
+      } catch {
+        // Silently fail
+      }
+    };
+    fetchRating();
+  }, [property.id]);
 
   const formatPrice = (price: number, currency: string) => {
     const symbol = currency === 'USD' ? 'US$' : 'S/';
@@ -146,7 +179,15 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
             <SimilarProperties currentProperty={property} />
 
             {/* 6. RECOMENDACIONES */}
-            <PersonalizedRecommendations title="Más recomendaciones para ti" properties={[]} />
+            <PersonalizedRecommendations 
+              title="Más recomendaciones para ti" 
+              properties={[]}
+              currentPropertyId={property.id}
+              currentTransactionType={property.transactionType}
+              currentDistrict={property.location?.district}
+              currentProvince={property.location?.province}
+              currentType={property.type}
+            />
           </div>
 
           {/* ════════════════════════════════════════
@@ -204,6 +245,25 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
                     </div>
                   ))}
                 </div>
+
+                {/* Rating promedio */}
+                {rating && rating.totalRatings > 0 && (
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="flex items-center gap-0.5">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 ${i < Math.round(rating.averageRating) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm font-bold text-gray-900">{rating.averageRating.toFixed(1)}</span>
+                      <span className="text-xs text-gray-400">({rating.totalRatings} {rating.totalRatings === 1 ? 'reseña' : 'reseñas'})</span>
+                    </div>
+                  </div>
+                )}
+
                 <p className="mt-3 text-xs text-gray-400 flex items-center gap-1">
                   <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -212,6 +272,29 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
                     day: 'numeric', month: 'long', year: 'numeric',
                   })}
                 </p>
+              </div>
+
+              {/* ⭐ CALIFICAR PROPIEDAD */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <h3 className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-3">Calificar propiedad</h3>
+                <div className="flex flex-col items-center gap-2">
+                  <StarRating
+                    propertyId={property.id}
+                    size="md"
+                    showValue
+                    onRatingSaved={() => {
+                      // Recargar rating después de calificar
+                      fetch(`/api/properties/${property.id}/rating`).then(res => {
+                        if (res.ok) res.json().then(data => setRating(data));
+                      }).catch(() => {});
+                    }}
+                  />
+                  {rating && rating.totalRatings > 0 && (
+                    <p className="text-xs text-gray-400">
+                      Promedio: {rating.averageRating.toFixed(1)} ({rating.totalRatings} {rating.totalRatings === 1 ? 'voto' : 'votos'})
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* ✅ BOTÓN DESTACAR PROPIEDAD */}

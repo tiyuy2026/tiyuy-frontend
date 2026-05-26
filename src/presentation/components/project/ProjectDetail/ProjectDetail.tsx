@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useRef, useMemo } from 'react';
-import Image from 'next/image';
+import { useState, useMemo } from 'react';
 import { ProjectFull, ProjectUnit } from '@/core/domain/entities/Project';
 import { useProjects } from '@/presentation/hooks/useProjects';
 import ProjectQuotation from './ProjectQuotation';
+import { SimilarProjects } from '../SimilarProjects';
+import { ProjectGallery } from './ProjectGallery';
+import { ProjectContactSidebar } from './ProjectContactSidebar';
+import { ProjectComments } from './ProjectComments';
 
 interface ProjectDetailProps {
   project: ProjectFull;
@@ -26,11 +29,7 @@ const TYPE_LABELS: Record<string, string> = {
 export default function ProjectDetail({ project }: ProjectDetailProps) {
   const { projectUnits, projectFull } = useProjects();
   const [activeTab, setActiveTab] = useState<number | null>(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showAllImages, setShowAllImages] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<ProjectUnit | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const { data: unitsData } = projectUnits(project.id, 0, 100);
   const { data: fullProjectData } = projectFull(project.id);
@@ -38,40 +37,26 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
   const currentProject = fullProjectData || project;
   const units: ProjectUnit[] = unitsData?.content || currentProject.units || [];
 
-  // ── AGRUPAR UNIDADES SIMILARES (ya que backend no devuelve unitGroups) ──
-// Unidades con mismas características = mismo "tipo visual"
-const groupedUnitTypes = useMemo(() => {
-  const map = new Map<string, { units: ProjectUnit[]; key: string }>();
-  
-  units.forEach(unit => {
-    // Clave única por características (no por unitNumber)
-    const key = `${unit.type}-${unit.bedrooms ?? 0}-${unit.bathrooms}-${unit.area}-${unit.price}-${unit.floor}`;
-    if (!map.has(key)) {
-      map.set(key, { units: [], key });
-    }
-    map.get(key)!.units.push(unit);
-  });
-  
-  return Array.from(map.values()).sort((a, b) => 
-    (a.units[0].bedrooms ?? 0) - (b.units[0].bedrooms ?? 0)
-  );
-}, [units]);
+  // ── AGRUPAR UNIDADES SIMILARES ──
+  const groupedUnitTypes = useMemo(() => {
+    const map = new Map<string, { units: ProjectUnit[]; key: string }>();
 
-// Para los tabs, usar los tipos agrupados
-const bedroomGroups = [...new Set(
-  groupedUnitTypes.map(g => g.units[0].bedrooms ?? 0)
-)].sort((a, b) => a - b);
+    units.forEach(unit => {
+      const key = `${unit.type}-${unit.bedrooms ?? 0}-${unit.bathrooms}-${unit.area}-${unit.price}-${unit.floor}`;
+      if (!map.has(key)) {
+        map.set(key, { units: [], key });
+      }
+      map.get(key)!.units.push(unit);
+    });
 
-// Mantener unitsByBedrooms para la vista expandida
-const unitsByBedrooms = useMemo(() => {
-  const acc = {} as Record<number, ProjectUnit[]>;
-  units.forEach(unit => {
-    const key = unit.bedrooms ?? 0;
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(unit);
-  });
-  return acc;
-}, [units]);
+    return Array.from(map.values()).sort((a, b) =>
+      (a.units[0].bedrooms ?? 0) - (b.units[0].bedrooms ?? 0)
+    );
+  }, [units]);
+
+  const bedroomGroups = [...new Set(
+    groupedUnitTypes.map(g => g.units[0].bedrooms ?? 0)
+  )].sort((a, b) => a - b);
 
   // Usar ProjectQuotation hook
   const quotation = ProjectQuotation({
@@ -80,7 +65,9 @@ const unitsByBedrooms = useMemo(() => {
     currency: currentProject.currency || 'S/.',
     TYPE_LABELS,
     PHASE_LABELS,
-    deliveryDate: (currentProject as any).deliveryDate ? new Date((currentProject as any).deliveryDate).toLocaleDateString('es-PE', { year: 'numeric', month: 'long' }) : undefined
+    deliveryDate: (currentProject as any).deliveryDate
+      ? new Date((currentProject as any).deliveryDate).toLocaleDateString('es-PE', { year: 'numeric', month: 'long' })
+      : undefined,
   });
 
   const activeGroup = activeTab ?? bedroomGroups[0] ?? null;
@@ -89,16 +76,14 @@ const unitsByBedrooms = useMemo(() => {
   const allImages = currentProject.images || [];
   const coverImage = currentProject.coverImageUrl;
   const galleryImages = allImages.length > 0 ? allImages : coverImage ? [coverImage] : [];
-  // 🔍 FIX: Excluir video de las imágenes de galería
-  const galleryImagesOnly = galleryImages.filter((img: string) => 
+  const galleryImagesOnly = galleryImages.filter((img: string) =>
     !img.includes('.mp4') && !img.includes('.avi') && !img.includes('.mov') && !img.includes('.webm')
   );
   const blueprints = currentProject.blueprints || [];
   const renders = currentProject.renders || [];
 
-  // 🔍 FIX: Buscar video en renders por extensión de archivo
-  const video = renders && renders.length > 0 
-    ? renders.find(r => r.includes('.mp4') || r.includes('.avi') || r.includes('.mov') || r.includes('.webm'))
+  const video: string | null = renders && renders.length > 0
+    ? renders.find(r => r.includes('.mp4') || r.includes('.avi') || r.includes('.mov') || r.includes('.webm')) ?? null
     : null;
 
   const currency = currentProject.currency === 'USD' ? '$' : 'S/.';
@@ -110,166 +95,43 @@ const unitsByBedrooms = useMemo(() => {
       })
     : null;
 
-  // Debug: Ver qué datos tenemos
-  console.log('🔍 Debug ProjectDetail:', {
-    // Dirección
-    address: currentProject.address,
-    fullAddress: currentProject.fullAddress,
-    street: currentProject.street,
-    streetNumber: currentProject.streetNumber,
-    district: currentProject.district,
-    province: currentProject.province,
-    latitude: currentProject.latitude,
-    longitude: currentProject.longitude,
-    // Media
-    video: video ? 'FOUND' : 'NOT FOUND',
-    videoUrl: video,
-    renders: renders,
-    images: allImages,
-    galleryImages: galleryImages,
-    blueprints: blueprints,
-    // Units
-    units: units.length,
-    firstUnit: units[0],
-    // API
-    hasGoogleMapsKey: !!process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY
-  });
-
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-gray-50">
+      <div className="w-full px-4 sm:px-6 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-      {/* ── GALERÍA TIPO URBANIA ── */}
-      <section className="max-w-7xl mx-auto px-4 pt-6">
+          {/* ════════════════════════════════════════
+              COLUMNA PRINCIPAL (2/3)
+          ════════════════════════════════════════ */}
+          <div className="lg:col-span-8 space-y-6">
 
-        {/* Breadcrumb */}
-        <div className="text-sm text-gray-500 mb-3">
-          <span>Proyectos</span>
-          <span className="mx-2">›</span>
-          <span>{currentProject.district}</span>
-          <span className="mx-2">›</span>
-          <span className="text-gray-800 font-medium">{currentProject.name}</span>
-        </div>
+            {/* Breadcrumb */}
+            <div className="text-sm text-gray-500">
+              <span>Proyectos</span>
+              <span className="mx-2">›</span>
+              <span>{currentProject.district}</span>
+              <span className="mx-2">›</span>
+              <span className="text-gray-800 font-medium">{currentProject.name}</span>
+            </div>
 
-        {/* Título del desarrollador */}
-        {currentProject.developer?.companyName && (
-          <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1 text-xs font-semibold text-gray-700 mb-3">
-            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-            {currentProject.developer.companyName}
-          </div>
-        )}
-
-        {/* Grid de imágenes estilo Urbania */}
-        <div className="relative grid grid-cols-4 grid-rows-2 gap-2 h-[480px] rounded-2xl overflow-hidden mb-2">
-
-          {/* ── IZQUIERDA: Video o imagen principal (3/4 ancho = 2/3) ── */}
-          <div className="col-span-3 row-span-2 relative bg-gray-900 cursor-pointer"
-            onClick={() => {
-              if (video && videoRef.current) {
-                if (isPlaying) {
-                  videoRef.current.pause();
-                  setIsPlaying(false);
-                } else {
-                  videoRef.current.play();
-                  setIsPlaying(true);
-                }
-              }
-            }}
-          >
-            {video ? (
-              <>
-                <video
-                  ref={videoRef}
-                  src={video}
-                  loop
-                  playsInline
-                  className="w-full h-full object-cover"
-                  poster={galleryImagesOnly[0] || undefined}
-                  onPlay={() => setIsPlaying(true)}
-                  onPause={() => setIsPlaying(false)}
-                />
-
-                {/* Botón play/pause centrado */}
-                {!isPlaying && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-black/50 hover:bg-black/70 transition rounded-full p-5">
-                      <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
-                  </div>
-                )}
-
-                <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10 flex items-center gap-1">
-                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.723v6.554a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
-                  VIDEO 360°
-                </span>
-              </>
-            ) : galleryImagesOnly[0] ? (
-              <Image
-                src={galleryImagesOnly[0]}
-                alt={`Imagen principal de ${currentProject.name}`}
-                fill className="object-cover" priority
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-green-100 to-teal-200 flex items-center justify-center">
-                <svg className="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4h4v4H9z" /></svg>
+            {/* Título del desarrollador */}
+            {currentProject.developer?.companyName && (
+              <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1 text-xs font-semibold text-gray-700">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                {currentProject.developer.companyName}
               </div>
             )}
-            {/* Label nombre proyecto */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-              <span className="text-white text-sm font-semibold">{currentProject.name}</span>
-            </div>
-          </div>
 
-          {/* ── DERECHA: 2 imágenes en columna ── */}
-          {galleryImagesOnly.slice(1, 3).map((imageUrl, index) => (
-            <div
-              key={index + 1}
-              className="relative bg-gray-200 cursor-pointer group overflow-hidden"
-              onClick={() => { setCurrentImageIndex(index + 1); setShowAllImages(true); }}
-            >
-              <Image
-                src={imageUrl}
-                alt={`${currentProject.name} - imagen ${index + 2}`}
-                fill className="object-cover group-hover:brightness-90 transition duration-300"
-                sizes="25vw"
-              />
-            </div>
-          ))}
+            {/* 1. GALERÍA */}
+            <ProjectGallery
+              project={currentProject}
+              galleryImagesOnly={galleryImagesOnly}
+              blueprints={blueprints}
+              video={video}
+            />
 
-          {/* Si no hay suficientes imágenes, mostrar placeholders */}
-          {galleryImagesOnly.length <= 1 && (
-            <>
-              <div className="w-full h-full bg-gray-100" />
-              <div className="w-full h-full bg-gray-100" />
-            </>
-          )}
-
-          {/* Botón "Ver todas las fotos" */}
-          <button
-            onClick={() => setShowAllImages(true)}
-            className="absolute bottom-3 right-3 bg-white text-gray-800 text-xs font-semibold px-3 py-2 rounded-xl shadow-lg flex items-center gap-2 hover:bg-gray-50 transition z-10"
-          >
-            🖼 Ver todas las fotos
-            {galleryImagesOnly.length > 0 && (
-              <span className="bg-gray-100 text-gray-600 rounded-full px-2 py-0.5">{galleryImagesOnly.length}</span>
-            )}
-            {blueprints.length > 0 && (
-              <span className="bg-gray-100 text-gray-600 rounded-full px-2 py-0.5">Planos: {blueprints.length}</span>
-            )}
-          </button>
-        </div>
-      </section>
-
-      {/* ── CONTENIDO PRINCIPAL + SIDEBAR ── */}
-      <section className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-
-          {/* ── COLUMNA PRINCIPAL ── */}
-          <div className="lg:col-span-2 space-y-10">
-
-            {/* Info principal */}
-            <div>
+            {/* 2. INFO PRINCIPAL */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <p className="text-sm text-gray-500 mb-1">
                 {TYPE_LABELS[currentProject.type] || currentProject.type} en {currentProject.district}
               </p>
@@ -303,11 +165,13 @@ const unitsByBedrooms = useMemo(() => {
               )}
             </div>
 
-            {/* Stats tipo Urbania */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-b border-gray-100 py-6">
+            {/* 3. STATS */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               {currentProject.totalUnits > 0 && (
                 <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4h4v4H9z" /></svg>
+                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4h4v4H9z" />
+                  </svg>
                   <div>
                     <p className="text-sm font-semibold text-gray-800">{currentProject.totalUnits} unidades</p>
                   </div>
@@ -315,7 +179,9 @@ const unitsByBedrooms = useMemo(() => {
               )}
               {currentProject.areaFrom && (
                 <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                  </svg>
                   <div>
                     <p className="text-sm font-semibold text-gray-800">
                       {currentProject.areaFrom}{currentProject.areaTo ? ` a ${currentProject.areaTo}` : ''} m² tot.
@@ -325,7 +191,9 @@ const unitsByBedrooms = useMemo(() => {
               )}
               {currentProject.floors && (
                 <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4z" /></svg>
+                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4z" />
+                  </svg>
                   <div>
                     <p className="text-sm font-semibold text-gray-800">{currentProject.floors} pisos</p>
                   </div>
@@ -333,7 +201,9 @@ const unitsByBedrooms = useMemo(() => {
               )}
               {bedroomGroups.length > 0 && (
                 <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M3 12h18M3 12v5h18v-5M7 12V9h4v3M13 12V9h4v3" /></svg>
+                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M3 12h18M3 12v5h18v-5M7 12V9h4v3M13 12V9h4v3" />
+                  </svg>
                   <div>
                     <p className="text-sm font-semibold text-gray-800">
                       {bedroomGroups[0] === 0
@@ -347,21 +217,20 @@ const unitsByBedrooms = useMemo(() => {
               )}
             </div>
 
-            {/* Descripción */}
-            <div>
+            {/* 4. DESCRIPCIÓN */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-3">Sobre el proyecto</h2>
               <p className="text-gray-600 leading-relaxed">{currentProject.description}</p>
             </div>
 
-            {/* ── TIPOS DE UNIDADES (agrupados visualmente) ── */}
+            {/* 5. TIPOS DE UNIDADES */}
             {groupedUnitTypes.length > 0 && (
-              <div>
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-2">Tipos de unidades</h2>
                 <p className="text-sm text-gray-500 mb-6">
                   {units.filter(u => u.status === 'AVAILABLE').length} unidades disponibles de {units.length} en total
                 </p>
 
-                {/* Tabs por dormitorios */}
                 {bedroomGroups.length > 1 && (
                   <div className="flex gap-2 mb-6 border-b border-gray-200 overflow-x-auto">
                     {bedroomGroups.map(beds => (
@@ -383,18 +252,15 @@ const unitsByBedrooms = useMemo(() => {
                   </div>
                 )}
 
-                {/* Cards de tipos — 1 card por grupo de unidades similares */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {groupedUnitTypes
                     .filter(g => activeGroup === null || (g.units[0].bedrooms ?? 0) === activeGroup)
                     .map(({ units: groupUnits, key }) => {
                       const sample = groupUnits[0];
                       const available = groupUnits.filter(u => u.status === 'AVAILABLE').length;
-                      const reserved  = groupUnits.filter(u => u.status === 'RESERVED').length;
-                      const sold      = groupUnits.filter(u => u.status === 'SOLD').length;
-                      
-                      // Intentar detectar nombre del grupo desde el unitNumber
-                      // "torre 2-1-1" → "Torre 2" (todo antes del segundo guion)
+                      const reserved = groupUnits.filter(u => u.status === 'RESERVED').length;
+                      const sold = groupUnits.filter(u => u.status === 'SOLD').length;
+
                       const groupLabel = (() => {
                         const parts = sample.unitNumber.split('-');
                         if (parts.length >= 3) return parts.slice(0, -2).join(' ');
@@ -403,11 +269,12 @@ const unitsByBedrooms = useMemo(() => {
 
                       return (
                         <div key={key} className="border border-gray-200 rounded-2xl overflow-hidden hover:shadow-md transition bg-white">
-                          
-                          {/* Placeholder del plano (el backend no devuelve blueprintImage aún) */}
                           <div className="relative h-40 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center border-b border-gray-100">
                             <div className="text-center">
-                              <svg className="w-10 h-10 text-gray-300 mx-auto mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9 22V12h6v10"/></svg>
+                              <svg className="w-10 h-10 text-gray-300 mx-auto mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 22V12h6v10" />
+                              </svg>
                               <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
                                 {sample.type === 'APARTMENT' ? 'Departamento' :
                                  sample.type === 'PENTHOUSE' ? 'Penthouse' :
@@ -415,7 +282,6 @@ const unitsByBedrooms = useMemo(() => {
                               </p>
                             </div>
 
-                            {/* Badge disponibilidad */}
                             <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
                               {available > 0 && (
                                 <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">
@@ -434,37 +300,57 @@ const unitsByBedrooms = useMemo(() => {
                               )}
                             </div>
 
-                            {/* Total del grupo */}
                             <div className="absolute bottom-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
                               {groupUnits.length} unidades en este tipo
                             </div>
                           </div>
 
                           <div className="p-4">
-                            {/* Nombre del grupo */}
                             <p className="font-bold text-gray-900 mb-1 capitalize">{groupLabel}</p>
-                            
-                            {/* Características */}
+
                             <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500 mb-3">
                               {(sample.bedrooms ?? 0) > 0 && (
-                                <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M3 12h18M3 12v5h18v-5M7 12V9h4v3M13 12V9h4v3"/></svg>{sample.bedrooms} dorm.</span>
+                                <span className="flex items-center gap-1">
+                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M3 12h18M3 12v5h18v-5M7 12V9h4v3M13 12V9h4v3" />
+                                  </svg>
+                                  {sample.bedrooms} dorm.
+                                </span>
                               )}
-                              <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 12h16M4 12a2 2 0 01-2-2V7h4v3M4 12v5a2 2 0 002 2h12a2 2 0 002-2v-5M8 7V5a2 2 0 114 0v2"/></svg>{sample.bathrooms} baños</span>
-                              <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>{sample.area} m²</span>
+                              <span className="flex items-center gap-1">
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 12h16M4 12a2 2 0 01-2-2V7h4v3M4 12v5a2 2 0 002 2h12a2 2 0 002-2v-5M8 7V5a2 2 0 114 0v2" />
+                                </svg>
+                                {sample.bathrooms} baños
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                </svg>
+                                {sample.area} m²
+                              </span>
                               {sample.parkingSpots > 0 && (
-                                <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zm10 0a2 2 0 11-4 0 2 2 0 014 0zM4 9l2-5h12l2 5M4 9h16M4 9H2m18 0h2"/></svg>{sample.parkingSpots} est.</span>
+                                <span className="flex items-center gap-1">
+                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zm10 0a2 2 0 11-4 0 2 2 0 014 0zM4 9l2-5h12l2 5M4 9h16M4 9H2m18 0h2" />
+                                  </svg>
+                                  {sample.parkingSpots} est.
+                                </span>
                               )}
                               {sample.view && (
-                                <span className="flex items-center gap-1"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7"/></svg>{sample.view}</span>
+                                <span className="flex items-center gap-1">
+                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" />
+                                  </svg>
+                                  {sample.view}
+                                </span>
                               )}
                             </div>
 
-                            {/* Precio */}
                             <p className="text-lg font-bold text-gray-900 mb-3">
                               {currency} {sample.price.toLocaleString('en-US')}
                             </p>
 
-                            {/* Barra de disponibilidad */}
                             <div className="mb-3">
                               <div className="flex justify-between text-xs text-gray-400 mb-1">
                                 <span>Disponibilidad</span>
@@ -478,9 +364,7 @@ const unitsByBedrooms = useMemo(() => {
                               </div>
                             </div>
 
-                            {/* Acciones */}
                             <div className="flex gap-2">
-                              {/* COTIZAR → genera PDF */}
                               <button
                                 onClick={() => quotation.generateQuotePDF(groupUnits, groupLabel)}
                                 className="flex-1 bg-blue-600 text-white text-xs py-2 px-3 rounded-lg hover:bg-blue-700 transition font-medium flex items-center justify-center gap-1"
@@ -492,7 +376,6 @@ const unitsByBedrooms = useMemo(() => {
                                 Cotizar PDF
                               </button>
 
-                              {/* VER UNIDADES → expande/colapsa */}
                               <button
                                 onClick={() => quotation.setExpandedGroupKey(quotation.expandedGroupKey === key ? null : key)}
                                 className="flex-1 border border-gray-200 text-gray-600 text-xs py-2 px-3 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-1"
@@ -505,7 +388,6 @@ const unitsByBedrooms = useMemo(() => {
                               </button>
                             </div>
 
-                            {/* CARDS EXPANDIDAS DEL GRUPO */}
                             {quotation.expandedGroupKey === key && (
                               <div className="mt-4 pt-4 border-t border-gray-100">
                                 <p className="text-xs text-gray-400 mb-3 font-medium uppercase tracking-wide">
@@ -516,7 +398,7 @@ const unitsByBedrooms = useMemo(() => {
                                     const waPhone = currentProject.developer?.phone?.replace(/\D/g, '') || '';
                                     const waMsg = encodeURIComponent(
                                       `Hola, estoy interesado en la unidad *${unit.unitNumber}* del proyecto *${currentProject.name}*.\n` +
-                                      `• Área: ${unit.area} m²\n• Precio: ${currentProject.currency || 'S/.'} ${unit.price.toLocaleString()}\n¿Podría darme más información?` 
+                                      `• Área: ${unit.area} m²\n• Precio: ${currentProject.currency || 'S/.'} ${unit.price.toLocaleString()}\n¿Podría darme más información?`
                                     );
                                     return (
                                       <div key={unit.id}
@@ -529,7 +411,7 @@ const unitsByBedrooms = useMemo(() => {
                                         <span className={`inline-block mt-1 mb-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
                                           unit.status === 'AVAILABLE' ? 'bg-green-100 text-green-700' :
                                           unit.status === 'RESERVED'  ? 'bg-yellow-100 text-yellow-700' :
-                                                                                'bg-red-100 text-red-700'
+                                                                        'bg-red-100 text-red-700'
                                         }`}>
                                           {unit.status === 'AVAILABLE' ? 'Disponible' :
                                            unit.status === 'RESERVED'  ? 'Reservado' : 'Vendido'}
@@ -556,10 +438,12 @@ const unitsByBedrooms = useMemo(() => {
                       );
                     })}
                 </div>
+              </div>
+            )}
 
-                {/* ── AMENIDADES ── */}
+            {/* 6. AMENIDADES */}
             {currentProject.amenities && currentProject.amenities.length > 0 && (
-              <div>
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Amenidades</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {(currentProject.amenities as any[]).map((amenity, i) => {
@@ -575,9 +459,9 @@ const unitsByBedrooms = useMemo(() => {
               </div>
             )}
 
-            {/* ── TIMELINE ── */}
+            {/* 7. TIMELINE */}
             {currentProject.timeline && currentProject.timeline.length > 0 && (
-              <div>
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Cronograma del proyecto</h2>
                 <div className="relative border-l-2 border-blue-200 pl-6 space-y-6">
                   {currentProject.timeline.map((milestone, i) => (
@@ -596,8 +480,8 @@ const unitsByBedrooms = useMemo(() => {
               </div>
             )}
 
-            {/* ── UBICACIÓN ── */}
-            <div>
+            {/* 8. UBICACIÓN */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-1">Ubicación del proyecto</h2>
               <p className="text-sm text-gray-500 flex items-center gap-1 mb-4">
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -612,33 +496,20 @@ const unitsByBedrooms = useMemo(() => {
               </p>
 
               <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm h-72">
-                {/* Debug: Mostrar si tenemos API key */}
                 {process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY ? (
                   <>
-                    {/* Prioridad 1: coordenadas exactas */}
                     {currentProject.latitude && currentProject.longitude ? (
                       <iframe
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0 }}
-                        loading="lazy"
-                        allowFullScreen
+                        width="100%" height="100%" style={{ border: 0 }} loading="lazy" allowFullScreen
                         referrerPolicy="no-referrer-when-downgrade"
                         src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}&q=${currentProject.latitude},${currentProject.longitude}&zoom=16`}
                       />
                     ) : currentProject.fullAddress || currentProject.address ? (
-                      /* Prioridad 2: dirección como texto */
                       <iframe
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0 }}
-                        loading="lazy"
-                        allowFullScreen
+                        width="100%" height="100%" style={{ border: 0 }} loading="lazy" allowFullScreen
                         referrerPolicy="no-referrer-when-downgrade"
                         src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}&q=${encodeURIComponent(
-                          currentProject.fullAddress ||
-                          currentProject.address ||
-                          `${currentProject.district}, ${currentProject.province}, Perú` 
+                          currentProject.fullAddress || currentProject.address || `${currentProject.district}, ${currentProject.province}, Perú`
                         )}&zoom=16`}
                       />
                     ) : (
@@ -648,138 +519,36 @@ const unitsByBedrooms = useMemo(() => {
                     )}
                   </>
                 ) : (
-                  /* Fallback: OpenStreetMap si no hay API key */
                   <iframe
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    loading="lazy"
+                    width="100%" height="100%" style={{ border: 0 }} loading="lazy"
                     src={`https://www.openstreetmap.org/export/embed.html?bbox=${currentProject.longitude ? currentProject.longitude - 0.01 : '-77.0428'},${currentProject.latitude ? currentProject.latitude - 0.01 : '-12.0464'},${currentProject.longitude ? currentProject.longitude + 0.01 : '-77.0428'},${currentProject.latitude ? currentProject.latitude + 0.01 : '-12.0464'}&layer=mapnik&marker=${currentProject.latitude || '-12.0464'},${currentProject.longitude || '-77.0428'}`}
                   />
                 )}
               </div>
-            </div>
-          </div>
-                )}
-        </div>
 
-          {/* ── SIDEBAR CONTACTO ── */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-6 bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
-              <h3 className="text-base font-bold text-gray-900 mb-1">
-                Contáctate con {currentProject.developer?.companyName || 'el desarrollador'}
-              </h3>
-              <p className="text-sm text-gray-500 mb-4">
-                por el proyecto en {currentProject.district}, {currentProject.province}
-              </p>
-
-              <div className="space-y-3 mb-4">
-                <input type="email" placeholder="Email" defaultValue={currentProject.developer?.email || ''}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
-                <div className="grid grid-cols-2 gap-2">
-                  <input type="text" placeholder="Nombre"
-                    className="border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
-                  <input type="tel" placeholder="Teléfono"
-                    className="border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
-                </div>
-                <input type="text" placeholder="DNI"
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" />
-
-                {units.length > 0 && (
-                  <select className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    <option value="">Selecciona la unidad de interés</option>
-                    {units.filter(u => u.status === 'AVAILABLE').map((unit) => (
-                      <option key={unit.id} value={unit.id}>
-                        {unit.unitNumber} - {unit.bedrooms} dorm - {currency} {unit.price?.toLocaleString('en-US')}
-                      </option>
-                    ))}
-                  </select>
-                )}
-
-                <textarea rows={3} placeholder="¡Hola! Quiero que se comuniquen conmigo por este proyecto..."
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none" />
+              {/* Comentarios del proyecto */}
+              <div className="border-t border-gray-100 mt-6 pt-6">
+                <ProjectComments projectId={currentProject.id} />
               </div>
-
-              <div className="space-y-2 mb-4 text-xs text-gray-500">
-                <label className="flex items-start gap-2">
-                  <input type="checkbox" defaultChecked className="mt-0.5 accent-green-600" />
-                  <span>Acepto los <span className="underline cursor-pointer">Términos y Condiciones</span> y las <span className="underline cursor-pointer">políticas de privacidad</span>.</span>
-                </label>
-                <label className="flex items-start gap-2">
-                  <input type="checkbox" defaultChecked className="mt-0.5 accent-green-600" />
-                  <span>Autorizo el uso de mi información para fines adicionales</span>
-                </label>
-              </div>
-
-              <button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2">
-                Contactar
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </button>
-
-              {/* Info del developer */}
-              {currentProject.developer?.companyName && (
-                <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500 space-y-1">
-                  {currentProject.developer.phone && (
-                    <p className="flex items-center gap-1">
-                      <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                      {currentProject.developer.phone}
-                    </p>
-                  )}
-                  {currentProject.developer.ruc && (
-                    <p className="flex items-center gap-1">
-                      <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4h4v4H9z"/></svg>
-                      RUC: {currentProject.developer.ruc}
-                    </p>
-                  )}
-                </div>
-              )}
             </div>
+
+            {/* 9. PROYECTOS SIMILARES */}
+            <SimilarProjects currentProject={currentProject} />
           </div>
-        </div>
-      </section>
 
-      {/* ── MODAL GALERÍA COMPLETA ── */}
-      {showAllImages && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-          <button onClick={() => setShowAllImages(false)}
-            className="absolute top-4 right-4 text-white text-3xl hover:text-gray-300">✕</button>
-
-          <div className="w-full max-w-5xl">
-            {/* Imagen actual */}
-            <div className="relative h-[60vh] mb-4">
-              {galleryImagesOnly[currentImageIndex] && (
-                <Image src={galleryImagesOnly[currentImageIndex]} alt="Galería"
-                  fill className="object-contain" />
-              )}
-              <button onClick={() => setCurrentImageIndex(Math.max(0, currentImageIndex - 1))}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 transition">
-                ‹
-              </button>
-              <button onClick={() => setCurrentImageIndex(Math.min(galleryImagesOnly.length - 1, currentImageIndex + 1))}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 transition">
-                ›
-              </button>
-              <span className="absolute bottom-2 right-2 text-white text-sm bg-black/50 px-2 py-1 rounded">
-                {currentImageIndex + 1} / {galleryImagesOnly.length}
-              </span>
-            </div>
-
-            {/* Thumbnails */}
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {galleryImagesOnly.map((img, index) => (
-                <button key={index} onClick={() => setCurrentImageIndex(index)}
-                  className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition ${
-                    index === currentImageIndex ? 'border-white' : 'border-transparent'
-                  }`}>
-                  <Image src={img} alt={`thumb ${index}`} fill className="object-cover" />
-                </button>
-              ))}
-            </div>
+          {/* ════════════════════════════════════════
+              SIDEBAR (1/3) — sticky
+          ════════════════════════════════════════ */}
+          <div className="lg:col-span-4">
+            <ProjectContactSidebar
+              project={currentProject}
+              units={units}
+              currency={currency}
+            />
           </div>
+
         </div>
-      )}
+      </div>
 
       {/* ── MODAL DETALLE DE UNIDAD ── */}
       {selectedUnit && (() => {
@@ -794,17 +563,14 @@ const unitsByBedrooms = useMemo(() => {
           `• Estacionamientos: ${selectedUnit.parkingSpots}\n` +
           `• Vista: ${selectedUnit.view || 'No especificada'}\n` +
           `• Precio: ${currency} ${selectedUnit.price.toLocaleString()}\n\n` +
-          `¿Podría darme más información?` 
+          `¿Podría darme más información?`
         );
         const whatsappUrl = `https://wa.me/${whatsappPhone}?text=${whatsappMsg}`;
 
         return (
           <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
             onClick={(e) => { if (e.target === e.currentTarget) setSelectedUnit(null); }}>
-
             <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
-
-              {/* Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                 <div>
                   <h3 className="font-bold text-gray-900 text-lg">{selectedUnit.unitNumber}</h3>
@@ -818,14 +584,10 @@ const unitsByBedrooms = useMemo(() => {
                 </button>
               </div>
 
-              {/* Plano de la unidad */}
               <div className="relative h-52 bg-gray-50 border-b border-gray-100 flex items-center justify-center">
                 {(selectedUnit as any).blueprintImage ? (
-                  <img
-                    src={(selectedUnit as any).blueprintImage}
-                    alt={`Plano ${selectedUnit.unitNumber}`}
-                    className="w-full h-full object-contain p-4"
-                  />
+                  <img src={(selectedUnit as any).blueprintImage} alt={`Plano ${selectedUnit.unitNumber}`}
+                    className="w-full h-full object-contain p-4" />
                 ) : (
                   <div className="text-center text-gray-300">
                     <svg className="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -845,7 +607,6 @@ const unitsByBedrooms = useMemo(() => {
                 </span>
               </div>
 
-              {/* Info completa de la unidad */}
               <div className="px-6 py-4 space-y-4">
                 <div className="grid grid-cols-3 gap-3">
                   {[
@@ -868,7 +629,6 @@ const unitsByBedrooms = useMemo(() => {
                   ))}
                 </div>
 
-                {/* Vista */}
                 {selectedUnit.view && (
                   <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
                     <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" /></svg>
@@ -876,7 +636,6 @@ const unitsByBedrooms = useMemo(() => {
                   </div>
                 )}
 
-                {/* Precio */}
                 <div className="flex items-center justify-between bg-blue-50 rounded-xl px-4 py-3">
                   <div>
                     <p className="text-xs text-blue-500 font-medium">Precio de venta</p>
@@ -896,7 +655,6 @@ const unitsByBedrooms = useMemo(() => {
                 </div>
               </div>
 
-              {/* Botones de acción */}
               <div className="px-6 pb-6 flex gap-3">
                 <a
                   href={whatsappUrl}
@@ -920,8 +678,7 @@ const unitsByBedrooms = useMemo(() => {
             </div>
           </div>
         );
-      })
-      ()}
+      })()}
     </main>
   );
 }

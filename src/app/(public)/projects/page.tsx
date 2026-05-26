@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import ProjectsContent from './components/ProjectsContent';
 
 export const metadata: Metadata = {
-  title: 'Proyectos Inmobiliarios en Perú | Departamentos y Casas - TIYUY',
+  title: 'Proyectos Inmobiliarios en Perú | Departamentos, Casas y Lotes - TIYUY',
   description: 'Descubre los mejores proyectos inmobiliarios en Perú. Departamentos, casas y lotes en Lima y provincias. Proyectos de vivienda e inversión de las principales inmobiliarias.',
   keywords: [
     'proyectos inmobiliarios Perú',
@@ -10,9 +10,11 @@ export const metadata: Metadata = {
     'proyectos de vivienda',
     'inversión inmobiliaria',
     'casas nuevas Perú',
-    'proyectos inmobiliarios 2024',
+    'proyectos inmobiliarios 2026',
     'inmobiliarias Perú',
-    'comprar departamento estreno'
+    'comprar departamento estreno',
+    'lotes en venta',
+    'preventa departamentos'
   ],
   openGraph: {
     title: 'Proyectos Inmobiliarios en Perú | TIYUY',

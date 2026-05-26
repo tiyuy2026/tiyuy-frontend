@@ -54,6 +54,16 @@ export function SearchBar({ propertyType, district }: { propertyType: string; di
       : district;
     if (selectedLocation) params.set('filtered', '1');
     
+    // Guardar búsqueda para recomendaciones en la home
+    localStorage.setItem('lastSearch', JSON.stringify({
+      transactionType: transactionType === 'venta' ? 'sale' : 'rent',
+      type: selectedType,
+      district: selectedLocation ? selectedLocation.mainText.toLowerCase() : district,
+      bedrooms: searchParams.get('bedrooms') || '',
+      bathrooms: searchParams.get('bathrooms') || '',
+      minArea: searchParams.get('minArea') || '',
+    }));
+    
     // Convertir 'venta'/'alquiler' a 'sale'/'rent' para usar rutas existentes
     const routeTransactionType = transactionType === 'venta' ? 'sale' : 'rent';
     const finalUrl = `/${routeTransactionType}/${selectedType}/${slug}?${params.toString()}`;
