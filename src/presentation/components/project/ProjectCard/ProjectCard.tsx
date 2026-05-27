@@ -129,18 +129,18 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </div>
         )}
 
-        {/* Overlay gradient para proteger el contraste de insignias */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent opacity-60" />
+        {/* Overlay gradient - reducido para un look más limpio */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-transparent opacity-50" />
 
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
           {project.isFeatured && (
-            <div className="bg-white/95 backdrop-blur-sm text-gray-900 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">
+            <div className="bg-white text-gray-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
               Destacado
             </div>
           )}
           {project.isVerified && (
-            <div className="bg-white/95 backdrop-blur-sm text-gray-900 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
+            <div className="bg-white text-gray-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1">
               <BadgeCheck className="w-3.5 h-3.5 text-blue-500" />
               Verificado
             </div>
@@ -151,15 +151,15 @@ export function ProjectCard({ project }: ProjectCardProps) {
         {renderLifecycleBadge()}
       </Link>
 
-      {/* Contenido */}
-      <Link href={`/projects/${getProjectSlug(project)}`} className="flex flex-col flex-grow">
+      {/* Contenido Minimalista estilo Airbnb */}
+      <Link href={`/projects/${getProjectSlug(project)}`} className="flex flex-col flex-grow mt-1">
         <div className="flex justify-between items-start gap-2">
           <h3 className="text-[15px] font-semibold text-gray-900 line-clamp-1">
             {project.name}
           </h3>
-          <div className="flex items-center gap-1 text-[13px] text-gray-900 flex-shrink-0">
-            <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
-            <span>{rating ? rating.averageRating.toFixed(1) : '—'}</span>
+          <div className="flex items-center gap-1 text-[14px] text-gray-900 flex-shrink-0">
+            <Star className="w-3.5 h-3.5 text-gray-900 fill-gray-900" />
+            <span>{rating && rating.averageRating > 0 ? rating.averageRating.toFixed(2) : 'Nuevo'}</span>
           </div>
         </div>
 
@@ -173,9 +173,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
           {project.availableUnits} unid. disponibles
         </p>
 
-        <div className="mt-1.5 flex items-center justify-between">
+        <div className="mt-1 flex items-center justify-between">
           <div className="flex items-center gap-1">
-            <span className="text-[15px] text-gray-900">Desde</span>
             <span className="text-[15px] font-semibold text-gray-900">
               {formatPrice(project.priceFrom, project.currency)}
             </span>

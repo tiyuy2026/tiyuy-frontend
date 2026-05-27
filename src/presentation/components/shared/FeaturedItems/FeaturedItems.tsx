@@ -43,6 +43,9 @@ export function FeaturedItems<T>({
   const [error, setError] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  
   // Set default emptyAction if not provided
   const defaultEmptyAction = emptyAction || {
     text: `Crear ${itemName}`,
@@ -50,6 +53,23 @@ export function FeaturedItems<T>({
     icon: ''
   };
   
+  const updateScrollState = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(Math.ceil(scrollLeft + clientWidth) < scrollWidth);
+    }
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(updateScrollState, 100);
+    window.addEventListener('resize', updateScrollState);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', updateScrollState);
+    };
+  }, [items]);
+
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: -scrollContainerRef.current.clientWidth, behavior: 'smooth' });
@@ -72,14 +92,33 @@ export function FeaturedItems<T>({
         
         // Cargar items destacados
         const result = await repository.getFeaturedItems();
-        console.log(`✅ ${itemName}s destacados recibidos:`, result);
-        setItems(result.content || []);
+        let itemsContent = result.content || [];
+        console.log(`✅ ${itemName}s destacados recibidos:`, itemsContent.length);
         
-        // Si no hay items destacados, cargar items recientes
-        if (!result.content || result.content.length === 0) {
-          console.log(`⚠️ No hay ${itemName}s destacados, cargando ${itemName}s recientes...`);
-          // TODO: Implementar getRecentItems cuando exista
+        // Si hay menos de 15, rellenar con recientes para que el carrusel se vea completo
+        if (itemsContent.length < 15) {
+          console.log(`⚠️ Solo hay ${itemsContent.length} destacados, rellenando con recientes...`);
+          try {
+            let recentResult;
+            if ('searchProjects' in repository) {
+              recentResult = await (repository as any).searchProjects({ page: 0, size: 15, sort: 'createdAt,desc' });
+            } else if ('search' in repository) {
+              recentResult = await (repository as any).search({ page: 0, size: 15, sort: 'createdAt,desc' });
+            }
+
+            if (recentResult && recentResult.content) {
+              const recentProps = recentResult.content || [];
+              const existingIds = new Set(itemsContent.map((p: any) => p.id));
+              const additionalProps = recentProps.filter((p: any) => !existingIds.has(p.id));
+              
+              itemsContent = [...itemsContent, ...additionalProps].slice(0, 15);
+            }
+          } catch (recentError) {
+            console.log('❌ Error cargando items recientes:', recentError);
+          }
         }
+        
+        setItems(itemsContent);
       } catch (error) {
         console.error(`❌ Error loading featured ${itemName}s:`, error);
         
@@ -97,26 +136,6 @@ export function FeaturedItems<T>({
     };
 
     loadFeaturedItems();
-  }, []);
-
-  // Refrescar items cada 30 segundos
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const refreshItems = async () => {
-        try {
-          const result = await repository.getFeaturedItems();
-          if (result.content && result.content.length > 0) {
-            setItems(result.content);
-          }
-        } catch (error) {
-          console.error('Error refreshing items:', error);
-        }
-      };
-      
-      refreshItems();
-    }, 30000); // 30 segundos
-    
-    return () => clearInterval(interval);
   }, []);
 
   if (isLoading) {
@@ -197,64 +216,109 @@ export function FeaturedItems<T>({
   }
 
   return (
-    <>
+    <div className="w-full">
       <style>{`
-        .carousel-wrapper-dynamic {
-          max-width: calc(2 * 280px + 8.25rem);
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
         }
-        @media (min-width: 768px) { .carousel-wrapper-dynamic { max-width: calc(2 * 330px + 10.5rem); } }
-        @media (min-width: 1024px) { .carousel-wrapper-dynamic { max-width: calc(3 * 280px + 12rem); } }
-        @media (min-width: 1280px) { .carousel-wrapper-dynamic { max-width: calc(5 * 210px + 15rem); } }
-        @media (min-width: 1536px) { .carousel-wrapper-dynamic { max-width: calc(6 * 230px + 16.5rem); } }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        
+        .carousel-card {
+          width: 85vw;
+        }
+        @media (min-width: 640px) {
+          .carousel-card { width: calc((100% - 20px) / 2); }
+        }
+        @media (min-width: 768px) {
+          .carousel-card { width: calc((100% - 2 * 24px) / 3); }
+        }
+        @media (min-width: 1024px) {
+          .carousel-card { width: calc((100% - 3 * 24px) / 4); }
+        }
+        @media (min-width: 1280px) {
+          .carousel-card { width: calc((100% - 4 * 24px) / 5); }
+        }
+        @media (min-width: 1536px) {
+          .carousel-card { width: calc((100% - 5 * 24px) / 6); }
+        }
+        @media (min-width: 1800px) {
+          .carousel-card { width: calc((100% - 6 * 24px) / 7); }
+        }
       `}</style>
-      <div className="w-full mx-auto relative group/carousel carousel-wrapper-dynamic px-12 md:px-16">
-      
-      {/* Flechas de navegación */}
-      <button
-        onClick={scrollLeft}
-        className="absolute -left-4 md:-left-8 top-[35%] -translate-y-1/2 z-20 bg-white shadow-md border border-gray-100 rounded-full p-2 hover:scale-105 transition-all duration-200 opacity-0 group-hover/carousel:opacity-100 disabled:opacity-0"
-        aria-label="Scroll izquierda"
-      >
-        <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
 
-      <button
-        onClick={scrollRight}
-        className="absolute -right-4 md:-right-8 top-[35%] -translate-y-1/2 z-20 bg-white shadow-md border border-gray-100 rounded-full p-2 hover:scale-105 transition-all duration-200 opacity-0 group-hover/carousel:opacity-100 disabled:opacity-0"
-        aria-label="Scroll derecha"
-      >
-        <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-      
-      {/* Horizontal scroll container */}
-      <div ref={scrollContainerRef} className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
-        <div className="flex-1 min-w-0" />
-        <div className="flex gap-4 sm:gap-5 md:gap-6 pb-4 pl-4 flex-shrink-0">
+      <div className="w-full max-w-[1920px] mx-auto px-8 xl:px-16">
+        
+        {/* Header and Navigation Controls */}
+        <div className="flex justify-between items-end mb-4 pr-4">
+          <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2 capitalize">
+            {itemName}s destacados
+            <Link href={itemName === 'proyecto' ? '/projects' : '/properties'} className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors ml-1">
+              <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </Link>
+          </h2>
+
+          <div className="flex gap-2">
+            <button
+              onClick={scrollLeft}
+              disabled={!canScrollLeft}
+              className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:shadow-md transition-all bg-white text-gray-600 hover:text-gray-900 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+              aria-label="Scroll izquierda"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={scrollRight}
+              disabled={!canScrollRight}
+              className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:shadow-md transition-all bg-white text-gray-600 hover:text-gray-900 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+              aria-label="Scroll derecha"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Horizontal scroll container */}
+        <div 
+          ref={scrollContainerRef} 
+          onScroll={updateScrollState}
+          className="flex overflow-x-auto gap-4 sm:gap-5 md:gap-6 hide-scrollbar snap-x snap-mandatory scroll-smooth pb-4"
+        >
           {items.map((item: any) => (
-            <div key={item.id} className="w-[85vw] sm:w-[280px] md:w-[330px] lg:w-[280px] xl:w-[210px] 2xl:w-[230px] flex-shrink-0 snap-start">
+            <div key={item.id} className="carousel-card flex-shrink-0 snap-start">
               <ItemCard item={item} />
             </div>
           ))}
-          {/* Tarjeta de Ver Todos */}
+          
+          {/* Tarjeta de Ver Todos al final */}
           {!hideViewAll && (
-            <div className="w-[85vw] sm:w-[280px] md:w-[330px] lg:w-[280px] xl:w-[210px] 2xl:w-[230px] flex-shrink-0 snap-start">
-              <Link href={itemName === 'proyecto' ? '/projects' : '/properties'} className="flex flex-col items-center justify-center h-full min-h-[250px] w-full bg-gray-50 hover:bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 transition-colors group">
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+            <div className="carousel-card flex-shrink-0 snap-start">
+              <Link href={itemName === 'proyecto' ? '/projects' : '/properties'} className="flex flex-col items-center justify-center h-full min-h-[320px] w-full bg-white hover:bg-gray-50 rounded-2xl border border-gray-200 transition-all hover:shadow-md group">
+                <div className="relative w-32 h-24 mb-6 group-hover:scale-105 transition-transform duration-300">
+                  <div className="absolute top-0 left-0 w-20 h-20 bg-gray-200 rounded-xl border-2 border-white shadow-sm -rotate-6 transform origin-bottom-left z-10 overflow-hidden">
+                    <div className="w-full h-full bg-blue-100/50"></div>
+                  </div>
+                  <div className="absolute top-2 right-0 w-20 h-20 bg-gray-200 rounded-xl border-2 border-white shadow-sm rotate-6 transform origin-bottom-right z-20 overflow-hidden">
+                    <div className="w-full h-full bg-green-100/50"></div>
+                  </div>
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-20 h-20 bg-gray-100 rounded-xl border-2 border-white shadow-md z-30 overflow-hidden">
+                    <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    </div>
+                  </div>
                 </div>
-                <span className="text-gray-600 font-medium group-hover:text-blue-600 transition-colors text-center px-4">Ver todos los<br/>{itemName}s</span>
+                <span className="text-[#003B95] font-semibold text-lg group-hover:text-blue-800 transition-colors">Ver todo</span>
               </Link>
             </div>
           )}
-          <div className="w-4 flex-shrink-0" />
         </div>
-        <div className="flex-1 min-w-0" />
       </div>
     </div>
-    </>
   );
 }

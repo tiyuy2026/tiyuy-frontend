@@ -7,21 +7,23 @@ import { PropertySummary } from '@/core/domain/entities/Property';
 import { PropertyFilter } from '@/core/domain/entities/PropertyFilter';
 import { PropertyRepository } from '@/infrastructure/repositories/PropertyRepository';
 
-interface FeaturedPropertiesProps {
+interface FilteredPropertiesProps {
+  title: string;
+  viewAllLink: string;
+  filter: PropertyFilter;
   hideViewAll?: boolean;
+  emptyMessage?: string;
 }
 
-export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesProps = {}) {
+export function FilteredProperties({ title, viewAllLink, filter, hideViewAll = false, emptyMessage = "No hay propiedades disponibles en esta categoría" }: FilteredPropertiesProps) {
   const [properties, setProperties] = useState<PropertySummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isRecommended, setIsRecommended] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   
-  // Crear instancia del repositorio
   const propertyRepo = new PropertyRepository();
 
   const updateScrollState = () => {
@@ -33,6 +35,7 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
   };
 
   useEffect(() => {
+    // Verificar estado inicial cuando las propiedades cambian
     const timeoutId = setTimeout(updateScrollState, 100);
     window.addEventListener('resize', updateScrollState);
     return () => {
@@ -59,69 +62,16 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
         setIsLoading(true);
         setError(null);
         
-        // Intentar cargar recomendaciones basadas en la última búsqueda
-        const lastSearchRaw = localStorage.getItem('lastSearch');
-        if (lastSearchRaw) {
-          try {
-            const lastSearch = JSON.parse(lastSearchRaw);
-            console.log('🔍 Última búsqueda encontrada:', lastSearch);
-            
-            const filters: PropertyFilter = {
-              transactionType: lastSearch.transactionType || 'sale',
-              type: lastSearch.type || 'departamentos',
-              district: lastSearch.district || '',
-              page: 0,
-              size: 15,
-              sort: 'createdAt,desc',
-            };
-            
-            const result = await propertyRepo.search(filters);
-            
-            if (result.properties && result.properties.length > 0) {
-              console.log('✅ Propiedades recomendadas recibidas:', result.properties.length);
-              setProperties(result.properties);
-              setIsRecommended(true);
-              return;
-            } else {
-              console.log('⚠️ No hay propiedades similares a tu búsqueda');
-              setProperties([]);
-              setIsRecommended(true);
-              return;
-            }
-          } catch (searchError) {
-            console.log('❌ Error buscando recomendaciones:', searchError);
-            // Fall through a featured properties
-          }
-        }
+        const result = await propertyRepo.search({
+          ...filter,
+          page: 0,
+          size: 15,
+          sort: 'createdAt,desc',
+        });
         
-        console.log('🔍 Cargando propiedades destacadas...');
-        
-        // Cargar propiedades destacadas (isFeatured: true)
-        const result = await propertyRepo.getFeaturedProperties(0, 15);
-        let featuredProps = result.properties || [];
-        console.log('✅ Propiedades destacadas recibidas:', featuredProps.length);
-        
-        // Si hay menos de 15, rellenar con propiedades recientes para que el carrusel se vea lleno
-        if (featuredProps.length < 15) {
-          console.log(`⚠️ Solo hay ${featuredProps.length} destacadas, rellenando con recientes...`);
-          try {
-            const recentResult = await propertyRepo.search({ page: 0, size: 15, sort: 'createdAt,desc' } as any);
-            const recentProps = recentResult.properties || [];
-            
-            // Filtrar duplicados
-            const existingIds = new Set(featuredProps.map(p => p.id));
-            const additionalProps = recentProps.filter(p => !existingIds.has(p.id));
-            
-            featuredProps = [...featuredProps, ...additionalProps].slice(0, 15);
-          } catch (recentError) {
-            console.log('❌ Error cargando propiedades recientes:', recentError);
-          }
-        }
-        
-        setProperties(featuredProps);
-        setIsRecommended(false);
+        setProperties(result.properties || []);
       } catch (error) {
-        console.error('❌ Error loading featured properties:', error);
+        console.error('❌ Error loading filtered properties:', error);
         setError('No se pudieron cargar las propiedades');
         setProperties([]);
       } finally {
@@ -130,7 +80,7 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
     };
 
     loadProperties();
-  }, []);
+  }, [filter.type, filter.transactionType, filter.district]);
 
   if (isLoading) {
     return (
@@ -138,7 +88,7 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
         <div className="flex overflow-x-auto scrollbar-hide">
           <div className="flex-1 min-w-0" />
           <div className="flex gap-4 sm:gap-5 md:gap-6 pb-4 px-4 flex-shrink-0">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="w-[85vw] sm:w-[280px] md:w-[320px] lg:w-[240px] xl:w-[190px] 2xl:w-[220px] flex-shrink-0">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
                   <div className="w-full aspect-square bg-gray-200" />
@@ -160,44 +110,16 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
 
   if (error) {
     return (
-      <div className="text-center py-20 bg-gradient-to-br from-red-50 to-orange-100 rounded-2xl">
-        <h3 className="text-2xl font-bold text-gray-800 mb-3">
-          Error al cargar propiedades
-        </h3>
-        <p className="text-gray-600 text-lg mb-6 max-w-md mx-auto">
-          {error}
-        </p>
-        <button 
-          onClick={() => window.location.reload()}
-          className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
-        >
-          <span>Reintentar</span>
-        </button>
+      <div className="text-center py-10">
+        <p className="text-gray-500">{error}</p>
       </div>
     );
   }
 
   if (properties.length === 0) {
-    if (isRecommended) {
-      return (
-        <div className="text-center py-20 bg-gradient-to-br from-amber-50 to-orange-100 rounded-2xl">
-          <h3 className="text-2xl font-bold text-gray-800 mb-3">
-            No tenemos recomendaciones disponibles
-          </h3>
-          <p className="text-gray-600 text-lg mb-6 max-w-md mx-auto">
-            No encontramos propiedades similares a tu búsqueda. Intenta con otros criterios o vuelve más tarde.
-          </p>
-        </div>
-      );
-    }
     return (
-      <div className="text-center py-20 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl">
-        <h3 className="text-2xl font-bold text-gray-800 mb-3">
-          No hay propiedades disponibles
-        </h3>
-        <p className="text-gray-600 text-lg mb-6 max-w-md mx-auto">
-          Sé el primero en publicar una propiedad o vuelve más tarde para descubrir nuevas oportunidades
-        </p>
+      <div className="text-center py-10">
+        <p className="text-gray-500">{emptyMessage}</p>
       </div>
     );
   }
@@ -212,7 +134,7 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
-        
+
         .carousel-card {
           width: 85vw;
         }
@@ -237,16 +159,11 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
       `}</style>
       
       <div className="w-full max-w-[1920px] mx-auto px-8 xl:px-16">
-        
         {/* Header and Navigation Controls */}
         <div className="flex justify-between items-end mb-4 pr-4">
           <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-            {isRecommended ? (
-              <>Más recomendaciones para ti <span className="text-gray-500 text-lg">🎯</span></>
-            ) : (
-              <>Alojamientos populares</>
-            )}
-            <Link href="/properties" className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors ml-1">
+            {title}
+            <Link href={viewAllLink} className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors ml-1">
               <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </Link>
           </h2>
@@ -288,8 +205,9 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
           ))}
           
           {/* Tarjeta de Ver Todos al final */}
-          <div className="carousel-card flex-shrink-0 snap-start">
-              <Link href="/properties" className="flex flex-col items-center justify-center h-full min-h-[320px] w-full bg-white hover:bg-gray-50 rounded-2xl border border-gray-200 transition-all hover:shadow-md group">
+          {!hideViewAll && (
+            <div className="carousel-card flex-shrink-0 snap-start">
+              <Link href={viewAllLink} className="flex flex-col items-center justify-center h-full min-h-[320px] w-full bg-white hover:bg-gray-50 rounded-2xl border border-gray-200 transition-all hover:shadow-md group">
                 <div className="relative w-32 h-24 mb-6 group-hover:scale-105 transition-transform duration-300">
                   <div className="absolute top-0 left-0 w-20 h-20 bg-gray-200 rounded-xl border-2 border-white shadow-sm -rotate-6 transform origin-bottom-left z-10 overflow-hidden">
                     <div className="w-full h-full bg-blue-100/50"></div>
@@ -306,6 +224,7 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
                 <span className="text-[#003B95] font-semibold text-lg group-hover:text-blue-800 transition-colors">Ver todo</span>
               </Link>
             </div>
+          )}
         </div>
       </div>
     </div>

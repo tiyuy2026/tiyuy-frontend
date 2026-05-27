@@ -176,9 +176,10 @@ async getById(id: number): Promise<Property> {
     return response.data;
   }
 
-  async getFeaturedProperties(page = 0, size = 4): Promise<PropertySearchResult> {
+  async getFeaturedProperties(page = 0, size = 15): Promise<PropertySearchResult> {
     try {
       const response = await publicApiClient.get('/properties/featured', {
+        params: { page, size },
         timeout: 120000,
       });
 

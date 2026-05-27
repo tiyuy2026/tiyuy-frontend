@@ -7,6 +7,7 @@ import { Icon } from '@iconify/react';
 import { Footer } from '@/presentation/components/layout/Footer/Footer';
 import { FeaturedProperties } from '@/presentation/components/property/FeaturedProperties/FeaturedProperties';
 import { FeaturedProjects } from '@/presentation/components/project/FeaturedProjects/FeaturedProjects';
+import { FilteredProperties } from '@/presentation/components/property/FilteredProperties/FilteredProperties';
 import { LocationSearch } from '@/presentation/components/forms/LocationSearch/LocationSearch';
 
 const HERO_IMAGES = [
@@ -385,48 +386,60 @@ export default function HomePage() {
       </section>
 
       {/* PROPIEDADES DESTACADAS / RECOMENDACIONES */}
-      <section className="py-20 bg-background">
-        <div className="w-full px-8 xl:px-16">
-          <div className="max-w-[1920px] mx-auto">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 bg-brand-light text-brand px-4 py-2 rounded-full text-sm font-semibold mb-4 border border-brand/10">
-                <span>⭐</span>
-                <span>PROPIEDADES DESTACADAS</span>
-              </div>
-              <h2 className="text-4xl xl:text-5xl font-bold text-foreground mb-4">
-                Encuentra el hogar de tus
-                <span className="text-brand"> sueños</span>
-              </h2>
-              <p className="text-xl text-foreground/70 max-w-3xl mx-auto">
-                Descubre las mejores propiedades en todo el Perú, seleccionadas cuidadosamente para ofrecerte calidad y confianza.
-              </p>
-            </div>
-            
-            <FeaturedProperties />
-          </div>
+      <section className="py-10 bg-background border-b border-gray-100">
+        <div className="w-full max-w-[1920px] mx-auto">
+          <FeaturedProperties />
+        </div>
+      </section>
+
+      {/* DEPARTAMENTOS EN ALQUILER */}
+      <section className="py-10 bg-background border-b border-gray-100">
+        <div className="w-full max-w-[1920px] mx-auto">
+          <FilteredProperties 
+            title="Departamentos para alquilar" 
+            viewAllLink="/rent/departamentos/lima" 
+            filter={{ type: 'APARTMENT', transactionType: 'RENT' }} 
+          />
+        </div>
+      </section>
+
+      {/* CASAS EN VENTA */}
+      <section className="py-10 bg-background border-b border-gray-100">
+        <div className="w-full max-w-[1920px] mx-auto">
+          <FilteredProperties 
+            title="Casas disponibles para compra" 
+            viewAllLink="/sale/casas/lima" 
+            filter={{ type: 'HOUSE', transactionType: 'SALE' }} 
+          />
         </div>
       </section>
 
       {/* PROYECTOS INMOBILIARIOS */}
-      <section className="py-20 bg-background border-t border-gray-100">
-        <div className="w-full px-8 xl:px-16">
-          <div className="max-w-[1920px] mx-auto">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 bg-brand-light text-brand px-4 py-2 rounded-full text-sm font-semibold mb-4 border border-brand/10">
-                <span>🏗️</span>
-                <span>PROYECTOS INMOBILIARIOS</span>
-              </div>
-              <h2 className="text-4xl xl:text-5xl font-bold text-foreground mb-4">
-                Proyectos
-                <span className="text-brand"> cerca de ti</span>
-              </h2>
-              <p className="text-xl text-foreground/70 max-w-3xl mx-auto">
-                Descubre los mejores proyectos de vivienda e inversión de las principales inmobiliarias del Perú.
-              </p>
-            </div>
-            
-            <FeaturedProjects />
-          </div>
+      <section className="py-10 bg-background border-b border-gray-100">
+        <div className="w-full max-w-[1920px] mx-auto">
+          <FeaturedProjects />
+        </div>
+      </section>
+
+      {/* OFICINAS Y LOCALES */}
+      <section className="py-10 bg-background border-b border-gray-100">
+        <div className="w-full max-w-[1920px] mx-auto">
+          <FilteredProperties 
+            title="Espacios para tu negocio" 
+            viewAllLink="/sale/oficinas/lima" 
+            filter={{ type: 'COMMERCIAL' }} 
+          />
+        </div>
+      </section>
+
+      {/* TERRENOS */}
+      <section className="py-10 bg-background">
+        <div className="w-full max-w-[1920px] mx-auto">
+          <FilteredProperties 
+            title="Terrenos y lotes de inversión" 
+            viewAllLink="/sale/terrenos/lima" 
+            filter={{ type: 'LAND' }} 
+          />
         </div>
       </section>
 
