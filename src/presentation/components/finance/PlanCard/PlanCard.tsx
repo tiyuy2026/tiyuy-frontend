@@ -1,5 +1,6 @@
 'use client';
 
+import { Icon } from '@iconify/react';
 import { SubscriptionPlan, BillingCycle } from '@/core/domain/entities/Wallet';
 
 interface PlanCardProps {
@@ -7,32 +8,22 @@ interface PlanCardProps {
   onSelectPlan: (plan: SubscriptionPlan) => void;
   isSelected?: boolean;
   isExhausted?: boolean;
-  isActive?: boolean; //  NUEVO - plan activo del usuario
-  discountPercentage?: number; //  NUEVO - porcentaje de descuento
-  hasDiscount?: boolean; //  NUEVO - si tiene descuento aplicado
-  canRenew?: boolean; //  NUEVO - si el plan puede renovarse
-  isExpired?: boolean; //  NUEVO - si el plan esta vencido por tiempo
-  isExhaustedByLimit?: boolean; //  NUEVO - si el plan esta agotado por limite
-  selectedBillingCycle?: BillingCycle; //  NUEVO - ciclo de facturacion seleccionado
-  onBillingCycleChange?: (cycle: BillingCycle) => void; //  NUEVO - callback para cambio de ciclo
+  isActive?: boolean;
+  discountPercentage?: number;
+  hasDiscount?: boolean;
+  canRenew?: boolean;
+  isExpired?: boolean;
+  isExhaustedByLimit?: boolean;
+  selectedBillingCycle?: BillingCycle;
+  onBillingCycleChange?: (cycle: BillingCycle) => void;
 }
 
 export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive, discountPercentage, hasDiscount, canRenew, isExpired, isExhaustedByLimit, selectedBillingCycle, onBillingCycleChange }: PlanCardProps) {
-  // DEBUG: Logs para depurar props recibidas
-  console.log(' DEBUG PlanCard:', {
-    planName: plan.name,
-    planPrice: plan.price,
-    discountPercentage,
-    hasDiscount,
-    hasPriceDiscount: hasDiscount && discountPercentage && discountPercentage > 0
-  });
-
   const formatPrice = (price: number, currency: string) => {
     const symbol = currency === 'USD' ? 'US$' : 'S/';
     return `${symbol} ${price.toLocaleString()}`;
   };
 
-  // Calcular precio con descuento
   const calculateDiscountedPrice = () => {
     if (!hasDiscount || !discountPercentage) return plan.price;
     const discountAmount = plan.price * (discountPercentage / 100);
@@ -42,13 +33,12 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
   const discountedPrice = calculateDiscountedPrice();
   const hasPriceDiscount = hasDiscount && discountPercentage && discountPercentage > 0;
 
-  // Calculate price for selected billing cycle
   const getPriceForCycle = (cycle: BillingCycle): number => {
     switch (cycle) {
       case 'QUARTERLY':
-        return plan.priceQuarterly || (plan.price * 3 * 0.9); // 10% discount
+        return plan.priceQuarterly || (plan.price * 3 * 0.9);
       case 'YEARLY':
-        return plan.priceYearly || (plan.price * 12 * 0.8); // 20% discount
+        return plan.priceYearly || (plan.price * 12 * 0.8);
       default:
         return plan.price;
     }
@@ -58,203 +48,176 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
   const currentPrice = getPriceForCycle(currentCycle);
   const finalPrice = hasPriceDiscount ? currentPrice * (1 - discountPercentage / 100) : currentPrice;
 
-  console.log(' DEBUG PlanCard cálculo:', {
-    discountedPrice,
-    hasPriceDiscount,
-    originalPrice: plan.price,
-    currentCycle,
-    currentPrice,
-    finalPrice
-  });
+  const isPopular = plan.isFeatured && !isExhausted && !isActive && !isExpired;
 
   return (
-    <div className={`bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all border-2 ${
-      isActive && !isExhausted && !isExpired ? 'border-green-500 ring-2 ring-green-400 ring-opacity-50' :
-      isSelected && !isExhausted && !isExpired ? 'border-blue-500' : 
-      isExpired ? 'border-gray-300 bg-gray-50' :
-      isExhaustedByLimit ? 'border-red-300 bg-red-50' :
-      isExhausted ? 'border-gray-400' : 'border-transparent'
-    } ${
-      isExpired ? 'opacity-60 grayscale' : 
-      isExhaustedByLimit ? 'opacity-75' : 
-      isExhausted ? 'opacity-70 grayscale hover:opacity-80' : ''
+    <div className={`relative bg-white rounded-3xl p-8 transition-all duration-300 ${
+      isPopular 
+        ? 'border-2 border-[var(--brand-primary)] shadow-xl' 
+        : 'border border-gray-200 shadow-md hover:shadow-lg'
     }`}>
-
-      {/* Banner según estado */}
-      {isActive && !isExhausted && !isExpired && (
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-t-xl py-2 text-center">
-          <span className="text-white font-bold text-sm"> TU PLAN ACTUAL</span>
-        </div>
-      )}
-      {isExhaustedByLimit && isActive && plan.id !== 'FREE' && (
-        <div className="bg-gradient-to-r from-red-400 to-red-500 rounded-t-xl py-2 text-center">
-          <span className="text-white font-bold text-sm"> PLAN AGOTADO</span>
-        </div>
-      )}
-      {isExpired && isActive && plan.id !== 'FREE' && (
-        <div className="bg-gradient-to-r from-gray-500 to-gray-600 rounded-t-xl py-2 text-center">
-          <span className="text-white font-bold text-sm"> PLAN VENCIDO</span>
-        </div>
-      )}
-      {isExhausted && isActive && plan.id === 'FREE' && (
-        <div className="bg-gradient-to-r from-gray-600 to-gray-700 rounded-t-xl py-2 text-center">
-          <span className="text-white font-bold text-sm"> PLAN CONSUMIDO</span>
-        </div>
-      )}
-      {isExhausted && !isActive && (
-        <div className="bg-gradient-to-r from-gray-500 to-gray-600 rounded-t-xl py-2 text-center">
-          <span className="text-white font-bold text-sm"> PLAN AGOTADO</span>
-        </div>
-      )}
-      {plan.isFeatured && !isExhausted && !isActive && !isExpired && (
-        <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-t-xl py-2 text-center">
-          <span className="text-white font-bold text-sm"> MÁS POPULAR</span>
+      
+      {isPopular && (
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+          <span className="bg-[var(--brand-primary)] text-white text-sm font-bold px-4 py-1.5 rounded-full">
+            POPULAR
+          </span>
         </div>
       )}
 
-      <div className="p-8">
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">{plan.name}</h3>
-        <p className="text-gray-600 mb-6">{plan.description}</p>
+      <div className="mb-6">
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+        <p className="text-gray-500 text-sm">{plan.description}</p>
+      </div>
 
-        <div className="space-y-2 mb-8">
-          {plan.features.map((feature, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <span className={isActive ? 'text-green-500' : isExhausted ? 'text-gray-400' : 'text-green-500'}>[OK]</span>
-              <span className={isExhausted && !isActive ? 'text-gray-500 line-through' : 'text-gray-700'}>
-                {feature}
-              </span>
-            </div>
-          ))}
+      <div className="mb-6">
+        <div className="flex items-baseline gap-1">
+          <span className="text-5xl font-bold text-gray-900">
+            {formatPrice(finalPrice, plan.currency)}
+          </span>
         </div>
+        <p className="text-gray-400 text-sm mt-1">/mes</p>
+        
+        {hasPriceDiscount && (
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-gray-400 line-through text-sm">
+              {formatPrice(currentPrice, plan.currency)}
+            </span>
+            <span className="bg-[var(--brand-primary-light)] text-[var(--brand-primary)] text-xs font-bold px-2 py-1 rounded-full">
+              {discountPercentage}% OFF
+            </span>
+          </div>
+        )}
+      </div>
 
-        <div className="text-center">
-          {/* Billing Cycle Selection */}
-          {!isActive && !isExhausted && !isExpired && plan.id !== 'FREE' && (
-            <div className="mb-4">
-              <div className="flex justify-center gap-2 mb-3">
-                <button
-                  onClick={() => onBillingCycleChange?.('MONTHLY')}
-                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                    currentCycle === 'MONTHLY'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  Mensual
-                </button>
-                <button
-                  onClick={() => onBillingCycleChange?.('QUARTERLY')}
-                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                    currentCycle === 'QUARTERLY'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  Trimestral
-                </button>
-                <button
-                  onClick={() => onBillingCycleChange?.('YEARLY')}
-                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                    currentCycle === 'YEARLY'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  Anual
-                </button>
-              </div>
-              
-              {/* Show discount badges for billing cycles */}
-              {currentCycle !== 'MONTHLY' && (
-                <div className="flex justify-center gap-2 mb-2">
-                  {currentCycle === 'QUARTERLY' && (
-                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                      10% OFF
-                    </span>
-                  )}
-                  {currentCycle === 'YEARLY' && (
-                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                      20% OFF
-                    </span>
-                  )}
-                </div>
+      {!isActive && !isExhausted && !isExpired && plan.id !== 'FREE' && (
+        <div className="mb-6">
+          <div className="flex gap-2 mb-3">
+            <button
+              onClick={() => onBillingCycleChange?.('MONTHLY')}
+              className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
+                currentCycle === 'MONTHLY'
+                  ? 'bg-[var(--brand-primary)] text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Mensual
+            </button>
+            <button
+              onClick={() => onBillingCycleChange?.('QUARTERLY')}
+              className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
+                currentCycle === 'QUARTERLY'
+                  ? 'bg-[var(--brand-primary)] text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Trimestral
+            </button>
+            <button
+              onClick={() => onBillingCycleChange?.('YEARLY')}
+              className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
+                currentCycle === 'YEARLY'
+                  ? 'bg-[var(--brand-primary)] text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Anual
+            </button>
+          </div>
+          
+          {currentCycle !== 'MONTHLY' && (
+            <div className="flex justify-center gap-2">
+              {currentCycle === 'QUARTERLY' && (
+                <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+                  10% OFF
+                </span>
+              )}
+              {currentCycle === 'YEARLY' && (
+                <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+                  20% OFF
+                </span>
               )}
             </div>
           )}
-
-          {/* Mostrar precio con descuento */}
-          {hasPriceDiscount ? (
-            <div className="mb-2">
-              <div className="text-gray-400 line-through text-sm mb-1">
-                {formatPrice(currentPrice, plan.currency)}
-              </div>
-              <div className="text-4xl font-bold text-green-600">
-                {formatPrice(finalPrice, plan.currency)}
-              </div>
-              <div className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full inline-block mt-2">
-                 {discountPercentage}% OFF
-              </div>
-            </div>
-          ) : (
-            <div className="text-4xl font-bold mb-2 text-gray-900">
-              {formatPrice(finalPrice, plan.currency)}
-            </div>
-          )}
-          
-          {/* Show billing cycle duration */}
-          {plan.id !== 'FREE' && (
-            <p className="text-sm mb-2 text-gray-500">
-              {currentCycle === 'MONTHLY' && '30 días'}
-              {currentCycle === 'QUARTERLY' && '90 días (3 meses)'}
-              {currentCycle === 'YEARLY' && '365 días (1 año)'}
-            </p>
-          )}
-          
-          <p className="text-sm mb-6 text-gray-500">
-            {plan.maxPublications} publicaciones
-          </p>
-
-          <button
-            onClick={() => {
-              // Only allow selection if plan is not exhausted and not active
-              if (!isExhausted && !isActive && !isExpired) {
-                onSelectPlan(plan);
-              }
-              // Allow renewal only for expired plans
-              else if (canRenew && isActive) {
-                onSelectPlan(plan);
-              }
-            }}
-            disabled={
-              (isActive && !isExhausted && !isExpired) || 
-              (isExhausted && plan.id === 'FREE') || 
-              (isExhaustedByLimit && !canRenew) ||
-              (isExpired && !canRenew)
-            }
-            className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform hover:scale-105 ${
-              canRenew && isActive
-                ? 'bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 shadow-lg animate-pulse'
-                : isExhaustedByLimit && !canRenew
-                ? 'bg-red-100 text-red-700 cursor-not-allowed'
-                : isExpired && !canRenew
-                ? 'bg-gray-200 text-gray-600 cursor-not-allowed'
-                : isExhausted && !isActive
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : isActive
-                ? 'bg-green-500 text-white cursor-default'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            } ${isSelected && !isExhausted && !isActive && !isExpired ? 'ring-4 ring-blue-600 ring-opacity-50' : ''}`}
-          >
-            {canRenew && isActive ? 'Renovar Plan' : 
-             isExhaustedByLimit && !canRenew ? 'Plan Agotado' : 
-             isExpired && !canRenew ? 'Plan Vencido' :
-             isExhausted && !isActive ? 'Plan Agotado' : 
-             isExhausted && isActive && plan.id === 'FREE' ? 'Plan Consumido' :
-             isActive ? 'Plan Activo' : 
-             `Elegir ${plan.name}`}
-          </button>
         </div>
+      )}
+
+      {plan.id !== 'FREE' && (
+        <p className="text-gray-400 text-sm mb-4">
+          {currentCycle === 'MONTHLY' && '30 días'}
+          {currentCycle === 'QUARTERLY' && '90 días (3 meses)'}
+          {currentCycle === 'YEARLY' && '365 días (1 año)'}
+        </p>
+      )}
+
+      <div className="space-y-3 mb-8">
+        {plan.features.map((feature, index) => (
+          <div key={index} className="flex items-start gap-3">
+            <Icon 
+              icon="material-symbols:check-circle-rounded" 
+              className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+                isExhausted && !isActive ? 'text-gray-300' : 'text-[var(--brand-primary)]'
+              }`}
+            />
+            <span className={`text-sm ${
+              isExhausted && !isActive ? 'text-gray-400 line-through' : 'text-gray-700'
+            }`}>
+              {feature}
+            </span>
+          </div>
+        ))}
       </div>
+
+      <div className="pt-4 border-t border-gray-100">
+        <p className="text-gray-500 text-sm mb-4 text-center">
+          {plan.maxPublications} publicaciones
+        </p>
+
+        <button
+          onClick={() => {
+            if (!isExhausted && !isActive && !isExpired) {
+              onSelectPlan(plan);
+            } else if (canRenew && isActive) {
+              onSelectPlan(plan);
+            }
+          }}
+          disabled={
+            (isActive && !isExhausted && !isExpired) || 
+            (isExhausted && plan.id === 'FREE') || 
+            (isExhaustedByLimit && !canRenew) ||
+            (isExpired && !canRenew)
+          }
+          className={`w-full py-3.5 rounded-xl cursor-pointer font-semibold text-base transition-all ${
+            canRenew && isActive
+              ? 'bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 shadow-lg animate-pulse'
+              : isExhaustedByLimit && !canRenew
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : isExpired && !canRenew
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : isExhausted && !isActive
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : isActive
+              ? 'bg-gray-100 text-gray-400 cursor-default'
+              : plan.name.includes('PREMIUM') || plan.name.includes('ENTERPRISE')
+              ? 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary-light-hover)]'
+              : 'bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)]'
+          } ${isSelected && !isExhausted && !isActive && !isExpired ? 'ring-2 ring-[var(--brand-primary)] ring-opacity-50' : ''}`}
+        >
+          {canRenew && isActive ? 'Renovar Plan' : 
+           isExhaustedByLimit && !canRenew ? 'Plan Agotado' : 
+           isExpired && !canRenew ? 'Plan Vencido' :
+           isExhausted && !isActive ? 'Plan Agotado' : 
+           isExhausted && isActive && plan.id === 'FREE' ? 'Plan Consumido' :
+           isActive ? 'Plan Activo' : 
+           `Elegir ${plan.name}`}
+        </button>
+      </div>
+
+      {isActive && !isExhausted && !isExpired && (
+        <div className="absolute top-4 right-4 ">
+          <Icon icon="material-symbols:check-circle" className="w-6 h-6 text-[var(--brand-primary)]" />
+        </div>
+      )}
     </div>
   );
 }
