@@ -7,6 +7,36 @@ const developerRepo = new DeveloperRepository();
 
 const DEVELOPER_MARKETING_KEY = ['developer', 'marketing'];
 
+function handleCampaignError(error: any, defaultMsg: string) {
+  const code = error.response?.data?.code;
+  const message = error.response?.data?.message;
+  
+  if (code === 'CAMPAIGN_LIMIT_REACHED') {
+    const msg = message || 'Has llegado al límite de tu plan actual.';
+    toast.error(msg, { duration: 6000 });
+    setTimeout(() => {
+      toast.success(
+        '💡 ¿Quieres más campañas? Haz upgrade en /plans',
+        { duration: 8000 }
+      );
+    }, 1000);
+  } else if (code === 'MONTHLY_CAMPAIGN_LIMIT_REACHED') {
+    const msg = message || 'Solo puedes publicar 1 campaña por mes.';
+    toast.error(msg, { duration: 6000 });
+  } else if (code === 'NO_ACTIVE_SUBSCRIPTION') {
+    const msg = message || 'No tienes una suscripción activa.';
+    toast.error(msg, { duration: 6000 });
+    setTimeout(() => {
+      toast.success(
+        '💡 Adquiere un plan en /plans',
+        { duration: 8000 }
+      );
+    }, 1000);
+  } else {
+    toast.error(message || defaultMsg);
+  }
+}
+
 // Marketing hooks
 export function useDeveloperMarketingStats() {
   const { user } = useAuthStore();
@@ -38,7 +68,7 @@ export function useDeveloperCreateCampaign() {
       toast.success('Campaña creada exitosamente');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al crear campaña');
+      handleCampaignError(error, 'Error al crear campaña');
     },
   });
 }
@@ -87,6 +117,20 @@ export function useDeveloperPayCampaign() {
   });
 }
 
+export function useDeveloperPublishCampaign() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => developerRepo.publishMyCampaign(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...DEVELOPER_MARKETING_KEY, 'campaigns'] });
+      toast.success('Campaña enviada para aprobación');
+    },
+    onError: (error: any) => {
+      handleCampaignError(error, 'Error al publicar campaña');
+    },
+  });
+}
+
 export function useDeveloperRenewCampaign() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -102,57 +146,13 @@ export function useDeveloperRenewCampaign() {
   });
 }
 
-export function useDeveloperMyBanners() {
+export function useDeveloperTargetEntities() {
   const { user } = useAuthStore();
   return useQuery({
-    queryKey: [...DEVELOPER_MARKETING_KEY, 'banners'],
-    queryFn: () => developerRepo.getMyBanners(),
+    queryKey: [...DEVELOPER_MARKETING_KEY, 'target-entities'],
+    queryFn: () => developerRepo.getTargetEntities(),
     enabled: user?.role === 'DEVELOPER',
-    staleTime: 30000,
-  });
-}
-
-export function useDeveloperCreateBanner() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (request: import('@/core/domain/entities/Admin').CreateBannerRequest) =>
-      developerRepo.createMyBanner(request),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [...DEVELOPER_MARKETING_KEY, 'banners'] });
-      toast.success('Banner creado exitosamente');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al crear banner');
-    },
-  });
-}
-
-export function useDeveloperUpdateBanner() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: import('@/core/domain/entities/Admin').CreateBannerRequest }) =>
-      developerRepo.updateMyBanner(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [...DEVELOPER_MARKETING_KEY, 'banners'] });
-      toast.success('Banner actualizado exitosamente');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al actualizar banner');
-    },
-  });
-}
-
-export function useDeveloperDeleteBanner() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: number) => developerRepo.deleteMyBanner(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [...DEVELOPER_MARKETING_KEY, 'banners'] });
-      toast.success('Banner eliminado exitosamente');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al eliminar banner');
-    },
+    staleTime: 60000,
   });
 }
 
@@ -163,5 +163,14 @@ export function useDeveloperPricingList() {
     queryFn: () => developerRepo.getPricingList(),
     enabled: user?.role === 'DEVELOPER',
     staleTime: 30000,
+  });
+}
+
+export function useDeveloperUploadCampaignImage() {
+  return useMutation({
+    mutationFn: (file: File) => developerRepo.uploadCampaignImage(file),
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al subir la imagen');
+    },
   });
 }

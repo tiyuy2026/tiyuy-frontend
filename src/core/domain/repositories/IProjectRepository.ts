@@ -1,4 +1,5 @@
 import { Project, ProjectSummary, ProjectFull, ProjectUnit } from '../entities/Project';
+import { ProjectMapSearchResult } from '../entities/PropertyMapResult';
 
 /**
  * Interface del repositorio de Proyectos
@@ -184,4 +185,21 @@ export interface IProjectRepository {
    * Eliminar media del proyecto
    */
   deleteProjectMedia?(projectId: number, mediaId: number): Promise<void>;
+
+  /**
+   * Búsqueda de proyectos para mapa
+   * Usado para: mapa interactivo de proyectos
+   */
+  searchForMap(filters: {
+    district?: string;
+    province?: string;
+    region?: string;
+    type?: string;
+    phase?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    minArea?: number;
+    maxArea?: number;
+    isFeatured?: boolean;
+  }): Promise<ProjectMapSearchResult>;
 }

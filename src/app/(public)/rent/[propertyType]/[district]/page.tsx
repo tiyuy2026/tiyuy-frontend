@@ -7,6 +7,9 @@ import { Pagination } from './Pagination';
 import { SearchBar } from './SearchBar';
 import { SEOContent } from '@/presentation/components/property/SEOContent/SEOContent';
 import { SearchTrackingProvider } from '@/presentation/components/searchTracking/SearchTrackingProvider';
+import { PropertyMapWrapper } from '@/presentation/features/property-map/components/PropertyMapWrapper';
+import { propertyMapResultToGeneric } from '@/core/domain/adapters/MapItemAdapters';
+import { MapFilters } from '@/core/domain/entities/MapTypes';
 
 interface Props {
   params: Promise<{
@@ -62,7 +65,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = `${propertyTypeLabel} en Alquiler en ${district} | TIYUY`;
   const description = `Encuentra ${propertyTypeLabel.toLowerCase()} en alquiler en ${district}. Las mejores opciones con precios, fotos y detalles completos en TIYUY.`;
-  const canonicalUrl = `https://tiyuy.com/rent/${resolvedParams.propertyType}/${resolvedParams.district}`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const canonicalUrl = `${siteUrl}/rent/${resolvedParams.propertyType}/${resolvedParams.district}`;
 
   return {
     title,
@@ -123,6 +127,25 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
   const result = await propertyRepo.search(filters);
   const propertyTypeLabel = PROPERTY_TYPE_LABELS[resolvedParams.propertyType];
 
+  // Crear searchFn para el mapa (usa el repositorio de propiedades)
+  const propertySearchFn = async (mapFilters: MapFilters) => {
+    const mapResult = await propertyRepo.searchForMap({
+      transactionType: 'RENT',
+      type: propertyType as any,
+      district: mapFilters.district || district,
+      province: mapFilters.province,
+      region: mapFilters.region,
+      minPrice: mapFilters.minPrice,
+      maxPrice: mapFilters.maxPrice,
+      minArea: mapFilters.minArea,
+      maxArea: mapFilters.maxArea,
+      minBedrooms: mapFilters.bedrooms,
+      minBathrooms: mapFilters.bathrooms,
+      isFeatured: mapFilters.isFeatured,
+    });
+    return propertyMapResultToGeneric(mapResult);
+  };
+
   return (
     <>
       <SearchTrackingProvider
@@ -151,7 +174,37 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
             </aside>
 
             <div className="lg:col-span-3">
+              <div className="mb-4 flex items-center justify-between">
+                <h1 className="text-lg font-semibold text-gray-900">
+                  {propertyTypeLabel} en {district}
+                  <span className="ml-2 text-sm font-normal text-gray-500">
+                    ({result.pagination.totalElements} propiedades)
+                  </span>
+                </h1>
+                <PropertyMapWrapper
+                  transactionType="RENT"
+                  entitySubType={propertyType}
+                  filters={{
+                    ...(isAllPeru ? {} : isMainProvince ? { province: district } : { district }),
+                    ...(isFiltered
+                      ? {
+                          minPrice: resolvedSearchParams.minPrice ? Number(resolvedSearchParams.minPrice) : undefined,
+                          maxPrice: resolvedSearchParams.maxPrice ? Number(resolvedSearchParams.maxPrice) : undefined,
+                          bedrooms: resolvedSearchParams.bedrooms ? Number(resolvedSearchParams.bedrooms) : undefined,
+                          bathrooms: resolvedSearchParams.bathrooms ? Number(resolvedSearchParams.bathrooms) : undefined,
+                          minArea: resolvedSearchParams.minArea ? Number(resolvedSearchParams.minArea) : undefined,
+                          maxArea: resolvedSearchParams.maxArea ? Number(resolvedSearchParams.maxArea) : undefined,
+                        }
+                      : {}),
+                  }}
+                  totalItems={result.pagination.totalElements}
+                  itemLabel="propiedad"
+                  itemLabelPlural="propiedades"
+                  detailBaseUrl="/property/"
+                />
+              </div>
               <PropertyGrid properties={result.properties} />
+
               {result.pagination.totalPages > 1 && (
                 <Pagination pagination={result.pagination} />
               )}

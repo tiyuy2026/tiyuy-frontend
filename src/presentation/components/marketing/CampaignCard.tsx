@@ -11,7 +11,7 @@ interface CampaignCardProps {
   campaign: PromotionCampaign;
   onEdit: (id: number, data: UpdatePromotionCampaignRequest) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
-  onRenew: (id: number) => Promise<void>;
+  onRenew?: (id: number) => Promise<void>;
   isDeleting?: boolean;
   isUpdating?: boolean;
   isRenewing?: boolean;
@@ -66,7 +66,7 @@ export function CampaignCard({
   };
 
   const handleRenew = async () => {
-    await onRenew(campaign.id);
+    if (onRenew) await onRenew(campaign.id);
   };
 
   const ctr = campaign.impressions && campaign.impressions > 0

@@ -1,6 +1,16 @@
 import { axiosClient } from '../api/axios-client';
-import { Banner, CampaignPricing, PromotionCampaign, MarketingStats, CreateBannerRequest, CreatePromotionCampaignRequest, UpdatePromotionCampaignRequest } from '@/core/domain/entities/Admin';
+import { PromotionCampaign, MarketingStats, CreatePromotionCampaignRequest, UpdatePromotionCampaignRequest, Banner, CreateBannerRequest } from '@/core/domain/entities/Admin';
 import { PaginatedResponse } from '@/core/domain/repositories/IAdminRepository';
+
+export interface TargetEntity {
+  id: number;
+  title: string;
+  type: 'PROPERTY' | 'PROJECT';
+  status: string;
+  imageUrl: string | null;
+  price: string;
+  location: string;
+}
 
 const BASE_URL = '/v1/developer';
 
@@ -30,16 +40,7 @@ export class DeveloperRepository {
     await axiosClient.delete(`${BASE_URL}/marketing/campaigns/${id}`);
   }
 
-  async payForCampaign(id: number, paymentRequest: any): Promise<PromotionCampaign> {
-    const response = await axiosClient.post(`${BASE_URL}/marketing/campaigns/${id}/pay`, paymentRequest);
-    return response.data;
-  }
-
-  async renewCampaign(id: number, paymentRequest: any): Promise<PromotionCampaign> {
-    const response = await axiosClient.post(`${BASE_URL}/marketing/campaigns/${id}/renew`, paymentRequest);
-    return response.data;
-  }
-
+  // Banners
   async getMyBanners(): Promise<Banner[]> {
     const response = await axiosClient.get(`${BASE_URL}/marketing/banners`);
     return response.data;
@@ -59,8 +60,43 @@ export class DeveloperRepository {
     await axiosClient.delete(`${BASE_URL}/marketing/banners/${id}`);
   }
 
-  async getPricingList(): Promise<CampaignPricing[]> {
+  // Publish (DRAFT → PENDING_APPROVAL)
+  async publishMyCampaign(id: number): Promise<PromotionCampaign> {
+    const response = await axiosClient.post(`${BASE_URL}/marketing/campaigns/${id}/publish`);
+    return response.data;
+  }
+
+  // Renew
+  async renewCampaign(id: number, paymentRequest: any): Promise<PromotionCampaign> {
+    const response = await axiosClient.post(`${BASE_URL}/marketing/campaigns/${id}/renew`, paymentRequest);
+    return response.data;
+  }
+
+  // Pay
+  async payForCampaign(id: number, paymentRequest: any): Promise<PromotionCampaign> {
+    const response = await axiosClient.post(`${BASE_URL}/marketing/campaigns/${id}/pay`, paymentRequest);
+    return response.data;
+  }
+
+  // Target Entities (for campaign linking)
+  async getTargetEntities(): Promise<TargetEntity[]> {
+    const response = await axiosClient.get(`${BASE_URL}/marketing/target-entities`);
+    return response.data;
+  }
+
+  // Pricing List
+  async getPricingList(): Promise<any[]> {
     const response = await axiosClient.get(`${BASE_URL}/marketing/pricing`);
     return response.data;
+  }
+
+  // Image Upload
+  async uploadCampaignImage(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axiosClient.post(`${BASE_URL}/marketing/upload-image`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data.imageUrl;
   }
 }

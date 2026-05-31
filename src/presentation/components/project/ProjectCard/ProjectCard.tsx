@@ -36,37 +36,6 @@ export function ProjectCard({ project }: ProjectCardProps) {
   const [rating, setRating] = useState<RatingData | null>(null);
   const [commentCount, setCommentCount] = useState<number | null>(null);
 
-  useEffect(() => {
-    const fetchRating = async () => {
-      try {
-        const res = await fetch(`/api/projects/${project.id}/rating`);
-        if (res.ok) {
-          const data = await res.json();
-          setRating(data);
-        }
-      } catch {
-        // Silently fail
-      }
-    };
-    fetchRating();
-  }, [project.id]);
-
-  useEffect(() => {
-    const fetchCommentCount = async () => {
-      try {
-        const res = await fetch(`/api/projects/${project.id}/comments`);
-        if (res.ok) {
-          const data = await res.json();
-          const count = Array.isArray(data) ? data.length : 0;
-          setCommentCount(count);
-        }
-      } catch {
-        // Silently fail
-      }
-    };
-    fetchCommentCount();
-  }, [project.id]);
-
   const formatPrice = (price: number, currency: string) => {
     const symbol = currency === 'USD' ? '$' : 'S/';
     return `${symbol} ${price.toLocaleString('es-PE')}`;

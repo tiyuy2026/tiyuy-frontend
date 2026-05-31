@@ -1065,6 +1065,14 @@ export interface MarketingStats {
   revenueGrowth?: number;
   ctrGrowth?: number;
   leadsGrowth?: number;
+  /** Daily stats for charts (clicks & impressions per day) */
+  dailyStats?: DailyStat[];
+}
+
+export interface DailyStat {
+  date: string;
+  clicks: number;
+  impressions: number;
 }
 
 
@@ -1092,6 +1100,41 @@ export interface PromotionCampaign {
   revenue?: number;
   createdAt: string;
   updatedAt?: string;
+  /** ID del proyecto vinculado (opcional) */
+  targetProjectId?: number | null;
+  /** ID de la propiedad vinculada (opcional) */
+  targetPropertyId?: number | null;
+  /** Nombre del proyecto vinculado (para mostrar) */
+  targetProjectName?: string;
+  /** Nombre de la propiedad vinculada (para mostrar) */
+  targetPropertyName?: string;
+  /** Owner info */
+  ownerId?: number;
+  ownerRole?: string;
+  /** Nombre del owner (inmobiliaria/agente) */
+  ownerName?: string;
+  /** Logo del owner (inmobiliaria/agente) */
+  ownerLogoUrl?: string;
+  /** Distrito/ubicación del proyecto vinculado */
+  projectDistrict?: string;
+  /** Tipo de proyecto (ej: "Departamentos", "Casas", etc.) */
+  projectType?: string;
+  /** Área desde (m²) del proyecto vinculado */
+  projectAreaFrom?: string;
+  /** Precio desde del proyecto vinculado */
+  projectPriceFrom?: string;
+  /** Moneda del precio */
+  projectPriceCurrency?: string;
+  /** Payment info */
+  paymentId?: string;
+  paymentConfirmed?: boolean;
+  /** Lifecycle */
+  active?: boolean;
+  expired?: boolean;
+  leads?: number;
+  approvedBy?: number;
+  approvedAt?: string;
+  notes?: string;
 }
 
 export interface CreatePromotionCampaignRequest {
@@ -1106,6 +1149,8 @@ export interface CreatePromotionCampaignRequest {
   pricePaid: number;
   currency?: string;
   displayOrder?: number;
+  targetProjectId?: number | null;
+  targetPropertyId?: number | null;
 }
 
 export interface UpdatePromotionCampaignRequest {
@@ -1122,30 +1167,7 @@ export interface UpdatePromotionCampaignRequest {
   displayOrder?: number;
 }
 
-export interface CampaignPricing {
-  id: number;
-  name: string;
-  description?: string;
-  promotionType: string;
-  durationDays: number;
-  pricePen: number;
-  priceUsd: number;
-  isActive: boolean;
-  displayOrder?: number;
-  createdAt: string;
-  updatedAt?: string;
-}
-
-export interface CreateCampaignPricingRequest {
-  promotionType: string;
-  name: string;
-  description?: string;
-  durationDays: number;
-  pricePen: number;
-  priceUsd: number;
-  isActive?: boolean;
-  displayOrder?: number;
-}
+export type BannerDisplayMode = 'SOLO_BANNER' | 'INTEGRATED';
 
 export interface Banner {
   id: number;
@@ -1154,10 +1176,13 @@ export interface Banner {
   imageUrl: string;
   linkUrl?: string;
   placement: string;
+  displayMode?: BannerDisplayMode;
   displayOrder?: number;
   startDate: string;
   endDate?: string;
+  durationDays?: number;
   isActive: boolean;
+  currentlyActive?: boolean;
   impressions?: number;
   clicks?: number;
   conversions?: number;
@@ -1175,7 +1200,9 @@ export interface CreateBannerRequest {
   displayOrder?: number;
   startDate: string;
   endDate?: string;
+  durationDays?: number;
 }
+
 
 export interface FestiveCampaign {
   id: number;
@@ -1208,5 +1235,4 @@ export interface CreateFestiveCampaignRequest {
   maxParticipants?: number;
   termsAndConditions?: string;
 }
-
 

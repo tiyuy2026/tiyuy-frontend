@@ -13,7 +13,6 @@ import {
   usePromotionCampaigns,
   useBanners,
   useFestiveCampaigns,
-  useCampaignPricingList,
 } from '@/presentation/hooks/useAdmin';
 import {
   TrendingUp, DollarSign, Megaphone, Gift,
@@ -192,12 +191,9 @@ export default function AdminCampaignsDashboard() {
   const { data: campaignsData } = usePromotionCampaigns({ page: 0, size: 50 });
   const { data: bannersData }   = useBanners();
   const { data: festiveData }   = useFestiveCampaigns();
-  const { data: pricingData }   = useCampaignPricingList();
-
   const campaigns = useMemo(() => Array.isArray(campaignsData) ? campaignsData : (campaignsData?.content || []), [campaignsData]);
   const banners   = useMemo(() => Array.isArray(bannersData) ? bannersData : [], [bannersData]);
   const festive   = useMemo(() => Array.isArray(festiveData) ? festiveData : [], [festiveData]);
-  const pricing   = useMemo(() => Array.isArray(pricingData) ? pricingData : [], [pricingData]);
 
   // ── Métricas reales ──────────────────────────────────────────────────────
   const activeCampaigns  = stats?.activeCampaigns  ?? campaigns.filter(c => c.status === 'ACTIVE').length;
@@ -459,7 +455,7 @@ export default function AdminCampaignsDashboard() {
           onClick={() => router.push('/admin/campaigns/list')}
             className="flex items-center gap-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
           >
-            <Zap className="w-4 h-4" /> Nueva Campaña
+            <Zap className="w-4 h-4" /> Ver Campañas
           </button>
         </div>
       </div>
@@ -501,7 +497,7 @@ export default function AdminCampaignsDashboard() {
           value={formatCompactCurrency(totalRevenue)}
           icon={<DollarSign className="w-5 h-5" />}
           iconBg="bg-amber-50" iconColor="text-amber-600"
-          badge={`${pricing.length} precios config`}
+          badge={`${totalCampaigns} campañas`}
           badgePositive={true}
           sparkline={sparklineData.revenue}
           sparkColor={AMBER}

@@ -92,6 +92,8 @@ export interface ProjectSummary {
   district: string;
   province: string;
   region: string;
+  latitude?: number;
+  longitude?: number;
   areaFrom?: number;
   areaTo?: number;
   bedrooms?: number;

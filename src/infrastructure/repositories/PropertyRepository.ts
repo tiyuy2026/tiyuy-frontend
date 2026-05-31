@@ -1,11 +1,63 @@
 import { axiosClient, publicApiClient } from '../api/axios-client';
 import { ENDPOINTS } from '../api/endpoints';
 import { IPropertyRepository, CreatePropertyData, UpdatePropertyData } from '@/core/domain/repositories/IPropertyRepository';
-import { Property, PropertySummary, PropertyMedia } from '@/core/domain/entities/Property';
+import { Property, PropertySummary, PropertyMedia, MapSearchResult, MapPropertySummary, PropertyType, TransactionType, Currency, MapCoverageType } from '@/core/domain/entities/Property';
 import { PropertyFilter, PropertySearchResult } from '@/core/domain/entities/PropertyFilter';
 import { PropertyMapper } from '@/core/application/mappers/PropertyMapper';
 
 export class PropertyRepository implements IPropertyRepository {
+  async searchForMap(filters: PropertyFilter): Promise<MapSearchResult> {
+    const response = await axiosClient.get('/properties/map/search', {
+      params: {
+        type: filters.type,
+        transactionType: filters.transactionType,
+        district: filters.district,
+        province: filters.province,
+        region: filters.region,
+        minPrice: filters.minPrice,
+        maxPrice: filters.maxPrice,
+        minBedrooms: filters.minBedrooms,
+        minBathrooms: filters.minBathrooms,
+        minParkingSpots: filters.minParkingSpots,
+        minArea: filters.minArea,
+        maxArea: filters.maxArea,
+        isFeatured: filters.isFeatured,
+      },
+    });
+
+    const data = response.data;
+
+    // Mapear respuesta del backend (PropertySummaryDto) al formato esperado por el frontend (MapPropertySummary)
+    const properties: MapPropertySummary[] = (data.properties || []).map((p: any) => ({
+      id: p.id,
+      title: p.title || '',
+      slug: p.slug || '',
+      price: p.price ? Number(p.price) : 0,
+      currency: (p.currency || 'PEN') as Currency,
+      type: (p.type || 'APARTMENT') as PropertyType,
+      transactionType: (p.transactionType || 'SALE') as TransactionType,
+      mainPhotoUrl: p.coverPhotoUrl || undefined,
+      district: p.district || '',
+      province: p.province || '',
+      region: p.region || '',
+      latitude: p.latitude ? Number(p.latitude) : 0,
+      longitude: p.longitude ? Number(p.longitude) : 0,
+      bedrooms: p.bedrooms ?? undefined,
+      bathrooms: p.bathrooms ?? undefined,
+      area: p.totalArea ? Number(p.totalArea) : undefined,
+      isFeatured: p.isFeatured ?? undefined,
+    }));
+
+    return {
+      properties,
+      requestedArea: data.requestedArea || '',
+      effectiveCoverage: (data.effectiveCoverage || 'NO_RESULTS') as MapCoverageType,
+      coverageMessage: data.coverageMessage || '',
+      districtsIncluded: data.districtsIncluded || [],
+      totalResults: data.totalResults || 0,
+    };
+  }
+
   async search(filters: PropertyFilter): Promise<PropertySearchResult> {
     console.log('Enviando filtros al backend:', JSON.stringify(filters, null, 2));
     console.log('BaseURL actual:', axiosClient.defaults.baseURL);

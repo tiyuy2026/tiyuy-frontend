@@ -1,9 +1,10 @@
-import { Property, PropertySummary,PropertyMedia } from '../entities/Property';
+import { Property, PropertySummary, PropertyMedia, MapSearchResult } from '../entities/Property';
 import { PropertyFilter, PropertySearchResult } from '../entities/PropertyFilter';
 
 export interface IPropertyRepository {
   // Búsqueda
   search(filters: PropertyFilter): Promise<PropertySearchResult>;
+  searchForMap(filters: PropertyFilter): Promise<MapSearchResult>;
   getBySlug(slug: string): Promise<Property>;
   getById(id: number): Promise<Property>;
   

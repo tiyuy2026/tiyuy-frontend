@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Heart, MapPin, Maximize, BedDouble, Bath, BadgeCheck, Star, AlertCircle, Clock, MessageCircle } from 'lucide-react';
@@ -9,15 +9,6 @@ import { FavoriteButton } from '@/presentation/components/shared/FavoriteButton'
 
 interface PropertyCardProps {
   property: Property | PropertySummary;
-}
-
-interface RatingData {
-  averageRating: number;
-  totalRatings: number;
-}
-
-interface CommentCountData {
-  count: number;
 }
 
 // Type guard to check if property is full Property (has seo)
@@ -34,39 +25,9 @@ function getPropertySlug(property: Property | PropertySummary): string {
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
-  const [rating, setRating] = useState<RatingData | null>(null);
-  const [commentCount, setCommentCount] = useState<number | null>(null);
-
-  useEffect(() => {
-    const fetchRating = async () => {
-      try {
-        const res = await fetch(`/api/properties/${property.id}/rating`);
-        if (res.ok) {
-          const data = await res.json();
-          setRating(data);
-        }
-      } catch {
-        // Silently fail - rating is not critical
-      }
-    };
-    fetchRating();
-  }, [property.id]);
-
-  useEffect(() => {
-    const fetchCommentCount = async () => {
-      try {
-        const res = await fetch(`/api/properties/${property.id}/comments`);
-        if (res.ok) {
-          const data = await res.json();
-          const count = Array.isArray(data) ? data.length : 0;
-          setCommentCount(count);
-        }
-      } catch {
-        // Silently fail
-      }
-    };
-    fetchCommentCount();
-  }, [property.id]);
+  // Rating y comentarios se obtienen desde el backend en endpoints públicos
+  // cuando estén disponibles. Por ahora se muestran valores por defecto.
+  const commentCount: number | null = null;
 
   const PROPERTY_TYPE_LABELS: Record<string, string> = {
     APARTMENT: 'Departamento',
@@ -181,7 +142,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
           </h3>
           <div className="flex items-center gap-1 text-[14px] text-gray-900 flex-shrink-0">
             <Star className="w-3.5 h-3.5 text-gray-900 fill-gray-900" />
-            <span>{rating && rating.averageRating > 0 ? rating.averageRating.toFixed(2) : 'Nuevo'}</span>
+            <span>Nuevo</span>
           </div>
         </div>
 

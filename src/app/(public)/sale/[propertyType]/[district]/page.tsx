@@ -7,6 +7,9 @@ import { Pagination } from './Pagination';
 import { SearchBar } from './SearchBar';
 import { SEOContent } from '@/presentation/components/property/SEOContent/SEOContent';
 import { SearchTrackingProvider } from '@/presentation/components/searchTracking/SearchTrackingProvider';
+import { PropertyMapWrapper } from '@/presentation/features/property-map/components/PropertyMapWrapper';
+import { propertyMapResultToGeneric } from '@/core/domain/adapters/MapItemAdapters';
+import { MapFilters } from '@/core/domain/entities/MapTypes';
 
 interface Props {
   params: Promise<{
@@ -95,7 +98,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     }
   }
 
-  const canonicalUrl = `https://tiyuy.com/sale/${resolvedParams.propertyType}/${resolvedParams.district}${
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const canonicalUrl = `${siteUrl}/sale/${resolvedParams.propertyType}/${resolvedParams.district}${
     isFiltered
       ? '?' +
         new URLSearchParams(
@@ -138,7 +142,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       locale: 'es_PE',
       images: [
         {
-          url: 'https://tiyuy.com/og-image.jpg',
+          url: `${siteUrl}/og-image.jpg`,
           width: 1200,
           height: 630,
           alt: `${propertyTypeLabel} en venta en ${district} - TIYUY`,
@@ -149,7 +153,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       card: 'summary_large_image',
       title,
       description,
-      images: ['https://tiyuy.com/twitter-image.jpg'],
+      images: [`${siteUrl}/twitter-image.jpg`],
       creator: '@tiyuy_peru',
       site: '@tiyuy_peru',
     },
@@ -196,7 +200,7 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
     transactionType: 'SALE' as const,
     sort: 'createdAt,desc',
     page: resolvedSearchParams.page ? Number(resolvedSearchParams.page) : 0,
-    size: 9, // Cambiado de 20 a 9 para mostrar 3x3 grid
+    size: 9,
     type: propertyType as any,
     ...(isAllPeru ? {} : isMainProvince ? { province: district } : { district }),
     ...(isFiltered
@@ -212,8 +216,28 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
       : {}),
   };
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
   const result = await propertyRepo.search(filters);
   const propertyTypeLabel = PROPERTY_TYPE_LABELS[resolvedParams.propertyType];
+
+  // Crear searchFn para el mapa (usa el repositorio de propiedades)
+  const propertySearchFn = async (mapFilters: MapFilters) => {
+    const mapResult = await propertyRepo.searchForMap({
+      transactionType: 'SALE',
+      type: propertyType as any,
+      district: mapFilters.district || district,
+      province: mapFilters.province,
+      region: mapFilters.region,
+      minPrice: mapFilters.minPrice,
+      maxPrice: mapFilters.maxPrice,
+      minArea: mapFilters.minArea,
+      maxArea: mapFilters.maxArea,
+      minBedrooms: mapFilters.bedrooms,
+      minBathrooms: mapFilters.bathrooms,
+      isFeatured: mapFilters.isFeatured,
+    });
+    return propertyMapResultToGeneric(mapResult);
+  };
 
   let title = `${propertyTypeLabel} en Venta en ${district} | TIYUY`;
   let description = `Encuentra ${propertyTypeLabel.toLowerCase()} en venta en ${district}. Las mejores propiedades con precios, fotos y detalles completos en TIYUY.`;
@@ -239,7 +263,7 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
     }
   }
 
-  const canonicalUrl = `https://tiyuy.com/sale/${resolvedParams.propertyType}/${resolvedParams.district}${
+  const canonicalUrl = `${siteUrl}/sale/${resolvedParams.propertyType}/${resolvedParams.district}${
     isFiltered
       ? '?' +
         new URLSearchParams(
@@ -288,26 +312,26 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
                     priceCurrency: property.currency,
                     availability: 'https://schema.org/InStock',
                   },
-                  url: `https://tiyuy.com/property/${property.id}`,
+                  url: `${siteUrl}/property/${property.id}`,
                 },
               })),
             },
             breadcrumb: {
               '@type': 'BreadcrumbList',
               itemListElement: [
-                { '@type': 'ListItem', position: 1, name: 'Inicio', item: 'https://tiyuy.com' },
-                { '@type': 'ListItem', position: 2, name: 'Venta', item: 'https://tiyuy.com/sale' },
+                { '@type': 'ListItem', position: 1, name: 'Inicio', item: siteUrl },
+                { '@type': 'ListItem', position: 2, name: 'Venta', item: `${siteUrl}/sale` },
                 {
                   '@type': 'ListItem',
                   position: 3,
                   name: propertyTypeLabel,
-                  item: `https://tiyuy.com/sale/${resolvedParams.propertyType}`,
+                  item: `${siteUrl}/sale/${resolvedParams.propertyType}`,
                 },
                 {
                   '@type': 'ListItem',
                   position: 4,
                   name: district,
-                  item: `https://tiyuy.com/sale/${resolvedParams.propertyType}/${resolvedParams.district}`,
+                  item: `${siteUrl}/sale/${resolvedParams.propertyType}/${resolvedParams.district}`,
                 },
               ],
             },
@@ -350,6 +374,27 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
                     ({result.pagination.totalElements} propiedades)
                   </span>
                 </h1>
+                <PropertyMapWrapper
+                  transactionType="SALE"
+                  entitySubType={propertyType}
+                  filters={{
+                    ...(isAllPeru ? {} : isMainProvince ? { province: district } : { district }),
+                    ...(isFiltered
+                      ? {
+                          minPrice: resolvedSearchParams.minPrice ? Number(resolvedSearchParams.minPrice) : undefined,
+                          maxPrice: resolvedSearchParams.maxPrice ? Number(resolvedSearchParams.maxPrice) : undefined,
+                          bedrooms: resolvedSearchParams.bedrooms ? Number(resolvedSearchParams.bedrooms) : undefined,
+                          bathrooms: resolvedSearchParams.bathrooms ? Number(resolvedSearchParams.bathrooms) : undefined,
+                          minArea: resolvedSearchParams.minArea ? Number(resolvedSearchParams.minArea) : undefined,
+                          maxArea: resolvedSearchParams.maxArea ? Number(resolvedSearchParams.maxArea) : undefined,
+                        }
+                      : {}),
+                  }}
+                  totalItems={result.pagination.totalElements}
+                  itemLabel="propiedad"
+                  itemLabelPlural="propiedades"
+                  detailBaseUrl="/property/"
+                />
               </div>
 
               <PropertyGrid properties={result.properties} />

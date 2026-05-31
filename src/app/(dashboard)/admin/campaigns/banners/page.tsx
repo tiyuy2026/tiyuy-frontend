@@ -5,41 +5,43 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useBanners, useCreateBanner, useUpdateBanner, useDeleteBanner, useCampaignPricingList, useUpdateCampaignPricing } from '@/presentation/hooks/useAdmin';
+import { useState, useMemo, useRef } from 'react';
+import { useBanners, useCreateBannerWithUpload, useUpdateBanner, useDeleteBanner } from '@/presentation/hooks/useAdmin';
+import type { Banner } from '@/core/domain/entities/Admin';
 import { Modal } from '@/presentation/components/ui/Modal';
 import { Input } from '@/presentation/components/ui/Input';
 import { Button } from '@/presentation/components/ui/Button';
 import { LoadingState, EmptyState, ErrorState } from '@/presentation/components/admin/AdminUIStates';
-import { Banner, CreateBannerRequest, CampaignPricing } from '@/core/domain/entities/Admin';
-import { Image, Plus, Search, Edit3, Trash2, Eye, EyeOff, DollarSign, Save, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Image, Plus, Search, Edit3, Trash2, Eye, EyeOff, Upload, Clock } from 'lucide-react';
+
 
 export default function MarketingBannersPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedBanner, setSelectedBanner] = useState<Banner | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isPriceModalOpen, setIsPriceModalOpen] = useState(false);
-  const [selectedPricing, setSelectedPricing] = useState<CampaignPricing | null>(null);
-
   const { data: bannersData, isLoading, error, refetch } = useBanners();
-  const createMutation = useCreateBanner();
+  const createMutation = useCreateBannerWithUpload();
   const updateMutation = useUpdateBanner();
   const deleteMutation = useDeleteBanner();
-  const { data: pricingData } = useCampaignPricingList();
-  const updatePricingMutation = useUpdateCampaignPricing();
-
-  const pricingList = useMemo(() => Array.isArray(pricingData) ? pricingData : [], [pricingData]);
-  const bannerPricing = useMemo(() => pricingList.find(p => p.promotionType === 'BANNER'), [pricingList]);
 
   const bannersList = Array.isArray(bannersData) ? bannersData : [];
   const filteredBanners = bannersList.filter(banner =>
     banner.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleCreate = async (formData: CreateBannerRequest) => {
+  const handleCreate = async (data: {
+    image: File;
+    title: string;
+    placement: string;
+    displayMode?: 'SOLO_BANNER' | 'INTEGRATED';
+    description?: string;
+    linkUrl?: string;
+    durationDays?: number;
+    displayOrder?: number;
+  }) => {
     try {
-      await createMutation.mutateAsync(formData);
+      await createMutation.mutateAsync(data);
       setIsCreateModalOpen(false);
       refetch();
     } catch (error) {
@@ -123,32 +125,6 @@ export default function MarketingBannersPage() {
           <Plus className="w-4 h-4" /> Crear Banner
         </button>
       </div>
-
-      {/* ── Precio de Banner ── */}
-      {bannerPricing && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-amber-600" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-gray-500">Precio de Publicación de Banner</p>
-              <p className="text-lg font-extrabold text-gray-900">
-                S/ {bannerPricing.pricePen.toLocaleString('es-PE', { minimumFractionDigits: 2 })} 
-                <span className="text-sm font-normal text-gray-400 mx-1">/</span>
-                $ {bannerPricing.priceUsd.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => { setSelectedPricing(bannerPricing); setIsPriceModalOpen(true); }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 text-sm font-medium rounded-xl hover:bg-amber-100 transition-all"
-          >
-            <DollarSign className="w-4 h-4" />
-            Actualizar Precio de Banner
-          </button>
-        </div>
-      )}
 
       {/* Search */}
       <div className="relative">
@@ -242,110 +218,7 @@ export default function MarketingBannersPage() {
           banner={selectedBanner}
         />
       )}
-
-      {/* ── Modal Actualizar Precio de Banner ── */}
-      <UpdateBannerPriceModal
-        isOpen={isPriceModalOpen}
-        onClose={() => { setIsPriceModalOpen(false); setSelectedPricing(null); }}
-        item={selectedPricing}
-        onSave={async (data) => {
-          if (!selectedPricing) return;
-          await updatePricingMutation.mutateAsync({
-            id: selectedPricing.id,
-            request: { pricePen: data.pricePen, priceUsd: data.priceUsd },
-          });
-          setIsPriceModalOpen(false);
-          setSelectedPricing(null);
-        }}
-        isSaving={updatePricingMutation.isPending}
-      />
     </div>
-  );
-}
-
-// ─── Modal para actualizar precio de banner ─────────────────────────────────
-function UpdateBannerPriceModal({ isOpen, onClose, onSave, item, isSaving }: {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (data: { pricePen: number; priceUsd: number }) => void;
-  item: CampaignPricing | null;
-  isSaving: boolean;
-}) {
-  const [pricePen, setPricePen] = useState(item?.pricePen || 0);
-  const [priceUsd, setPriceUsd] = useState(item?.priceUsd || 0);
-
-  useState(() => {
-    if (item) {
-      setPricePen(item.pricePen);
-      setPriceUsd(item.priceUsd);
-    }
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave({ pricePen: Number(pricePen), priceUsd: Number(priceUsd) });
-  };
-
-  if (!isOpen || !item) return null;
-
-  return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-            <DollarSign className="w-5 h-5 text-amber-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">Actualizar Precio de Banner</h3>
-            <p className="text-sm text-gray-500">
-              {item.name}
-            </p>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
-            <p className="text-xs text-amber-800">
-              El cambio se aplica en tiempo real. Agentes y developers verán el nuevo precio inmediatamente.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Precio PEN <span className="text-gray-400">(S/)</span></label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">S/</span>
-                <input type="number" step="0.01" min="0" value={pricePen}
-                  onChange={(e) => setPricePen(Number(e.target.value))}
-                  className="w-full pl-8 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" required />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Precio USD <span className="text-gray-400">($)</span></label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                <input type="number" step="0.01" min="0" value={priceUsd}
-                  onChange={(e) => setPriceUsd(Number(e.target.value))}
-                  className="w-full pl-8 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all" required />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-3 pt-2">
-            <button type="submit" disabled={isSaving}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-xl hover:shadow-md hover:from-amber-600 hover:to-orange-600 transition-all disabled:opacity-50">
-              {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              {isSaving ? 'Actualizando...' : 'Actualizar Precio'}
-            </button>
-            <button type="button" onClick={onClose} disabled={isSaving}
-              className="flex-1 px-4 py-2.5 bg-gray-50 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-100 transition-all disabled:opacity-50">
-              Cancelar
-            </button>
-          </div>
-        </form>
-      </div>
-    </Modal>
   );
 }
 
@@ -358,23 +231,58 @@ interface BannerModalProps {
 }
 
 function BannerModal({ isOpen, onClose, onSubmit, title, banner }: BannerModalProps) {
-  const [formData, setFormData] = useState({
-    title: banner?.title || '',
-    description: banner?.description || '',
-    imageUrl: banner?.imageUrl || '',
-    linkUrl: banner?.linkUrl || '',
-    placement: banner?.placement || 'HOME_BANNER',
-    startDate: banner?.startDate ? new Date(banner.startDate).toISOString().split('T')[0] : '',
-    endDate: banner?.endDate ? new Date(banner.endDate).toISOString().split('T')[0] : '',
-  });
+  const [titleField, setTitleField] = useState(banner?.title || '');
+  const [description, setDescription] = useState(banner?.description || '');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState(banner?.imageUrl || '');
+  const [linkUrl, setLinkUrl] = useState(banner?.linkUrl || '');
+  const [placement, setPlacement] = useState(banner?.placement || 'SLIDER');
+  const [displayMode, setDisplayMode] = useState<'SOLO_BANNER' | 'INTEGRATED'>(banner?.displayMode || 'INTEGRATED');
+  const [durationDays, setDurationDays] = useState(banner?.durationDays || 30);
+  const [displayOrder, setDisplayOrder] = useState(banner?.displayOrder || 0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      ...formData,
-      startDate: formData.startDate ? new Date(formData.startDate).toISOString() : null,
-      endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null,
-    });
+    if (banner) {
+      // Edit mode: send JSON (existing behavior)
+      onSubmit({
+        title: titleField,
+        description,
+        imageUrl: imagePreview,
+        linkUrl,
+        placement,
+        displayMode,
+        durationDays,
+        displayOrder,
+      });
+    } else {
+      // Create mode: send file + fields
+      if (!imageFile) {
+        alert('Debes seleccionar una imagen para el banner.');
+        return;
+      }
+      onSubmit({
+        image: imageFile,
+        title: titleField,
+        placement,
+        displayMode,
+        description,
+        linkUrl,
+        durationDays,
+        displayOrder,
+      });
+    }
   };
 
   if (!isOpen) return null;
@@ -384,16 +292,62 @@ function BannerModal({ isOpen, onClose, onSubmit, title, banner }: BannerModalPr
       <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input label="Título" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} required />
+          <Input label="Título" value={titleField} onChange={(e) => setTitleField(e.target.value)} required />
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all" />
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all" />
           </div>
-          <Input label="URL de Imagen" value={formData.imageUrl} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })} required />
-          <Input label="URL de Destino" value={formData.linkUrl} onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })} />
+
+          {/* Image upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {banner ? 'URL de Imagen (o sube una nueva)' : 'Imagen del Banner'}
+            </label>
+            {imagePreview && (
+              <div className="mb-2 rounded-lg overflow-hidden h-28 bg-gray-50">
+                <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-100 transition-all border border-gray-200"
+              >
+                <Upload className="w-4 h-4" />
+                {imageFile ? imageFile.name : 'Seleccionar Imagen'}
+              </button>
+              {banner && !imageFile && (
+                <span className="text-xs text-gray-400">(deja vacío para mantener la actual)</span>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              URL de Destino <span className="text-gray-400 font-normal">(opcional)</span>
+            </label>
+            <input
+              type="text"
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              placeholder="https://ejemplo.com"
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
+            />
+            <p className="text-xs text-gray-400 mt-1">Solo si el banner debe redirigir a un enlace al hacer clic. Déjalo vacío si es solo decorativo.</p>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación</label>
-            <select value={formData.placement} onChange={(e) => setFormData({ ...formData, placement: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all">
+            <select value={placement} onChange={(e) => setPlacement(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all">
               <option value="HOME_MAIN">Home - Principal</option>
               <option value="HOME_SPOTLIGHT">Home - Spotlight</option>
               <option value="HOME_BANNER">Home - Banner</option>
@@ -410,8 +364,61 @@ function BannerModal({ isOpen, onClose, onSubmit, title, banner }: BannerModalPr
               <option value="CATEGORY_PAGE">Página de Categoría</option>
             </select>
           </div>
-          <Input label="Fecha Inicio" type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} required />
-          <Input label="Fecha Fin" type="date" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} />
+
+          {/* Tipo de visualización */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de visualización</label>
+            <div className="space-y-2">
+              <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${displayMode === 'INTEGRATED' ? 'border-teal-500 bg-teal-50/50 ring-1 ring-teal-500/20' : 'border-gray-200 hover:border-gray-300'}`}>
+                <input
+                  type="radio"
+                  name="displayMode"
+                  value="INTEGRATED"
+                  checked={displayMode === 'INTEGRATED'}
+                  onChange={() => setDisplayMode('INTEGRATED')}
+                  className="w-4 h-4 text-teal-600 focus:ring-teal-500"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Integrar al carrusel principal</p>
+                  <p className="text-xs text-gray-500">El banner se mezcla con las imágenes estáticas del carrusel del home</p>
+                </div>
+              </label>
+              <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${displayMode === 'SOLO_BANNER' ? 'border-teal-500 bg-teal-50/50 ring-1 ring-teal-500/20' : 'border-gray-200 hover:border-gray-300'}`}>
+                <input
+                  type="radio"
+                  name="displayMode"
+                  value="SOLO_BANNER"
+                  checked={displayMode === 'SOLO_BANNER'}
+                  onChange={() => setDisplayMode('SOLO_BANNER')}
+                  className="w-4 h-4 text-teal-600 focus:ring-teal-500"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Solo Banner</p>
+                  <p className="text-xs text-gray-500">Se muestra únicamente como banner individual, no se agrega al carrusel</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          {/* Duration in days */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              <span className="flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" />
+                Duración (días)
+              </span>
+            </label>
+            <input
+              type="number"
+              min={1}
+              max={365}
+              value={durationDays}
+              onChange={(e) => setDurationDays(Number(e.target.value))}
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
+            />
+            <p className="text-xs text-gray-400 mt-1">El banner se desactivará automáticamente después de este período.</p>
+          </div>
+
           <div className="flex gap-3 pt-4">
             <button type="submit" className="flex-1 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-sm font-medium rounded-xl hover:shadow-md transition-all">
               {banner ? 'Actualizar' : 'Crear'} Banner
@@ -425,3 +432,5 @@ function BannerModal({ isOpen, onClose, onSubmit, title, banner }: BannerModalPr
     </Modal>
   );
 }
+
+

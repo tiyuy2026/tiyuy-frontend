@@ -1,8 +1,18 @@
 import { axiosClient } from '../api/axios-client';
 import { IAgentRepository } from '@/core/domain/repositories/IAgentRepository';
 import { Agent, AgentDashboard, PublicAgentProfile, UpdateAgentProfileRequest } from '@/core/domain/entities/Agent';
-import { Banner, CampaignPricing, PromotionCampaign, MarketingStats, CreateBannerRequest, CreatePromotionCampaignRequest, UpdatePromotionCampaignRequest } from '@/core/domain/entities/Admin';
+import { PromotionCampaign, MarketingStats, CreatePromotionCampaignRequest, UpdatePromotionCampaignRequest, Banner, CreateBannerRequest } from '@/core/domain/entities/Admin';
 import { PaginatedResponse } from '@/core/domain/repositories/IAdminRepository';
+
+export interface TargetEntity {
+  id: number;
+  title: string;
+  type: 'PROPERTY' | 'PROJECT';
+  status: string;
+  imageUrl: string | null;
+  price: string;
+  location: string;
+}
 
 const BASE_URL = '/v1/agent';
 
@@ -52,16 +62,7 @@ export class AgentRepository implements IAgentRepository {
     await axiosClient.delete(`${BASE_URL}/marketing/campaigns/${id}`);
   }
 
-  async payForCampaign(id: number, paymentRequest: any): Promise<PromotionCampaign> {
-    const response = await axiosClient.post(`${BASE_URL}/marketing/campaigns/${id}/pay`, paymentRequest);
-    return response.data;
-  }
-
-  async renewCampaign(id: number, paymentRequest: any): Promise<PromotionCampaign> {
-    const response = await axiosClient.post(`${BASE_URL}/marketing/campaigns/${id}/renew`, paymentRequest);
-    return response.data;
-  }
-
+  // Banners
   async getMyBanners(): Promise<Banner[]> {
     const response = await axiosClient.get(`${BASE_URL}/marketing/banners`);
     return response.data;
@@ -81,9 +82,50 @@ export class AgentRepository implements IAgentRepository {
     await axiosClient.delete(`${BASE_URL}/marketing/banners/${id}`);
   }
 
-  async getPricingList(): Promise<CampaignPricing[]> {
-    const response = await axiosClient.get(`${BASE_URL}/marketing/pricing`);
+  // Publish campaign
+  async publishMyCampaign(id: number): Promise<PromotionCampaign> {
+    const response = await axiosClient.post(`${BASE_URL}/marketing/campaigns/${id}/publish`);
     return response.data;
+  }
+
+  // Renew campaign
+  async renewMyCampaign(id: number, paymentRequest: { paymentMethod: string }): Promise<PromotionCampaign> {
+    const response = await axiosClient.post(`${BASE_URL}/marketing/campaigns/${id}/renew`, paymentRequest);
+    return response.data;
+  }
+
+  // Target entities (projects & properties for linking)
+  async getMyTargetEntities(): Promise<TargetEntity[]> {
+    const response = await axiosClient.get(`${BASE_URL}/marketing/target-entities`);
+    const data = response.data;
+    const entities: TargetEntity[] = [];
+    if (data?.projects && Array.isArray(data.projects)) {
+      data.projects.forEach((p: any) => {
+        entities.push({
+          id: p.id,
+          title: p.title || p.name || '',
+          type: 'PROJECT',
+          status: p.status || 'ACTIVE',
+          imageUrl: p.imageUrl || p.mainImageUrl || null,
+          price: p.price ? `${p.price}` : '',
+          location: p.location || p.district || '',
+        });
+      });
+    }
+    if (data?.properties && Array.isArray(data.properties)) {
+      data.properties.forEach((p: any) => {
+        entities.push({
+          id: p.id,
+          title: p.title || p.name || '',
+          type: 'PROPERTY',
+          status: p.status || 'ACTIVE',
+          imageUrl: p.imageUrl || p.mainImageUrl || null,
+          price: p.price ? `${p.price}` : '',
+          location: p.location || p.district || '',
+        });
+      });
+    }
+    return entities;
   }
 
   private mapToAgent(data: any): Agent {

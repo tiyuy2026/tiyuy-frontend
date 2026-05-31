@@ -63,8 +63,6 @@ const CAMPAIGN_SUBITEMS: NavItem[] = [
   { label: 'Dashboard', href: '/admin/campaigns', icon: LayoutDashboard },
   { label: 'Lista de Campañas', href: '/admin/campaigns/list', icon: Megaphone },
   { label: 'Banners', href: '/admin/campaigns/banners', icon: ImageIcon },
-  { label: 'Campañas Festivas', href: '/admin/campaigns/festive', icon: Gift },
-  { label: 'Precios', href: '/admin/campaigns/pricing', icon: DollarSign },
 ];
 
 // ─── Configuración del menú ─────────────────────────────────────────────────

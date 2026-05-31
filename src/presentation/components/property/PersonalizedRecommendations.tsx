@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { PropertySummary } from '@/core/domain/entities/Property';
 import { PropertyCard } from './PropertyCard/PropertyCard';
 import { PropertyRepository } from '@/infrastructure/repositories/PropertyRepository';
+import { mapSpanishPropertyType, mapTransactionType } from '@/core/application/mappers/PropertyTypeMapper';
 
 interface RecommendationProps {
   title: string;
@@ -42,8 +43,8 @@ export function PersonalizedRecommendations({
         if (lastSearchRaw) {
           try {
             const lastSearch = JSON.parse(lastSearchRaw);
-            if (lastSearch.transactionType) filters.transactionType = lastSearch.transactionType;
-            if (lastSearch.type) filters.type = lastSearch.type;
+            if (lastSearch.transactionType) filters.transactionType = mapTransactionType(lastSearch.transactionType);
+            if (lastSearch.type) filters.type = mapSpanishPropertyType(lastSearch.type);
             if (lastSearch.district) filters.district = lastSearch.district;
           } catch (e) {
             // ignore
@@ -54,15 +55,18 @@ export function PersonalizedRecommendations({
         if (!filters.transactionType && currentTransactionType) {
           filters.transactionType = currentTransactionType;
         }
+        if (!filters.type && currentType) {
+          filters.type = mapSpanishPropertyType(currentType);
+        }
+        
+        // Ubicación: usar SOLO un campo (district o province) para evitar
+        // errores de JOIN duplicado en el backend (PropertySpecification)
         if (!filters.district && currentDistrict) {
           filters.district = currentDistrict;
-        }
-        if (!filters.province && currentProvince) {
+        } else if (!filters.district && !filters.province && currentProvince) {
           filters.province = currentProvince;
         }
-        if (!filters.type && currentType) {
-          filters.type = currentType;
-        }
+        // Si ya tenemos district del localStorage, NO agregar province
 
         const result = await propertyRepo.search(filters);
         

@@ -9,15 +9,66 @@ import { FeaturedProperties } from '@/presentation/components/property/FeaturedP
 import { FeaturedProjects } from '@/presentation/components/project/FeaturedProjects/FeaturedProjects';
 import { FilteredProperties } from '@/presentation/components/property/FilteredProperties/FilteredProperties';
 import { LocationSearch } from '@/presentation/components/forms/LocationSearch/LocationSearch';
+import { FeaturedCampaigns } from '@/presentation/components/marketing/FeaturedCampaigns';
+import { usePublicBanners } from '@/presentation/hooks/usePublicBanners';
 
-const HERO_IMAGES = [
+// Fallback images si no hay banners configurados en admin
+const FALLBACK_HERO_IMAGES = [
   '/assets/images/hero/hero-1.jpg',
   '/assets/images/hero/hero-2.jpg',
   '/assets/images/hero/hero-3.jpg',
   '/assets/images/hero/hero-4.jpg',
 ];
 
+/**
+ * Intercala imágenes de banners entre las imágenes estáticas del carrusel.
+ * Ejemplo: [estática1, banner1, estática2, banner2, estática3, estática4]
+ */
+function intercalateImages(staticImages: string[], bannerImages: string[]): string[] {
+  const result: string[] = [];
+  const maxBannersPerSlot = Math.max(1, Math.floor(staticImages.length / bannerImages.length));
+  let bannerIndex = 0;
+  let bannerCountInSlot = 0;
+
+  for (let i = 0; i < staticImages.length; i++) {
+    result.push(staticImages[i]);
+    // Insertar un banner después de cada imagen estática (si hay banners disponibles)
+    if (bannerIndex < bannerImages.length) {
+      bannerCountInSlot++;
+      if (bannerCountInSlot >= maxBannersPerSlot || i === staticImages.length - 1) {
+        result.push(bannerImages[bannerIndex]);
+        bannerIndex++;
+        bannerCountInSlot = 0;
+      }
+    }
+  }
+
+  // Si sobran banners, agregarlos al final
+  while (bannerIndex < bannerImages.length) {
+    result.push(bannerImages[bannerIndex]);
+    bannerIndex++;
+  }
+
+  return result;
+}
+
 export default function HomePage() {
+  // Cargar banners públicos con displayMode INTEGRATED para mezclar con imágenes estáticas
+  const { banners: sliderBanners } = usePublicBanners('SLIDER');
+  const { banners: mainBanners } = usePublicBanners('HOME_MAIN');
+  const { banners: homeBanners } = usePublicBanners('HOME_BANNER');
+  
+  // Unir todos los banners encontrados
+  const allBanners = [...sliderBanners, ...mainBanners, ...homeBanners];
+  
+  // Separar banners INTEGRATED (se mezclan con el carrusel) de SOLO_BANNER (no se muestran en carrusel)
+  const integratedBanners = allBanners.filter(b => b.displayMode === 'INTEGRATED' || !b.displayMode);
+  
+  // Mezclar banners integrados con imágenes estáticas: intercalar
+  const heroImages = integratedBanners.length > 0
+    ? intercalateImages(FALLBACK_HERO_IMAGES, integratedBanners.map(b => b.imageUrl))
+    : FALLBACK_HERO_IMAGES;
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'rent' | 'sale' | 'projects'>('sale');
   const [selectedPropertyType, setSelectedPropertyType] = useState('departamentos');
@@ -31,10 +82,10 @@ export default function HomePage() {
   // Slider automático del Hero
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+      setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [heroImages.length]);
 
   // Control e hidratación segura de rutas e historial (Previene errores de servidor en Next.js)
   useEffect(() => {
@@ -140,7 +191,7 @@ export default function HomePage() {
       {/* HERO */}
       <section className="relative">
         <div className="relative h-[540px] overflow-hidden">
-          {HERO_IMAGES.map((image, index) => (
+          {heroImages.map((image, index) => (
             <div
               key={index}
               className={`absolute inset-0 transition-opacity duration-1000 ${
@@ -442,6 +493,9 @@ export default function HomePage() {
           />
         </div>
       </section>
+
+      {/* CAMPAÑAS DE MARKETING DESTACADAS */}
+      <FeaturedCampaigns />
 
       <section className="py-12 bg-background border-t border-gray-200/60">
         <div className="w-full px-8 xl:px-16">

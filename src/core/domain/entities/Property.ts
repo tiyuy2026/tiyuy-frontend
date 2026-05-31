@@ -141,3 +141,43 @@ export interface PropertySummary {
   lifecycleStatus?: PropertyLifecycleStatus;
   remainingGraceDays?: number;
 }
+
+// ─── Map-specific types ────────────────────────────────────────────────
+
+export interface MapPropertySummary {
+  id: number;
+  title: string;
+  slug: string;
+  price: number;
+  currency: Currency;
+  type: PropertyType;
+  transactionType: TransactionType;
+  mainPhotoUrl?: string;
+  district: string;
+  province: string;
+  region: string;
+  latitude: number;
+  longitude: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  area?: number;
+  isFeatured?: boolean;
+}
+
+export type MapCoverageType = 'EXACT_DISTRICT' | 'NEARBY_DISTRICTS' | 'METRO_AREA' | 'PROVINCE' | 'REGION' | 'NO_RESULTS';
+
+export interface MapCoverageInfo {
+  coverage: MapCoverageType;
+  searchedDistrict: string;
+  nearbyDistricts: string[];
+  message: string;
+}
+
+export interface MapSearchResult {
+  properties: MapPropertySummary[];
+  requestedArea: string;
+  effectiveCoverage: MapCoverageType;
+  coverageMessage: string;
+  districtsIncluded: string[];
+  totalResults: number;
+}

@@ -4,9 +4,9 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       // Proxy API calls to backend (Vercel actuará como puente hacia tu Oracle)
+      // El backend usa context-path /api, por lo que /api/:path* -> BACKEND_URL/api/:path*
       {
         source: '/api/:path*',
-
         destination: `${process.env.BACKEND_URL ? `${process.env.BACKEND_URL.replace(/\/+$/, '')}/api` : 'http://152.70.129.43:8080/api'}/:path*`,
       },
       // Existing rewrites

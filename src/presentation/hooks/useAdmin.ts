@@ -1041,43 +1041,44 @@ export const useDeletePromotionCampaign = () => {
   });
 };
 
-export const useCampaignPricingList = (params?: { page?: number; size?: number }) => {
-  return useQuery({
-    queryKey: [ADMIN_QUERY_KEY, 'marketing', 'pricing', params],
-    queryFn: () => adminRepository.getCampaignPricingList(params),
-    staleTime: 30000,
-    refetchOnWindowFocus: true,
-  });
-};
-
-export const useCreateCampaignPricing = () => {
+export const useApprovePromotionCampaign = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (request: import('@/core/domain/entities/Admin').CreateCampaignPricingRequest) =>
-      adminRepository.createCampaignPricing(request),
+    mutationFn: (id: number) => adminRepository.approvePromotionCampaign(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'pricing'] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'campaigns'] });
     },
   });
 };
 
-export const useUpdateCampaignPricing = () => {
+export const useRejectPromotionCampaign = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, request }: { id: number; request: Partial<import('@/core/domain/entities/Admin').CreateCampaignPricingRequest> }) =>
-      adminRepository.updateCampaignPricing(id, request),
+    mutationFn: ({ id, reason }: { id: number; reason?: string }) =>
+      adminRepository.rejectPromotionCampaign(id, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'pricing'] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'campaigns'] });
     },
   });
 };
 
-export const useDeleteCampaignPricing = () => {
+export const useSuspendPromotionCampaign = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: number) => adminRepository.deleteCampaignPricing(id),
+    mutationFn: ({ id, reason }: { id: number; reason?: string }) =>
+      adminRepository.suspendPromotionCampaign(id, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'pricing'] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'campaigns'] });
+    },
+  });
+};
+
+export const useReactivatePromotionCampaign = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => adminRepository.reactivatePromotionCampaign(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'campaigns'] });
     },
   });
 };
@@ -1101,6 +1102,49 @@ export const useCreateBanner = () => {
     },
   });
 };
+
+/**
+ * Hook para crear un banner con subida de imagen (multipart/form-data).
+ * La imagen se sube a S3 y el banner se crea con la URL resultante.
+ */
+export const useCreateBannerWithUpload = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      image,
+      title,
+      placement,
+      displayMode,
+      description,
+      linkUrl,
+      durationDays,
+      displayOrder,
+    }: {
+      image: File;
+      title: string;
+      placement: string;
+      displayMode?: 'SOLO_BANNER' | 'INTEGRATED';
+      description?: string;
+      linkUrl?: string;
+      durationDays?: number;
+      displayOrder?: number;
+    }) =>
+      adminRepository.createBannerWithUpload(
+        image,
+        title,
+        placement,
+        displayMode,
+        description,
+        linkUrl,
+        durationDays,
+        displayOrder
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'marketing', 'banners'] });
+    },
+  });
+};
+
 
 export const useUpdateBanner = () => {
   const queryClient = useQueryClient();

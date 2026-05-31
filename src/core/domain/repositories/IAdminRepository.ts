@@ -139,10 +139,6 @@ export interface IAdminRepository {
   createPromotionCampaign(request: import('@/core/domain/entities/Admin').CreatePromotionCampaignRequest): Promise<import('@/core/domain/entities/Admin').PromotionCampaign>;
   updatePromotionCampaign(id: number, request: import('@/core/domain/entities/Admin').UpdatePromotionCampaignRequest): Promise<import('@/core/domain/entities/Admin').PromotionCampaign>;
   deletePromotionCampaign(id: number): Promise<void>;
-  getCampaignPricingList(params?: { page?: number; size?: number }): Promise<import('@/core/domain/entities/Admin').CampaignPricing[]>;
-  createCampaignPricing(request: import('@/core/domain/entities/Admin').CreateCampaignPricingRequest): Promise<import('@/core/domain/entities/Admin').CampaignPricing>;
-  updateCampaignPricing(id: number, request: Partial<import('@/core/domain/entities/Admin').CreateCampaignPricingRequest>): Promise<import('@/core/domain/entities/Admin').CampaignPricing>;
-  deleteCampaignPricing(id: number): Promise<void>;
   getBanners(params?: { page?: number; size?: number; location?: string }): Promise<import('@/core/domain/entities/Admin').Banner[]>;
   createBanner(request: import('@/core/domain/entities/Admin').CreateBannerRequest): Promise<import('@/core/domain/entities/Admin').Banner>;
   updateBanner(id: number, request: Partial<import('@/core/domain/entities/Admin').CreateBannerRequest>): Promise<import('@/core/domain/entities/Admin').Banner>;

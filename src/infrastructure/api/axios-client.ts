@@ -1,15 +1,16 @@
 import axios from 'axios';
 
+// El backend usa context-path /api
 const serverBaseURL = process.env.BACKEND_URL
   ? `${process.env.BACKEND_URL}/api`
   : 'http://localhost:8080/api';
 
+// En el navegador, usar el proxy de Next.js (/api) para evitar CORS
+// En el servidor (SSR), usar la URL directa del backend
 const baseURL =
   typeof window === 'undefined'
     ? serverBaseURL
-    : (process.env.NEXT_PUBLIC_API_URL 
-        ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, '')}/api`
-        : 'http://152.70.129.43:8080/api');
+    : '/api';
 
 export const axiosClient = axios.create({
   baseURL,

@@ -62,8 +62,6 @@ import {
   PromotionCampaign,
   CreatePromotionCampaignRequest,
   UpdatePromotionCampaignRequest,
-  CampaignPricing,
-  CreateCampaignPricingRequest,
   Banner,
   CreateBannerRequest,
   FestiveCampaign,
@@ -1126,23 +1124,22 @@ export class AdminRepository implements IAdminRepository {
     await axiosClient.delete(`/v1/admin/marketing/campaigns/${id}`);
   }
 
-  async getCampaignPricingList(params?: { page?: number; size?: number }): Promise<CampaignPricing[]> {
-    const response = await axiosClient.get('/v1/admin/marketing/pricing');
-    return response.data;
+  async approvePromotionCampaign(id: number): Promise<void> {
+    await axiosClient.post(`/v1/admin/marketing/campaigns/${id}/approve`);
   }
 
-  async createCampaignPricing(request: CreateCampaignPricingRequest): Promise<CampaignPricing> {
-    const response = await axiosClient.post('/v1/admin/marketing/pricing', request);
-    return response.data;
+  async rejectPromotionCampaign(id: number, reason?: string): Promise<void> {
+    const params = reason ? { reason } : {};
+    await axiosClient.post(`/v1/admin/marketing/campaigns/${id}/reject`, null, { params });
   }
 
-  async updateCampaignPricing(id: number, request: Partial<CreateCampaignPricingRequest>): Promise<CampaignPricing> {
-    const response = await axiosClient.put(`/v1/admin/marketing/pricing/${id}`, request);
-    return response.data;
+  async suspendPromotionCampaign(id: number, reason?: string): Promise<void> {
+    const params = reason ? { reason } : {};
+    await axiosClient.post(`/v1/admin/marketing/campaigns/${id}/suspend`, null, { params });
   }
 
-  async deleteCampaignPricing(id: number): Promise<void> {
-    await axiosClient.delete(`/v1/admin/marketing/pricing/${id}`);
+  async reactivatePromotionCampaign(id: number): Promise<void> {
+    await axiosClient.post(`/v1/admin/marketing/campaigns/${id}/reactivate`);
   }
 
   async getBanners(params?: { page?: number; size?: number; location?: string }): Promise<Banner[]> {
@@ -1154,6 +1151,37 @@ export class AdminRepository implements IAdminRepository {
     const response = await axiosClient.post('/v1/admin/marketing/banners', request);
     return response.data;
   }
+
+  /**
+   * Create a banner with image upload (multipart/form-data).
+   * The image is uploaded to S3 and the banner is created with the resulting URL.
+   */
+  async createBannerWithUpload(
+    image: File,
+    title: string,
+    placement: string,
+    displayMode?: 'SOLO_BANNER' | 'INTEGRATED',
+    description?: string,
+    linkUrl?: string,
+    durationDays?: number,
+    displayOrder?: number
+  ): Promise<Banner> {
+    const formData = new FormData();
+    formData.append('image', image);
+    formData.append('title', title);
+    formData.append('placement', placement);
+    if (displayMode) formData.append('displayMode', displayMode);
+    if (description) formData.append('description', description);
+    if (linkUrl) formData.append('linkUrl', linkUrl);
+    if (durationDays !== undefined) formData.append('durationDays', String(durationDays));
+    if (displayOrder !== undefined) formData.append('displayOrder', String(displayOrder));
+
+    const response = await axiosClient.post('/v1/admin/marketing/banners/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  }
+
 
   async updateBanner(id: number, request: Partial<CreateBannerRequest>): Promise<Banner> {
     const response = await axiosClient.put(`/v1/admin/marketing/banners/${id}`, request);

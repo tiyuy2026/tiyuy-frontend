@@ -123,35 +123,6 @@ export function useAgentDeleteCampaign() {
   });
 }
 
-export function useAgentPayCampaign() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, paymentRequest }: { id: number; paymentRequest: any }) =>
-      agentRepo.payForCampaign(id, paymentRequest),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [...AGENT_MARKETING_KEY, 'campaigns'] });
-      toast.success('Pago procesado exitosamente');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al procesar pago');
-    },
-  });
-}
-
-export function useAgentRenewCampaign() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, paymentRequest }: { id: number; paymentRequest: any }) =>
-      agentRepo.renewCampaign(id, paymentRequest),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [...AGENT_MARKETING_KEY, 'campaigns'] });
-      toast.success('Campaña renovada exitosamente');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al renovar campaña');
-    },
-  });
-}
 
 export function useAgentMyBanners() {
   const { user } = useAuthStore();
@@ -207,15 +178,46 @@ export function useAgentDeleteBanner() {
   });
 }
 
-export function useAgentPricingList() {
+export function useAgentPublishCampaign() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => agentRepo.publishMyCampaign(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...AGENT_MARKETING_KEY, 'campaigns'] });
+      toast.success('Campaña publicada exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al publicar campaña');
+    },
+  });
+}
+
+export function useAgentRenewCampaign() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, paymentRequest }: { id: number; paymentRequest: { paymentMethod: string } }) =>
+      agentRepo.renewMyCampaign(id, paymentRequest),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...AGENT_MARKETING_KEY, 'campaigns'] });
+      toast.success('Campaña renovada exitosamente');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al renovar campaña');
+    },
+  });
+}
+
+export function useAgentTargetEntities() {
   const { user } = useAuthStore();
   return useQuery({
-    queryKey: [...AGENT_MARKETING_KEY, 'pricing'],
-    queryFn: () => agentRepo.getPricingList(),
+    queryKey: [...AGENT_MARKETING_KEY, 'targetEntities'],
+    queryFn: () => agentRepo.getMyTargetEntities(),
     enabled: user?.role === 'AGENT',
     staleTime: 30000,
   });
 }
+
+export type { TargetEntity } from '@/core/domain/repositories/IAgentRepository';
 
 // Re-export Agent type for use in components
 export type { Agent };

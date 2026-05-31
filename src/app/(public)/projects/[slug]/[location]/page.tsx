@@ -5,6 +5,9 @@ import { ProjectSearchBar } from './ProjectSearchBar';
 import { ProjectFiltersClient } from './ProjectFiltersClient';
 import { ProjectGrid } from './ProjectGrid';
 import { Pagination } from './Pagination';
+import { PropertyMapWrapper } from '@/presentation/features/property-map/components/PropertyMapWrapper';
+import { projectMapResultToGeneric } from '@/core/domain/adapters/MapItemAdapters';
+import { MapFilters } from '@/core/domain/entities/MapTypes';
 
 interface Props {
   params: Promise<{
@@ -164,6 +167,22 @@ export default async function ProjectsCategoryPage({ params, searchParams }: Pro
   const result = await projectRepo.searchProjects(filters);
   const projectTypeLabel = PROJECT_TYPE_LABELS[resolvedParams.slug] || 'Proyectos';
 
+  // Crear searchFn para el mapa de proyectos
+  const projectSearchFn = async (mapFilters: MapFilters) => {
+    const mapResult = await projectRepo.searchForMap({
+      type: projectType,
+      district: mapFilters.district || location,
+      province: mapFilters.province,
+      region: mapFilters.region,
+      minPrice: mapFilters.minPrice,
+      maxPrice: mapFilters.maxPrice,
+      minArea: mapFilters.minArea,
+      maxArea: mapFilters.maxArea,
+      isFeatured: mapFilters.isFeatured,
+    });
+    return projectMapResultToGeneric(mapResult);
+  };
+
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="px-8 pt-6 pb-8">
@@ -190,7 +209,7 @@ export default async function ProjectsCategoryPage({ params, searchParams }: Pro
 
           {/* Resultados */}
           <div className="lg:col-span-3">
-            {/* Título de resultados */}
+            {/* Título de resultados + Botón mapa */}
             <div className="mb-4 flex items-center justify-between">
               <h1 className="text-lg font-semibold text-gray-900">
                 {projectTypeLabel} en {location}
@@ -198,6 +217,25 @@ export default async function ProjectsCategoryPage({ params, searchParams }: Pro
                   ({result.totalElements} proyectos)
                 </span>
               </h1>
+                <PropertyMapWrapper
+                  entityType="project"
+                  entitySubType={projectType}
+                  filters={{
+                    ...(isAllPeru ? {} : isMainProvince ? { province: location } : { district: location }),
+                    ...(isFiltered
+                      ? {
+                          minPrice: resolvedSearchParams.minPrice ? Number(resolvedSearchParams.minPrice) : undefined,
+                          maxPrice: resolvedSearchParams.maxPrice ? Number(resolvedSearchParams.maxPrice) : undefined,
+                          minArea: resolvedSearchParams.minArea ? Number(resolvedSearchParams.minArea) : undefined,
+                          maxArea: resolvedSearchParams.maxArea ? Number(resolvedSearchParams.maxArea) : undefined,
+                        }
+                      : {}),
+                  }}
+                  totalItems={result.totalElements}
+                  itemLabel="proyecto"
+                  itemLabelPlural="proyectos"
+                  detailBaseUrl="/projects/detail/"
+                />
             </div>
 
             <ProjectGrid projects={result.content} />

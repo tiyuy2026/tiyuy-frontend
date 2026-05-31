@@ -4,8 +4,13 @@ import {
   Project, 
   ProjectSummary,
   ProjectFull, 
-  ProjectUnit 
+  ProjectUnit,
 } from '@/core/domain/entities/Project';
+import {
+  ProjectMapSearchResult,
+  PropertyMapCoverageInfo,
+  MapCoverageLevel
+} from '@/core/domain/entities/PropertyMapResult';
 
 //  INLINE type (no necesita SearchFilters import)
 type SearchFilters = Parameters<IProjectRepository['searchProjects']>[0];
@@ -467,6 +472,50 @@ export class ProjectRepository implements IProjectRepository {
       numberOfElements: result.content.length,
       first: result.page === 0,
       empty: result.content.length === 0,
+    };
+  }
+
+  /**
+   * Búsqueda de proyectos para mapa
+   */
+  async searchForMap(filters: {
+    district?: string;
+    province?: string;
+    region?: string;
+    type?: string;
+    phase?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    minArea?: number;
+    maxArea?: number;
+    isFeatured?: boolean;
+  }): Promise<ProjectMapSearchResult> {
+    const params = new URLSearchParams();
+    
+    if (filters.district) params.append('district', filters.district);
+    if (filters.province) params.append('province', filters.province);
+    if (filters.region) params.append('region', filters.region);
+    if (filters.type) params.append('type', filters.type);
+    if (filters.phase) params.append('phase', filters.phase);
+    if (filters.minPrice) params.append('minPrice', filters.minPrice.toString());
+    if (filters.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
+    if (filters.minArea) params.append('minArea', filters.minArea.toString());
+    if (filters.maxArea) params.append('maxArea', filters.maxArea.toString());
+    if (filters.isFeatured !== undefined) params.append('isFeatured', filters.isFeatured.toString());
+
+    const response = await publicApiClient.get(`/projects/map/search?${params}`);
+    const data = response.data;
+
+    return {
+      projects: (data.projects || []).map((p: any) => ({
+        ...p,
+        coverImageUrl: p.coverImageUrl || null,
+      })),
+      requestedArea: data.requestedArea || '',
+      effectiveCoverage: data.effectiveCoverage || 'NO_RESULTS',
+      coverageMessage: data.coverageMessage || '',
+      districtsIncluded: data.districtsIncluded || [],
+      totalResults: data.totalResults || 0,
     };
   }
 }

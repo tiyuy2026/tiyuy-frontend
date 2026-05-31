@@ -305,13 +305,6 @@ export function GitHubSidebar() {
           icon: <Target className="w-4 h-4" />,
           path: '/admin/real-estate-discounts',
           requiredPermissions: ['DISCOUNTS_CREATE']
-        },
-        {
-          id: 'pricing-preview',
-          label: 'Vista Previa de Precios',
-          icon: <BarChart3 className="w-4 h-4" />,
-          path: '/admin/pricing-preview',
-          requiredPermissions: ['DISCOUNTS_CREATE']
         }
       ]
     },
@@ -341,13 +334,6 @@ export function GitHubSidebar() {
           label: 'Banners',
           icon: <Target className="w-4 h-4" />,
           path: '/admin/campaigns/banners',
-          requiredPermissions: ['COMMUNICATIONS_MANAGE']
-        },
-        {
-          id: 'campaigns-pricing',
-          label: 'Precios',
-          icon: <DollarSign className="w-4 h-4" />,
-          path: '/admin/campaigns/pricing',
           requiredPermissions: ['COMMUNICATIONS_MANAGE']
         },
         {

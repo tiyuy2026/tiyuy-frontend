@@ -19,73 +19,48 @@ const contactRepo = new ContactRepository();
 
 
 // API Configuration
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-
-
+// En el navegador, usar el proxy de Next.js (/api) para evitar CORS
+// En el servidor (SSR), usar la URL directa del backend
+const API_BASE_URL = typeof window === 'undefined'
+  ? (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').replace(/\/api\/?$/, '')
+  : '';
 
 // Helper function for API calls
-
 async function apiCall(endpoint: string, options: RequestInit = {}) {
-  // Asegurar que no haya doble /api si API_BASE_URL ya lo incluye
+  // En el navegador, usar /api como proxy de Next.js
+  // En SSR, usar la URL directa del backend
   const baseUrl = API_BASE_URL.replace(/\/$/, '');
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = `${baseUrl}${cleanEndpoint}`;
-
-  
+  // Asegurar que el endpoint tenga /api prefix
+  const apiEndpoint = cleanEndpoint.startsWith('/api') ? cleanEndpoint : `/api${cleanEndpoint}`;
+  const url = `${baseUrl}${apiEndpoint}`;
 
   let token = null;
-
   if (typeof window !== 'undefined') {
-
     try {
-
       const { useAuthStore } = require('@/presentation/store/authStore');
-
       const authStore = useAuthStore.getState();
-
       token = authStore.token;
 
-      
-
       if (!token) {
-
         token = localStorage.getItem('tiyuy-auth-token') || 
-
                localStorage.getItem('token') || 
-
                localStorage.getItem('auth-token');
-
       }
-
     } catch {
-
       token = localStorage.getItem('tiyuy-auth-token') || 
-
              localStorage.getItem('token') || 
-
              localStorage.getItem('auth-token');
-
     }
-
   }
 
-  
-
   const response = await fetch(url, {
-
     headers: {
-
       'Content-Type': 'application/json',
-
       ...(token && { 'Authorization': `Bearer ${token}` }),
-
       ...options.headers,
-
     },
-
     ...options,
-
   });
 
   
@@ -1582,18 +1557,12 @@ export function useUploadChannelEventImages() {
 
       
 
-      const response = await fetch(`${API_BASE_URL}/contacts/extended/channels/${channelId}/events/${eventId}/upload-images`, {
-
+      const response = await fetch(`/api/contacts/extended/channels/${channelId}/events/${eventId}/upload-images`, {
         method: 'POST',
-
         headers: {
-
           'Authorization': `Bearer ${localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token')}`,
-
         },
-
         body: formData,
-
       });
 
       
@@ -1660,18 +1629,12 @@ export function useUploadChannelDocuments() {
 
       
 
-      const response = await fetch(`${API_BASE_URL}/contacts/extended/channels/${channelId}/posts/${postId}/documents`, {
-
+      const response = await fetch(`/api/contacts/extended/channels/${channelId}/posts/${postId}/documents`, {
         method: 'POST',
-
         headers: {
-
           'Authorization': `Bearer ${localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token')}`,
-
         },
-
         body: formData,
-
       });
 
       
@@ -1744,18 +1707,12 @@ export function useUploadChannelPostImages() {
 
       
 
-      const response = await fetch(`${API_BASE_URL}/contacts/extended/channels/posts/${postId}/upload-images`, {
-
+      const response = await fetch(`/api/contacts/extended/channels/posts/${postId}/upload-images`, {
         method: 'POST',
-
         headers: {
-
           'Authorization': `Bearer ${localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token')}`,
-
         },
-
         body: formData,
-
       });
 
       

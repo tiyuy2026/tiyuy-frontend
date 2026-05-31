@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
-import { useAuthStore } from '@/presentation/store/authStore';
 import {
   useReceivedLeads,
   useUnreadLeadsCount,
@@ -16,11 +15,6 @@ import {
 import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 import Link from 'next/link';
 import { toast } from '@/presentation/store/toastStore';
-import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, Flame, Home, MessageSquare, Users, Diamond, User,
-  ChevronDown, LogOut, Building
-} from 'lucide-react';
 
 const STATUS_COLORS: Record<string, string> = {
   ALL: 'bg-gray-500',
@@ -43,74 +37,8 @@ const getStatusOptions = () => [
   { value: 'CLOSED_LOST', label: 'Perdido', color: STATUS_COLORS.CLOSED_LOST },
 ];
 
-// Sidebar Navigation Component
-function Sidebar() {
-  const pathname = usePathname();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const { user } = useAuthStore();
-  
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-  
-  const menuItems = [
-    { href: '/dashboard/crm-leads', icon: Flame, label: 'CRM Leads' },
-    { href: '/my-properties', icon: Home, label: 'Mis Propiedades' },
-    { href: '/dashboard/my-contacts', icon: MessageSquare, label: 'Mensajes' },
-    { href: '/dashboard/clients', icon: Users, label: 'Clientes' },
-    { href: '/plans', icon: Diamond, label: 'Planes' },
-    { href: '/dashboard/profile', icon: User, label: 'Perfil' },
-  ];
-
-  return (
-    <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
-      {/* Header con Logo */}
-      <div className="p-4 border-b border-gray-200">
-        {/* Logo */}
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
-            T
-          </div>
-          <div>
-            <h1 className="font-bold text-gray-900 text-lg">TIYUY</h1>
-            <p className="text-xs text-gray-500">CRM Inmobiliario</p>
-          </div>
-        </Link>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                isActive
-                  ? 'bg-teal-50 text-teal-700 font-medium'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              <span>{item.label}</span>
-              {isActive && <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full"></span>}
-            </Link>
-          );
-        })}
-      </nav>
-    </aside>
-  );
-}
+// NOTA: El Sidebar se hereda del layout padre (dashboard/layout.tsx)
+// No duplicar sidebar aquí
 
 // Stat Card Component (estilo Creatio)
 function StatCard({ 
@@ -585,15 +513,10 @@ export default function CRMLeadsPage() {
   if (error) {
     return (
       <ProtectedRoute>
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <main className="flex-1 bg-gray-50 p-8">
-            <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
-              <div className="text-5xl mb-4">!</div>
-              <h2 className="text-xl font-semibold text-red-800 mb-2">Error cargando leads</h2>
-              <p className="text-red-600">{error.message}</p>
-            </div>
-          </main>
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center m-8">
+          <div className="text-5xl mb-4">!</div>
+          <h2 className="text-xl font-semibold text-red-800 mb-2">Error cargando leads</h2>
+          <p className="text-red-600">{error.message}</p>
         </div>
       </ProtectedRoute>
     );
@@ -601,10 +524,8 @@ export default function CRMLeadsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
-        
-        <main className="flex-1 overflow-auto">
+      <div className="bg-gray-50 min-h-full">
+        <main>
           {/* Header */}
           <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
             <div className="px-8 py-4">
