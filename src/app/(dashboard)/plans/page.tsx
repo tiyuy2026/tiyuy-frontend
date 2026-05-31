@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
 import { useAvailablePlans, useSubscribeToPlan, useActiveSubscription, useAvailableDeveloperDiscountCodes } from '@/presentation/hooks/useFinance';
@@ -10,6 +11,7 @@ import { PlanCard } from '@/presentation/components/finance';
 import { SubscriptionPlan, BillingCycle } from '@/core/domain/entities/Wallet';
 import { UpgradePlanModal } from '@/presentation/components/modals/UpgradePlanModal';
 import { authStorage } from '@/infrastructure/storage/auth-storage';
+import HeroSection from './HeroSection';
 
 export default function PlansPage() {
   const { data: plans, isLoading } = useAvailablePlans();
@@ -490,69 +492,22 @@ export default function PlansPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-        <div className="bg-gradient-to-r from-blue-600 to-teal-600 text-white">
-          <div className="max-w-6xl mx-auto px-4 py-16">
-            <div className="text-center">
-              <h1 className="text-5xl font-bold mb-6">Planes para Tu Negocio Inmobiliario</h1>
-              <p className="text-xl mb-8 text-blue-100 max-w-3xl mx-auto">
-                Publica propiedades, reach más clientes y haz crecer tu negocio con los planes más flexibles del mercado peruano
-              </p>
-              <div className="flex flex-wrap justify-center gap-8 text-sm">
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l2-2z" clipRule="evenodd" />
-                  </svg>
-                  <span>Cancela cuando quieras</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c0-1.021-.082-1.997-.233-2.926l-.003-.1a.998.998 0 00-.01-.192 7.99 7.99 0 00-4.495-4.095l-.003-.018A7.976 7.976 0 003.07 4.141l.09-.014c.827-.06 1.643-.19 2.433-.411l.012-.003a1 1 0 00.717-1.213l-4.022-2.304a1 1 0 00-1.064.092l-3.998 2.31a1 1 0 00-.292 1.411l2.02 3.485a1 1 0 001.111.518l2.167-1.257a11.951 11.951 0 005.475 5.475 11.951 11.951 0 00-5.475 5.475z" clipRule="evenodd" />
-                  </svg>
-                  <span>Soporte 24/7</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 001.745.723 3.066 3.066 0 001.745-.723 3.066 3.066 0 00-1.745-.723A3.066 3.066 0 006.267 3.455zm3.447 4.792a1 1 0 00-.617-.835l-2.833-1.89a1 1 0 00-.977.063l-2.833 1.89a1 1 0 00-.36 1.366l2.833 1.89a1 1 0 00.977-.063l2.833-1.89a1 1 0 00.36-1.366z" clipRule="evenodd" />
-                  </svg>
-                  <span>Métodos de pago seguros</span>
-                </div>
-              </div>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gray-50">
+        <div className="relative bg-white overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand-primary-light)] via-white to-white opacity-50"></div>
+          <HeroSection />
         </div>
 
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Todo lo que necesitas para tener éxito</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Nuestras herramientas están diseñadas para maximizar tu visibilidad y facilitar la gestión de tus propiedades
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {features.map((feature, index) => (
-              <div key={index} className="flex items-start gap-3 p-4 bg-white rounded-lg shadow-md">
-                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <span className="text-gray-700 font-medium">{feature}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="max-w-6xl mx-auto px-4 pb-16">
+        <div className="max-w-7xl mx-auto px-4 pb-16 pt-12">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Elige tu Plan Ideal</h2>
             <p className="text-lg text-gray-600">Precios transparentes, sin sorpresas. Escalable según tu crecimiento.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {isLoading ? (
               <div className="col-span-full text-center py-16">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)]"></div>
                 <p className="mt-4 text-gray-600">Cargando planes...</p>
               </div>
             ) : plans ? (
@@ -663,144 +618,159 @@ export default function PlansPage() {
           {selectedPlan && (
             <div className="mt-12 text-center">
               {/* Discount Code Section - Ultra-Inteligente: Solo muestra si no hay automáticos */}
-              {(() => {
-                // Verificar si hay descuentos disponibles para este usuario
-                const intelligentDiscount = detectIntelligentDiscount(selectedPlan);
-                const hasAgencyDiscount = hasAgencyRole && hasDiscountCodes;
-                const hasAnyDiscountAvailable = intelligentDiscount || hasAgencyDiscount || appliedManualDiscount?.valid;
-                
-                // Solo mostrar sección de descuentos si realmente hay descuentos disponibles
-                if (hasAnyDiscountAvailable) {
-                  if (intelligentDiscount) {
-                    return (
-                      <div className="mb-8 bg-blue-50 border-blue-200 rounded-xl p-6 max-w-md mx-auto">
-                        <h3 className="text-sm font-semibold text-blue-800 mb-3">
-                          Descuento inteligente aplicado
-                        </h3>
-                        <div className="text-xs text-blue-700">
-                          Se ha aplicado automáticamente un {intelligentDiscount.percentage}% de descuento según el precio del plan.
-                        </div>
-                      </div>
-                    );
-                  } else if (hasAgencyDiscount) {
-                    return (
-                      <div className="mb-8 bg-green-50 border-green-200 rounded-xl p-6 max-w-md mx-auto">
-                        <h3 className="text-sm font-semibold text-green-800 mb-3">
-                          Descuento de agencia aplicado
-                        </h3>
-                        <div className="text-xs text-green-700">
-                          Se ha aplicado automáticamente el descuento de tu inmobiliaria.
-                        </div>
-                      </div>
-                    );
-                  } else if (appliedManualDiscount?.valid) {
-                    return (
-                      <div className="mb-8 bg-yellow-50 border-yellow-200 rounded-xl p-6 max-w-md mx-auto">
-                        <h3 className="text-sm font-semibold text-yellow-800 mb-3">
-                          Descuento personal aplicado
-                        </h3>
-                        <div className="text-xs text-green-600">
-                          {appliedManualDiscount.message}
-                        </div>
-                      </div>
-                    );
-                  }
-                }
-                
-                // Si hay descuento manual sin validar, mostrar campo para ingresarlo
-                if (!intelligentDiscount && !hasAgencyDiscount && !appliedManualDiscount?.valid) {
-                  return (
-                    <div className="mb-8 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl p-6 max-w-md mx-auto">
-                      <h3 className="text-sm font-semibold text-yellow-800 mb-3">
-                        ¿Tienes un código de descuento personal?
-                      </h3>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={manualDiscountCode}
-                          onChange={(e) => setManualDiscountCode(e.target.value.toUpperCase())}
-                          placeholder="Ingresa tu código (ej: DESCUENTO20)"
-                          className="flex-1 px-4 py-2 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm uppercase"
-                          disabled={appliedManualDiscount?.valid || isValidatingManual}
-                        />
-                        <button
-                          onClick={handleValidateManualDiscount}
-                          disabled={!manualDiscountCode.trim() || isValidatingManual || appliedManualDiscount?.valid}
-                          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-                            appliedManualDiscount?.valid
-                              ? 'bg-green-500 text-white cursor-default'
-                              : selectedPlan?.name === 'PREMIUM' ? 'bg-purple-100 text-purple-800' : 'bg-yellow-600 text-white hover:bg-yellow-700 disabled:bg-gray-300 disabled:cursor-not-allowed'
-                          }`}
-                        >
-                          {isValidatingManual ? (
-                            <span className="flex items-center gap-1">
-                              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                              </svg>
-                              Validando...
-                            </span>
-                          ) : appliedManualDiscount?.valid ? (
-                            '✓ Aplicado'
-                          ) : (
-                            'Aplicar'
-                          )}
-                        </button>
-                      </div>
-                      {appliedManualDiscount?.valid && (
-                        <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
-                          {appliedManualDiscount.message}
-                        </p>
-                      )}
-                      {appliedManualDiscount && !appliedManualDiscount.valid && (
-                        <p className="text-xs text-red-600 mt-2">{appliedManualDiscount.message}</p>
-                      )}
-                    </div>
-                  );
-                }
-                
-                // Si hay descuentos automáticos, no mostrar campo manual
-                return null;
-              })()}
+               {(() => {
+                 const intelligentDiscount = detectIntelligentDiscount(selectedPlan);
+                 const hasAgencyDiscount = hasAgencyRole && hasDiscountCodes;
+                 const hasAnyDiscountAvailable = intelligentDiscount || hasAgencyDiscount || appliedManualDiscount?.valid;
+                 
+                 if (hasAnyDiscountAvailable) {
+                   if (intelligentDiscount) {
+                     return (
+                       <div className="mb-8 bg-[var(--brand-primary-light)] border border-[var(--brand-primary)] rounded-xl p-6 max-w-md mx-auto">
+                         <div className="flex items-center gap-2 mb-2">
+                           <Icon icon="material-symbols:local-offer-rounded" className="w-5 h-5 text-[var(--brand-primary)]" />
+                           <h3 className="text-sm font-bold text-[var(--brand-primary)]">
+                             Descuento inteligente aplicado
+                           </h3>
+                         </div>
+                         <div className="text-sm text-gray-700">
+                           Se ha aplicado automáticamente un {intelligentDiscount.percentage}% de descuento según el precio del plan.
+                         </div>
+                       </div>
+                     );
+                   } else if (hasAgencyDiscount) {
+                     return (
+                       <div className="mb-8 bg-[var(--brand-primary-light)] border border-[var(--brand-primary)] rounded-xl p-6 max-w-md mx-auto">
+                         <div className="flex items-center gap-2 mb-2">
+                           <Icon icon="material-symbols:business-center-rounded" className="w-5 h-5 text-[var(--brand-primary)]" />
+                           <h3 className="text-sm font-bold text-[var(--brand-primary)]">
+                             Descuento de agencia aplicado
+                           </h3>
+                         </div>
+                         <div className="text-sm text-gray-700">
+                           Se ha aplicado automáticamente el descuento de tu inmobiliaria.
+                         </div>
+                       </div>
+                     );
+                   } else if (appliedManualDiscount?.valid) {
+                     return (
+                       <div className="mb-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6 max-w-md mx-auto">
+                         <div className="flex items-center gap-2 mb-2">
+                           <Icon icon="material-symbols:check-circle-rounded" className="w-5 h-5 text-green-600" />
+                           <h3 className="text-sm font-bold text-green-800">
+                             Descuento personal aplicado
+                           </h3>
+                         </div>
+                         <div className="text-sm text-gray-700">
+                           {appliedManualDiscount.message}
+                         </div>
+                       </div>
+                     );
+                   }
+                 }
+                 
+                 if (!intelligentDiscount && !hasAgencyDiscount && !appliedManualDiscount?.valid) {
+                   return (
+                     <div className="mb-8 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl p-6 max-w-md mx-auto">
+                       <div className="flex items-center gap-2 mb-3">
+                         <Icon icon="material-symbols:local-offer-rounded" className="w-5 h-5 text-yellow-600" />
+                         <h3 className="text-sm font-bold text-yellow-800">
+                           ¿Tienes un código de descuento personal?
+                         </h3>
+                       </div>
+                       <div className="flex gap-2">
+                         <input
+                           type="text"
+                           value={manualDiscountCode}
+                           onChange={(e) => setManualDiscountCode(e.target.value.toUpperCase())}
+                           placeholder="Ingresa tu código (ej: DESCUENTO20)"
+                           className="flex-1 px-4 py-2 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm uppercase"
+                           disabled={appliedManualDiscount?.valid || isValidatingManual}
+                         />
+                         <button
+                           onClick={handleValidateManualDiscount}
+                           disabled={!manualDiscountCode.trim() || isValidatingManual || appliedManualDiscount?.valid}
+                           className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                             appliedManualDiscount?.valid
+                               ? 'bg-green-500 text-white cursor-default'
+                               : selectedPlan?.name === 'PREMIUM' ? 'bg-purple-100 text-purple-800' : 'bg-yellow-600 text-white hover:bg-yellow-700 disabled:bg-gray-300 disabled:cursor-not-allowed'
+                           }`}
+                         >
+                           {isValidatingManual ? (
+                             <span className="flex items-center gap-1">
+                               <Icon icon="line-md:loading-loop" className="w-4 h-4" />
+                               Validando...
+                             </span>
+                           ) : appliedManualDiscount?.valid ? (
+                             <span className="flex items-center gap-1">
+                               <Icon icon="material-symbols:check-rounded" className="w-4 h-4" />
+                               Aplicado
+                             </span>
+                           ) : (
+                             'Aplicar'
+                           )}
+                         </button>
+                       </div>
+                       {appliedManualDiscount?.valid && (
+                         <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
+                           <Icon icon="material-symbols:info-rounded" className="w-4 h-4" />
+                           {appliedManualDiscount.message}
+                         </p>
+                       )}
+                       {appliedManualDiscount && !appliedManualDiscount.valid && (
+                         <p className="text-sm text-red-600 mt-2 flex items-center gap-1">
+                           <Icon icon="material-symbols:error-rounded" className="w-4 h-4" />
+                           {appliedManualDiscount.message}
+                         </p>
+                       )}
+                     </div>
+                   );
+                 }
+                 
+                 return null;
+               })()}
               
-              <button
-                onClick={handleSubscribe}
-                disabled={subscribeMutation.isPending}
-                className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-              >
-                {subscribeMutation.isPending ? (
-                  <span className="flex items-center gap-2">
-                    Procesando...
-                  </span>
-                ) : (
-                  (() => {
-                    const originalPrice = selectedPlan.price ?? 0;
-                    const discountedPrice = getDiscountedPrice(selectedPlan);
-                    const hasDiscount = discountedPrice < originalPrice;
-                    
-                    return (
-                      <div className="flex flex-col items-center">
-                        {hasDiscount && (
-                          <div className="text-sm line-through text-gray-300 mb-1">
-                            S/ {originalPrice.toLocaleString('es-PE')}
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2">
-                          <span>Suscribirse al Plan {selectedPlan.name}</span>
-                          <span className="font-bold">
-                            - S/ {discountedPrice.toLocaleString('es-PE')}
-                          </span>
-                          {hasDiscount && (
-                            <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                              {Math.round((1 - discountedPrice / originalPrice) * 100)}% OFF
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })()
-                )}
-              </button>
+               <button
+                 onClick={handleSubscribe}
+                 disabled={subscribeMutation.isPending}
+                 className={`bg-[var(--brand-primary)] text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-[var(--brand-primary-hover)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg ${
+                   !subscribeMutation.isPending ? 'cursor-pointer' : ''
+                 }`}
+               >
+                 {subscribeMutation.isPending ? (
+                   <span className="flex items-center gap-2">
+                     <Icon icon="line-md:loading-loop" className="w-5 h-5" />
+                     Procesando...
+                   </span>
+                 ) : (
+                   (() => {
+                     const originalPrice = selectedPlan.price ?? 0;
+                     const discountedPrice = getDiscountedPrice(selectedPlan);
+                     const hasDiscount = discountedPrice < originalPrice;
+                     
+                     return (
+                       <div className="flex flex-col items-center">
+                         {hasDiscount && (
+                           <div className="text-sm line-through text-gray-300 mb-1">
+                             S/ {originalPrice.toLocaleString('es-PE')}
+                           </div>
+                         )}
+                         <div className="flex items-center gap-2">
+                           <span>Suscribirse al Plan {selectedPlan.name}</span>
+                           <span className="font-bold">
+                             - S/ {discountedPrice.toLocaleString('es-PE')}
+                           </span>
+                           {hasDiscount && (
+                             <span className="bg-white text-[var(--brand-primary)] text-xs px-2 py-1 rounded-full font-bold">
+                               {Math.round((1 - discountedPrice / originalPrice) * 100)}% OFF
+                             </span>
+                           )}
+                         </div>
+                       </div>
+                     );
+                   })()
+                 )}
+               </button>
             </div>
           )}
         </div>
