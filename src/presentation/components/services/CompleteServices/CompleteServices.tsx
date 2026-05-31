@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
+import { Building2, Landmark, Banknote, Receipt, BookOpen, PiggyBank, Building, Home, Users, Ruler } from 'lucide-react';
 
 export function CompleteServices() {
   const sections = [
     {
-      icon: '🏠',
+      image: 'https://i.postimg.cc/8zXkngB6/sunat.png',
       title: 'SUNAT',
       subtitle: 'Superintendencia Nacional de Aduanas y de Administración Tributaria',
       url: 'https://www.sunat.gob.pe/',
@@ -20,7 +22,8 @@ export function CompleteServices() {
       ],
     },
     {
-      icon: '🏛️',
+      image: 'https://i.postimg.cc/65YByxP1/sunarp.png',
+      imageScale: 'scale-125',
       title: 'SUNARP',
       subtitle: 'Superintendencia Nacional de los Registros Públicos',
       url: 'https://www.sunarp.gob.pe/',
@@ -31,7 +34,7 @@ export function CompleteServices() {
       ],
     },
     {
-      icon: '🏦',
+      icon: <PiggyBank className="w-7 h-7 text-brand" />,
       title: 'Guía de Crédito Hipotecario',
       subtitle: 'Información para obtener tu crédito hipotecario',
       url: 'https://www.sbs.gob.pe/',
@@ -44,10 +47,10 @@ export function CompleteServices() {
   ];
 
   const otrasInstituciones = [
-    { title: 'CAVALI - ICB', desc: 'Tasas de interés y mercado de valores', cta: 'Consultar', url: 'https://www.cavali.com.pe/' },
-    { title: 'Ministerio de Vivienda', desc: 'Programas de subsidios y financiamiento', cta: 'Ver programas', url: 'https://www.minvivienda.gob.pe/' },
-    { title: 'Tasadores Peruanos', desc: 'Servicio profesional de tasación', cta: 'Tasar', url: 'https://www.tasadoresperuanos.org/' },
-    { title: 'Colegio de Arquitectos', desc: 'Validación de planos y permisos', cta: 'Consultar', url: 'https://www.cap.org.pe/' },
+    { icon: <Building className="w-6 h-6 text-brand" />, title: 'CAVALI - ICB', desc: 'Tasas de interés y mercado de valores', cta: 'Consultar', url: 'https://www.cavali.com.pe/' },
+    { icon: <Home className="w-6 h-6 text-brand" />, title: 'Ministerio de Vivienda', desc: 'Programas de subsidios y financiamiento', cta: 'Ver programas', url: 'https://www.minvivienda.gob.pe/' },
+    { icon: <Users className="w-6 h-6 text-brand" />, title: 'Tasadores Peruanos', desc: 'Servicio profesional de tasación', cta: 'Tasar', url: 'https://www.tasadoresperuanos.org/' },
+    { icon: <Ruler className="w-6 h-6 text-brand" />, title: 'Colegio de Arquitectos', desc: 'Validación de planos y permisos', cta: 'Consultar', url: 'https://www.cap.org.pe/' },
   ];
 
   return (
@@ -70,10 +73,25 @@ export function CompleteServices() {
           {sections.map((sec) => (
             <section key={sec.title} className="bg-gray-50 rounded-2xl p-6 sm:p-8 border border-gray-200">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-gray-200 pb-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-brand-light border border-brand/10 flex items-center justify-center text-xl shrink-0">
-                    {sec.icon}
-                  </div>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                  {sec.image ? (
+                    <div className="w-52 h-20 rounded-xl bg-white border border-gray-200 flex items-center justify-center shrink-0 overflow-hidden">
+                      <div className="relative w-full h-full">
+                        <Image 
+                          src={sec.image} 
+                          alt={sec.title} 
+                          fill
+                          sizes="(max-width: 768px) 208px, 208px"
+                          className={`object-contain object-center ${sec.imageScale || 'scale-110'}`}
+                          priority
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-brand-light border border-brand/10 flex items-center justify-center shrink-0">
+                      {sec.icon}
+                    </div>
+                  )}
                   <div>
                     <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
                       {sec.title}
