@@ -98,7 +98,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         // Usar ruta relativa para WebSocket - Vercel no soporta WebSocket proxy, 
         // así que necesitamos la URL real del backend para WebSocket
         const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-        const host = window.location.hostname === 'localhost' ? 'localhost:8080' : '152.70.129.43:8080';
+        const host = process.env.NEXT_PUBLIC_WS_HOST || (window.location.hostname === 'localhost' ? 'localhost:8080' : window.location.hostname + ':8080');
         wsUrl = `${wsProtocol}://${host}/ws/chat`;
       }
 

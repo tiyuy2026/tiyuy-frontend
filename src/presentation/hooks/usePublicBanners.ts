@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { axiosClient } from '@/infrastructure/api/axios-client';
+import { publicApiClient } from '@/infrastructure/api/axios-client';
 
 export interface PublicBanner {
   id: number;
@@ -34,7 +34,7 @@ export function usePublicBanners(placement: string = 'SLIDER') {
       try {
         setLoading(true);
         setError(null);
-        const response = await axiosClient.get(
+        const response = await publicApiClient.get(
           `/v1/public/marketing/banners/placement/${placement}`
         );
         if (mounted) {

@@ -102,8 +102,8 @@ export const useAuth = () => {
         // No fallamos el registro si el email no se envía
       }
 
-      // Redirigir según el rol
-      const targetRoute = response.role === 'ADMIN' ? '/admin' : '/dashboard';
+      // Redirigir a la pantalla principal después del registro
+      const targetRoute = response.role === 'ADMIN' ? '/admin' : '/';
       router.push(targetRoute);
     } catch (err: any) {
       setError(err.message || 'Error al registrar usuario');

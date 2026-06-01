@@ -1,4 +1,4 @@
-import { axiosClient } from '../api/axios-client';
+import { axiosClient, publicApiClient } from '../api/axios-client';
 import { ENDPOINTS } from '../api/endpoints';
 import { IFavoriteRepository } from '@/core/domain/repositories/IFavoriteRepository';
 import { Favorite, FavoritePropertyCard } from '@/core/domain/entities/Favorite';
@@ -68,7 +68,7 @@ export class FavoriteRepository implements IFavoriteRepository {
 
   async check(propertyId: number): Promise<boolean> {
     try {
-      const res = await axiosClient.get<FavoriteCheckDTO>(
+      const res = await publicApiClient.get<FavoriteCheckDTO>(
         ENDPOINTS.FAVORITES.CHECK(propertyId)
       );
       return res.data.isFavorite;

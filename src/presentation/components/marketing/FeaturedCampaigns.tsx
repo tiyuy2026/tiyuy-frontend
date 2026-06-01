@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Star, MapPin, Building2, Home, Ruler, DollarSign, ArrowRight } from 'lucide-react';
 import { PromotionCampaign } from '@/core/domain/entities/Admin';
-import { axiosClient } from '@/infrastructure/api/axios-client';
+import { publicApiClient } from '@/infrastructure/api/axios-client';
 
 const MAX_VISIBLE_CARDS = 10;
 
@@ -25,7 +25,7 @@ export function FeaturedCampaigns() {
 
   const fetchCampaigns = async () => {
     try {
-      const res = await axiosClient.get('/v1/public/marketing/campaigns/active');
+      const res = await publicApiClient.get('/v1/public/marketing/campaigns/active');
       setCampaigns(res.data);
     } catch (err) {
       console.error('Error fetching active campaigns:', err);
