@@ -3,7 +3,20 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
-      // Proxy API calls to backend (Vercel actuará como puente hacia tu Oracle)
+      // Local API wrappers must run before proxying to backend
+      {
+        source: '/api/auth/:path*',
+        destination: '/api/auth/:path*',
+      },
+      {
+        source: '/api/google-places/:path*',
+        destination: '/api/google-places/:path*',
+      },
+      {
+        source: '/api/images/proxy/:path*',
+        destination: '/api/images/proxy/:path*',
+      },
+      // Proxy other API calls to backend (Vercel actuará como puente hacia tu Oracle)
       // El backend usa context-path /api, por lo que /api/:path* -> BACKEND_URL/api/:path*
       {
         source: '/api/:path*',

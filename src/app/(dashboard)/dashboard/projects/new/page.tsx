@@ -1,6 +1,8 @@
-'use client';
+"use client";
 
 import React, { useState } from 'react';
+import { Info, MapPin, Layers, Calendar, Image as ImageIcon } from 'lucide-react';
+import { tiyuyColors } from '@/styles/tiyuy-colors';
 import { useRouter } from 'next/navigation';
 import { PropertyForm } from '@/presentation/components/property/PropertyForm/PropertyForm';
 import { useAuthStore } from '@/presentation/store/authStore';
@@ -21,83 +23,93 @@ export default function NuevoProyectoPage() {
   const { user, isAuthenticated } = useAuthStore();
   const [currentStep, setCurrentStep] = useState(1);
 
-  console.log('NuevoProyectoPage: Usuario:', user?.role);
-
   return (
     <ProtectedRoute>
       <TrialGuard>
         <div className="min-h-screen bg-gray-50 py-8">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Banner de advertencia de trial */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <TrialWarningBanner />
 
-            {/* Header */}
+            {/* Hero (simple) */}
             <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                  Nuevo Proyecto Inmobiliario
-                </h1>
-                <p className="text-gray-600 mt-2">
-                  Publica tu proyecto de obra nueva y llega a miles de interesados
-                </p>
+              <div className="px-4 py-6 sm:px-6 lg:px-8">
+                <h1 className="text-3xl font-bold text-slate-900">Nuevo Proyecto</h1>
+                <p className="mt-2 text-base text-slate-600">Completa la información del proyecto en pasos sencillos. Puedes guardar borrador y completar más tarde.</p>
               </div>
-              <button
-                onClick={() => router.back()}
-                className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                ← Volver
-              </button>
             </div>
-          </div>
 
-          {/* Progress Steps */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              {PROJECT_STEPS.map((step, index) => (
-                <div key={step.number} className="flex items-center">
+            {/* Progress Steps (icons, styled with brand colors + progress bar) */}
+            <div className="mb-8">
+              <div className="relative">
+                {/* Background track */}
+                <div className="absolute left-0 right-0 top-6 hidden md:block">
+                  <div style={{ height: 6, backgroundColor: tiyuyColors.gray[100], borderRadius: 9999 }} />
+                </div>
+
+                {/* Filled progress */}
+                <div className="absolute left-0 top-6 hidden md:block">
                   <div
-                    className={`
-                      w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors
-                      ${currentStep >= step.number
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-200 text-gray-600'
-                      }
-                    `}
-                  >
-                    {step.number}
-                  </div>
-                  {index < PROJECT_STEPS.length - 1 && (
-                    <div
-                      className={`
-                        w-full h-0.5 mx-4 transition-colors
-                        ${currentStep > step.number ? 'bg-purple-600' : 'bg-gray-200'}
-                      `}
-                    />
-                  )}
+                    style={{
+                      height: 6,
+                      backgroundColor: tiyuyColors.brand.DEFAULT,
+                      borderRadius: 9999,
+                      width: `${((currentStep - 1) / (PROJECT_STEPS.length - 1)) * 100}%`,
+                      transition: 'width 300ms ease',
+                    }}
+                  />
                 </div>
-              ))}
-            </div>
-            <div className="flex justify-between mt-2">
-              {PROJECT_STEPS.map((step) => (
-                <div key={step.number} className="flex-1 text-center">
-                  <p className="text-xs text-gray-600">{step.title}</p>
-                </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Form */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <PropertyForm
-              mode="create"
-              formType="project"
-              onStepChange={setCurrentStep}
-            />
+                {/* Circles and segments */}
+                <div className="flex items-center w-full">
+                  {PROJECT_STEPS.map((step, index) => {
+                    const Icon = [Info, MapPin, Layers, Calendar, ImageIcon][step.number - 1];
+                    const isCompleted = currentStep > step.number;
+                    const isActive = currentStep === step.number;
+                    const circleStyle: React.CSSProperties = isActive || isCompleted ? { backgroundColor: tiyuyColors.brand.DEFAULT, color: tiyuyColors.text.inverse, boxShadow: '0 6px 18px rgba(74,154,62,0.12)' } : { backgroundColor: tiyuyColors.gray[100], color: tiyuyColors.text.secondary };
+
+                    return (
+                      <React.Fragment key={step.number}>
+                        <div className="flex items-center justify-center z-10" style={{ width: 48 }}>
+                          <div style={circleStyle} className={`w-12 h-12 rounded-full flex items-center justify-center transition-all`}>
+                            <Icon className="w-5 h-5" />
+                          </div>
+                        </div>
+
+                        {index < PROJECT_STEPS.length - 1 && (
+                          <div className="flex-1 px-3 hidden md:block">
+                            <div style={{ height: 6, borderRadius: 9999, backgroundColor: currentStep > step.number ? tiyuyColors.brand.DEFAULT : tiyuyColors.gray[100], transition: 'background-color 200ms' }} />
+                          </div>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+
+                {/* Labels under circles */}
+                <div className="flex items-start mt-3 w-full">
+                  {PROJECT_STEPS.map((step, index) => (
+                    <React.Fragment key={`label-${step.number}`}>
+                      <div style={{ width: 48 }} className="text-center">
+                        <p className={`text-sm ${currentStep === step.number ? 'font-semibold' : 'font-medium'}`} style={{ color: currentStep === step.number ? tiyuyColors.text.primary : tiyuyColors.text.secondary }}>{step.title}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{step.description}</p>
+                      </div>
+
+                      {index < PROJECT_STEPS.length - 1 && (
+                        <div className="flex-1" />
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Form */}
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <PropertyForm mode="create" formType="project" onStepChange={setCurrentStep} />
+            </div>
           </div>
         </div>
-      </div>
-    </TrialGuard>
+      </TrialGuard>
     </ProtectedRoute>
   );
 }

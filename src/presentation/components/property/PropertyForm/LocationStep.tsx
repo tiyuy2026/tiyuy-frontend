@@ -8,9 +8,10 @@ interface LocationStepProps {
   formData: any;
   onChange: (field: string, value: any) => void;
   propertyId?: number;
+  validationErrors?: Record<string, string>;
 }
 
-export function LocationStep({ formData, onChange }: LocationStepProps) {
+export function LocationStep({ formData, onChange, validationErrors }: LocationStepProps) {
   const [locationInput, setLocationInput] = useState(
     formData.district && formData.province 
       ? `${formData.district}, ${formData.province}` 
@@ -253,14 +254,17 @@ useEffect(() => {
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Distrito</label>
             <input type="text" value={formData.district || ''} readOnly placeholder="Se autocompleta al buscar" className={inputClass} />
+            {validationErrors?.district && <p className="mt-1 text-sm text-red-600">{validationErrors.district}</p>}
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Provincia</label>
             <input type="text" value={formData.province || ''} readOnly placeholder="Se autocompleta al buscar" className={inputClass} />
+            {validationErrors?.province && <p className="mt-1 text-sm text-red-600">{validationErrors.province}</p>}
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Región / Departamento</label>
             <input type="text" value={formData.region || ''} readOnly placeholder="Se autocompleta al buscar" className={inputClass} />
+            {validationErrors?.region && <p className="mt-1 text-sm text-red-600">{validationErrors.region}</p>}
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
@@ -288,6 +292,7 @@ useEffect(() => {
               placeholder="Ej: Av. Principal, Jr. Lima"
               className={inputClass.replace('bg-gray-50', 'bg-white')}
             />
+            {validationErrors?.street && <p className="mt-1 text-sm text-red-600">{validationErrors.street}</p>}
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
@@ -300,6 +305,7 @@ useEffect(() => {
               placeholder="Ej: 123, 456-A"
               className={inputClass.replace('bg-gray-50', 'bg-white')}
             />
+            {validationErrors?.streetNumber && <p className="mt-1 text-sm text-red-600">{validationErrors.streetNumber}</p>}
           </div>
         </div>
 

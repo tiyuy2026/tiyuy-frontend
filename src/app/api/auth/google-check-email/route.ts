@@ -17,41 +17,50 @@ export async function POST(request: NextRequest) {
     try {
       const response = await fetch(`${backendUrl}/auth/check-email`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
         body: JSON.stringify({ email }),
       });
 
-      // Manejar diferentes respuestas del backend
+      const data = await response.json().catch(() => ({}));
+
+      // Manejar respuesta explícita del backend
       if (response.ok) {
-        // Si el backend responde 200, el email no existe
-        const data = await response.json();
+        if (typeof data.exists === 'boolean') {
+          return NextResponse.json({ exists: data.exists, ...data }, { status: 200 });
+        }
+
+        if (data?.message && /already|registered|exist|ya existe|registrado/i.test(data.message)) {
+          return NextResponse.json({ exists: true, message: data.message }, { status: 200 });
+        }
+
+        if (data?.user || data?.email) {
+          return NextResponse.json({ exists: true, ...data }, { status: 200 });
+        }
+
         return NextResponse.json({ exists: false, ...data }, { status: 200 });
-      } else if (response.status === 409) {
-        // Si el backend responde 409 (Conflict), el email ya existe
-        const errorData = await response.json();
-        console.log('Email ya registrado según backend:', errorData);
-        return NextResponse.json({ exists: true, message: errorData.message }, { status: 200 });
-      } else {
-        // Para otros errores, intentar leer el cuerpo y pasar el mensaje
-        const errorData = await response.json().catch(() => ({}));
-        console.error('Backend error:', response.status, errorData);
-        return NextResponse.json({ 
-          exists: false, 
-          message: errorData.message || `Error ${response.status}` 
-        }, { status: 200 });
       }
+
+      if (response.status === 409) {
+        return NextResponse.json({ exists: true, message: data.message || 'El correo ya está registrado' }, { status: 200 });
+      }
+
+      if (response.status === 404) {
+        return NextResponse.json({ exists: false, message: data.message || 'El correo no está registrado' }, { status: 200 });
+      }
+
+      const backendMessage = data?.message || `Error ${response.status}`;
+      console.error('Backend error:', response.status, backendMessage);
+      return NextResponse.json({ exists: false, message: backendMessage }, { status: 200 });
 
     } catch (backendError: any) {
       console.error('Error connecting to backend:', backendError);
-      
-      // Fallback: Simulación para desarrollo
-      const commonEmails = ['test@test.com', 'admin@admin.com', 'user@user.com'];
-      const exists = commonEmails.includes(email.toLowerCase());
-
-      return NextResponse.json({ exists }, { status: 200 });
+      return NextResponse.json(
+        { message: 'No se pudo verificar el correo con el backend. Intenta nuevamente más tarde.' },
+        { status: 502 }
+      );
     }
 
   } catch (error) {

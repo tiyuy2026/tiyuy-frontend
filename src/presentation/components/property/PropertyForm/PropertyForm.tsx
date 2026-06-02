@@ -67,6 +67,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
   const [createdPropertyId, setCreatedPropertyId] = useState<number | undefined>(property?.id);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showPlanExpiredModal, setShowPlanExpiredModal] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const { data: myPropertiesData } = useMyProperties();
   const { data: activeSubscription } = useActiveSubscription();
@@ -154,10 +155,90 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
     onStepChange?.(step);
   };
 
-  const handleChange = (field: string, value: any) =>
+  const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    setValidationErrors((prev) => ({ ...prev, [field]: '' }));
+  };
+
+  const validateStep = (step: number) => {
+    const errors: Record<string, string> = {};
+
+    if (formType === 'project') {
+      if (step === 1) {
+        if (!formData.name || !formData.name.trim()) {
+          errors.name = 'El nombre del proyecto es obligatorio';
+        }
+        if (!formData.description || formData.description.trim().length < 30) {
+          errors.description = 'La descripción debe tener al menos 30 caracteres';
+        }
+        if (!formData.phase) {
+          errors.phase = 'Selecciona la fase del proyecto';
+        }
+        if (!formData.projectType) {
+          errors.projectType = 'Selecciona el tipo de proyecto';
+        }
+      }
+
+      if (step === 2) {
+        if (!formData.address || !formData.address.trim()) {
+          errors.address = 'La dirección es obligatoria';
+        }
+        if (!formData.district || !formData.district.trim()) {
+          errors.district = 'Selecciona el distrito';
+        }
+        if (!formData.province || !formData.province.trim()) {
+          errors.province = 'Selecciona la provincia';
+        }
+        if (!formData.region || !formData.region.trim()) {
+          errors.region = 'Selecciona la región';
+        }
+        if (!formData.street || !formData.street.trim()) {
+          errors.street = 'El nombre de la calle es obligatorio';
+        }
+        if (!formData.streetNumber || !formData.streetNumber.trim()) {
+          errors.streetNumber = 'El número de la calle es obligatorio';
+        }
+      }
+
+      if (step === 3) {
+        if (!formData.totalUnits || Number(formData.totalUnits) <= 0) {
+          errors.totalUnits = 'Ingresa la cantidad de unidades disponibles';
+        }
+        if (!formData.areaFrom || Number(formData.areaFrom) <= 0) {
+          errors.areaFrom = 'Ingresa el área mínima del proyecto';
+        }
+        if (!formData.areaTo || Number(formData.areaTo) <= 0) {
+          errors.areaTo = 'Ingresa el área máxima del proyecto';
+        }
+        if (Number(formData.areaTo) < Number(formData.areaFrom)) {
+          errors.areaTo = 'El área máxima debe ser igual o mayor al área mínima';
+        }
+      }
+
+      if (step === 4) {
+        if (!formData.startDate) {
+          errors.startDate = 'Ingresa la fecha de inicio';
+        }
+        if (!formData.estimatedDelivery) {
+          errors.estimatedDelivery = 'Ingresa la fecha de entrega estimada';
+        }
+        if (formData.priceFrom && formData.priceTo && Number(formData.priceTo) < Number(formData.priceFrom)) {
+          errors.priceTo = 'El precio máximo debe ser igual o mayor que el mínimo';
+        }
+      }
+    }
+
+    return errors;
+  };
 
   const handleNext = () => {
+    const stepErrors = validateStep(currentStep);
+    if (Object.keys(stepErrors).length > 0) {
+      setValidationErrors(stepErrors);
+      toast.error('Revisa los campos marcados para continuar');
+      return;
+    }
+    setValidationErrors({});
     // Create project when reaching step 5 (before showing component)
     if (formType === 'project' && currentStep === 4 && !createdPropertyId) {
       // PREVIOUS VALIDATION of required fields
@@ -664,6 +745,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
           {currentSteps[currentStep - 1].title}
         </h1>
         <p className="text-sm text-gray-400 mt-0.5">{currentSteps[currentStep - 1].description}</p>
+        {/* Mostrar errores solo al lado de cada campo; no resumir globalmente aquí */}
       </div>
 
       {/* ── STEP CONTENT (con contenedor robusto) ── */}
@@ -675,6 +757,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
             propertyId={createdPropertyId}
             projectId={createdPropertyId}
             groupBlueprintFiles={formData.groupBlueprintFiles}
+            validationErrors={validationErrors}
           />
         </div>
       </div>
