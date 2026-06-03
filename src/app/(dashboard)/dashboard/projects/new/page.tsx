@@ -76,8 +76,9 @@ export default function NuevoProyectoPage() {
                         </div>
 
                         {index < PROJECT_STEPS.length - 1 && (
-                          <div className="flex-1 px-3 hidden md:block">
-                            <div style={{ height: 6, borderRadius: 9999, backgroundColor: currentStep > step.number ? tiyuyColors.brand.DEFAULT : tiyuyColors.gray[100], transition: 'background-color 200ms' }} />
+                          <div className="flex-1 px-3">
+                            <div className="hidden md:block" style={{ height: 6, borderRadius: 9999, backgroundColor: currentStep > step.number ? tiyuyColors.brand.DEFAULT : tiyuyColors.gray[100], transition: 'background-color 200ms' }} />
+                            <div className="md:hidden" style={{ height: 2, borderRadius: 9999, backgroundColor: currentStep > step.number ? tiyuyColors.brand.DEFAULT : tiyuyColors.gray[100], transition: 'background-color 200ms' }} />
                           </div>
                         )}
                       </React.Fragment>
@@ -90,8 +91,8 @@ export default function NuevoProyectoPage() {
                   {PROJECT_STEPS.map((step, index) => (
                     <React.Fragment key={`label-${step.number}`}>
                       <div style={{ width: 48 }} className="text-center">
-                        <p className={`text-sm ${currentStep === step.number ? 'font-semibold' : 'font-medium'}`} style={{ color: currentStep === step.number ? tiyuyColors.text.primary : tiyuyColors.text.secondary }}>{step.title}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">{step.description}</p>
+                        <p className={`text-sm ${currentStep === step.number ? 'font-semibold' : 'font-medium'} hidden md:block`} style={{ color: currentStep === step.number ? tiyuyColors.text.primary : tiyuyColors.text.secondary }}>{step.title}</p>
+                        <p className={`text-xs mt-0.5 hidden md:block`} style={{ color: tiyuyColors.text.secondary }}>{step.description}</p>
                       </div>
 
                       {index < PROJECT_STEPS.length - 1 && (
