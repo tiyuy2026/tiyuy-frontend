@@ -75,8 +75,8 @@ export default function NuevaPropiedadPage() {
 
       {/* ── TOP NAV ── */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/dashboard')}
               className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
@@ -84,35 +84,30 @@ export default function NuevaPropiedadPage() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Volver
+              <span className="hidden sm:inline">Volver</span>
             </button>
-            <span className="text-gray-300 select-none">|</span>
+            <span className="text-gray-300 select-none hidden sm:block">|</span>
             <button
               onClick={() => router.push('/my-properties')}
-              className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+              className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors hidden sm:block"
             >
               Ir a historial
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <span
-              className="text-xs font-semibold px-3 py-1.5 rounded-full"
+              className="text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-full"
               style={
                 canPublish
                   ? { backgroundColor: '#f0fdf4', color: '#00a63e' }
                   : { backgroundColor: '#fef2f2', color: '#dc2626' }
               }
             >
-              {canPublish
+              <span className="hidden sm:inline">{canPublish
                 ? `${remainingPublications}/${maxPublications} publicaciones disponibles`
-                : 'Límite alcanzado'}
-            </span>
-            <span className="text-sm text-gray-500 hidden sm:block">
-              Publicando como:{' '}
-              <span className="font-semibold text-gray-800">
-                {user?.firstName} {user?.lastName}
-              </span>
+                : 'Límite alcanzado'}</span>
+              <span className="sm:hidden">{canPublish ? `${remainingPublications}` : '0'}</span>
             </span>
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
@@ -124,13 +119,55 @@ export default function NuevaPropiedadPage() {
         </div>
       </header>
 
+      {/* ── MOBILE STEPPER ── */}
+      <div className="lg:hidden bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex items-center justify-between">
+            {STEPS.map((step, index) => {
+              const isDone = currentStep > step.number;
+              const isActive = currentStep === step.number;
+              return (
+                <div key={step.number} className="flex items-center flex-1">
+                  <div className="flex flex-col items-center flex-1">
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
+                      style={
+                        isDone || isActive
+                          ? { backgroundColor: '#00a63e', color: '#fff' }
+                          : { backgroundColor: '#f3f4f6', color: '#9ca3af' }
+                      }
+                    >
+                      {isDone ? (
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : step.number}
+                    </div>
+                    <p className={`text-[10px] font-medium mt-1 text-center ${
+                      isActive ? 'text-gray-900' : isDone ? 'text-green-600' : 'text-gray-400'
+                    }`}>
+                      {step.title.split(' ')[0]}
+                    </p>
+                  </div>
+                  {index < STEPS.length - 1 && (
+                    <div
+                      className="w-8 sm:w-12 h-0.5 mx-1 rounded-full transition-all duration-300"
+                      style={{ backgroundColor: isDone ? '#00a63e' : '#e5e7eb' }}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
       {/* ── BODY ── */}
-      <div className="max-w-7xl mx-auto px-6 py-8 flex gap-8 items-start">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex gap-8 items-start">
 
         {/* ── SIDEBAR: STEPPER ── */}
         <aside className="w-64 flex-shrink-0 hidden lg:block">
-          {/* Card blanco estilo Tiyuy */}
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden"
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden sticky top-20"
             style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
             <div className="px-5 py-4 border-b border-gray-100">
               <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
@@ -180,8 +217,7 @@ export default function NuevaPropiedadPage() {
             </div>
           </div>
 
-          {/* Card info adicional */}
-          <div className="bg-white rounded-xl border border-gray-200 mt-4 overflow-hidden"
+          <div className="bg-white rounded-xl border border-gray-200 mt-4 overflow-hidden sticky top-[380px]"
             style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
             <div className="px-5 py-4 border-b border-gray-100">
               <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
@@ -210,9 +246,9 @@ export default function NuevaPropiedadPage() {
           </div>
         </aside>
 
-        {/* ── MAIN: FORM en card blanco ── */}
+        {/* ── MAIN: FORM ── */}
         <main className="flex-1 min-w-0">
-          <div className="bg-white rounded-xl border border-gray-200 px-8 py-8 min-h-[600px]"
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 lg:p-8 min-h-[600px]"
             style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
             <PropertyForm
               mode="create"
@@ -224,7 +260,7 @@ export default function NuevaPropiedadPage() {
 
       {/* ── FOOTER ── */}
       <footer className="bg-white border-t border-gray-200 mt-6">
-        <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           <div>
             <h4 className="text-sm font-semibold text-gray-900 mb-3">¿Por qué publicar con nosotros?</h4>
             <ul className="space-y-2">

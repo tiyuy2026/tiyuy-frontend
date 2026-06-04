@@ -127,9 +127,9 @@ export function Footer() {
             <span className="text-gray-500">© {new Date().getFullYear()} Tiyuy, Inc.</span>
             <span className="hidden md:inline text-gray-300">·</span>
             <div className="flex items-center gap-3 text-gray-650">
-              <Link href="/#privacidad" className="hover:underline hover:text-brand">Privacidad</Link>
+              <Link href="/privacy" className="hover:underline hover:text-brand">Privacidad</Link>
               <span className="text-gray-300">·</span>
-              <Link href="/#terminos" className="hover:underline hover:text-brand">Términos</Link>
+              <Link href="/terms" className="hover:underline hover:text-brand">Términos</Link>
               <span className="text-gray-300">·</span>
               <Link href="/#mapa" className="hover:underline hover:text-brand">Mapa del sitio</Link>
             </div>
