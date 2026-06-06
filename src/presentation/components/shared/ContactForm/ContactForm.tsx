@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { Icon } from '@iconify/react';
 import { useCRMInteraction } from '@/presentation/hooks/useCRMInteraction';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { Input } from '@/presentation/components/ui';
@@ -13,6 +14,8 @@ interface ContactFormProps {
 export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
   const { isAuthenticated, user } = useAuthStore();
   const { trackContactForm, isLoading } = useCRMInteraction();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
     contactName: user?.firstName && user?.lastName
@@ -21,9 +24,30 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
     contactEmail: user?.email || '',
     contactPhone: '',
     message: '¡Hola! Me interesa esta propiedad. ¿Está disponible?',
-    preferredContactMethod: 'EMAIL' as const,
+    preferredContactMethod: 'EMAIL',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  type ContactMethod = 'EMAIL' | 'PHONE' | 'WHATSAPP';
+
+  const contactMethods: { value: ContactMethod; label: string; icon: string }[] = [
+    { value: 'EMAIL', label: 'Email', icon: 'material-symbols:mail-outline' },
+    { value: 'PHONE', label: 'Teléfono', icon: 'material-symbols:phone-in-talk-outline' },
+    { value: 'WHATSAPP', label: 'WhatsApp', icon: 'ic:baseline-whatsapp' },
+  ];
+
+  const selectedMethod = contactMethods.find(m => m.value === formData.preferredContactMethod);
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -74,7 +98,7 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
         contactEmail: isAuthenticated && user?.email ? user.email : '',
         contactPhone: '',
         message: '¡Hola! Me interesa esta propiedad. ¿Está disponible?',
-        preferredContactMethod: 'EMAIL' as const,
+        preferredContactMethod: 'EMAIL' as ContactMethod,
       });
       setErrors({});
     } catch (error) {
@@ -84,6 +108,12 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
       <h3 className="text-xl font-bold text-gray-900 mb-4">
         Contactar al propietario
       </h3>
@@ -122,22 +152,61 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
           placeholder="+51 999 999 999"
         />
 
-        {/* Método preferido */}
-        <div>
-          <label htmlFor="preferredContactMethod" className="block text-sm font-medium text-gray-700 mb-2">
+        {/* Método preferido - Dropdown personalizado */}
+        <div ref={dropdownRef}>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Prefieres que te contacten por
           </label>
-          <select
-            id="preferredContactMethod"
-            name="preferredContactMethod"
-            value={formData.preferredContactMethod}
-            onChange={handleChange}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-700 bg-gray-50"
+          <button
+            type="button"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl border border-gray-300 bg-white shadow-sm hover:border-gray-400 transition-all duration-200 text-gray-700"
           >
-            <option value="EMAIL">Email</option>
-            <option value="PHONE">Teléfono</option>
-            <option value="WHATSAPP">WhatsApp</option>
-          </select>
+            <span className="flex items-center gap-3">
+              {selectedMethod && (
+                <Icon icon={selectedMethod.icon} className="w-5 h-5 text-brand" />
+              )}
+              <span>{selectedMethod?.label}</span>
+            </span>
+            <Icon
+              icon="material-symbols:keyboard-arrow-down"
+              className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+
+          {dropdownOpen && (
+            <div className="relative z-50">
+              <div
+                className="absolute top-1 left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden"
+                style={{ animation: 'fadeIn 0.15s ease-out' }}
+              >
+                {contactMethods.map((method) => (
+                  <button
+                    key={method.value}
+                    type="button"
+                    onClick={() => {
+                      setFormData({ ...formData, preferredContactMethod: method.value });
+                      setDropdownOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors duration-150 ${
+                      formData.preferredContactMethod === method.value
+                        ? 'bg-brand/5 text-brand font-semibold'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <Icon
+                      icon={method.icon}
+                      className={`w-5 h-5 ${formData.preferredContactMethod === method.value ? 'text-brand' : 'text-gray-400'}`}
+                    />
+                    <span>{method.label}</span>
+                    {formData.preferredContactMethod === method.value && (
+                      <Icon icon="material-symbols:check" className="w-5 h-5 text-brand ml-auto" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Mensaje */}

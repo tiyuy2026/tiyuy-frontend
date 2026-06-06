@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Property, PropertySummary } from '@/core/domain/entities/Property';
 import { PropertyCard } from './PropertyCard/PropertyCard';
 
@@ -21,7 +22,7 @@ const TRANSACTION_LABELS: Record<string, string> = {
   SALE: 'Venta',
 };
 
-export function SimilarProperties({ currentProperty, maxItems = 6 }: SimilarPropertiesProps) {
+export function SimilarProperties({ currentProperty, maxItems = 5 }: SimilarPropertiesProps) {
   const [data, setData] = useState<SimilarPropertiesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -80,8 +81,8 @@ export function SimilarProperties({ currentProperty, maxItems = 6 }: SimilarProp
         <h3 className="text-base font-bold text-gray-900 mb-4">
           Propiedades similares en {currentProperty.location?.district || 'la zona'}
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: Math.min(maxItems, 6) }).map((_, i) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          {Array.from({ length: Math.min(maxItems, 5) }).map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="w-full aspect-square bg-gray-200 rounded-xl mb-3" />
               <div className="space-y-2 p-1">
@@ -139,10 +140,31 @@ export function SimilarProperties({ currentProperty, maxItems = 6 }: SimilarProp
         {transactionLabel} - {data.totalResults} propiedad{data.totalResults !== 1 ? 'es' : ''} encontrada{data.totalResults !== 1 ? 's' : ''}
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
         {data.properties.map((p) => (
           <PropertyCard key={p.id} property={p} />
         ))}
+        
+        {/* Tarjeta Ver todo */}
+        <Link
+          href="/properties"
+          className="flex flex-col items-center justify-center min-h-[280px] w-full bg-white hover:bg-gray-50 rounded-2xl border border-gray-200 transition-all hover:shadow-md group"
+        >
+          <div className="relative w-28 h-20 mb-4 group-hover:scale-105 transition-transform duration-300">
+            <div className="absolute top-0 left-0 w-16 h-16 bg-gray-200 rounded-xl border-2 border-white shadow-sm -rotate-6 transform origin-bottom-left z-10 overflow-hidden">
+              <div className="w-full h-full bg-blue-100/50"></div>
+            </div>
+            <div className="absolute top-2 right-0 w-16 h-16 bg-gray-200 rounded-xl border-2 border-white shadow-sm rotate-6 transform origin-bottom-right z-20 overflow-hidden">
+              <div className="w-full h-full bg-green-100/50"></div>
+            </div>
+            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-16 h-16 bg-gray-100 rounded-xl border-2 border-white shadow-md z-30 overflow-hidden">
+              <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                <svg className="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              </div>
+            </div>
+          </div>
+          <span className="text-[#003B95] font-semibold text-base group-hover:text-blue-800 transition-colors">Ver todo</span>
+        </Link>
       </div>
     </div>
   );
