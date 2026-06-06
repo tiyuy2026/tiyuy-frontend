@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { NotificationList } from '@/presentation/components/notifications/NotificationList/NotificationList';
 import { User, Building, MessageSquare, LogOut, ChevronDown, FolderGit, Menu, X } from 'lucide-react';
+import { PublishButton } from '@/presentation/components/shared/PublishButton/PublishButton';
 
 export function Header() {
   const router = useRouter();
@@ -456,12 +457,7 @@ export function Header() {
                                   </Link>
                                 </li>
                                 <li>
-                                  <Link
-                                    href="/my-properties/new"
-                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
-                                  >
-                                    Publica un inmueble para venta
-                                  </Link>
+                                  <PublishButton label="Publica un inmueble para venta" />
                                 </li>
                               </ul>
                             </div>
@@ -750,12 +746,7 @@ export function Header() {
                                   </Link>
                                 </li>
                                 <li>
-                                  <Link
-                                    href="/my-properties/new"
-                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
-                                  >
-                                    Publica un inmueble para alquilar
-                                  </Link>
+                                  <PublishButton label="Publica un inmueble para alquilar" />
                                 </li>
                               </ul>
                             </div>
@@ -810,12 +801,7 @@ export function Header() {
                               <h3 className="font-bold text-black text-lg mb-5">Otros servicios</h3>
                               <ul className="space-y-3">
                                 <li>
-                                  <Link
-                                    href="/my-properties/new"
-                                    className="text-gray-800 hover:text-black text-base block cursor-pointer"
-                                  >
-                                    Publica un inmueble
-                                  </Link>
+                                  <PublishButton label="Publica un inmueble" />
                                 </li>
                               </ul>
                             </div>
