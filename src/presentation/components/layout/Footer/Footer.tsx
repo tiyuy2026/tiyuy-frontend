@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Icon } from '@iconify/react';
 
 const INSPIRATION_SECTIONS = [
@@ -62,27 +63,61 @@ const FOOTER_COLUMNS = [
   },
 ];
 
+const SOCIAL_LINKS = [
+  {
+    href: 'https://www.instagram.com/tiyuyperu/',
+    icon: 'fa6-brands:instagram',
+    label: 'Instagram',
+  },
+  {
+    href: 'https://www.facebook.com/tiyuyperu',
+    icon: 'fa6-brands:facebook',
+    label: 'Facebook',
+  },
+  {
+    href: 'https://twitter.com/tiyuyperu',
+    icon: 'fa6-brands:x-twitter',
+    label: 'X (Twitter)',
+  },
+  {
+    href: 'https://www.tiktok.com/@tiyuyperu_oficial',
+    icon: 'fa6-brands:tiktok',
+    label: 'TikTok',
+  },
+  {
+    href: 'https://www.youtube.com/@tiyuyperu',
+    icon: 'fa6-brands:youtube',
+    label: 'YouTube',
+  },
+  {
+    href: 'https://www.linkedin.com/in/tiyuy-peru-4858863b5/',
+    icon: 'fa6-brands:linkedin',
+    label: 'LinkedIn',
+  },
+];
+
 export function Footer() {
   return (
-    <footer className="w-full mt-12 bg-gray-50 border-t border-gray-200 text-foreground font-sans">
-      
-      {/* SECCIÓN 1: INSPIRACIÓN */}
-      <section className="py-10 border-b border-gray-200">
-        <div className="w-full px-6 xl:px-10 max-w-[1920px] mx-auto">
-          <h2 className="text-[22px] font-semibold tracking-tight mb-8">
-            Inspiración para tu próxima búsqueda
-          </h2>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-8">
-            {INSPIRATION_SECTIONS.map((section, index) => (
-              <div key={index} className="flex flex-col">
-                <h3 className="text-[14px] font-semibold mb-4">{section.title}</h3>
-                <ul className="space-y-3">
-                  {section.links.map((link, linkIdx) => (
-                    <li key={linkIdx}>
-                      <Link 
-                        href={link.href} 
-                        className="text-[14px] text-gray-550 hover:underline hover:text-brand transition-colors duration-200"
+    <footer className="w-full mt-12 bg-[#1a1a1a] text-gray-300 font-sans">
+
+      {/* SECCIÓN PRINCIPAL: 4 columnas */}
+      <div className="w-full px-6 xl:px-16 max-w-[1920px] mx-auto py-12 border-b border-white/10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+          {/* Columna 1: Inspiración */}
+          <div>
+            <h3 className="text-white font-semibold text-[15px] mb-5">Explorar propiedades</h3>
+            {INSPIRATION_SECTIONS.map((section, i) => (
+              <div key={i} className="mb-5">
+                <p className="text-gray-400 text-[13px] font-semibold uppercase tracking-wider mb-3">
+                  {section.title}
+                </p>
+                <ul className="space-y-2">
+                  {section.links.map((link, j) => (
+                    <li key={j}>
+                      <Link
+                        href={link.href}
+                        className="text-[13px] text-gray-400 hover:text-white transition-colors duration-200"
                       >
                         {link.label}
                       </Link>
@@ -92,96 +127,113 @@ export function Footer() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* SECCIÓN 2: ENLACES PRINCIPALES */}
-      <section className="py-12 border-b border-gray-200">
-        <div className="w-full px-6 xl:px-10 max-w-[1920px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {FOOTER_COLUMNS.map((column, index) => (
-              <div key={index}>
-                <h3 className="font-semibold text-[14px] mb-4">{column.title}</h3>
-                <ul className="space-y-3 text-[14px]">
-                  {column.links.map((link, linkIdx) => (
-                    <li key={linkIdx}>
-                      <Link 
-                        href={link.href} 
-                        className="text-gray-600 hover:underline hover:text-brand transition-colors duration-200"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+          {/* Columnas 2, 3, 4 */}
+          {FOOTER_COLUMNS.map((column, i) => (
+            <div key={i}>
+              <h3 className="text-white font-semibold text-[15px] mb-5">{column.title}</h3>
+              <ul className="space-y-3">
+                {column.links.map((link, j) => (
+                  <li key={j}>
+                    <Link
+                      href={link.href}
+                      className="text-[13px] text-gray-400 hover:text-white transition-colors duration-200"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* SECCIÓN: Aceptamos + Redes sociales */}
+      <div className="w-full px-6 xl:px-16 max-w-[1920px] mx-auto py-8 border-b border-white/10">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+
+          {/* Métodos de pago */}
+          <div>
+            <p className="text-white font-semibold text-[14px] mb-4">Aceptamos</p>
+            <div className="flex flex-wrap items-center gap-3">
+              {/* MercadoPago */}
+              <div className="flex items-center gap-1.5 bg-[#009ee3] text-white text-[12px] font-bold px-3 py-2 rounded-lg">
+                <Icon icon="simple-icons:mercadopago" width="18" height="18" />
+                <span>Mercado Pago</span>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      <section className="py-6">
-        <div className="w-full px-6 xl:px-10 max-w-[1920px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          
-          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-[14px]">
-            <span className="text-gray-500">© {new Date().getFullYear()} Tiyuy, Inc.</span>
-            <span className="hidden md:inline text-gray-300">·</span>
-            <div className="flex items-center gap-3 text-gray-650">
-              <Link href="/#privacidad" className="hover:underline hover:text-brand">Privacidad</Link>
-              <span className="text-gray-300">·</span>
-              <Link href="/#terminos" className="hover:underline hover:text-brand">Términos</Link>
-              <span className="text-gray-300">·</span>
-              <Link href="/#mapa" className="hover:underline hover:text-brand">Mapa del sitio</Link>
+              {/* Yape */}
+              <div className="flex items-center gap-1.5 bg-[#6b21a8] text-white text-[12px] font-bold px-3 py-2 rounded-lg">
+                <Icon icon="mdi:cellphone" width="18" height="18" />
+                <span>Yape</span>
+              </div>
+
+              {/* Visa */}
+              <div className="bg-white rounded-lg px-3 py-2 flex items-center justify-center h-9">
+                <Icon icon="logos:visa" width="38" height="24" />
+              </div>
+
+              {/* Mastercard */}
+              <div className="bg-white rounded-lg px-3 py-2 flex items-center justify-center h-9">
+                <Icon icon="logos:mastercard" width="36" height="24" />
+              </div>
+
+              {/* American Express */}
+              <div className="bg-white rounded-lg px-3 py-2 flex items-center justify-center h-9">
+                <Icon icon="logos:amex" width="36" height="24" />
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4 text-[14px] font-semibold">
-            <div className="flex items-center gap-4">
-              <button className="flex items-center gap-2 hover:text-brand transition-colors focus:outline-none">
-                <Icon icon="material-symbols:language" width="16" height="16" />
-                <span>Español (PE)</span>
-              </button>
-              
-              <button className="flex items-center gap-1 hover:text-brand transition-colors focus:outline-none">
-                <span>S/</span>
-                <span>PEN</span>
-              </button>
-            </div>
-            <div className="flex gap-4 sm:ml-4 border-t sm:border-t-0 sm:border-l border-gray-200 pt-4 sm:pt-0 sm:pl-4">
-              <a 
-                href="https://www.instagram.com/tiyuyperu/" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="size-9 rounded-full flex items-center justify-center text-gray-500 bg-transparent hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:via-[#ee2a7b] hover:to-[#6228d7] hover:text-white transition-all duration-300 ease-in-out" 
-                aria-label="Instagram"
-              >
-                <Icon icon="fa6-brands:instagram" width="18" height="18" />
-              </a>
-
-              <a 
-                href="https://www.linkedin.com/in/tiyuy-peru-4858863b5/" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="size-9 rounded-full flex items-center justify-center text-gray-500 bg-transparent hover:bg-[#0A66C2] hover:text-white transition-all duration-300 ease-in-out" 
-                aria-label="LinkedIn"
-              >
-                <Icon icon="fa6-brands:linkedin" width="18" height="18" />
-              </a>
-
-              <a 
-                href="https://www.tiktok.com/@tiyuyperu_oficial/video/7625094755235548434?m" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="size-9 rounded-full flex items-center justify-center text-gray-500 bg-transparent hover:bg-black hover:text-white transition-all duration-300 ease-in-out" 
-                aria-label="TikTok"
-              >
-                <Icon icon="fa6-brands:tiktok" width="16" height="16" />
-              </a>
-
+          {/* Redes sociales */}
+          <div>
+            <p className="text-white font-semibold text-[14px] mb-4">Conectar con TIYUY</p>
+            <div className="flex items-center gap-3">
+              {SOCIAL_LINKS.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  className="size-9 rounded-full flex items-center justify-center text-gray-400 bg-white/10 hover:bg-white/20 hover:text-white transition-all duration-200"
+                >
+                  <Icon icon={social.icon} width="17" height="17" />
+                </a>
+              ))}
             </div>
           </div>
         </div>
-      </section>
+      </div>
+
+      {/* SECCIÓN BOTTOM: copyright + idioma + moneda */}
+      <div className="w-full px-6 xl:px-16 max-w-[1920px] mx-auto py-5">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-gray-500">
+
+          <div className="flex flex-wrap items-center gap-2">
+            <span>© {new Date().getFullYear()} Tiyuy, Inc.</span>
+            <span className="text-gray-600">·</span>
+            <Link href="/#privacidad" className="hover:text-white transition-colors">Privacidad</Link>
+            <span className="text-gray-600">·</span>
+            <Link href="/#terminos" className="hover:text-white transition-colors">Términos</Link>
+            <span className="text-gray-600">·</span>
+            <Link href="/#mapa" className="hover:text-white transition-colors">Mapa del sitio</Link>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button className="flex items-center gap-1.5 hover:text-white transition-colors focus:outline-none">
+              <Icon icon="material-symbols:language" width="15" height="15" />
+              <span>Español (PE)</span>
+            </button>
+            <button className="flex items-center gap-1 hover:text-white transition-colors focus:outline-none">
+              <span>S/</span>
+              <span>PEN</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
     </footer>
   );
 }

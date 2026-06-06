@@ -4,6 +4,9 @@ import { Hind } from 'next/font/google';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import './globals.css';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import { ConditionalHeader } from '@/presentation/components/layout/ConditionalHeader/ConditionalHeader';
 
 const hind = Hind({ 

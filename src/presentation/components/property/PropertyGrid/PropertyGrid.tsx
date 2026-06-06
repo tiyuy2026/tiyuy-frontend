@@ -11,8 +11,8 @@ interface PropertyGridProps {
 export function PropertyGrid({ properties, isLoading }: PropertyGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-        {[...Array(6)].map((_, i) => (
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+        {[...Array(8)].map((_, i) => (
           <PropertyCardSkeleton key={i} />
         ))}
       </div>
@@ -34,7 +34,7 @@ export function PropertyGrid({ properties, isLoading }: PropertyGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
       {properties.map((property) => (
         <PropertyCard key={property.id} property={property} />
       ))}
@@ -44,18 +44,12 @@ export function PropertyGrid({ properties, isLoading }: PropertyGridProps) {
 
 function PropertyCardSkeleton() {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
-      <div className="w-full h-56 bg-gray-300" />
-      <div className="p-4">
-        <div className="h-4 bg-gray-300 rounded w-1/3 mb-3" />
-        <div className="h-6 bg-gray-300 rounded w-full mb-2" />
-        <div className="h-4 bg-gray-300 rounded w-2/3 mb-3" />
-        <div className="flex gap-4 mb-3">
-          <div className="h-4 bg-gray-300 rounded w-16" />
-          <div className="h-4 bg-gray-300 rounded w-16" />
-          <div className="h-4 bg-gray-300 rounded w-16" />
-        </div>
-        <div className="h-8 bg-gray-300 rounded w-1/2" />
+    <div className="animate-pulse">
+      <div className="w-full aspect-square bg-gray-200 rounded-xl mb-3" />
+      <div className="space-y-2">
+        <div className="h-4 bg-gray-200 rounded w-3/4" />
+        <div className="h-3 bg-gray-200 rounded w-1/2" />
+        <div className="h-4 bg-gray-200 rounded w-20" />
       </div>
     </div>
   );
