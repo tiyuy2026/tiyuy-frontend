@@ -86,7 +86,7 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
     <div className="min-h-screen bg-gray-50">
 
       <div className="w-full px-4 sm:px-6 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
           {/* ════════════════════════════════════════
               COLUMNA PRINCIPAL  (2 / 3)
@@ -197,20 +197,20 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
             <div className="sticky top-4 space-y-4">
 
               {/* Contactar */}
-              <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-                <div className="px-5 pt-5 pb-3 border-b border-gray-100">
-                  <h3 className="text-base font-bold text-gray-900">Contacta al anunciante</h3>
+              <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden max-w-sm mx-auto">
+                <div className="px-4 pt-4 pb-2 border-b border-gray-100">
+                  <h3 className="text-sm font-bold text-gray-900">Contacta al anunciante</h3>
                 </div>
-                <div className="px-5 py-4">
+                <div className="px-4 py-3">
                   <ContactForm propertyId={property.id} ownerId={property.owner.id} />
                 </div>
-                <div className="px-5 pb-5">
+                <div className="px-4 pb-4">
                   <WhatsAppButton property={property} className="w-full" />
                 </div>
               </div>
 
               {/* Agente */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 max-w-sm mx-auto">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-xl bg-teal-600 flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
                     {property.owner.name.charAt(0).toUpperCase()}
@@ -231,7 +231,7 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
               </div>
 
               {/* Estadísticas */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 max-w-sm mx-auto">
                 <h3 className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-3">Estadísticas</h3>
                 <div className="grid grid-cols-3 gap-2 text-center">
                   {[
@@ -275,7 +275,7 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
               </div>
 
               {/* ⭐ CALIFICAR PROPIEDAD */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 max-w-sm mx-auto">
                 <h3 className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-3">Calificar propiedad</h3>
                 <div className="flex flex-col items-center gap-2">
                   <StarRating
@@ -298,12 +298,14 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
               </div>
 
               {/* ✅ BOTÓN DESTACAR PROPIEDAD */}
-              <FeaturePropertyButton 
-                propertyId={property.id}
-                ownerId={property.owner.id}
-                isFeatured={property.isFeatured}
-                status={property.status}
-              />
+              <div className="max-w-sm mx-auto">
+                <FeaturePropertyButton 
+                  propertyId={property.id}
+                  ownerId={property.owner.id}
+                  isFeatured={property.isFeatured}
+                  status={property.status}
+                />
+              </div>
 
             </div>
           </div>

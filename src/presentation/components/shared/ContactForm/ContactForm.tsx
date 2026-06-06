@@ -107,18 +107,18 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-3">
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(-4px); }
           to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
-      <h3 className="text-xl font-bold text-gray-900 mb-4">
+      <h3 className="text-sm font-bold text-gray-900 mb-2">
         Contactar al propietario
       </h3>
 
-      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-2.5" noValidate>
         <Input
           id="contactName"
           name="contactName"
@@ -154,30 +154,30 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
 
         {/* Método preferido - Dropdown personalizado */}
         <div ref={dropdownRef}>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-xs font-medium text-gray-700 mb-1.5">
             Prefieres que te contacten por
           </label>
           <button
             type="button"
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl border border-gray-300 bg-white shadow-sm hover:border-gray-400 transition-all duration-200 text-gray-700"
+            className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg border border-gray-300 bg-white shadow-sm hover:border-gray-400 transition-all duration-200 text-gray-700 text-sm"
           >
-            <span className="flex items-center gap-3">
+            <span className="flex items-center gap-2">
               {selectedMethod && (
-                <Icon icon={selectedMethod.icon} className="w-5 h-5 text-brand" />
+                <Icon icon={selectedMethod.icon} className="w-4 h-4 text-brand" />
               )}
               <span>{selectedMethod?.label}</span>
             </span>
             <Icon
               icon="material-symbols:keyboard-arrow-down"
-              className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
             />
           </button>
 
           {dropdownOpen && (
             <div className="relative z-50">
               <div
-                className="absolute top-1 left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden"
+                className="absolute top-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
                 style={{ animation: 'fadeIn 0.15s ease-out' }}
               >
                 {contactMethods.map((method) => (
@@ -188,7 +188,7 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
                       setFormData({ ...formData, preferredContactMethod: method.value });
                       setDropdownOpen(false);
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors duration-150 ${
+                    className={`w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
                       formData.preferredContactMethod === method.value
                         ? 'bg-brand/5 text-brand font-semibold'
                         : 'text-gray-700 hover:bg-gray-50'
@@ -196,11 +196,11 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
                   >
                     <Icon
                       icon={method.icon}
-                      className={`w-5 h-5 ${formData.preferredContactMethod === method.value ? 'text-brand' : 'text-gray-400'}`}
+                      className={`w-4 h-4 ${formData.preferredContactMethod === method.value ? 'text-brand' : 'text-gray-400'}`}
                     />
                     <span>{method.label}</span>
                     {formData.preferredContactMethod === method.value && (
-                      <Icon icon="material-symbols:check" className="w-5 h-5 text-brand ml-auto" />
+                      <Icon icon="material-symbols:check" className="w-4 h-4 text-brand ml-auto" />
                     )}
                   </button>
                 ))}
@@ -211,7 +211,7 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
 
         {/* Mensaje */}
         <div>
-          <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="message" className="block text-xs font-medium text-gray-700 mb-1.5">
             Mensaje
           </label>
           <textarea
@@ -219,8 +219,8 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
             name="message"
             value={formData.message}
             onChange={handleChange}
-            rows={4}
-            className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none text-gray-700 placeholder:text-gray-400 ${
+            rows={3}
+            className={`w-full px-3 py-2.5 rounded-lg border transition-all duration-200 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 ${
               errors.message
                 ? 'border-red-500 focus:ring-2 focus:ring-red-500 bg-red-50'
                 : 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50'
@@ -228,8 +228,8 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
             placeholder="Hola, me interesa esta propiedad..."
           />
           {errors.message && (
-            <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
               {errors.message}
@@ -240,7 +240,7 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full bg-blue-600 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isLoading ? 'Enviando...' : 'Enviar mensaje'}
         </button>

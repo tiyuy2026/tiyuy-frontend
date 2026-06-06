@@ -36,7 +36,7 @@ export function WhatsAppButton({ property, className = '' }: WhatsAppButtonProps
       <button
         onClick={() => handleWhatsAppClick()}
         disabled={isLoading}
-        className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 disabled:scale-100 flex items-center justify-center gap-3 text-lg"
+        className="w-full bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-semibold py-2.5 px-4 rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center gap-2 text-sm"
       >
         {isLoading ? (
           <>
@@ -49,7 +49,7 @@ export function WhatsAppButton({ property, className = '' }: WhatsAppButtonProps
         ) : (
           <>
             <svg 
-              className="w-6 h-6" 
+              className="w-5 h-5" 
               fill="currentColor" 
               viewBox="0 0 24 24" 
               xmlns="http://www.w3.org/2000/svg"
