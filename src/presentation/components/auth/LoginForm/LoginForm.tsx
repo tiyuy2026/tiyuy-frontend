@@ -81,6 +81,11 @@ export const LoginForm: React.FC = () => {
     try {
       const result = await signInWithGoogleComplete();
 
+      if (result.verificationError) {
+        // Si la verificación de email falló por un error técnico, no sugerimos registrarse.
+        return;
+      }
+
       if (result.exists && result.authResponse) {
         // Usuario existe → login exitoso
         const userData: User = {
@@ -117,7 +122,15 @@ export const LoginForm: React.FC = () => {
 
         router.replace(targetRoute);
         setTimeout(() => window.location.assign(targetRoute), 100);
-      } else if (result.userData) {
+      } else if (result.loginError && result.userData) {
+        // Hubo un error relacionado con el login de Google; mostrarlo sin forzar registro.
+        setInfoDialog({
+          isOpen: true,
+          message: result.loginError,
+          showRegisterButton: false,
+          googleData: undefined,
+        });
+      } else if (!result.exists && result.userData) {
         // Usuario no existe → ofrecer registro con datos pre-cargados
         setInfoDialog({
           isOpen: true,

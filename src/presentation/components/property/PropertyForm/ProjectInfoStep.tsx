@@ -7,9 +7,10 @@ import { PROJECT_PHASES, PROJECT_PHASES_LABELS, PROJECT_TYPES, PROJECT_TYPES_LAB
 interface ProjectInfoStepProps {
   formData: any;
   onChange: (field: string, value: any) => void;
+  validationErrors?: Record<string, string>;
 }
 
-export function ProjectInfoStep({ formData, onChange }: ProjectInfoStepProps) {
+export function ProjectInfoStep({ formData, onChange, validationErrors }: ProjectInfoStepProps) {
   const selectedCurrency = formData.currency || 'PEN';
   const currencySymbol = CURRENCIES[selectedCurrency as keyof typeof CURRENCIES]?.symbol || 'S/';
 
@@ -88,10 +89,13 @@ export function ProjectInfoStep({ formData, onChange }: ProjectInfoStepProps) {
           </label>
           <input
             type="number"
-            value={formData.priceFrom || 0}
-            onChange={(e) => handleChangeWithLog('priceFrom', parseFloat(e.target.value) || 0)}
+            value={formData.priceFrom ?? ''}
+            onChange={(e) => {
+              const raw = e.target.value;
+              handleChangeWithLog('priceFrom', raw === '' ? '' : parseFloat(raw));
+            }}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-            placeholder="0"
+            placeholder="Ej: 150000"
             min="0"
             step="0.01"
           />
@@ -103,10 +107,13 @@ export function ProjectInfoStep({ formData, onChange }: ProjectInfoStepProps) {
           </label>
           <input
             type="number"
-            value={formData.priceTo || 0}
-            onChange={(e) => handleChangeWithLog('priceTo', parseFloat(e.target.value) || 0)}
+            value={formData.priceTo ?? ''}
+            onChange={(e) => {
+              const raw = e.target.value;
+              handleChangeWithLog('priceTo', raw === '' ? '' : parseFloat(raw));
+            }}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-            placeholder="0"
+            placeholder="Ej: 300000"
             min="0"
             step="0.01"
           />
@@ -152,6 +159,9 @@ export function ProjectInfoStep({ formData, onChange }: ProjectInfoStepProps) {
           placeholder="Ej: Residencial Las Flores"
           required
         />
+        {validationErrors?.name && (
+          <p className="mt-1 text-sm text-red-600">{validationErrors.name}</p>
+        )}
       </div>
 
       {/* Descripción */}
@@ -170,6 +180,9 @@ export function ProjectInfoStep({ formData, onChange }: ProjectInfoStepProps) {
         <p className="text-xs text-gray-500 mt-1">
           Mínimo 50 caracteres para mejor SEO
         </p>
+        {validationErrors?.description && (
+          <p className="mt-1 text-sm text-red-600">{validationErrors.description}</p>
+        )}
       </div>
 
       {/* Amenidades */}

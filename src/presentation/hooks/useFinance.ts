@@ -55,41 +55,45 @@ export function useSubscribeToPlan() {
       // Se activara cuando MercadoPago notifique el pago
     },
     onError: (error: any) => {
-      console.error('Error en useSubscribeToPlan:', error);
-      console.error('Error response:', error.response);
-      console.error('Error data:', error.response?.data);
-      console.error('Error status:', error.response?.status);
+      const status = error.response?.status;
+      const data = error.response?.data;
       
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error || 
-                          error.message || 
-                          'Error al activar suscripción';
+      let message = 'No se pudo procesar la solicitud';
+      let type: 'warning' | 'info' | 'error' = 'warning';
       
-      toast.error(errorMessage);
+      if (status === 409) {
+        message = data?.message || 'Ya tienes una suscripción activa';
+        type = 'info';
+      } else if (status === 400) {
+        message = data?.message || 'Verifica los datos ingresados';
+        type = 'warning';
+      } else if (status === 402) {
+        message = data?.message || 'Completa el pago para activar tu suscripción';
+        type = 'info';
+      } else if (status === 500) {
+        message = 'Error del servidor. Intenta nuevamente.';
+        type = 'error';
+      } else if (error.message) {
+        message = error.message;
+      }
+      
+      toast[type](message);
     },
   });
 }
 
 export function useAvailableDeveloperDiscountCodes() {
-  console.log('🔍 HOOK: useAvailableDeveloperDiscountCodes INICIANDO');
   return useQuery({
     queryKey: ['developer', 'discount-codes'],
     queryFn: async () => {
-      console.log('🔍 HOOK: queryFn ejecutándose');
       const userData = authStorage.getUser();
-      console.log('🔍 HOOK: userData obtenido:', userData);
       if (!userData || (userData.role !== 'AGENT' && userData.role !== 'DEVELOPER')) {
-        console.log('🚫 HOOK: Usuario no es agente ni developer - no se obtienen descuentos, rol:', userData?.role);
         return [];
       }
-      console.log('✅ HOOK: Usuario es agente o developer - obteniendo descuentos, rol:', userData.role);
-      console.log('🔍 HOOK: Usuario agencyId:', userData.agencyId);
       try {
         const result = await financeRepo.getAvailableDeveloperDiscountCodes();
-        console.log('✅ HOOK: Descuentos obtenidos exitosamente:', result);
         return result;
       } catch (error) {
-        console.error('❌ HOOK: Error obteniendo descuentos:', error);
         throw error;
       }
     },

@@ -140,6 +140,17 @@ export function ProjectUnitsStep({ formData, onChange, propertyId }: ProjectUnit
     onChange('units', newUnits);
     onChange('totalUnits', newUnits.length + totalFromGroups());
     onChange('availableUnits', newUnits.length + totalFromGroups());
+    
+    // Auto-calculate areaFrom and areaTo from all units
+    const allAreas = [
+      ...newUnits.map((u: any) => u.area),
+      ...(formData.unitGroups || []).map((g: any) => g.area)
+    ];
+    if (allAreas.length > 0) {
+      onChange('areaFrom', Math.min(...allAreas));
+      onChange('areaTo', Math.max(...allAreas));
+    }
+    
     setCurrentUnit({ ...emptyUnit });
     setShowUnitForm(false);
   };
@@ -182,6 +193,17 @@ export function ProjectUnitsStep({ formData, onChange, propertyId }: ProjectUnit
     onChange('unitGroups', newGroups);
     onChange('totalUnits', (formData.units?.length || 0) + newGroups.reduce((s: number, g: any) => s + g.quantity, 0));
     onChange('availableUnits', (formData.units?.length || 0) + newGroups.reduce((s: number, g: any) => s + g.quantity, 0));
+    
+    // Auto-calculate areaFrom and areaTo from all units and groups
+    const allAreas = [
+      ...(formData.units || []).map((u: any) => u.area),
+      ...newGroups.map((g: any) => g.area)
+    ];
+    if (allAreas.length > 0) {
+      onChange('areaFrom', Math.min(...allAreas));
+      onChange('areaTo', Math.max(...allAreas));
+    }
+    
     setCurrentGroup({ ...emptyGroup });
     setShowGroupForm(false);
   };

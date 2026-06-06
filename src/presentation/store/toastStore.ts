@@ -10,4 +10,20 @@ export const toast = {
   error(message: string) {
     hotToast.error(message);
   },
+  info(message: string) {
+    hotToast(message, {
+      style: {
+        background: '#3B82F6',
+        color: '#fff',
+      },
+    });
+  },
+  warning(message: string) {
+    hotToast(message, {
+      style: {
+        background: '#F59E0B',
+        color: '#fff',
+      },
+    });
+  },
 };

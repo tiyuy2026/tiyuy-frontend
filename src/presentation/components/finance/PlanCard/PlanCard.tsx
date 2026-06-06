@@ -51,10 +51,14 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
   const isPopular = plan.isFeatured && !isExhausted && !isActive && !isExpired;
 
   return (
-    <div className={`relative bg-white rounded-3xl p-8 transition-all duration-300 ${
-      isPopular 
-        ? 'border-2 border-[var(--brand-primary)] shadow-xl' 
-        : 'border border-gray-200 shadow-md hover:shadow-lg'
+    <div className={`relative rounded-3xl p-8 transition-all duration-300 ${
+      isActive && !isExhausted && !isExpired
+        ? 'bg-blue-50 border-2 border-blue-400 shadow-lg'
+        : isExhausted || isExpired
+        ? 'bg-gray-100 border-2 border-orange-300 shadow-md'
+        : isPopular 
+          ? 'bg-white border-2 border-[var(--brand-primary)] shadow-xl' 
+          : 'bg-white border border-gray-200 shadow-md hover:shadow-lg'
     }`}>
       
       {isPopular && (

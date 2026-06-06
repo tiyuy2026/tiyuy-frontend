@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getToken, isTokenExpired, clearTokens } from './token-utils';
 
 // El backend usa context-path /api
 const serverBaseURL = process.env.BACKEND_URL
@@ -67,10 +68,6 @@ export const apiClient = axiosClient;
 // Request interceptor: Agrega JWT automáticamente
 axiosClient.interceptors.request.use(
   (config) => {
-    console.log(' AXIOS REQUEST - Method:', config.method?.toUpperCase(), 'URL:', config.url);
-    console.log(' AXIOS BASEURL:', axiosClient.defaults.baseURL);
-    console.log(' FULL URL:', `${axiosClient.defaults.baseURL || ''}${config.url || ''}`);
-
     if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
       if (config.headers) {
         delete (config.headers as any)['Content-Type'];
@@ -86,28 +83,18 @@ axiosClient.interceptors.request.use(
     }
 
     if (typeof window !== 'undefined') {
-      let token =
-        localStorage.getItem('tiyuy-auth-token') ||
-        localStorage.getItem('token') ||
-        localStorage.getItem('auth-token');
-
-      if (token && token.startsWith('{"state":')) {
-        try {
-          const parsed = JSON.parse(token);
-          token = parsed.state?.token || token;
-          console.log(' Extracted token from Zustand object');
-        } catch (e) {
-          console.log(' Failed to parse token object:', e);
-        }
-      }
-
-      console.log(' Token check:', token ? 'EXISTS' : 'MISSING');
+      const token = getToken();
 
       if (token) {
+        // 🔥 PREVENTIVO: Si el token ya expiró, limpiar y redirigir al login
+        // ANTES de hacer la petición, evitando el 401 innecesario
+        if (isTokenExpired(token)) {
+          clearTokens();
+          window.location.href = '/login';
+          return Promise.reject(new Error('Token expirado'));
+        }
+
         config.headers.Authorization = `Bearer ${token}`;
-        console.log(' Token added to headers');
-      } else {
-        console.log(' No token found in localStorage');
       }
     }
 
@@ -122,8 +109,11 @@ axiosClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('tiyuy-auth-token');
-        window.location.href = '/login';
+        clearTokens();
+        // Evitar redirigir múltiples veces si hay varias peticiones fallando en paralelo
+        if (!window.location.pathname.startsWith('/login')) {
+          window.location.href = '/login';
+        }
       }
     }
 

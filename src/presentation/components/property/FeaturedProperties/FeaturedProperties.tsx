@@ -52,100 +52,34 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
     }
   };
 
-  // Combinaciones de tipo/transacción para obtener una mezcla diversa
-  const DIVERSITY_QUERIES: Array<{ transactionType: string; type: string }> = [
-    { transactionType: 'SALE', type: 'APARTMENT' },
-    { transactionType: 'RENT', type: 'APARTMENT' },
-    { transactionType: 'SALE', type: 'HOUSE' },
-    { transactionType: 'RENT', type: 'HOUSE' },
-    { transactionType: 'SALE', type: 'LAND' },
-    { transactionType: 'SALE', type: 'OFFICE' },
-    { transactionType: 'SALE', type: 'COMMERCIAL' },
-    { transactionType: 'RENT', type: 'ROOM' },
-  ];
-
-  /**
-   * Obtiene una mezcla diversa de propiedades de diferentes tipos y transacciones.
-   * Toma 2 propiedades de cada categoría para asegurar variedad.
-   */
-  const loadDiverseProperties = async (): Promise<PropertySummary[]> => {
-    const allProperties: PropertySummary[] = [];
-    const seenIds = new Set<number>();
-
-    // Hacer consultas en paralelo para cada combinación
-    const promises = DIVERSITY_QUERIES.map(async ({ transactionType, type }) => {
-      try {
-        const result = await propertyRepo.search({
-          transactionType: transactionType as any,
-          type: type as any,
-          page: 0,
-          size: 3,
-          sort: 'isFeatured,desc,createdAt,desc',
-        });
-        return result.properties || [];
-      } catch {
-        return [];
-      }
-    });
-
-    const results = await Promise.all(promises);
-
-    // Intercalar propiedades de diferentes categorías para máxima diversidad
-    let maxLen = Math.max(...results.map(r => r.length));
-    for (let i = 0; i < maxLen; i++) {
-      for (const props of results) {
-        if (i < props.length && !seenIds.has(props[i].id)) {
-          seenIds.add(props[i].id);
-          allProperties.push(props[i]);
-          if (allProperties.length >= 15) break;
-        }
-      }
-      if (allProperties.length >= 15) break;
-    }
-
-    return allProperties;
-  };
-
   useEffect(() => {
     const loadProperties = async () => {
       try {
         setIsLoading(true);
         setError(null);
         
-        // Intentar cargar una mezcla diversa de propiedades
-        const diverseProps = await loadDiverseProperties();
+        // Usar el nuevo endpoint optimizado /featured/mix
+        // Devuelve hasta 10 propiedades con mezcla balanceada por tipo
+        const mixProps = await propertyRepo.getFeaturedMix();
         
-        if (diverseProps.length > 0) {
-          console.log('✅ Propiedades diversas recibidas:', diverseProps.length);
-          setProperties(diverseProps);
+        if (mixProps.length > 0) {
+          setProperties(mixProps.slice(0, 10));
           setIsRecommended(true);
           return;
         }
         
-        // Fallback: propiedades destacadas
-        console.log('🔍 Cargando propiedades destacadas...');
-        const result = await propertyRepo.getFeaturedProperties(0, 15);
-        let featuredProps = result.properties || [];
-        console.log('✅ Propiedades destacadas recibidas:', featuredProps.length);
-        
-        // Si hay menos de 15, rellenar con propiedades recientes
-        if (featuredProps.length < 15) {
-          console.log(`⚠️ Solo hay ${featuredProps.length} destacadas, rellenando con recientes...`);
-          try {
-            const recentResult = await propertyRepo.search({ page: 0, size: 15, sort: 'createdAt,desc' } as any);
-            const recentProps = recentResult.properties || [];
-            const existingIds = new Set(featuredProps.map(p => p.id));
-            const additionalProps = recentProps.filter(p => !existingIds.has(p.id));
-            featuredProps = [...featuredProps, ...additionalProps].slice(0, 15);
-          } catch (recentError) {
-            console.log('❌ Error cargando propiedades recientes:', recentError);
-          }
-        }
-        
-        setProperties(featuredProps);
+        // Si no hay destacadas, obtener las más recientes (máximo 10)
+        const recentResult = await propertyRepo.search({
+          transactionType: 'SALE' as any,
+          page: 0,
+          size: 10,
+          sort: 'createdAt,desc',
+        } as any);
+        const recentProps = recentResult.properties || [];
+        setProperties(recentProps.slice(0, 10));
         setIsRecommended(false);
       } catch (error) {
-        console.error('❌ Error loading featured properties:', error);
+        console.error('Error loading featured properties:', error);
         setError('No se pudieron cargar las propiedades');
         setProperties([]);
       } finally {
@@ -266,7 +200,7 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
         <div className="flex justify-between items-end mb-4 pr-4">
           <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
             {isRecommended ? (
-              <>Más recomendaciones para ti <span className="text-gray-500 text-lg">🎯</span></>
+              <>Más recomendaciones para ti</>
             ) : (
               <>Alojamientos populares</>
             )}

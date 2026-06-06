@@ -11,6 +11,14 @@ export interface GoogleUserData {
   uid: string;
 }
 
+export interface GoogleAuthCompleteResult {
+  exists: boolean;
+  userData?: GoogleUserData;
+  authResponse?: any;
+  loginError?: string;
+  verificationError?: string;
+}
+
 export const useGoogleAuth = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +83,7 @@ export const useGoogleAuth = () => {
     }
   };
 
-  const signInWithGoogleComplete = async (): Promise<{ exists: boolean; userData?: GoogleUserData; authResponse?: any }> => {
+  const signInWithGoogleComplete = async (): Promise<GoogleAuthCompleteResult> => {
     setLoading(true);
     setError(null);
 
@@ -87,33 +95,46 @@ export const useGoogleAuth = () => {
         return { exists: false };
       }
 
-      // Verificar si el email ya existe en el sistema
-      const { exists } = await authRepository.checkGoogleEmailExists(googleUserData.email);
-      
-      if (exists) {
-        // Si existe, intentar login directo
-        try {
-          const authResponse = await authRepository.loginWithGoogle(
-            googleUserData.email,
-            googleUserData.firstName,
-            googleUserData.lastName,
-            googleUserData.uid
-          );
-          
-          return { 
-            exists: true, 
-            userData: googleUserData, 
-            authResponse 
-          };
-        } catch (loginError: any) {
-          // Si falla el login, mostrar que necesita registrarse
-          console.error('Error en login con Google:', loginError);
-          return { exists: false, userData: googleUserData };
-        }
-      }
+      // Normalizar el correo para evitar mayúsculas inconsistentes
+      const normalizedEmail = googleUserData.email.toLowerCase();
 
-      // Si no existe, devolver datos para registro
-      return { exists: false, userData: googleUserData };
+      // Intentar login directo con Google en el backend
+      try {
+        const authResponse = await authRepository.loginWithGoogle(
+          normalizedEmail,
+          googleUserData.firstName,
+          googleUserData.lastName,
+          googleUserData.uid
+        );
+
+        return {
+          exists: true,
+          userData: googleUserData,
+          authResponse,
+        };
+      } catch (loginError: any) {
+        console.error('Error en login con Google:', loginError);
+
+        const errorMessage = loginError?.message || 'No se pudo iniciar sesión con Google.';
+        const isRegistrationError = /reg[ií]strate|no se pudo autenticar|no encontrado|not found|not registered|registrado/i.test(
+          errorMessage
+        );
+
+        if (isRegistrationError) {
+          return {
+            exists: false,
+            userData: googleUserData,
+            loginError: errorMessage,
+          };
+        }
+
+        setError(errorMessage);
+        return {
+          exists: false,
+          userData: googleUserData,
+          verificationError: errorMessage,
+        };
+      }
       
     } catch (error: any) {
       console.error('Error en autenticación completa con Google:', error);

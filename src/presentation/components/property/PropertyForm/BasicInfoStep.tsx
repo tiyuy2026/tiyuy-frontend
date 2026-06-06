@@ -4,9 +4,10 @@ interface BasicInfoStepProps {
   formData: any;
   onChange: (field: string, value: any) => void;
   propertyId?: number;
+  validationErrors?: Record<string, string>;
 }
 
-export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
+export function BasicInfoStep({ formData, onChange, validationErrors }: BasicInfoStepProps) {
   const isActive = (field: string, value: string) => formData[field] === value;
 
   const PROPERTY_TYPES = [
@@ -47,15 +48,15 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
           font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .transaction-btn:hover {
-          border-color: brand;
-          color: brand;
+          border-color: #00a63e;
+          color: #00a63e;
           background: #f0fdf4;
         }
         .transaction-btn.active {
-          border-color: brand;
-          background: brand;
+          border-color: #00a63e;
+          background: #00a63e;
           color: #fff;
-          box-shadow: 0 4px 14px rgba(34,197,94,0.25);
+          box-shadow: 0 4px 14px rgba(0,166,62,0.3);
         }
 
         .type-btn {
@@ -76,17 +77,17 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
           width: 100%;
         }
         .type-btn:hover {
-          border-color: brand;
-          color: brand;
+          border-color: #00a63e;
+          color: #00a63e;
           background: #f0fdf4;
         }
-        .type-btn:hover svg { color: brand; }
+        .type-btn:hover svg { color: #00a63e; }
         .type-btn.active {
-          border-color: brand;
+          border-color: #00a63e;
           background: #f0fdf4;
-          color: brand-dark;
+          color: #004d1a;
         }
-        .type-btn.active svg { color: brand; }
+        .type-btn.active svg { color: #00a63e; }
 
         .field-label {
           font-size: 11px;
@@ -113,9 +114,9 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
         }
         .form-input::placeholder { color: #94a3b8; }
         .form-input:focus {
-          border-color: brand;
+          border-color: #00a63e;
           background: #fff;
-          box-shadow: 0 0 0 3px rgba(34,197,94,0.08);
+          box-shadow: 0 0 0 3px rgba(0,166,62,0.08);
         }
 
         .form-select {
@@ -132,15 +133,15 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
           font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .form-select:focus {
-          border-color: brand;
+          border-color: #00a63e;
           background: #fff;
-          box-shadow: 0 0 0 3px rgba(34,197,94,0.08);
+          box-shadow: 0 0 0 3px rgba(0,166,62,0.08);
         }
 
         .section-divider {
           width: 28px;
           height: 2.5px;
-          background: brand;
+          background: #00a63e;
           border-radius: 2px;
           margin-bottom: 14px;
         }
@@ -174,6 +175,9 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
               Alquilar
             </button>
           </div>
+          {validationErrors?.transactionType && (
+            <p className="mt-2 text-sm text-red-600">{validationErrors.transactionType}</p>
+          )}
         </div>
 
         {/* ── TIPO DE PROPIEDAD ── */}
@@ -188,25 +192,28 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
                 onClick={() => onChange('type', type.value)}
                 className={`type-btn ${isActive('type', type.value) ? 'active' : ''}`}
               >
-                <span style={{ color: isActive('type', type.value) ? 'brand' : '#94a3b8', transition: 'color 0.2s' }}>
+                <span style={{ color: isActive('type', type.value) ? '#00a63e' : '#94a3b8', transition: 'color 0.2s' }}>
                   {type.icon}
                 </span>
                 <span>{type.label}</span>
               </button>
             ))}
           </div>
+          {validationErrors?.type && (
+            <p className="mt-2 text-sm text-red-600">{validationErrors.type}</p>
+          )}
         </div>
 
         {/* ── PRECIO ── */}
         <div>
           <div className="section-divider" />
           <label className="field-label">Precio</label>
-          <div className="flex gap-3">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative sm:w-40">
               <select
                 value={formData.currency}
                 onChange={(e) => onChange('currency', e.target.value)}
-                className="form-select pr-8"
+                className="form-select pr-8 w-full"
                 style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center', backgroundSize: '14px' }}
               >
                 <option value="PEN">S/ PEN</option>
@@ -218,10 +225,13 @@ export function BasicInfoStep({ formData, onChange }: BasicInfoStepProps) {
               value={formData.price || ''}
               onChange={(e) => onChange('price', Number(e.target.value))}
               required
-              className="form-input flex-1"
+              className={`form-input flex-1 ${validationErrors?.price ? 'border-red-500' : ''}`}
               placeholder="Ingresa el precio"
             />
           </div>
+          {validationErrors?.price && (
+            <p className="mt-2 text-sm text-red-600">{validationErrors.price}</p>
+          )}
         </div>
 
         {/* ── DESCRIPCIÓN ── */}

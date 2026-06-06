@@ -436,7 +436,7 @@ export default function PlansPage() {
               },
               body: JSON.stringify({
                 subscriptionId: subscription.id.toString(),
-                title: `Plan ${selectedPlan.name}`,
+                title: selectedPlan.name,
                 unitPrice: finalPrice,
                 frontendUrl: window.location.origin
               })

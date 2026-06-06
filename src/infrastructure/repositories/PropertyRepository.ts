@@ -228,6 +228,22 @@ async getById(id: number): Promise<Property> {
     return response.data;
   }
 
+  async getFeaturedMix(): Promise<PropertySummary[]> {
+    try {
+      const response = await publicApiClient.get('/properties/featured/mix', {
+        timeout: 120000,
+      });
+
+      if (response.data && Array.isArray(response.data)) {
+        return response.data.map(PropertyMapper.toSummary);
+      }
+      return [];
+    } catch (error) {
+      console.error('Error loading featured mix:', error);
+      return [];
+    }
+  }
+
   async getFeaturedProperties(page = 0, size = 15): Promise<PropertySearchResult> {
     try {
       const response = await publicApiClient.get('/properties/featured', {
