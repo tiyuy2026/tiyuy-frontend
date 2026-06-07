@@ -171,45 +171,18 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
 
   return (
     <div className="sticky top-4 space-y-4">
-      {/* ── FAVORITO / COMPARTIR ── */}
-      <div className="flex items-center justify-end gap-1">
-        <button
-          type="button"
-          onClick={handleToggleFavorite}
-          disabled={favLoading}
-          aria-label={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 hover:text-rose-500 hover:bg-rose-50"
-        >
-          <svg
-            className={`w-4 h-4 transition-all duration-200 ${
-              isFavorite ? 'fill-rose-500 stroke-rose-500 scale-110' : 'fill-none stroke-current'
-            }`}
-            viewBox="0 0 24 24"
-            strokeWidth={1.8}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-            />
-          </svg>
-          {favLoading ? '...' : isFavorite ? 'Guardado' : 'Favorito'}
-        </button>
-        <ShareButton variant="topbar" />
-      </div>
-
       {/* ── FORMULARIO DE CONTACTO ── */}
       <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-        <div className="px-5 pt-5 pb-3 border-b border-gray-100">
-          <h3 className="text-base font-bold text-gray-900">
+        <div className="px-4 pt-4 pb-2 border-b border-gray-100">
+          <h3 className="text-sm font-bold text-gray-900">
             Contáctate con {project.developer?.companyName || 'el desarrollador'}
           </h3>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 mt-0.5">
             por el proyecto en {project.district}, {project.province}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-5 py-4 space-y-4" noValidate>
+        <form onSubmit={handleSubmit} className="px-4 py-3 space-y-2.5" noValidate>
           <Input
             id="contactName"
             name="contactName"
@@ -245,7 +218,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
 
           {/* Método preferido */}
           <div>
-            <label htmlFor="preferredContactMethod" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="preferredContactMethod" className="block text-xs font-medium text-gray-700 mb-1">
               Prefieres que te contacten por
             </label>
             <select
@@ -253,7 +226,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
               name="preferredContactMethod"
               value={formData.preferredContactMethod}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-700 bg-gray-50"
+              className="w-full px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm text-gray-700 bg-gray-50"
             >
               <option value="EMAIL">Email</option>
               <option value="PHONE">Teléfono</option>
@@ -264,7 +237,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
           {/* Unidad de interés */}
           {units.length > 0 && (
             <div>
-              <label htmlFor="selectedUnitId" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="selectedUnitId" className="block text-xs font-medium text-gray-700 mb-1">
                 Unidad de interés (opcional)
               </label>
               <select
@@ -272,7 +245,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
                 name="selectedUnitId"
                 value={formData.selectedUnitId}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-700 bg-gray-50"
+                className="w-full px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm text-gray-700 bg-gray-50"
               >
                 <option value="">Selecciona una unidad</option>
                 {units.filter(u => u.status === 'AVAILABLE').map((unit) => (
@@ -286,7 +259,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
 
           {/* Mensaje */}
           <div>
-            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="message" className="block text-xs font-medium text-gray-700 mb-1">
               Mensaje
             </label>
             <textarea
@@ -294,8 +267,8 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
               name="message"
               value={formData.message}
               onChange={handleChange}
-              rows={4}
-              className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none text-gray-700 placeholder:text-gray-400 ${
+              rows={3}
+              className={`w-full px-3 py-2 rounded-xl border transition-all duration-200 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 ${
                 errors.message
                   ? 'border-red-500 focus:ring-2 focus:ring-red-500 bg-red-50'
                   : 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50'
@@ -303,8 +276,8 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
               placeholder="Hola, me interesa este proyecto..."
             />
             {errors.message && (
-              <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
                 {errors.message}
@@ -315,7 +288,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-blue-600 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? 'Enviando...' : 'Enviar mensaje'}
           </button>
@@ -323,14 +296,14 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
 
         {/* WhatsApp Button */}
         {project.developer?.phone && (
-          <div className="px-5 pb-5">
+          <div className="px-4 pb-4">
             <button
               type="button"
               onClick={handleWhatsApp}
               disabled={isLoading}
-              className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-green-500 hover:bg-green-600 text-white py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                 <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L.057 23.882l6.162-1.616A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.878 9.878 0 01-5.031-1.378l-.361-.214-3.741.981.998-3.648-.235-.374A9.859 9.859 0 012.106 12C2.106 6.579 6.579 2.106 12 2.106S21.894 6.579 21.894 12 17.421 21.894 12 21.894z"/>
               </svg>

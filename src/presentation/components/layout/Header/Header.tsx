@@ -208,7 +208,8 @@ export function Header() {
               <img
                 src="/assets/images/logo.png"
                 alt="TIYUY"
-                className="h-50 w-auto"
+                className="w-auto object-contain bg-transparent"
+                style={{ height: 'clamp(80px, 5vw, 64px)', maxWidth: '260px' }}
               />
             </Link>
 
