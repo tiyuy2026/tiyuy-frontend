@@ -1,44 +1,20 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import Link from 'next/link';
 import { PropertyCard } from '../PropertyCard/PropertyCard';
-import { PropertySummary } from '@/core/domain/entities/Property';
-import { PropertyRepository } from '@/infrastructure/repositories/PropertyRepository';
+import { useFeaturedProperties } from '@/presentation/hooks/useFeaturedProperties';
 
 interface FeaturedPropertiesProps {
   hideViewAll?: boolean;
 }
 
 export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesProps = {}) {
-  const [properties, setProperties] = useState<PropertySummary[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isRecommended, setIsRecommended] = useState(false);
+  const { data: properties = [], isLoading, error } = useFeaturedProperties();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-  
-  // Crear instancia del repositorio
-  const propertyRepo = new PropertyRepository();
 
-  const updateScrollState = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(Math.ceil(scrollLeft + clientWidth) < scrollWidth);
-    }
-  };
-
-  useEffect(() => {
-    const timeoutId = setTimeout(updateScrollState, 100);
-    window.addEventListener('resize', updateScrollState);
-    return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener('resize', updateScrollState);
-    };
-  }, [properties]);
+  const canScrollLeft = false;
+  const canScrollRight = true;
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -51,44 +27,6 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
       scrollContainerRef.current.scrollBy({ left: scrollContainerRef.current.clientWidth, behavior: 'smooth' });
     }
   };
-
-  useEffect(() => {
-    const loadProperties = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        // Usar el nuevo endpoint optimizado /featured/mix
-        // Devuelve hasta 10 propiedades con mezcla balanceada por tipo
-        const mixProps = await propertyRepo.getFeaturedMix();
-        
-        if (mixProps.length > 0) {
-          setProperties(mixProps.slice(0, 10));
-          setIsRecommended(true);
-          return;
-        }
-        
-        // Si no hay destacadas, obtener las más recientes (máximo 10)
-        const recentResult = await propertyRepo.search({
-          transactionType: 'SALE' as any,
-          page: 0,
-          size: 10,
-          sort: 'createdAt,desc',
-        } as any);
-        const recentProps = recentResult.properties || [];
-        setProperties(recentProps.slice(0, 10));
-        setIsRecommended(false);
-      } catch (error) {
-        console.error('Error loading featured properties:', error);
-        setError('No se pudieron cargar las propiedades');
-        setProperties([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadProperties();
-  }, []);
 
   if (isLoading) {
     return (
@@ -123,9 +61,9 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
           Error al cargar propiedades
         </h3>
         <p className="text-gray-600 text-lg mb-6 max-w-md mx-auto">
-          {error}
+          {error instanceof Error ? error.message : 'No se pudieron cargar las propiedades'}
         </p>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
         >
@@ -136,25 +74,13 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
   }
 
   if (properties.length === 0) {
-    if (isRecommended) {
-      return (
-        <div className="text-center py-20 bg-gradient-to-br from-amber-50 to-orange-100 rounded-2xl">
-          <h3 className="text-2xl font-bold text-gray-800 mb-3">
-            No tenemos recomendaciones disponibles
-          </h3>
-          <p className="text-gray-600 text-lg mb-6 max-w-md mx-auto">
-            No encontramos propiedades similares a tu búsqueda. Intenta con otros criterios o vuelve más tarde.
-          </p>
-        </div>
-      );
-    }
     return (
       <div className="text-center py-20 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl">
         <h3 className="text-2xl font-bold text-gray-800 mb-3">
           No hay propiedades disponibles
         </h3>
         <p className="text-gray-600 text-lg mb-6 max-w-md mx-auto">
-          Sé el primero en publicar una propiedad o vuelve más tarde para descubrir nuevas oportunidades
+          Se el primero en publicar una propiedad o vuelve mas tarde para descubrir nuevas oportunidades
         </p>
       </div>
     );
@@ -170,7 +96,7 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
-        
+
         .carousel-card {
           width: 85vw;
         }
@@ -193,17 +119,13 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
           .carousel-card { width: calc((100% - 6 * 24px) / 7); }
         }
       `}</style>
-      
+
       <div className="w-full max-w-[1920px] mx-auto px-8 xl:px-16">
-        
+
         {/* Header and Navigation Controls */}
         <div className="flex justify-between items-end mb-4 pr-4">
           <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-            {isRecommended ? (
-              <>Más recomendaciones para ti</>
-            ) : (
-              <>Alojamientos populares</>
-            )}
+            Alojamientos populares
             <Link href="/properties" className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors ml-1">
               <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </Link>
@@ -234,9 +156,8 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
         </div>
 
         {/* Horizontal scroll container */}
-        <div 
-          ref={scrollContainerRef} 
-          onScroll={updateScrollState}
+        <div
+          ref={scrollContainerRef}
           className="flex overflow-x-auto gap-4 sm:gap-5 md:gap-6 hide-scrollbar snap-x snap-mandatory scroll-smooth pb-4"
         >
           {properties.map((property) => (
@@ -244,7 +165,7 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
               <PropertyCard property={property} />
             </div>
           ))}
-          
+
           {/* Tarjeta de Ver Todos al final */}
           <div className="carousel-card flex-shrink-0 snap-start">
               <Link href="/properties" className="flex flex-col items-center justify-center h-full min-h-[320px] w-full bg-white hover:bg-gray-50 rounded-2xl border border-gray-200 transition-all hover:shadow-md group">

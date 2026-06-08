@@ -27,11 +27,9 @@ async function getServiceWorkerRegistration(): Promise<ServiceWorkerRegistration
   }
   
   try {
-    // Check if already registered
     const existing = await navigator.serviceWorker.getRegistration('/sw.js');
     if (existing) return existing;
     
-    // Register new
     const registration = await navigator.serviceWorker.register('/sw.js');
     console.log('[Push] Service Worker registered:', registration);
     return registration;
@@ -46,10 +44,8 @@ async function subscribeToPush(): Promise<PushSubscription | null> {
   const registration = await getServiceWorkerRegistration();
   if (!registration) return null;
   
-  // Wait for service worker to be ready
   await navigator.serviceWorker.ready;
   
-  // VAPID public key for Tiyuy
   const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || 
     'BI1_F5Kp6a5z8m2rA8FhM1YV1uxpKNuoa3McI5qFs70iZfNdfUkwnbIM0MWacP56qIqtP0JtwlUsJPnRD7xCcS0';
   
@@ -102,14 +98,11 @@ export function PushNotificationToggle({ className = '' }: PushNotificationToggl
   const { data: pushStatus } = usePushStatus();
   
   useEffect(() => {
-    // Check if push is supported
     const supported = 'serviceWorker' in navigator && 'PushManager' in window;
     setIsSupported(supported);
     
     if (supported) {
       setPermission(Notification.permission);
-      
-      // Check existing subscription
       checkSubscription();
     }
   }, []);
@@ -132,16 +125,13 @@ export function PushNotificationToggle({ className = '' }: PushNotificationToggl
     setIsLoading(true);
     
     try {
-      // Request permission first
       const result = await Notification.requestPermission();
       setPermission(result);
       
       if (result !== 'granted') {
-        alert('Necesitas permitir las notificaciones para recibir alertas push');
         return;
       }
       
-      // Subscribe
       const subscription = await subscribeToPush();
       if (subscription) {
         await subscribeMutation.mutateAsync(subscription);
@@ -149,7 +139,6 @@ export function PushNotificationToggle({ className = '' }: PushNotificationToggl
       }
     } catch (error) {
       console.error('Failed to subscribe:', error);
-      alert('Error al suscribirse a notificaciones push');
     } finally {
       setIsLoading(false);
     }
@@ -161,7 +150,6 @@ export function PushNotificationToggle({ className = '' }: PushNotificationToggl
     try {
       const success = await unsubscribeFromPush();
       if (success) {
-        // Get the endpoint to send to backend
         const registration = await navigator.serviceWorker.getRegistration('/sw.js');
         const subscription = await registration?.pushManager.getSubscription();
         if (subscription) {
@@ -179,67 +167,84 @@ export function PushNotificationToggle({ className = '' }: PushNotificationToggl
   // Not supported
   if (!isSupported) {
     return (
-      <div className={`text-sm text-gray-500 ${className}`}>
-        Tu navegador no soporta notificaciones push
+      <div className={`text-xs text-slate-400 ${className}`}>
+        No soportado
       </div>
     );
   }
   
-  // Permission denied
+  // Permission denied - Chrome bloqueó permanentemente
   if (permission === 'denied') {
     return (
-      <div className={`text-sm text-red-500 ${className}`}>
-        Has bloqueado las notificaciones. Actívalas en la configuración de tu navegador.
+      <div className={`flex flex-col gap-2 ${className}`}>
+        <div className="flex items-center gap-2">
+          <BellOff className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+          <span className="text-xs text-red-600 font-medium">Notificaciones bloqueadas por Chrome</span>
+        </div>
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+          <p className="text-xs text-amber-800 font-medium mb-2">Para activar las notificaciones:</p>
+          <ol className="text-xs text-amber-700 space-y-1.5 list-decimal list-inside">
+            <li>Haz clic en el <strong>icono del candado 🔒</strong> (o <strong>i</strong>) junto a la URL</li>
+            <li>Ve a <strong>Configuración del sitio</strong> o <strong>Permisos</strong></li>
+            <li>Busca <strong>Notificaciones</strong> y cámbialo a <strong>Permitir</strong></li>
+            <li>Recarga la página y haz clic en <strong>Activar</strong></li>
+          </ol>
+        </div>
+        <button
+          onClick={async () => {
+            setIsLoading(true);
+            try {
+              const result = await Notification.requestPermission();
+              setPermission(result);
+              if (result === 'granted') {
+                const subscription = await subscribeToPush();
+                if (subscription) {
+                  await subscribeMutation.mutateAsync(subscription);
+                  setIsSubscribed(true);
+                }
+              }
+            } catch (error) {
+              console.error('Failed to request permission:', error);
+            } finally {
+              setIsLoading(false);
+            }
+          }}
+          disabled={isLoading}
+          className="flex items-center justify-center gap-1.5 px-3 py-2 bg-red-500 text-white hover:bg-red-600 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 w-full"
+        >
+          {isLoading ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <BellOff className="w-3.5 h-3.5" />
+          )}
+          {isLoading ? 'Verificando...' : 'Reintentar después de cambiar'}
+        </button>
       </div>
     );
   }
-  
+
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      <div className="flex items-center gap-2">
-        {isSubscribed ? (
-          <div className="flex items-center gap-2 text-green-600">
-            <Bell className="w-5 h-5" />
-            <span className="text-sm font-medium">Notificaciones activadas</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 text-gray-500">
-            <BellOff className="w-5 h-5" />
-            <span className="text-sm">Notificaciones desactivadas</span>
-          </div>
-        )}
-      </div>
-      
-      <button
-        onClick={isSubscribed ? handleUnsubscribe : handleSubscribe}
-        disabled={isLoading || subscribeMutation.isPending || unsubscribeMutation.isPending}
-        className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 ${
-          isSubscribed
-            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            : 'bg-blue-600 text-white hover:bg-blue-700'
-        } disabled:opacity-50 disabled:cursor-not-allowed`}
-      >
-        {isLoading || subscribeMutation.isPending || unsubscribeMutation.isPending ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            {isSubscribed ? 'Desactivando...' : 'Activando...'}
-          </>
-        ) : (
-          <>
-            {isSubscribed ? (
-              <>
-                <BellOff className="w-4 h-4" />
-                Desactivar
-              </>
-            ) : (
-              <>
-                <Bell className="w-4 h-4" />
-                Activar notificaciones
-              </>
-            )}
-          </>
-        )}
-      </button>
-    </div>
+    <button
+      onClick={isSubscribed ? handleUnsubscribe : handleSubscribe}
+      disabled={isLoading || subscribeMutation.isPending || unsubscribeMutation.isPending}
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 ${
+        isSubscribed
+          ? 'bg-green-50 text-green-700 hover:bg-green-100'
+          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+      } ${className}`}
+    >
+      {isLoading || subscribeMutation.isPending || unsubscribeMutation.isPending ? (
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+      ) : isSubscribed ? (
+        <Bell className="w-3.5 h-3.5" />
+      ) : (
+        <BellOff className="w-3.5 h-3.5" />
+      )}
+      {isLoading || subscribeMutation.isPending || unsubscribeMutation.isPending
+        ? '...'
+        : isSubscribed
+          ? 'Push ON'
+          : 'Push OFF'}
+    </button>
   );
 }

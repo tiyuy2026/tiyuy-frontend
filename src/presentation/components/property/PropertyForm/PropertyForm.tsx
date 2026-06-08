@@ -85,7 +85,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
     return (publishedPropertiesCount + publishedProjectsCount) < 1;
   }, [activeSubscription, publishedPropertiesCount, publishedProjectsCount]);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<any>({
     // Existing properties (only if property form)
     type: property?.type || 'APARTMENT',
     transactionType: (property && 'transactionType' in property) ? property.transactionType : 'SALE',
@@ -156,7 +156,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
   };
 
   const handleChange = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
     setValidationErrors((prev) => ({ ...prev, [field]: '' }));
   };
 
@@ -201,7 +201,8 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       }
 
       if (step === 3) {
-        const hasUnits = (formData.units?.length || 0) > 0 || (formData.unitGroups?.length || 0) > 0;
+        const fd = formData as any;
+        const hasUnits = (fd.units?.length || 0) > 0 || (fd.unitGroups?.length || 0) > 0;
         if (!hasUnits) {
           errors.units = 'Agrega al menos una unidad o grupo de unidades';
         }

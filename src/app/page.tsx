@@ -54,9 +54,9 @@ function intercalateImages(staticImages: string[], bannerImages: string[]): stri
 
 export default function HomePage() {
   // Cargar banners públicos con displayMode INTEGRATED para mezclar con imágenes estáticas
-  const { banners: sliderBanners } = usePublicBanners('SLIDER');
-  const { banners: mainBanners } = usePublicBanners('HOME_MAIN');
-  const { banners: homeBanners } = usePublicBanners('HOME_BANNER');
+  const { data: sliderBanners = [] } = usePublicBanners('SLIDER');
+  const { data: mainBanners = [] } = usePublicBanners('HOME_MAIN');
+  const { data: homeBanners = [] } = usePublicBanners('HOME_BANNER');
   
   // Unir todos los banners encontrados
   const allBanners = [...sliderBanners, ...mainBanners, ...homeBanners];

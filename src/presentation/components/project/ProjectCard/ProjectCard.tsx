@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { BadgeCheck, Clock, AlertCircle, Star, MessageCircle } from 'lucide-react';
 import type { Project, ProjectSummary } from '@/core/domain/entities/Project';
+import { LazyImage } from '@/presentation/components/ui/LazyImage/LazyImage';
 
 interface ProjectCardProps {
   project: Project | ProjectSummary;
@@ -81,16 +82,10 @@ export function ProjectCard({ project }: ProjectCardProps) {
       {/* Imagen */}
       <Link href={`/projects/${getProjectSlug(project)}`} className="relative w-full aspect-square rounded-xl overflow-hidden mb-3">
         {project.coverImageUrl ? (
-          <img
+          <LazyImage
             src={`/api/images/proxy?url=${encodeURIComponent(project.coverImageUrl)}`}
             alt={project.name || ''}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={(e) => {
-              console.error('Error loading cover image:', project.coverImageUrl);
-              e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
-              e.currentTarget.parentElement!.innerHTML = '<span class="text-6xl">🏗️</span>';
-            }}
+            className="w-full h-full group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-100">

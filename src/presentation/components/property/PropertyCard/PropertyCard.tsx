@@ -2,10 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Heart, MapPin, Maximize, BedDouble, Bath, BadgeCheck, Star, AlertCircle, Clock, MessageCircle } from 'lucide-react';
+import { BadgeCheck, Star, AlertCircle, Clock, MessageCircle } from 'lucide-react';
 import type { Property, PropertySummary } from '@/core/domain/entities/Property';
 import { FavoriteButton } from '@/presentation/components/shared/FavoriteButton';
+import { LazyImage } from '@/presentation/components/ui/LazyImage/LazyImage';
 
 interface PropertyCardProps {
   property: Property | PropertySummary;
@@ -88,16 +88,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
       {/* Imagen */}
       <Link href={`/property/${getPropertySlug(property)}`} className="relative w-full aspect-square rounded-xl overflow-hidden mb-3">
         {property.coverPhotoUrl ? (
-          <img
+          <LazyImage
             src={`/api/images/proxy?url=${encodeURIComponent(property.coverPhotoUrl)}`}
             alt={property.title || ''}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={(e) => {
-              console.error('Error loading cover image:', property.coverPhotoUrl);
-              e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
-              e.currentTarget.parentElement!.innerHTML = '<span class="text-6xl">🏠</span>';
-            }}
+            className="w-full h-full group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-100">

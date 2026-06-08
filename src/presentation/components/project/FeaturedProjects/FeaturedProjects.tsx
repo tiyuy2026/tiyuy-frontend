@@ -1,30 +1,206 @@
 'use client';
 
-import { FeaturedItems } from '@/presentation/components/shared/FeaturedItems/FeaturedItems';
-import { ProjectRepository } from '@/infrastructure/repositories/ProjectRepository';
+import { useRef } from 'react';
+import Link from 'next/link';
 import { ProjectCard } from '../ProjectCard/ProjectCard';
-import { ProjectSummary } from '@/core/domain/entities/Project';
-
-// Wrapper component to adapt props from FeaturedItems format to ProjectCard format
-const ProjectCardWrapper = ({ item }: { item: ProjectSummary }) => (
-  <ProjectCard project={item} />
-);
+import { useFeaturedProjects } from '@/presentation/hooks/useFeaturedProjects';
 
 export function FeaturedProjects() {
-  const projectRepo = new ProjectRepository();
+  const { data: items = [], isLoading, error } = useFeaturedProjects();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const canScrollLeft = false;
+  const canScrollRight = true;
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -scrollContainerRef.current.clientWidth, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: scrollContainerRef.current.clientWidth, behavior: 'smooth' });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="relative">
+        <div className="flex overflow-x-auto scrollbar-hide">
+          <div className="flex-1 min-w-0" />
+          <div className="flex gap-4 sm:gap-5 md:gap-6 pb-4 px-4 flex-shrink-0">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className="w-[85vw] sm:w-[280px] md:w-[320px] lg:w-[240px] xl:w-[190px] 2xl:w-[220px] flex-shrink-0">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
+                  <div className="w-full aspect-square bg-gray-200" />
+                  <div className="p-4 space-y-3">
+                    <div className="h-4 bg-gray-200 rounded-full w-24" />
+                    <div className="h-4 bg-gray-200 rounded w-full" />
+                    <div className="h-4 bg-gray-200 rounded w-2/3" />
+                    <div className="h-5 bg-gray-200 rounded w-20 mt-2" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex-1 min-w-0" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-20 bg-gradient-to-br from-red-50 to-orange-100 rounded-2xl">
+        <div className="text-8xl mb-6">🏢</div>
+        <h3 className="text-2xl font-bold text-gray-800 mb-3">
+          Error al cargar proyectos
+        </h3>
+        <p className="text-gray-600 text-lg mb-6 max-w-md mx-auto">
+          {error instanceof Error ? error.message : 'No se pudieron cargar los proyectos'}
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+        >
+          <span>Reintentar</span>
+        </button>
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="text-center py-20 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl">
+        <div className="text-8xl mb-6">🏢</div>
+        <h3 className="text-2xl font-bold text-gray-800 mb-3">
+          No tenemos recomendaciones disponibles
+        </h3>
+        <p className="text-gray-600 text-lg mb-6 max-w-md mx-auto">
+          Se el primero en destacar un proyecto o vuelve mas tarde para descubrir nuevas oportunidades
+        </p>
+        <div className="flex gap-4 justify-center">
+          <Link
+            href="/my-projects/new"
+            className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          >
+            <span>Crear Proyecto</span>
+            <span>🏢</span>
+          </Link>
+          <Link
+            href="/projects"
+            className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+          >
+            <span>Explorar proyectos</span>
+            <span>🔍</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <FeaturedItems
-      repository={projectRepo}
-      ItemCard={ProjectCardWrapper}
-      itemName="proyecto"
-      emptyMessage="No tenemos recomendaciones disponibles"
-      emptyIcon="🏢"
-      emptyAction={{
-        text: "Crear Proyecto",
-        href: "/my-projects/new",
-        icon: "🏢"
-      }}
-    />
+    <div className="w-full">
+      <style>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+
+        .carousel-card {
+          width: 85vw;
+        }
+        @media (min-width: 640px) {
+          .carousel-card { width: calc((100% - 20px) / 2); }
+        }
+        @media (min-width: 768px) {
+          .carousel-card { width: calc((100% - 2 * 24px) / 3); }
+        }
+        @media (min-width: 1024px) {
+          .carousel-card { width: calc((100% - 3 * 24px) / 4); }
+        }
+        @media (min-width: 1280px) {
+          .carousel-card { width: calc((100% - 4 * 24px) / 5); }
+        }
+        @media (min-width: 1536px) {
+          .carousel-card { width: calc((100% - 5 * 24px) / 6); }
+        }
+        @media (min-width: 1800px) {
+          .carousel-card { width: calc((100% - 6 * 24px) / 7); }
+        }
+      `}</style>
+
+      <div className="w-full max-w-[1920px] mx-auto px-8 xl:px-16">
+
+        {/* Header and Navigation Controls */}
+        <div className="flex justify-between items-end mb-4 pr-4">
+          <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2 capitalize">
+            Proyectos destacados
+            <Link href="/projects" className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors ml-1">
+              <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </Link>
+          </h2>
+
+          <div className="flex gap-2">
+            <button
+              onClick={scrollLeft}
+              disabled={!canScrollLeft}
+              className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:shadow-md transition-all bg-white text-gray-600 hover:text-gray-900 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+              aria-label="Scroll izquierda"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={scrollRight}
+              disabled={!canScrollRight}
+              className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:shadow-md transition-all bg-white text-gray-600 hover:text-gray-900 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+              aria-label="Scroll derecha"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Horizontal scroll container */}
+        <div
+          ref={scrollContainerRef}
+          className="flex overflow-x-auto gap-4 sm:gap-5 md:gap-6 hide-scrollbar snap-x snap-mandatory scroll-smooth pb-4"
+        >
+          {items.map((item: any) => (
+            <div key={item.id} className="carousel-card flex-shrink-0 snap-start">
+              <ProjectCard project={item} />
+            </div>
+          ))}
+
+          {/* Tarjeta de Ver Todos al final */}
+          <div className="carousel-card flex-shrink-0 snap-start">
+            <Link href="/projects" className="flex flex-col items-center justify-center h-full min-h-[320px] w-full bg-white hover:bg-gray-50 rounded-2xl border border-gray-200 transition-all hover:shadow-md group">
+              <div className="relative w-32 h-24 mb-6 group-hover:scale-105 transition-transform duration-300">
+                <div className="absolute top-0 left-0 w-20 h-20 bg-gray-200 rounded-xl border-2 border-white shadow-sm -rotate-6 transform origin-bottom-left z-10 overflow-hidden">
+                  <div className="w-full h-full bg-blue-100/50"></div>
+                </div>
+                <div className="absolute top-2 right-0 w-20 h-20 bg-gray-200 rounded-xl border-2 border-white shadow-sm rotate-6 transform origin-bottom-right z-20 overflow-hidden">
+                  <div className="w-full h-full bg-green-100/50"></div>
+                </div>
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-20 h-20 bg-gray-100 rounded-xl border-2 border-white shadow-md z-30 overflow-hidden">
+                  <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  </div>
+                </div>
+              </div>
+              <span className="text-[#003B95] font-semibold text-lg group-hover:text-blue-800 transition-colors">Ver todo</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

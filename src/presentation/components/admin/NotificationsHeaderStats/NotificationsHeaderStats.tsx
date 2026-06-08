@@ -1,18 +1,17 @@
 /**
  * Notifications Header Stats Component
- * Muestra las 4 tarjetas de estadísticas en el header
+ * Muestra los tabs de navegación para la página de notificaciones
  */
 
 interface NotificationsHeaderStatsProps {
-  activeTab: 'send' | 'history' | 'stats';
-  onTabChange: (tab: 'send' | 'history' | 'stats') => void;
+  activeTab: 'send' | 'history';
+  onTabChange: (tab: 'send' | 'history') => void;
 }
 
 export function NotificationsHeaderStats({ activeTab, onTabChange }: NotificationsHeaderStatsProps) {
   const tabs = [
-    { id: 'send' as const, label: 'Enviar Notificación' },
-    { id: 'history' as const, label: 'Historial y Alertas' },
-    { id: 'stats' as const, label: 'Estadísticas' }
+    { id: 'send' as const, label: 'Notificaciones' },
+    { id: 'history' as const, label: 'Alertas e Historial' }
   ];
 
   return (
