@@ -1,7 +1,53 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
+
+const termsData = {
+  lastUpdated: "3 de junio de 2025",
+  intro: {
+    highlight: "Bienvenido a Tiyuy. Estos Términos de Servicio (\"Términos\") constituyen un acuerdo legal entre tú (\"Usuario\", \"tu\" o \"tus\") y Tiyuy (\"nosotros\", \"nuestro\" o \"la Plataforma\") que regula el acceso y uso de nuestros servicios.",
+    paragraphs: [
+      "Al registrarte, acceder o utilizar cualquier servicio de Tiyuy, declaras que has leído, comprendido y aceptas estar sujeto a estos Términos y a nuestra Política de Privacidad. Si no aceptas estos términos, no debes utilizar la Plataforma.",
+      "Nos reservamos el derecho de actualizar estos Términos en cualquier momento. Los cambios entrarán en vigor desde su publicación. El uso continuado de la Plataforma después de modificaciones constituye aceptación de los nuevos Términos."
+    ]
+  },
+  services: [
+    { icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', title: 'Publicación de inmuebles', desc: 'Permite a propietarios, agentes e inmobiliarias publicar propiedades en venta o alquiler' },
+    { icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z', title: 'Búsqueda y descubrimiento', desc: 'Herramientas avanzadas de búsqueda, filtros y geolocalización para encontrar inmuebles' },
+    { icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', title: 'Comunicación entre usuarios', desc: 'Sistema de mensajería para conectar interesados con publicantes de forma segura' },
+    { icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', title: 'Herramientas de gestión', desc: 'Panel de administración para gestionar propiedades, contactos y estadísticas' },
+    { icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', title: 'Planes y suscripciones', desc: 'Servicios premium con funcionalidades avanzadas para profesionales del sector' },
+    { icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z', title: 'Mapas y ubicación', desc: 'Integración con servicios de mapas para mostrar ubicaciones de propiedades' }
+  ],
+  requirements: [
+    "Ser mayor de 18 años",
+    "Proporcionar información veraz, exacta y actualizada",
+    "Contar con un correo electrónico válido",
+    "Completar el proceso de verificación de identidad cuando sea requerido"
+  ],
+  accountTypes: [
+    { name: 'Usuario', desc: 'Busca propiedades y contacta publicantes' },
+    { name: 'Agente', desc: 'Publica propiedades y gestiona clientes' },
+    { name: 'Inmobiliaria', desc: 'Gestión avanzada con equipo de trabajo' }
+  ],
+  prohibitedContent: [
+    'Información falsa o engañosa',
+    'Precios inflados o ficticios',
+    'Fotografías de propiedades ajenas',
+    'Datos de contacto en descripciones',
+    'Lenguaje discriminatorio u ofensivo',
+    'Spam o publicidad no solicitada',
+    'Propiedades inexistentes',
+    'Contenido ilegal o fraudulento'
+  ],
+  badConduct: [
+    { title: 'Uso no autorizado', desc: 'Acceder, manipular o intentar acceder a sistemas, servidores o datos de Tiyuy sin autorización.' },
+    { title: 'Suplantación de identidad', desc: 'Crear cuentas con información falsa o hacerse pasar por otra persona o entidad.' },
+    { title: 'Actividades automatizadas', desc: 'Utilizar bots, scrapers o herramientas automatizadas para extraer datos de la Plataforma sin autorización.' },
+    { title: 'Interferencia con el servicio', desc: 'Realizar acciones que interrumpan, dañen o sobrecargen la infraestructura de Tiyuy.' },
+    { title: 'Distribución de malware', desc: 'Transmitir virus, gusanos, troyanos o cualquier código malicioso a través de la Plataforma.' }
+  ]
+};
 
 const SECTIONS = [
   { id: 'intro', title: 'Introducción' },
@@ -18,51 +64,41 @@ const SECTIONS = [
   { id: 'contact', title: 'Contacto' },
 ];
 
+const SectionHeader = ({ num, title }: { num: number; title: string }) => (
+  <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
+    <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">
+      {num}
+    </span>
+    {title}
+  </h2>
+);
+
 export default function TermsPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <img src="/assets/images/logo.png" alt="Tiyuy" className="h-8 w-auto" />
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/privacy"
-              className="text-sm text-gray-600 hover:text-gray-900 transition-colors hidden sm:block"
-            >
-              Política de Privacidad
-            </Link>
-            <Link
-              href="/"
-              className="text-sm font-medium px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
-            >
-              Volver al inicio
-            </Link>
-          </div>
-        </div>
-      </header>
-
       {/* Hero */}
-      <div className="bg-gradient-to-br from-green-50 via-white to-emerald-50 border-b border-gray-100">
+      <div className="bg-gradient-to-br from-[var(--brand-primary)]/5 via-transparent to-[var(--brand-primary)]/[0.02] border-b border-[var(--border-light)] transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 mb-4">
-              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[var(--brand-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <span className="text-sm font-semibold text-green-600 uppercase tracking-wider">Términos de Servicio</span>
+              <span className="text-sm font-bold text-[var(--brand-primary)] uppercase tracking-wider">
+                Términos de Servicio
+              </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight mb-4">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--text-primary)] tracking-tight mb-4">
               Términos y condiciones de uso
             </h1>
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-lg text-[var(--text-secondary)] leading-relaxed font-medium">
               Estos términos establecen las reglas y condiciones bajo las cuales puedes utilizar la plataforma Tiyuy. Al acceder a nuestros servicios, aceptas cumplir con estos términos.
             </p>
-            <p className="text-sm text-gray-400 mt-4">Última actualización: 3 de junio de 2025</p>
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)]/60 mt-6 font-medium tracking-wide">
+              Última actualización: {termsData.lastUpdated}
+            </p>
           </div>
         </div>
       </div>
@@ -70,12 +106,11 @@ export default function TermsPage() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="flex gap-8 lg:gap-12">
+          
           {/* Sidebar Navigation - Desktop */}
           <aside className="hidden lg:block w-64 flex-shrink-0">
             <nav className="sticky top-24 space-y-1">
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4 px-3">
-                Contenido
-              </p>
+              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4 px-3">Contenido</p>
               {SECTIONS.map((section) => (
                 <a
                   key={section.id}
@@ -107,10 +142,7 @@ export default function TermsPage() {
           {/* Mobile Nav Overlay */}
           {mobileMenuOpen && (
             <div className="lg:hidden fixed inset-0 z-30 bg-black/30" onClick={() => setMobileMenuOpen(false)}>
-              <div
-                className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-xl p-6 overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
+              <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-xl p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between mb-6">
                   <p className="text-sm font-bold text-gray-900">Contenido</p>
                   <button onClick={() => setMobileMenuOpen(false)} className="text-gray-400 hover:text-gray-600">
@@ -139,44 +171,27 @@ export default function TermsPage() {
           <main className="flex-1 min-w-0 max-w-4xl">
             <div className="prose prose-lg max-w-none">
 
-              {/* Introducción */}
+              {/* 1. Introducción */}
               <section id="intro" className="mb-12 scroll-mt-24">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">1</span>
-                  Introducción
-                </h2>
+                <SectionHeader num={1} title="Introducción" />
                 <div className="bg-green-50 border border-green-100 rounded-xl p-5 mb-6">
                   <p className="text-gray-700 leading-relaxed">
-                    Bienvenido a <strong>Tiyuy</strong>. Estos Términos de Servicio (&quot;Términos&quot;) constituyen un acuerdo legal entre tú (&quot;Usuario&quot;, &quot;tu&quot; o &quot;tus&quot;) y Tiyuy (&quot;nosotros&quot;, &quot;nuestro&quot; o &quot;la Plataforma&quot;) que regula el acceso y uso de nuestros servicios.
+                    {termsData.intro.highlight}
                   </p>
                 </div>
-                <p className="text-gray-600 leading-relaxed mb-4">
-                  Al registrarte, acceder o utilizar cualquier servicio de Tiyuy, declaras que has leído, comprendido y aceptas estar sujeto a estos Términos y a nuestra Política de Privacidad. Si no aceptas estos términos, no debes utilizar la Plataforma.
-                </p>
-                <p className="text-gray-600 leading-relaxed">
-                  Nos reservamos el derecho de actualizar estos Términos en cualquier momento. Los cambios entrarán en vigor desde su publicación. El uso continuado de la Plataforma después de modificaciones constituye aceptación de los nuevos Términos.
-                </p>
+                {termsData.intro.paragraphs.map((para, i) => (
+                  <p key={i} className="text-gray-600 leading-relaxed mb-4">{para}</p>
+                ))}
               </section>
 
-              {/* Servicios */}
+              {/* 2. Servicios */}
               <section id="services" className="mb-12 scroll-mt-24">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">2</span>
-                  Descripción de los servicios
-                </h2>
+                <SectionHeader num={2} title="Descripción de los servicios" />
                 <p className="text-gray-600 leading-relaxed mb-6">
                   Tiyuy es una plataforma digital que ofrece los siguientes servicios:
                 </p>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {[
-                    { icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', title: 'Publicación de inmuebles', desc: 'Permite a propietarios, agentes e inmobiliarias publicar propiedades en venta o alquiler' },
-                    { icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z', title: 'Búsqueda y descubrimiento', desc: 'Herramientas avanzadas de búsqueda, filtros y geolocalización para encontrar inmuebles' },
-                    { icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', title: 'Comunicación entre usuarios', desc: 'Sistema de mensajería para conectar interesados con publicantes de forma segura' },
-                    { icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', title: 'Herramientas de gestión', desc: 'Panel de administración para gestionar propiedades, contactos y estadísticas' },
-                    { icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', title: 'Planes y suscripciones', desc: 'Servicios premium con funcionalidades avanzadas para profesionales del sector' },
-                    { icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z', title: 'Mapas y ubicación', desc: 'Integración con servicios de mapas para mostrar ubicaciones de propiedades' },
-                  ].map((item, i) => (
+                  {termsData.services.map((item, i) => (
                     <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 hover:border-green-200 transition-colors">
                       <svg className="w-5 h-5 text-green-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
@@ -188,33 +203,19 @@ export default function TermsPage() {
                 </div>
               </section>
 
-              {/* Cuentas */}
+              {/* 3. Cuentas */}
               <section id="accounts" className="mb-12 scroll-mt-24">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">3</span>
-                  Registro y cuentas de usuario
-                </h2>
-
+                <SectionHeader num={3} title="Registro y cuentas de usuario" />
                 <div className="space-y-4">
                   <div className="bg-white border border-gray-200 rounded-xl p-5">
                     <h3 className="font-semibold text-gray-900 mb-3">3.1 Requisitos de registro</h3>
                     <ul className="space-y-2 text-sm text-gray-600">
-                      <li className="flex items-start gap-2">
-                        <span className="text-green-600 mt-0.5">✓</span>
-                        Ser mayor de 18 años
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-green-600 mt-0.5">✓</span>
-                        Proporcionar información veraz, exacta y actualizada
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-green-600 mt-0.5">✓</span>
-                        Contar con un correo electrónico válido
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-green-600 mt-0.5">✓</span>
-                        Completar el proceso de verificación de identidad cuando sea requerido
-                      </li>
+                      {termsData.requirements.map((req, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="text-green-600 mt-0.5">✓</span>
+                          {req}
+                        </li>
+                      ))}
                     </ul>
                   </div>
 
@@ -228,11 +229,7 @@ export default function TermsPage() {
                   <div className="bg-white border border-gray-200 rounded-xl p-5">
                     <h3 className="font-semibold text-gray-900 mb-3">3.3 Tipos de cuenta</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      {[
-                        { name: 'Usuario', desc: 'Busca propiedades y contacta publicantes' },
-                        { name: 'Agente', desc: 'Publica propiedades y gestiona clientes' },
-                        { name: 'Inmobiliaria', desc: 'Gestión avanzada con equipo de trabajo' },
-                      ].map((type, i) => (
+                      {termsData.accountTypes.map((type, i) => (
                         <div key={i} className="bg-green-50 border border-green-100 rounded-lg p-3">
                           <h4 className="font-semibold text-green-800 text-sm">{type.name}</h4>
                           <p className="text-xs text-green-600 mt-1">{type.desc}</p>
@@ -243,13 +240,9 @@ export default function TermsPage() {
                 </div>
               </section>
 
-              {/* Publicaciones */}
+              {/* 4. Publicaciones */}
               <section id="publications" className="mb-12 scroll-mt-24">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">4</span>
-                  Publicaciones de propiedades
-                </h2>
-
+                <SectionHeader num={4} title="Publicaciones de propiedades" />
                 <div className="space-y-4">
                   <div className="bg-white border border-gray-200 rounded-xl p-5">
                     <h3 className="font-semibold text-gray-900 mb-3">4.1 Responsabilidad del publicante</h3>
@@ -268,16 +261,7 @@ export default function TermsPage() {
                   <div className="bg-red-50 border border-red-200 rounded-xl p-5">
                     <h3 className="font-semibold text-red-800 mb-3">4.3 Contenido prohibido</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {[
-                        'Información falsa o engañosa',
-                        'Precios inflados o ficticios',
-                        'Fotografías de propiedades ajenas',
-                        'Datos de contacto en descripciones',
-                        'Lenguaje discriminatorio u ofensivo',
-                        'Spam o publicidad no solicitada',
-                        'Propiedades inexistentes',
-                        'Contenido ilegal o fraudulento',
-                      ].map((item, i) => (
+                      {termsData.prohibitedContent.map((item, i) => (
                         <div key={i} className="flex items-center gap-2 text-sm text-red-700">
                           <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -290,24 +274,14 @@ export default function TermsPage() {
                 </div>
               </section>
 
-              {/* Conducta */}
+              {/* 5. Conducta */}
               <section id="conduct" className="mb-12 scroll-mt-24">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">5</span>
-                  Conducta del usuario
-                </h2>
+                <SectionHeader num={5} title="Conducta del usuario" />
                 <p className="text-gray-600 leading-relaxed mb-6">
                   Te comprometes a utilizar la Plataforma de manera responsable y legal. Queda estrictamente prohibido:
                 </p>
-
                 <div className="space-y-3">
-                  {[
-                    { title: 'Uso no autorizado', desc: 'Acceder, manipular o intentar acceder a sistemas, servidores o datos de Tiyuy sin autorización.' },
-                    { title: 'Suplantación de identidad', desc: 'Crear cuentas con información falsa o hacerse pasar por otra persona o entidad.' },
-                    { title: 'Actividades automatizadas', desc: 'Utilizar bots, scrapers o herramientas automatizadas para extraer datos de la Plataforma sin autorización.' },
-                    { title: 'Interferencia con el servicio', desc: 'Realizar acciones que interrumpan, dañen o sobrecargen la infraestructura de Tiyuy.' },
-                    { title: 'Distribución de malware', desc: 'Transmitir virus, gusanos, troyanos o cualquier código malicioso a través de la Plataforma.' },
-                  ].map((item, i) => (
+                  {termsData.badConduct.map((item, i) => (
                     <div key={i} className="flex gap-3 bg-white border border-gray-200 rounded-xl p-4">
                       <div className="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold">
                         {i + 1}
@@ -321,13 +295,9 @@ export default function TermsPage() {
                 </div>
               </section>
 
-              {/* Pagos */}
+              {/* 6. Pagos */}
               <section id="payments" className="mb-12 scroll-mt-24">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">6</span>
-                  Pagos y suscripciones
-                </h2>
-
+                <SectionHeader num={6} title="Pagos y suscripciones" />
                 <div className="space-y-4">
                   <div className="bg-white border border-gray-200 rounded-xl p-5">
                     <h3 className="font-semibold text-gray-900 mb-3">6.1 Planes disponibles</h3>
@@ -352,13 +322,9 @@ export default function TermsPage() {
                 </div>
               </section>
 
-              {/* Propiedad intelectual */}
+              {/* 7. Propiedad intelectual */}
               <section id="ip" className="mb-12 scroll-mt-24">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">7</span>
-                  Propiedad intelectual
-                </h2>
-
+                <SectionHeader num={7} title="Propiedad intelectual" />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-white border border-gray-200 rounded-xl p-5">
                     <h3 className="font-semibold text-gray-900 mb-3">De Tiyuy</h3>
@@ -375,13 +341,9 @@ export default function TermsPage() {
                 </div>
               </section>
 
-              {/* Limitación de responsabilidad */}
+              {/* 8. Limitación de responsabilidad */}
               <section id="liability" className="mb-12 scroll-mt-24">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">8</span>
-                  Limitación de responsabilidad
-                </h2>
-
+                <SectionHeader num={8} title="Limitación de responsabilidad" />
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center flex-shrink-0">
@@ -397,19 +359,14 @@ export default function TermsPage() {
                     </div>
                   </div>
                 </div>
-
                 <p className="text-gray-600 leading-relaxed mt-6">
                   En la máxima medida permitida por la ley, Tiyuy no será responsable por daños directos, indirectos, incidentales, especiales o consecuentes derivados del uso o la imposibilidad de uso de la Plataforma, incluyendo pero no limitándose a pérdidas económicas, interrupción del negocio o pérdida de datos.
                 </p>
               </section>
 
-              {/* Terminación */}
+              {/* 9. Terminación */}
               <section id="termination" className="mb-12 scroll-mt-24">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">9</span>
-                  Terminación del servicio
-                </h2>
-
+                <SectionHeader num={9} title="Terminación del servicio" />
                 <div className="space-y-4">
                   <div className="bg-white border border-gray-200 rounded-xl p-5">
                     <h3 className="font-semibold text-gray-900 mb-3">9.1 Por el usuario</h3>
@@ -434,23 +391,17 @@ export default function TermsPage() {
                 </div>
               </section>
 
-              {/* Modificaciones */}
+              {/* 10. Modificaciones */}
               <section id="changes" className="mb-12 scroll-mt-24">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">10</span>
-                  Modificaciones de los Términos
-                </h2>
+                <SectionHeader num={10} title="Modificaciones de los Términos" />
                 <p className="text-gray-600 leading-relaxed">
                   Tiyuy puede modificar estos Términos en cualquier momento. Notificaremos a los usuarios registrados sobre cambios significativos mediante un aviso en la Plataforma o por correo electrónico. Te recomendamos revisar periódicamente esta página. El uso continuado de la Plataforma después de la publicación de modificaciones constituye tu aceptación de los nuevos Términos.
                 </p>
               </section>
 
-              {/* Legislación */}
+              {/* 11. Legislación */}
               <section id="law" className="mb-12 scroll-mt-24">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">11</span>
-                  Legislación aplicable y jurisdicción
-                </h2>
+                <SectionHeader num={11} title="Legislación aplicable y jurisdicción" />
                 <p className="text-gray-600 leading-relaxed mb-4">
                   Estos Términos se rigen por las leyes de la República del Perú. Cualquier controversia derivada de la interpretación o ejecución de estos Términos será sometida a la jurisdicción exclusiva de los jueces y tribunales de Lima, Perú.
                 </p>
@@ -461,16 +412,12 @@ export default function TermsPage() {
                 </div>
               </section>
 
-              {/* Contacto */}
+              {/* 12. Contacto */}
               <section id="contact" className="mb-12 scroll-mt-24">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">12</span>
-                  Contacto
-                </h2>
+                <SectionHeader num={12} title="Contacto" />
                 <p className="text-gray-600 leading-relaxed mb-6">
                   Si tienes preguntas sobre estos Términos de Servicio, contáctanos:
                 </p>
-
                 <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl p-6 text-white">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div>

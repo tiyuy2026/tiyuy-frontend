@@ -68,43 +68,45 @@ const SOCIAL_LINKS = [
     href: 'https://www.instagram.com/tiyuyperu/',
     icon: 'fa6-brands:instagram',
     label: 'Instagram',
+    hoverBg: 'hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:via-[#ee2a7b] hover:to-[#6228d7]',
   },
   {
     href: 'https://www.facebook.com/tiyuyperu',
     icon: 'fa6-brands:facebook',
     label: 'Facebook',
+    hoverBg: 'hover:bg-[#1877F2]',
   },
   {
     href: 'https://twitter.com/tiyuyperu',
     icon: 'fa6-brands:x-twitter',
     label: 'X (Twitter)',
+    hoverBg: 'hover:bg-[#000000]',
   },
   {
     href: 'https://www.tiktok.com/@tiyuyperu_oficial',
     icon: 'fa6-brands:tiktok',
     label: 'TikTok',
+    hoverBg: 'hover:bg-[#000000]',
   },
   {
     href: 'https://www.youtube.com/@tiyuyperu',
     icon: 'fa6-brands:youtube',
     label: 'YouTube',
+    hoverBg: 'hover:bg-[#FF0000]',
   },
   {
     href: 'https://www.linkedin.com/in/tiyuy-peru-4858863b5/',
     icon: 'fa6-brands:linkedin',
     label: 'LinkedIn',
+    hoverBg: 'hover:bg-[#0077B5]',
   },
 ];
 
 export function Footer() {
   return (
     <footer className="w-full mt-12 bg-[#1a1a1a] text-gray-300 font-sans">
-
-      {/* SECCIÓN PRINCIPAL: 4 columnas */}
       <div className="w-full px-6 xl:px-16 max-w-[1920px] mx-auto py-12 border-b border-white/10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-
-          {/* Columna 1: Inspiración */}
           <div>
             <h3 className="text-white font-semibold text-[15px] mb-5">Explorar propiedades</h3>
             {INSPIRATION_SECTIONS.map((section, i) => (
@@ -128,7 +130,6 @@ export function Footer() {
             ))}
           </div>
 
-          {/* Columnas 2, 3, 4 */}
           {FOOTER_COLUMNS.map((column, i) => (
             <div key={i}>
               <h3 className="text-white font-semibold text-[15px] mb-5">{column.title}</h3>
@@ -149,44 +150,35 @@ export function Footer() {
         </div>
       </div>
 
-      {/* SECCIÓN: Aceptamos + Redes sociales */}
       <div className="w-full px-6 xl:px-16 max-w-[1920px] mx-auto py-8 border-b border-white/10">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-
-          {/* Métodos de pago */}
           <div>
             <p className="text-white font-semibold text-[14px] mb-4">Aceptamos</p>
             <div className="flex flex-wrap items-center gap-3">
-              {/* MercadoPago */}
               <div className="flex items-center gap-1.5 bg-[#009ee3] text-white text-[12px] font-bold px-3 py-2 rounded-lg">
                 <Icon icon="simple-icons:mercadopago" width="18" height="18" />
                 <span>Mercado Pago</span>
               </div>
 
-              {/* Yape */}
               <div className="flex items-center gap-1.5 bg-[#6b21a8] text-white text-[12px] font-bold px-3 py-2 rounded-lg">
                 <Icon icon="mdi:cellphone" width="18" height="18" />
                 <span>Yape</span>
               </div>
 
-              {/* Visa */}
               <div className="bg-white rounded-lg px-3 py-2 flex items-center justify-center h-9">
                 <Icon icon="logos:visa" width="38" height="24" />
               </div>
 
-              {/* Mastercard */}
               <div className="bg-white rounded-lg px-3 py-2 flex items-center justify-center h-9">
                 <Icon icon="logos:mastercard" width="36" height="24" />
               </div>
 
-              {/* American Express */}
               <div className="bg-white rounded-lg px-3 py-2 flex items-center justify-center h-9">
                 <Icon icon="logos:amex" width="36" height="24" />
               </div>
             </div>
           </div>
 
-          {/* Redes sociales */}
           <div>
             <p className="text-white font-semibold text-[14px] mb-4">Conectar con TIYUY</p>
             <div className="flex items-center gap-3">
@@ -197,7 +189,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="size-9 rounded-full flex items-center justify-center text-gray-400 bg-white/10 hover:bg-white/20 hover:text-white transition-all duration-200"
+                  className={`size-9 rounded-full flex items-center justify-center text-gray-400 bg-white/10 hover:text-white transition-all duration-200 ${social.hoverBg}`}
                 >
                   <Icon icon={social.icon} width="17" height="17" />
                 </a>
@@ -207,16 +199,14 @@ export function Footer() {
         </div>
       </div>
 
-      {/* SECCIÓN BOTTOM: copyright + idioma + moneda */}
       <div className="w-full px-6 xl:px-16 max-w-[1920px] mx-auto py-5">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-gray-500">
-
           <div className="flex flex-wrap items-center gap-2">
             <span>© {new Date().getFullYear()} Tiyuy, Inc.</span>
             <span className="text-gray-600">·</span>
-            <Link href="/#privacidad" className="hover:text-white transition-colors">Privacidad</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacidad</Link>
             <span className="text-gray-600">·</span>
-            <Link href="/#terminos" className="hover:text-white transition-colors">Términos</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Términos</Link>
             <span className="text-gray-600">·</span>
             <Link href="/#mapa" className="hover:text-white transition-colors">Mapa del sitio</Link>
           </div>
@@ -233,7 +223,6 @@ export function Footer() {
           </div>
         </div>
       </div>
-
     </footer>
   );
 }
