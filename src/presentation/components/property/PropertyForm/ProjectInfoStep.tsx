@@ -1,5 +1,6 @@
 'use client';
 
+import { AlertTriangle } from 'lucide-react';
 import React from 'react';
 import Link from 'next/link';
 import { PROJECT_PHASES, PROJECT_PHASES_LABELS, PROJECT_TYPES, PROJECT_TYPES_LABELS, CURRENCIES } from '@/config/constants';
@@ -13,19 +14,24 @@ interface ProjectInfoStepProps {
 export function ProjectInfoStep({ formData, onChange, validationErrors }: ProjectInfoStepProps) {
   const selectedCurrency = formData.currency || 'PEN';
   const currencySymbol = CURRENCIES[selectedCurrency as keyof typeof CURRENCIES]?.symbol || 'S/';
+  
+  const AMENITY_OPTIONS = [
+    'Piscina', 'Gimnasio', 'Sauna', 'Jacuzzi', 'Sala de Juegos', 
+    'Coworking', 'Pet Friendly', 'Seguridad 24/7', 'Recepción',
+    'Área Infantil', 'BBQ', 'Terraza Panorámica'
+  ];
 
-  // Función para actualizar con logging
   const handleChangeWithLog = (field: string, value: any) => {
-    console.log(` ProjectInfoStep - Actualizando ${field}:`, value);
+    console.log(`ProjectInfoStep - Actualizando ${field}:`, value);
     onChange(field, value);
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Información del Proyecto</h3>
-        <p className="text-sm text-gray-600 mb-6">
-          Describe tu proyecto inmobiliario y especifica la fase actual
+        <h3 className="text-lg font-semibold text-gray-900 mb-1">Información del Proyecto</h3>
+        <p className="text-sm text-gray-500">
+          Describe tu proyecto inmobiliario y especifica la fase actual. Los campos con (*) son obligatorios.
         </p>
       </div>
 
@@ -38,7 +44,7 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
           <select
             value={formData.projectType || 'RESIDENTIAL'}
             onChange={(e) => handleChangeWithLog('projectType', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] bg-white outline-none"
             required
           >
             {Object.entries(PROJECT_TYPES_LABELS).map(([key, label]) => (
@@ -54,7 +60,7 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
           <select
             value={formData.phase || 'PRE_SALE'}
             onChange={(e) => handleChangeWithLog('phase', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] bg-white outline-none"
             required
           >
             {Object.entries(PROJECT_PHASES_LABELS).map(([key, label]) => (
@@ -64,8 +70,8 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
         </div>
       </div>
 
-      {/* Moneda y Rango de Precios */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Selector de Moneda */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Moneda
@@ -73,7 +79,7 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
           <select
             value={formData.currency || 'PEN'}
             onChange={(e) => handleChangeWithLog('currency', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] bg-white outline-none"
           >
             {Object.entries(CURRENCIES).map(([key, value]) => (
               <option key={key} value={key}>
@@ -83,9 +89,10 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
           </select>
         </div>
 
+        {/* Precio Desde */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Precio Desde
+            Precio Desde ({currencySymbol})
           </label>
           <input
             type="number"
@@ -94,16 +101,23 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
               const raw = e.target.value;
               handleChangeWithLog('priceFrom', raw === '' ? '' : parseFloat(raw));
             }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
             placeholder="Ej: 150000"
             min="0"
             step="0.01"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] bg-white text-gray-900 outline-none"
           />
+          {validationErrors?.priceFrom && (
+            <div className="mt-2 flex items-start gap-2 bg-red-50/50 border-l-4 border-red-500 p-2.5 rounded-r-lg text-sm text-red-700">
+              <span className="mt-0.5">⚠️</span>
+              <span className="font-medium">{validationErrors.priceFrom}</span>
+            </div>
+          )}
         </div>
 
+        {/* Precio Hasta */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Precio Hasta
+            Precio Hasta ({currencySymbol})
           </label>
           <input
             type="number"
@@ -112,36 +126,38 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
               const raw = e.target.value;
               handleChangeWithLog('priceTo', raw === '' ? '' : parseFloat(raw));
             }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
             placeholder="Ej: 300000"
             min="0"
             step="0.01"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] bg-white text-gray-900 outline-none"
           />
+          {validationErrors?.priceTo && (
+            <div className="mt-2 flex items-start gap-2 bg-red-50/50 border-l-4 border-red-500 p-2.5 rounded-r-lg text-sm text-red-700">
+              <span className="mt-0.5">⚠️</span>
+              <span className="font-medium">{validationErrors.priceTo}</span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Alerta de suscripción inteligente */}
+      {/* Alerta de suscripción */}
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0">
-            <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13 7c-1.5-1.5-5.5-1.5-7 0L4.5 15.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
+          <div className="flex-shrink-0 mt-0.5">
+            <AlertTriangle className="w-5 h-5 text-amber-600" strokeWidth={2} />
           </div>
           <div className="flex-1">
-            <h4 className="font-medium text-amber-900 mb-1">Plan Desarrollador</h4>
-            <p className="text-sm text-amber-800">
-              <strong> Primer proyecto GRATIS</strong> (30 días de prueba)
-              <br />
-              <strong> Proyectos adicionales</strong> requieren suscripción ENTERPRISE
-              <br />
+            <h4 className="font-medium text-amber-950 text-sm">Plan Desarrollador</h4>
+            <div className="text-sm text-amber-800 space-y-1 mt-0.5">
+              <p>• <strong>Primer proyecto GRATIS</strong> (30 días de prueba)</p>
+              <p>• <strong>Proyectos adicionales</strong> requieren suscripción <span className="font-semibold text-[var(--brand-primary)]">ENTERPRISE</span></p>
               <Link 
                 href="/plans"
-                className="text-amber-900 underline hover:text-amber-700 font-medium"
+                className="inline-block text-amber-950 underline hover:text-amber-700 font-semibold mt-1"
               >
                 Ver planes y precios
               </Link>
-            </p>
+            </div>
           </div>
         </div>
       </div>
@@ -155,66 +171,109 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
           type="text"
           value={formData.name || formData.projectName || ''}
           onChange={(e) => handleChangeWithLog('name', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] outline-none ${
+            validationErrors?.name ? 'border-red-300 bg-red-50/10' : 'border-gray-300'
+          }`}
           placeholder="Ej: Residencial Las Flores"
           required
         />
         {validationErrors?.name && (
-          <p className="mt-1 text-sm text-red-600">{validationErrors.name}</p>
+          <div className="mt-2 flex items-start gap-2 bg-red-50/50 border-l-4 border-red-500 p-2.5 rounded-r-lg text-sm text-red-700">
+            <span className="mt-0.5">⚠️</span>
+            <span className="font-medium">{validationErrors.name}</span>
+          </div>
         )}
       </div>
 
       {/* Descripción */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Descripción del Proyecto *
-        </label>
+        <div className="flex justify-between items-center mb-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Descripción del Proyecto *
+          </label>
+          <span className={`text-xs font-medium ${
+            (formData.description?.length || 0) < 50 ? 'text-amber-600' : 'text-emerald-600'
+          }`}>
+            {formData.description?.length || 0} caracteres (Mín. 50)
+          </span>
+        </div>
         <textarea
           value={formData.description || ''}
           onChange={(e) => handleChangeWithLog('description', e.target.value)}
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] outline-none ${
+            validationErrors?.description ? 'border-red-300 bg-red-50/10' : 'border-gray-300'
+          }`}
           placeholder="Describe tu proyecto, características principales, amenities, ubicación privilegiada..."
           required
         />
-        <p className="text-xs text-gray-500 mt-1">
-          Mínimo 50 caracteres para mejor SEO
+        <p className="text-xs text-gray-400 mt-1">
+          Una buena descripción mejora significativamente el posicionamiento SEO en los motores de búsqueda.
         </p>
         {validationErrors?.description && (
-          <p className="mt-1 text-sm text-red-600">{validationErrors.description}</p>
+          <div className="mt-2 flex items-start gap-2 bg-red-50/50 border-l-4 border-red-500 p-2.5 rounded-r-lg text-sm text-red-700">
+            <span className="mt-0.5">⚠️</span>
+            <span className="font-medium">{validationErrors.description}</span>
+          </div>
         )}
       </div>
 
       {/* Amenidades */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Amenidades Principales
-        </label>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {[
-            'Piscina', 'Gimnasio', 'Sauna', 'Jacuzzi', 'Sala de Juegos', 
-            'Coworking', 'Pet Friendly', 'Seguridad 24/7', 'Recepción',
-            'Área Infantil', 'BBQ', 'Terraza Panorámica'
-          ].map((amenity) => (
-            <label key={amenity} className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={formData.amenities?.includes(amenity) || false}
-                onChange={(e) => {
-                  const current = formData.amenities || [];
-                  if (e.target.checked) {
-                    handleChangeWithLog('amenities', [...current, amenity]);
-                  } else {
-                    handleChangeWithLog('amenities', current.filter((a: string) => a !== amenity));
-                  }
-                }}
-                className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-              />
-              <span className="text-sm text-gray-700">{amenity}</span>
-            </label>
-          ))}
+        <div className={`p-4 rounded-xl border transition-colors ${
+          validationErrors?.amenities ? 'border-red-200 bg-red-50/5' : 'border-gray-200 bg-gray-50/30'
+        }`}>
+          <label className="block text-sm font-bold text-gray-800 mb-3">
+            Amenidades Principales
+          </label>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {AMENITY_OPTIONS.map((amenity) => {
+              const isChecked = formData.amenities?.includes(amenity) || false;
+              return (
+                <label 
+                  key={amenity} 
+                  className={`flex items-center space-x-3 p-2.5 rounded-lg border cursor-pointer select-none transition-all duration-150 ${
+                    isChecked 
+                      ? 'bg-[var(--brand-primary)]/10 border-[var(--brand-primary)] text-gray-900 font-medium' 
+                      : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={(e) => {
+                      const current = formData.amenities || [];
+                      if (e.target.checked) {
+                        handleChangeWithLog('amenities', [...current, amenity]);
+                      } else {
+                        handleChangeWithLog('amenities', current.filter((a: string) => a !== amenity));
+                      }
+                    }}
+                    style={{ color: 'var(--brand-primary)' }}
+                    className="rounded h-4 w-4 border-gray-300 focus:ring-[var(--brand-primary)] dynamic-checkbox"
+                  />
+                  <span className="text-sm">{amenity}</span>
+                </label>
+              );
+            })}
+          </div>
         </div>
+
+        {validationErrors?.amenities && (
+          <div className="mt-2 flex items-start gap-2 bg-red-50/50 border-l-4 border-red-500 p-2.5 rounded-r-lg text-sm text-red-700">
+            <span className="mt-0.5">⚠️</span>
+            <span className="font-medium">{validationErrors.amenities}</span>
+          </div>
+        )}
       </div>
+      
+      <style jsx>{`
+        .dynamic-checkbox:checked {
+          background-color: var(--brand-primary) !important;
+          border-color: var(--brand-primary) !important;
+        }
+      `}</style>
     </div>
   );
 }

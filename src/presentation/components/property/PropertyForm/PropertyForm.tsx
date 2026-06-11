@@ -122,8 +122,8 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       projectType: (property && 'type' in property) ? property.type : 'RESIDENTIAL',
       totalUnits: (property && 'totalUnits' in property) ? property.totalUnits : 0,
       availableUnits: (property && 'availableUnits' in property) ? property.availableUnits : 0,
-      priceFrom: (property && 'priceFrom' in property) ? property.priceFrom : 0,
-      priceTo: (property && 'priceTo' in property) ? property.priceTo : 0,
+      priceFrom: (property && 'priceFrom' in property) ? property.priceFrom : '',
+      priceTo: (property && 'priceTo' in property) ? property.priceTo : '',
       startDate: (property && 'startDate' in property) ? property.startDate : '',
       estimatedDelivery: (property && 'estimatedDelivery' in property) ? property.estimatedDelivery : '',
       areaFrom: (property && 'areaFrom' in property) ? property.areaFrom : 0,
@@ -165,6 +165,18 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
 
     if (formType === 'project') {
       if (step === 1) {
+        const priceFrom = formData.priceFrom !== '' && formData.priceFrom !== null ? Number(formData.priceFrom) : null;
+        const priceTo = formData.priceTo !== '' && formData.priceTo !== null ? Number(formData.priceTo) : null;
+
+        if (priceFrom === null || priceFrom <= 0) {
+          errors.priceFrom = 'Ingresa un precio desde válido mayor a 0';
+        }
+        if (priceTo === null || priceTo <= 0) {
+          errors.priceTo = 'Ingresa un precio hasta válido mayor a 0';
+        }
+        if (priceFrom !== null && priceTo !== null && priceTo < priceFrom) {
+          errors.priceTo = 'El precio máximo debe ser mayor o igual al mínimo';
+        }
         if (!formData.name || !formData.name.trim()) {
           errors.name = 'El nombre del proyecto es obligatorio';
         }
@@ -177,7 +189,10 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
         if (!formData.projectType) {
           errors.projectType = 'Selecciona el tipo de proyecto';
         }
-      }
+        if (!formData.amenities || formData.amenities.length === 0) {
+          errors.amenities = 'Selecciona al menos una amenidad';
+        }
+    }
 
       if (step === 2) {
         if (!formData.address || !formData.address.trim()) {
