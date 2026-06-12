@@ -143,8 +143,8 @@ export default function NotificationsPage() {
 
   if (authLoading || !isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brand-primary)]"></div>
       </div>
     );
   }
@@ -345,8 +345,8 @@ export default function NotificationsPage() {
           {/* Content */}
           <div className="p-6">
             {isLoading ? (
-              <div className="flex items-center justify-center py-16">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-600"></div>
+              <div className="flex items-center justify-center py-12 sm:py-16">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--brand-primary)]"></div>
               </div>
             ) : paginatedNotifications.length === 0 ? (
               <EmptyState 
@@ -469,8 +469,8 @@ export default function NotificationsPage() {
 
 function EmptyState({ icon, title, description }: { icon: React.ReactNode; title: string; description?: string }) {
   return (
-    <div className="text-center py-16">
-      <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+    <div className="text-center py-12 sm:py-16 px-4">
+      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[var(--bg-tertiary)] rounded-full flex items-center justify-center mx-auto mb-4 text-[var(--text-muted)]">
         {icon}
       </div>
       <h3 className="text-lg font-medium text-slate-700 mb-2">{title}</h3>
@@ -595,12 +595,11 @@ function NotificationCard({ notification, onMarkAsRead, isHistory }: Notificatio
           : 'bg-slate-50/50 border-slate-100 hover:bg-slate-50'
       } ${isImportant && isUnread ? 'ring-1 ring-amber-200' : ''}`}
     >
-      {/* Icon */}
-      <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${getIconColors(notification.type)}`}>
+      {/* Icono adaptable en tamaño */}
+      <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${getIconColors(notification.type)}`}>
         {getIcon(notification.type)}
       </div>
 
-      {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">

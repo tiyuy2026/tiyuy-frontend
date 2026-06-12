@@ -12,6 +12,7 @@ import { Sun, Moon, Type, Globe, Lock, User, Camera, CheckCircle, Palette, Messa
 import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 import MyAgencySection from '@/presentation/components/profile/MyAgencySection';
 import { useDashboardSidebar } from './layout';
+import { useTheme } from '@/presentation/components/ThemeProvider';
 
 // Hooks para API
 function useCurrentUser() {
@@ -142,10 +143,9 @@ export default function DashboardPage() {
   const verifyIdentity = useVerifyIdentity();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   const user = currentUser || authUser;
-
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [crmBackground, setCrmBackground] = useState('#ffffff');
   const [fontSize, setFontSize] = useState<'small' | 'normal' | 'large'>('normal');
   const [language, setLanguage] = useState<'es' | 'en' | 'pt' | 'fr'>('es');
@@ -157,7 +157,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (preferences) {
-      setTheme(preferences.theme || 'light');
       setCrmBackground(preferences.crmBackground || '#ffffff');
       setFontSize(preferences.fontSize || 'normal');
       
@@ -217,9 +216,11 @@ export default function DashboardPage() {
     }
   };
 
-  const themeClasses = theme === 'dark' ? 'dark bg-gray-900 text-white' : 'bg-gray-50 text-gray-900';
+  const themeClasses = theme === 'dark' ? 'dark' : '';
   const fontSizeClass = fontSize === 'small' ? 'text-sm' : fontSize === 'large' ? 'text-lg' : 'text-base';
-  const mainContentStyle = { backgroundColor: crmBackground };
+  const mainContentStyle = theme === 'dark' 
+    ? { backgroundColor: crmBackground === '#ffffff' ? '#0f172a' : crmBackground, color: '#f9fafb' }
+    : { backgroundColor: crmBackground };
 
   const changePassword = useChangePassword();
   const updateEmail = useUpdateEmail();
@@ -311,7 +312,7 @@ export default function DashboardPage() {
         )}
         
         {!isLoadingUser && (
-          <div className="p-8 max-w-6xl mx-auto space-y-8">
+          <div className="p-8 max-w-6xl mx-auto space-y-8 dark:text-white">
             {isMobile && (
               <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
                 <div className="flex items-center gap-3">

@@ -7,9 +7,30 @@ import { useAuthStore } from '@/presentation/store/authStore';
 import { NotificationList } from '@/presentation/components/notifications/NotificationList/NotificationList';
 import { User, Building, MessageSquare, LogOut, ChevronDown, FolderGit, Menu, X } from 'lucide-react';
 
+
+
 export function Header() {
   const router = useRouter();
   const { isAuthenticated, user, logout } = useAuthStore();
+  const [visible, setVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      if (currentY < 10) {
+        setVisible(true);
+      } else if (currentY > lastScrollY.current) {
+        setVisible(false); 
+      } else {
+        setVisible(true); 
+      }
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const [showComprarMenu, setShowComprarMenu] = useState(false);
   const [showAlquilarMenu, setShowAlquilarMenu] = useState(false);
@@ -24,7 +45,6 @@ export function Header() {
   const userMenuRef = useRef<HTMLDivElement>(null);
   const contactsRef = useRef<HTMLDivElement>(null);
 
-  // Estados para filtros seleccionados
   const [comprarFilters, setComprarFilters] = useState({
     estado: '',
     tipo: '',
@@ -200,7 +220,8 @@ export function Header() {
 
   return (
     <>
-      <header className="bg-white sticky top-0 z-50 shadow-sm">
+      <header className={`bg-white sticky top-0 z-50 shadow-sm transition-transform duration-300 ${visible ? 'translate-y-0' : '-translate-y-full'}`}>
+
         <div className="w-full px-4">
           <div className="flex items-center justify-between h-16 max-w-[1600px] mx-auto">
             {/* LOGO */}

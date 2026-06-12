@@ -20,6 +20,43 @@ const FALLBACK_HERO_IMAGES = [
   '/assets/images/hero/hero-4.jpg',
 ];
 
+const links = [
+  { href: "/rent/departamentos/lima", label: "Alquilar" },
+  { href: "/sale/departamentos/lima", label: "Comprar" },
+  { href: "/my-properties/new", label: "Publicar" },
+  { href: "/projects/departamentos/lima", label: "Proyectos" },
+];
+const quickLinks = [
+  {
+    href: "/blog",
+    icon: "material-symbols:article-outline",
+    title: "Nuestro blog",
+    description: "Consejos, novedades y noticias del ámbito de la construcción.",
+    actionText: "Ver blog completo",
+  },
+  {
+    href: "/rental-guide",
+    icon: "material-symbols:assignment-outline",
+    title: "Guía para alquilar",
+    description: "Lo que necesitas saber a la hora de alquilar en un solo lugar.",
+    actionText: "Ver guía completa",
+  },
+  {
+    href: "/projects",
+    icon: "material-symbols:apartment",
+    title: "Proyectos Inmobiliarios",
+    description: "Descubre los mejores proyectos de vivienda y inversión de las principales inmobiliarias.",
+    actionText: "Ver proyectos",
+  },
+  {
+    href: "/about-tiyuy",
+    icon: "material-symbols:info-outline",
+    title: "Conoce TIYUY",
+    description: "Toda la información sobre cómo usar nuestro portal ¡y mucho más!",
+    actionText: "Conocer más",
+  },
+];
+
 /**
  * Intercala imágenes de banners entre las imágenes estáticas del carrusel.
  * Ejemplo: [estática1, banner1, estática2, banner2, estática3, estática4]
@@ -318,125 +355,61 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* TABS DE NAVEGACIÓN RÁPIDA */}
-      <section className="border-b border-gray-200 bg-background">
-        <div className="w-full px-8 xl:px-16">
+      <section className="bg-[var(--bg-primary)] border-b border-[var(--border-light)]">
+        <div className="w-full px-4 sm:px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
-            <div className="flex gap-8">
-              <Link
-                href="/rent/departamentos/lima"
-                className="py-4 text-base font-semibold text-foreground/70 hover:text-brand hover:border-b-4 hover:border-brand transition-all"
-              >
-                Alquilar
-              </Link>
-              <Link
-                href="/sale/departamentos/lima"
-                className="py-4 text-base font-semibold text-brand border-b-4 border-brand hover:text-brand"
-              >
-                Comprar
-              </Link>
-              <Link
-                href="/my-properties/new"
-                className="py-4 text-base font-medium text-foreground/70 hover:text-brand hover:border-b-4 hover:border-brand transition-all"
-              >
-                Publicar
-              </Link>
-              <Link
-                href="/projects/departamentos/lima"
-                className="py-4 text-base font-medium text-foreground/70 hover:text-brand hover:border-b-4 hover:border-brand transition-all"
-              >
-                Proyectos
-              </Link>
+            <div className="flex gap-6 sm:gap-8 overflow-x-auto scrollbar-none">
+              {links.map(({ href, label }) => {
+                const isActive = pathname.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={`py-4 text-sm sm:text-base font-semibold border-b-4 transition-all duration-200 whitespace-nowrap ${
+                      isActive
+                        ? "text-[var(--brand-primary)] border-[var(--brand-primary)]"
+                        : "text-[var(--text-secondary)] border-transparent hover:text-[var(--brand-primary)] hover:border-[var(--brand-primary)]"
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50/50 border-b border-gray-100">
-        <div className="w-full px-8 xl:px-16">
+      <section className="py-12 sm:py-16 bg-[var(--bg-primary)] border-b border-[var(--border-light)]">
+        <div className="w-full px-4 sm:px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              
-              <Link href="/blog" className="block group h-full">
-                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm border border-gray-200 hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
-                  <div className="flex-grow">
-                    <div className="w-14 h-14 bg-brand-light rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-light-hover transition-colors">
-                      <Icon icon="material-symbols:article-outline" className="w-7 h-7 text-brand" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+              {quickLinks.map(({ href, icon, title, description, actionText }) => (
+                <Link key={href} href={href} className="block group h-full">
+                  <div className="flex flex-col h-full bg-white rounded-xl p-6 sm:p-10 shadow-sm border border-gray-200 hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
+                    <div className="flex-grow">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-brand-light rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-light-hover transition-colors">
+                        <Icon icon={icon} className="w-6 h-6 sm:w-7 sm:h-7 text-brand" />
+                      </div>
+                      <h3 className="text-lg sm:text-xl font-bold text-foreground mb-3 group-hover:text-brand transition-colors">
+                        {title}
+                      </h3>
+                      <p className="text-foreground/70 text-sm sm:text-base leading-relaxed mb-4">
+                        {description}
+                      </p>
                     </div>
-                    <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-brand transition-colors">Nuestro blog</h3>
-                    <p className="text-foreground/70 text-base leading-relaxed mb-4">
-                      Consejos, novedades y noticias del ámbito de la construcción.
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 text-brand font-semibold text-sm">
-                    <span>Ver blog completo</span>
-                    <Icon icon="material-symbols:arrow-forward-ios-rounded" className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </Link>
-
-              {/* Card Guía */}
-              <Link href="/rental-guide" className="block group h-full">
-                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm border border-gray-200 hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
-                  <div className="flex-grow">
-                    <div className="w-14 h-14 bg-brand-light rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-light-hover transition-colors">
-                      <Icon icon="material-symbols:assignment-outline" className="w-7 h-7 text-brand" />
+                    <div className="flex items-center gap-2 text-brand font-semibold text-xs sm:text-sm pt-2">
+                      <span>{actionText}</span>
+                      <Icon icon="material-symbols:arrow-forward-ios-rounded" className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" />
                     </div>
-                    <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-brand transition-colors">Guía para alquilar</h3>
-                    <p className="text-foreground/70 text-base leading-relaxed mb-4">
-                      Lo que necesitas saber a la hora de alquilar en un solo lugar.
-                    </p>
                   </div>
-                  <div className="flex items-center gap-2 text-brand font-semibold text-sm">
-                    <span>Ver guía completa</span>
-                    <Icon icon="material-symbols:arrow-forward-ios-rounded" className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </Link>
-
-              {/* Card Proyectos */}
-              <Link href="/projects" className="block group h-full">
-                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm border border-gray-200 hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
-                  <div className="flex-grow">
-                    <div className="w-14 h-14 bg-brand-light rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-light-hover transition-colors">
-                      <Icon icon="material-symbols:apartment" className="w-7 h-7 text-brand" />
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-brand transition-colors">Proyectos Inmobiliarios</h3>
-                    <p className="text-foreground/70 text-base leading-relaxed mb-4">
-                      Descubre los mejores proyectos de vivienda y inversión de las principales inmobiliarias.
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 text-brand font-semibold text-sm">
-                    <span>Ver proyectos</span>
-                    <Icon icon="material-symbols:arrow-forward-ios-rounded" className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </Link>
-
-              {/* Card Conoce TIYUY */}
-              <Link href="/about-tiyuy" className="block group h-full">
-                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm border border-gray-200 hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
-                  <div className="flex-grow">
-                    <div className="w-14 h-14 bg-brand-light rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-light-hover transition-colors">
-                      <Icon icon="material-symbols:info-outline" className="w-7 h-7 text-brand" />
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-brand transition-colors">Conoce TIYUY</h3>
-                    <p className="text-foreground/70 text-base leading-relaxed mb-4">
-                      Toda la información sobre cómo usar nuestro portal ¡y mucho más!
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 text-brand font-semibold text-sm">
-                    <span>Conocer más</span>
-                    <Icon icon="material-symbols:arrow-forward-ios-rounded" className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </Link>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* PROPIEDADES DESTACADAS / RECOMENDACIONES */}
       <section className="py-10 bg-background border-b border-gray-100">
         <div className="w-full max-w-[1920px] mx-auto">
           <FeaturedProperties />
