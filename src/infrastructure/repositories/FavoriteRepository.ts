@@ -68,13 +68,13 @@ export class FavoriteRepository implements IFavoriteRepository {
 
   async check(propertyId: number): Promise<boolean> {
     try {
-      const res = await publicApiClient.get<FavoriteCheckDTO>(
+      const res = await axiosClient.get<FavoriteCheckDTO>(
         ENDPOINTS.FAVORITES.CHECK(propertyId)
       );
       return res.data.isFavorite;
     } catch (error: any) {
-      // Si es 403 (no autenticado) o cualquier error, devolver false silenciosamente
-      if (error?.response?.status === 403 || error?.response?.status === 401) {
+      // Si es 401 (no autenticado), devolver false silenciosamente
+      if (error?.response?.status === 401) {
         return false;
       }
       throw error;

@@ -5,9 +5,10 @@ import { useState } from 'react';
 interface CharacteristicsStepProps {
   formData: any;
   onChange: (field: string, value: any) => void;
+  validationErrors?: Record<string, string>;
 }
 
-export function CharacteristicsStep({ formData, onChange }: CharacteristicsStepProps) {
+export function CharacteristicsStep({ formData, onChange, validationErrors }: CharacteristicsStepProps) {
   const inputClass =
     'w-full px-4 py-3 rounded-lg border border-gray-200 text-sm text-gray-900 bg-gray-50 outline-none';
 

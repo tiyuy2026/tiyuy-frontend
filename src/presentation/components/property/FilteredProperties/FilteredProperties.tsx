@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import Link from 'next/link';
 import { PropertyCard } from '../PropertyCard/PropertyCard';
-import { PropertySummary } from '@/core/domain/entities/Property';
-import { PropertyFilter } from '@/core/domain/entities/PropertyFilter';
-import { PropertyRepository } from '@/infrastructure/repositories/PropertyRepository';
+import { useFilteredProperties } from '@/presentation/hooks/useFilteredProperties';
+import type { PropertyFilter } from '@/core/domain/entities/PropertyFilter';
 
 interface FilteredPropertiesProps {
   title: string;
@@ -15,34 +14,18 @@ interface FilteredPropertiesProps {
   emptyMessage?: string;
 }
 
-export function FilteredProperties({ title, viewAllLink, filter, hideViewAll = false, emptyMessage = "No hay propiedades disponibles en esta categoría" }: FilteredPropertiesProps) {
-  const [properties, setProperties] = useState<PropertySummary[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function FilteredProperties({
+  title,
+  viewAllLink,
+  filter,
+  hideViewAll = false,
+  emptyMessage = 'No hay propiedades disponibles en esta categoria',
+}: FilteredPropertiesProps) {
+  const { data: properties = [], isLoading, error } = useFilteredProperties(filter);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-  
-  const propertyRepo = new PropertyRepository();
 
-  const updateScrollState = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(Math.ceil(scrollLeft + clientWidth) < scrollWidth);
-    }
-  };
-
-  useEffect(() => {
-    // Verificar estado inicial cuando las propiedades cambian
-    const timeoutId = setTimeout(updateScrollState, 100);
-    window.addEventListener('resize', updateScrollState);
-    return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener('resize', updateScrollState);
-    };
-  }, [properties]);
+  const canScrollLeft = false;
+  const canScrollRight = true;
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -55,32 +38,6 @@ export function FilteredProperties({ title, viewAllLink, filter, hideViewAll = f
       scrollContainerRef.current.scrollBy({ left: scrollContainerRef.current.clientWidth, behavior: 'smooth' });
     }
   };
-
-  useEffect(() => {
-    const loadProperties = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        const result = await propertyRepo.search({
-          ...filter,
-          page: 0,
-          size: 15,
-          sort: 'createdAt,desc',
-        });
-        
-        setProperties(result.properties || []);
-      } catch (error) {
-        console.error('❌ Error loading filtered properties:', error);
-        setError('No se pudieron cargar las propiedades');
-        setProperties([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadProperties();
-  }, [filter.type, filter.transactionType, filter.district]);
 
   if (isLoading) {
     return (
@@ -111,7 +68,7 @@ export function FilteredProperties({ title, viewAllLink, filter, hideViewAll = f
   if (error) {
     return (
       <div className="text-center py-10">
-        <p className="text-gray-500">{error}</p>
+        <p className="text-gray-500">{error instanceof Error ? error.message : 'Error al cargar'}</p>
       </div>
     );
   }
@@ -157,7 +114,7 @@ export function FilteredProperties({ title, viewAllLink, filter, hideViewAll = f
           .carousel-card { width: calc((100% - 6 * 24px) / 7); }
         }
       `}</style>
-      
+
       <div className="w-full max-w-[1920px] mx-auto px-8 xl:px-16">
         {/* Header and Navigation Controls */}
         <div className="flex justify-between items-end mb-4 pr-4">
@@ -193,9 +150,8 @@ export function FilteredProperties({ title, viewAllLink, filter, hideViewAll = f
         </div>
 
         {/* Horizontal scroll container */}
-        <div 
-          ref={scrollContainerRef} 
-          onScroll={updateScrollState}
+        <div
+          ref={scrollContainerRef}
           className="flex overflow-x-auto gap-4 sm:gap-5 md:gap-6 hide-scrollbar snap-x snap-mandatory scroll-smooth pb-4"
         >
           {properties.map((property) => (
@@ -203,7 +159,7 @@ export function FilteredProperties({ title, viewAllLink, filter, hideViewAll = f
               <PropertyCard property={property} />
             </div>
           ))}
-          
+
           {/* Tarjeta de Ver Todos al final */}
           {!hideViewAll && (
             <div className="carousel-card flex-shrink-0 snap-start">

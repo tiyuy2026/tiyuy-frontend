@@ -1,67 +1,97 @@
 'use client';
 import { NotificationPreferencesForm } from '@/presentation/components/notifications/NotificationPreferences';
+import { Bell, Mail, Shield, ChevronRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function PreferenciasPage() {
+  const router = useRouter();
+
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="p-3 bg-blue-100 rounded-xl">
-          <svg 
-            className="h-6 w-6 text-blue-600" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Preferencias de Notificaciones
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Controla qué emails recibes de la plataforma
-          </p>
+      <div className="bg-white border-b border-slate-200">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.push('/notifications')}
+              className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+            >
+              <ChevronRight className="w-5 h-5 text-slate-400 rotate-180" />
+            </button>
+            <div className="p-3 bg-slate-100 rounded-xl">
+              <Bell className="w-6 h-6 text-slate-600" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">Preferencias de Notificaciones</h1>
+              <p className="text-sm text-slate-500">
+                Controla qué notificaciones y emails recibes de la plataforma
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Formulario */}
-        <div>
-          <NotificationPreferencesForm />
-        </div>
-
-        {/* Info Card */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <svg className="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            <h3 className="text-lg font-semibold text-gray-900">Seguridad</h3>
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Formulario - ocupa 2/3 */}
+          <div className="lg:col-span-2">
+            <NotificationPreferencesForm />
           </div>
-          <p className="text-sm text-gray-600 mb-4">
-            Todas tus preferencias están protegidas
-          </p>
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <svg className="h-4 w-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-              </svg>
-              <span>Solo enviamos emails importantes</span>
+
+          {/* Sidebar Info - ocupa 1/3 */}
+          <div className="space-y-4">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-green-50 rounded-lg">
+                  <Shield className="w-5 h-5 text-green-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900">Seguridad</h3>
+              </div>
+              <p className="text-sm text-slate-600 mb-4">
+                Tus preferencias se guardan automáticamente y están protegidas.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 text-sm text-slate-600">
+                  <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-4 h-4 text-blue-500" />
+                  </div>
+                  <span>Solo enviamos emails importantes</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-slate-600">
+                  <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-4 h-4 text-green-500" />
+                  </div>
+                  <span>Tus datos están encriptados</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-slate-600">
+                  <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Bell className="w-4 h-4 text-amber-500" />
+                  </div>
+                  <span>Cambios guardados al instante</span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <svg className="h-4 w-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-              </svg>
-              <span>Tus datos están encriptados</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="text-green-500 font-medium">✓</span>
-              <span>Cambios guardados automáticamente</span>
+
+            <div className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl shadow-lg p-6 text-white">
+              <h3 className="font-semibold mb-2">¿Necesitas ayuda?</h3>
+              <p className="text-sm text-slate-300 mb-4">
+                Si tienes dudas sobre las notificaciones, contáctanos.
+              </p>
+              <button
+                onClick={() => {
+                  const subject = encodeURIComponent('Ayuda con notificaciones - Tiyuy');
+                  const body = encodeURIComponent(
+                    'Hola equipo de Tiyuy,\n\n' +
+                    'Escribo para consultar sobre...\n\n' +
+                    '---\n' +
+                    'Enviado desde Preferencias de Notificaciones'
+                  );
+                  window.location.href = `mailto:soporte@tiyuy.com?subject=${subject}&body=${body}`;
+                }}
+                className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition-colors border border-white/10 hover:border-white/20"
+              >
+                Contactar soporte
+              </button>
             </div>
           </div>
         </div>

@@ -39,25 +39,31 @@ interface EventNotification extends BaseNotification {
 
 type UnifiedNotification = GeneralNotification | EventNotification;
 
+interface PageResponse<T> {
+  content: T[];
+  totalPages?: number;
+  totalElements?: number;
+  size?: number;
+  number?: number;
+}
+
 // Hook unificado para todas las notificaciones
 export const useUnifiedNotifications = (type?: 'all' | 'general' | 'events') => {
   const queryClient = useQueryClient();
   const { user, isAuthenticated } = useAuthStore();
 
-  // Query para notificaciones generales
+  // Query para notificaciones generales - devuelve el objeto completo con content[]
   const generalNotificationsQuery = useQuery({
     queryKey: ['notifications', 'general'],
-    queryFn: async () => {
-      if (!isAuthenticated || !user) return [];
+    queryFn: async (): Promise<PageResponse<GeneralNotification>> => {
+      if (!isAuthenticated || !user) return { content: [] };
       
       try {
-        // Intentar obtener del backend
-        const { data } = await apiClient.get<{content: GeneralNotification[]}>('/notifications/in-app');
-        return data.content || [];
+        const { data } = await apiClient.get<PageResponse<GeneralNotification>>('/notifications/in-app');
+        return data || { content: [] };
       } catch (error) {
-        // Sin fallback - si el API falla, devuelve array vacío
         console.error('Error fetching general notifications:', error);
-        return [];
+        return { content: [] };
       }
     },
     enabled: isAuthenticated && !!user && (type === 'all' || type === 'general' || !type),
@@ -67,30 +73,33 @@ export const useUnifiedNotifications = (type?: 'all' | 'general' | 'events') => 
   // Query para notificaciones de eventos
   const eventNotificationsQuery = useQuery({
     queryKey: ['notifications', 'events'],
-    queryFn: async () => {
-      if (!isAuthenticated || !user) return [];
+    queryFn: async (): Promise<PageResponse<EventNotification>> => {
+      if (!isAuthenticated || !user) return { content: [] };
       
       try {
-        const { data } = await apiClient.get<{content: EventNotification[]}>('/channel-events');
-        return data.content || [];
+        const { data } = await apiClient.get<PageResponse<EventNotification>>('/channel-events');
+        return data || { content: [] };
       } catch (error) {
-        // Sin fallback - si el API falla, devuelve array vacío
         console.error('Error fetching event notifications:', error);
-        return [];
+        return { content: [] };
       }
     },
     enabled: isAuthenticated && !!user && (type === 'all' || type === 'events' || !type),
     staleTime: 1000 * 60,
   });
 
+  // Extraer arrays de forma segura
+  const generalNotifications: GeneralNotification[] = generalNotificationsQuery.data?.content ?? [];
+  const eventNotifications: EventNotification[] = eventNotificationsQuery.data?.content ?? [];
+
   // Combinar notificaciones según el tipo solicitado
-  const allNotifications = [...(generalNotificationsQuery.data || []), ...(eventNotificationsQuery.data || [])]
+  const allNotifications: UnifiedNotification[] = [...generalNotifications, ...eventNotifications]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  const notifications = type === 'general' 
-    ? generalNotificationsQuery.data || []
+  const notifications: UnifiedNotification[] = type === 'general' 
+    ? generalNotifications
     : type === 'events'
-    ? eventNotificationsQuery.data || []
+    ? eventNotifications
     : allNotifications;
 
   const isLoading = type === 'general' 
@@ -99,35 +108,28 @@ export const useUnifiedNotifications = (type?: 'all' | 'general' | 'events') => 
     ? eventNotificationsQuery.isPending
     : generalNotificationsQuery.isPending || eventNotificationsQuery.isPending;
 
-  // Mutación para marcar como leído
+  // Mutación para marcar como leído - SIN optimistic update, espera respuesta real del backend
   const markAsReadMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      try {
-        // Backend usa POST /notifications/{id}/read (NotificationController)
-        await apiClient.post(`/notifications/${notificationId}/read`);
-      } catch (error) {
-        console.error('Error marking notification as read:', error);
-        throw error;
-      }
+      const { data } = await apiClient.post(`/notifications/${notificationId}/read`);
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      // Solo cuando el backend confirma, recargamos los datos reales
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'general'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'events'] });
     },
   });
 
-  // Mutación para marcar todas como leídas
+  // Mutación para marcar todas como leídas - SIN optimistic update
   const markAllAsReadMutation = useMutation({
     mutationFn: async () => {
-      try {
-        // Backend usa POST /notifications/read-all (NotificationController)
-        await apiClient.post('/notifications/read-all');
-      } catch (error) {
-        console.error('Error marking all notifications as read:', error);
-        throw error;
-      }
+      const { data } = await apiClient.post('/notifications/read-all');
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'general'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'events'] });
     },
   });
 

@@ -1,13 +1,24 @@
 export interface NotificationPreferences {
+  // Email preferences
   emailOnContact: boolean;
   emailOnFavorite: boolean;
   emailOnPropertyPublished: boolean;
   emailOnSubscriptionExpiring: boolean;
   emailMarketing: boolean;
-  emailOnEventCreated: boolean;
-  emailOnEventUpdated: boolean;
-  emailOnEventReminder: boolean;
-  emailOnEventJoined: boolean;
+
+  // Push notifications
+  pushEnabled: boolean;
+  pushOnMessage: boolean;
+  pushOnPropertyMatch: boolean;
+  pushOnSystemAlert: boolean;
+
+  // Notification frequency: IMMEDIATE, DAILY, WEEKLY
+  notificationFrequency: string;
+
+  // Specific alert types
+  propertyAlertsEnabled: boolean;
+  messageAlertsEnabled: boolean;
+  systemAlertsEnabled: boolean;
 }
 
 export type NotificationType = 

@@ -36,9 +36,6 @@ import {
   ChevronDown,
   ChevronRight,
   DollarSign,
-  ImageIcon,
-  Gift,
-  ChevronLeft,
 } from 'lucide-react';
 
 interface GitHubShellProps {
@@ -57,13 +54,6 @@ interface NavSection {
   title: string;
   items: NavItem[];
 }
-
-// ─── Submenú de Campañas ─────────────────────────────────────────────────────
-const CAMPAIGN_SUBITEMS: NavItem[] = [
-  { label: 'Dashboard', href: '/admin/campaigns', icon: LayoutDashboard },
-  { label: 'Lista de Campañas', href: '/admin/campaigns/list', icon: Megaphone },
-  { label: 'Banners', href: '/admin/campaigns/banners', icon: ImageIcon },
-];
 
 // ─── Configuración del menú ─────────────────────────────────────────────────
 
@@ -100,7 +90,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { label: 'Planes', href: '/admin/plans', icon: Layers },
       { label: 'Descuentos', href: '/admin/discounts', icon: Tag },
-      { label: 'Campañas', href: '/admin/campaigns', icon: Megaphone },
+      { label: 'Campanas', href: '/admin/campaigns', icon: Megaphone },
       { label: 'Finanzas', href: '/admin/finance', icon: DollarSign },
     ],
   },
@@ -114,11 +104,8 @@ const NAV_SECTIONS: NavSection[] = [
   {
     title: 'SISTEMA',
     items: [
-      { label: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
       { label: 'Administradores', href: '/admin/admins', icon: Users },
-      { label: 'Auditoria', href: '/admin/audit', icon: ShieldCheck },
-      { label: 'Actividad', href: '/admin/events', icon: Activity },
-      { label: 'Reportes', href: '/admin/reports', icon: FileText },
+      { label: 'Actividad', href: '/admin/activities', icon: Activity },
     ],
   },
   {
@@ -163,90 +150,6 @@ function SidebarItem({
   );
 }
 
-// ─── Sidebar Item con Submenú Expandible ─────────────────────────────────────
-
-function SidebarItemWithSubmenu({
-  item,
-  subitems,
-  collapsed,
-  pathname,
-}: {
-  item: NavItem;
-  subitems: NavItem[];
-  collapsed: boolean;
-  pathname: string;
-}) {
-  const [expanded, setExpanded] = useState(true);
-  const Icon = item.icon;
-
-  // Check if any subitem is active
-  const isActive = subitems.some((si) => pathname.startsWith(si.href));
-
-  if (collapsed) {
-    // When collapsed, just show the parent icon
-    return (
-      <div>
-        <div
-          className={`flex items-center justify-center px-2 py-2 rounded-md text-sm transition-all duration-150 ${
-            isActive
-              ? 'bg-white/15 text-white font-medium'
-              : 'text-gray-400 hover:text-white hover:bg-white/10'
-          }`}
-          title={item.label}
-        >
-          <Icon className="w-[18px] h-[18px] shrink-0" />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      {/* Parent button */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-150 ${
-          isActive
-            ? 'bg-white/15 text-white font-medium'
-            : 'text-gray-400 hover:text-white hover:bg-white/10'
-        }`}
-      >
-        <Icon className="w-[18px] h-[18px] shrink-0" />
-        <span className="flex-1 text-left truncate">{item.label}</span>
-        <ChevronDown
-          className={`w-3.5 h-3.5 transition-transform duration-200 ${
-            expanded ? 'rotate-0' : '-rotate-90'
-          }`}
-        />
-      </button>
-
-      {/* Subitems */}
-      {expanded && (
-        <div className="ml-2 mt-0.5 space-y-0.5 border-l border-white/10 pl-2">
-          {subitems.map((subitem) => {
-            const SubIcon = subitem.icon;
-            const isSubActive = pathname.startsWith(subitem.href);
-            return (
-              <Link
-                key={subitem.href}
-                href={subitem.href}
-                className={`flex items-center gap-3 px-3 py-1.5 rounded-md text-sm transition-all duration-150 ${
-                  isSubActive
-                    ? 'bg-white/15 text-white font-medium'
-                    : 'text-gray-400 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <SubIcon className="w-[15px] h-[15px] shrink-0" />
-                <span className="truncate">{subitem.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ─── Sidebar completo ────────────────────────────────────────────────────────
 
 function Sidebar({
@@ -269,10 +172,10 @@ function Sidebar({
       items = [];
     }
 
-    // Sistema: admins y auditoria solo para super admin
+    // Sistema: admins solo para super admin
     if (section.title === 'SISTEMA') {
       items = items.filter((item) => {
-        if ((item.href === '/admin/admins' || item.href === '/admin/audit') && !isSuperAdmin) {
+        if (item.href === '/admin/admins' && !isSuperAdmin) {
           return false;
         }
         return true;
@@ -300,32 +203,18 @@ function Sidebar({
 
           {/* Items */}
           <div className="space-y-0.5">
-            {section.items.map((item) => {
-              // Check if this item has a submenu (Campañas)
-              if (item.href === '/admin/campaigns') {
-                return (
-                  <SidebarItemWithSubmenu
-                    key={item.href}
-                    item={item}
-                    subitems={CAMPAIGN_SUBITEMS}
-                    collapsed={collapsed}
-                    pathname={pathname}
-                  />
-                );
-              }
-              return (
-                <SidebarItem
-                  key={item.href}
-                  item={item}
-                  collapsed={collapsed}
-                  active={
-                    item.href === '/admin'
-                      ? pathname === '/admin'
-                      : pathname.startsWith(item.href)
-                  }
-                />
-              );
-            })}
+            {section.items.map((item) => (
+              <SidebarItem
+                key={item.href}
+                item={item}
+                collapsed={collapsed}
+                active={
+                  item.href === '/admin'
+                    ? pathname === '/admin'
+                    : pathname.startsWith(item.href)
+                }
+              />
+            ))}
           </div>
         </div>
       ))}

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Star, X, LogIn, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { authStorage } from '@/infrastructure/storage/auth-storage';
+import { useAuthStore } from '@/presentation/store/authStore';
 import { useRouter } from 'next/navigation';
 
 interface StarRatingProps {
@@ -28,6 +29,7 @@ export function StarRating({
   onRatingSaved
 }: StarRatingProps) {
   const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
   const [rating, setRating] = useState(initialRating);
   const [hoverRating, setHoverRating] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -73,9 +75,11 @@ export function StarRating({
   const handleClick = async (value: number) => {
     if (readonly) return;
     
-    // Si no hay autenticación, mostrar modal
+    // Verificar autenticación usando el store y el token
     const token = authStorage.getToken();
-    if (!token) {
+    const isAuth = isAuthenticated && token && token !== 'undefined' && token !== 'null' && token.length > 10;
+    
+    if (!isAuth) {
       setPendingRating(value);
       setShowAuthModal(true);
       return;

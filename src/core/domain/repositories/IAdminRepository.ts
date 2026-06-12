@@ -147,6 +147,21 @@ export interface IAdminRepository {
   createFestiveCampaign(request: import('@/core/domain/entities/Admin').CreateFestiveCampaignRequest): Promise<import('@/core/domain/entities/Admin').FestiveCampaign>;
   updateFestiveCampaign(id: number, request: Partial<import('@/core/domain/entities/Admin').CreateFestiveCampaignRequest>): Promise<import('@/core/domain/entities/Admin').FestiveCampaign>;
   deleteFestiveCampaign(id: number): Promise<void>;
+
+  // Support Tickets (Centro de Soporte/Incidencias)
+  getSupportTickets(params?: {
+    status?: string;
+    category?: string;
+    severity?: string;
+    search?: string;
+    page?: number;
+    size?: number;
+  }): Promise<PaginatedResponse<import('@/core/domain/entities/Admin').SupportTicket>>;
+  getSupportTicketById(ticketId: number): Promise<import('@/core/domain/entities/Admin').SupportTicket>;
+  getSupportTicketStats(): Promise<import('@/core/domain/entities/Admin').SupportTicketStats>;
+  createSupportTicket(request: import('@/core/domain/entities/Admin').CreateSupportTicketRequest): Promise<import('@/core/domain/entities/Admin').SupportTicket>;
+  updateSupportTicketStatus(ticketId: number, request: import('@/core/domain/entities/Admin').UpdateSupportTicketStatusRequest): Promise<import('@/core/domain/entities/Admin').SupportTicket>;
+  notifyTicketUser(ticketId: number, data: { subject: string; message: string; sendEmail: boolean; sendInApp: boolean }): Promise<void>;
 }
 
 

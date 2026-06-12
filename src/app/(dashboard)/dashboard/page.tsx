@@ -8,9 +8,11 @@ import { useRouter } from 'next/navigation';
 import { toast } from '@/presentation/store/toastStore';
 import { axiosClient } from '@/infrastructure/api/axios-client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Sun, Moon, Type, Globe, Lock, User, Camera, CheckCircle, Palette, MessageSquare, Users, Diamond, Home, Flame, Building, FolderGit, PlusCircle } from 'lucide-react';
+import { Sun, Moon, Type, Globe, Lock, User, Camera, CheckCircle, Palette, MessageSquare, Users, Diamond, Home, Flame, Building, FolderGit, PlusCircle, SlidersHorizontal } from 'lucide-react';
 import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 import MyAgencySection from '@/presentation/components/profile/MyAgencySection';
+import { useDashboardSidebar } from './layout';
+import { useTheme } from '@/presentation/components/ThemeProvider';
 
 // Hooks para API
 function useCurrentUser() {
@@ -141,10 +143,9 @@ export default function DashboardPage() {
   const verifyIdentity = useVerifyIdentity();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   const user = currentUser || authUser;
-
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [crmBackground, setCrmBackground] = useState('#ffffff');
   const [fontSize, setFontSize] = useState<'small' | 'normal' | 'large'>('normal');
   const [language, setLanguage] = useState<'es' | 'en' | 'pt' | 'fr'>('es');
@@ -156,7 +157,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (preferences) {
-      setTheme(preferences.theme || 'light');
       setCrmBackground(preferences.crmBackground || '#ffffff');
       setFontSize(preferences.fontSize || 'normal');
       
@@ -216,9 +216,11 @@ export default function DashboardPage() {
     }
   };
 
-  const themeClasses = theme === 'dark' ? 'dark bg-gray-900 text-white' : 'bg-gray-50 text-gray-900';
+  const themeClasses = theme === 'dark' ? 'dark' : '';
   const fontSizeClass = fontSize === 'small' ? 'text-sm' : fontSize === 'large' ? 'text-lg' : 'text-base';
-  const mainContentStyle = { backgroundColor: crmBackground };
+  const mainContentStyle = theme === 'dark' 
+    ? { backgroundColor: crmBackground === '#ffffff' ? '#0f172a' : crmBackground, color: '#f9fafb' }
+    : { backgroundColor: crmBackground };
 
   const changePassword = useChangePassword();
   const updateEmail = useUpdateEmail();
@@ -275,6 +277,8 @@ export default function DashboardPage() {
     });
   };
 
+  const { sidebarOpen, setSidebarOpen, isMobile } = useDashboardSidebar();
+
   const timezones = [
     { value: 'America/Lima', label: 'Lima (GMT-5)' },
     { value: 'America/Bogota', label: 'Bogota (GMT-5)' },
@@ -308,7 +312,24 @@ export default function DashboardPage() {
         )}
         
         {!isLoadingUser && (
-          <div className="p-8 max-w-6xl mx-auto space-y-8">
+          <div className="p-8 max-w-6xl mx-auto space-y-8 dark:text-white">
+            {isMobile && (
+              <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                    className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-gray-100 p-3 text-gray-700 hover:bg-gray-200 transition-colors"
+                    title="Abrir menú"
+                  >
+                    <SlidersHorizontal className="w-5 h-5" />
+                  </button>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Opciones del perfil</p>
+                    <p className="text-xs text-gray-500">Abre el menú de navegación desde aquí</p>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* Profile Photo and Identity */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><User className="w-5 h-5" /> Identidad</h2>
@@ -390,8 +411,8 @@ export default function DashboardPage() {
                     <FolderGit className="w-6 h-6 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">My Projects</h3>
-                    <p className="text-sm text-gray-600">Active developments</p>
+                    <h3 className="font-semibold text-gray-900">Mis Proyectos</h3>
+                    <p className="text-sm text-gray-600">Desarrollos activos</p>
                   </div>
                   <span className="ml-auto text-green-600">→</span>
                 </Link>
@@ -401,8 +422,8 @@ export default function DashboardPage() {
                     <PlusCircle className="w-6 h-6 text-purple-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">New Project</h3>
-                    <p className="text-sm text-gray-600">Create development</p>
+                    <h3 className="font-semibold text-gray-900">Nuevo Proyecto</h3>
+                    <p className="text-sm text-gray-600">Crear desarrollo</p>
                   </div>
                   <span className="ml-auto text-purple-600">→</span>
                 </Link>

@@ -36,6 +36,35 @@ const TRANSACTION_TYPE_LABELS: Record<string, string> = {
   RENT: 'Alquiler',
 };
 
+function DescriptionSection({ description }: { description: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const words = description.split(/\s+/);
+  const isLong = words.length > 50;
+  const truncated = isLong ? words.slice(0, 50).join(' ') + '...' : description;
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+        <svg className="w-4 h-4 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+        </svg>
+        Descripción de la propiedad
+      </h2>
+      <div className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
+        {expanded ? description : truncated}
+      </div>
+      {isLong && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="mt-3 text-teal-600 hover:text-teal-700 font-semibold text-sm transition-colors"
+        >
+          {expanded ? 'Ver menos' : 'Ver más'}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function PropertyDetail({ property }: PropertyDetailProps) {
   // Trackear vista en CRM automáticamente
   useEffect(() => {
@@ -86,12 +115,12 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
     <div className="min-h-screen bg-gray-50">
 
       <div className="w-full px-4 sm:px-6 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
           {/* ════════════════════════════════════════
               COLUMNA PRINCIPAL  (2 / 3)
           ════════════════════════════════════════ */}
-          <div className="lg:col-span-8 space-y-4">
+          <div className="lg:col-span-9 space-y-4">
 
             {/* ── Botones encima de galería ── */}
             <div className="flex items-center justify-end gap-1">
@@ -106,43 +135,66 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
 
             {/* 2. TIPO · PRECIO · TÍTULO · DIRECCIÓN · STATS */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <p className="text-sm text-gray-400">
-                {propertyTypeLabel}
-                {property.totalArea ? ` · ${property.totalArea} m²` : ''}
-                {property.bedrooms  ? ` · ${property.bedrooms} dormitorio${property.bedrooms > 1 ? 's' : ''}` : ''}
-              </p>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-400">
+                    {propertyTypeLabel}
+                    {property.totalArea ? ` · ${property.totalArea} m²` : ''}
+                    {property.bedrooms  ? ` · ${property.bedrooms} dormitorio${property.bedrooms > 1 ? 's' : ''}` : ''}
+                  </p>
 
-              <div className="mt-2 flex items-baseline gap-3 flex-wrap">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                  {transactionLabel}&nbsp;{formatPrice(property.price, property.currency)}
-                  {property.transactionType === 'RENT' && (
-                    <span className="text-base font-normal text-gray-400 ml-1">/ mes</span>
+                  <div className="mt-2 flex items-baseline gap-3 flex-wrap">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                      {transactionLabel}&nbsp;{formatPrice(property.price, property.currency)}
+                      {property.transactionType === 'RENT' && (
+                        <span className="text-base font-normal text-gray-400 ml-1">/ mes</span>
+                      )}
+                    </h2>
+                    {property.pricePerSqm && (
+                      <span className="text-sm text-gray-400">
+                        · {formatPrice(property.pricePerSqm, property.currency)} / m²
+                      </span>
+                    )}
+                    {property.isNegotiable && (
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full">
+                         Negociable
+                      </span>
+                    )}
+                  </div>
+
+                  <h1 className="mt-3 text-lg font-semibold text-gray-800 leading-snug">
+                    {property.title}
+                  </h1>
+
+                  {locationLine && (
+                    <p className="mt-2 text-sm text-gray-500 flex items-center gap-1.5">
+                      <svg className="w-4 h-4 text-teal-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                      </svg>
+                      {locationLine}
+                    </p>
                   )}
-                </h2>
-                {property.pricePerSqm && (
-                  <span className="text-sm text-gray-400">
-                    · {formatPrice(property.pricePerSqm, property.currency)} / m²
-                  </span>
-                )}
-                {property.isNegotiable && (
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full">
-                     Negociable
-                  </span>
-                )}
+                </div>
+
+                {/* Estrellas de calificación a la derecha */}
+                <div className="flex flex-col items-center gap-1 flex-shrink-0 pt-1">
+                  <StarRating
+                    propertyId={property.id}
+                    size="md"
+                    showValue
+                    onRatingSaved={() => {
+                      fetch(`/api/properties/${property.id}/rating`).then(res => {
+                        if (res.ok) res.json().then(data => setRating(data));
+                      }).catch(() => {});
+                    }}
+                  />
+                  {rating && rating.totalRatings > 0 && (
+                    <span className="text-xs text-gray-500">
+                      {rating.averageRating.toFixed(1)} ({rating.totalRatings} {rating.totalRatings === 1 ? 'reseña' : 'reseñas'})
+                    </span>
+                  )}
+                </div>
               </div>
-
-              <h1 className="mt-3 text-lg font-semibold text-gray-800 leading-snug">
-                {property.title}
-              </h1>
-
-              {locationLine && (
-                <p className="mt-2 text-sm text-gray-500 flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-teal-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
-                  {locationLine}
-                </p>
-              )}
 
               {/* Stats — UNA SOLA VEZ aquí */}
               <div className="mt-4 pt-4 border-t border-gray-100">
@@ -152,17 +204,7 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
 
             {/* 3. DESCRIPCIÓN — ANTES del mapa, siempre visible */}
             {property.description && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-                  <svg className="w-4 h-4 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
-                  </svg>
-                  Descripción de la propiedad
-                </h2>
-                <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
-                  {property.description}
-                </p>
-              </div>
+              <DescriptionSection description={property.description} />
             )}
             
             {/* Debug: mostrar si hay descripción */}
@@ -193,18 +235,18 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
           {/* ════════════════════════════════════════
               SIDEBAR  (1 / 3)  — sticky
           ════════════════════════════════════════ */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-3">
             <div className="sticky top-4 space-y-4">
 
               {/* Contactar */}
               <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-                <div className="px-5 pt-5 pb-3 border-b border-gray-100">
-                  <h3 className="text-base font-bold text-gray-900">Contacta al anunciante</h3>
+                <div className="px-4 pt-4 pb-2 border-b border-gray-100">
+                  <h3 className="text-sm font-bold text-gray-900">Contacta al anunciante</h3>
                 </div>
-                <div className="px-5 py-4">
+                <div className="px-4 py-3">
                   <ContactForm propertyId={property.id} ownerId={property.owner.id} />
                 </div>
-                <div className="px-5 pb-5">
+                <div className="px-4 pb-4">
                   <WhatsAppButton property={property} className="w-full" />
                 </div>
               </div>

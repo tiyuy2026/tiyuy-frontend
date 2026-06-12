@@ -67,6 +67,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
   const [createdPropertyId, setCreatedPropertyId] = useState<number | undefined>(property?.id);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showPlanExpiredModal, setShowPlanExpiredModal] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const { data: myPropertiesData } = useMyProperties();
   const { data: activeSubscription } = useActiveSubscription();
@@ -84,7 +85,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
     return (publishedPropertiesCount + publishedProjectsCount) < 1;
   }, [activeSubscription, publishedPropertiesCount, publishedProjectsCount]);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<any>({
     // Existing properties (only if property form)
     type: property?.type || 'APARTMENT',
     transactionType: (property && 'transactionType' in property) ? property.transactionType : 'SALE',
@@ -121,8 +122,8 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       projectType: (property && 'type' in property) ? property.type : 'RESIDENTIAL',
       totalUnits: (property && 'totalUnits' in property) ? property.totalUnits : 0,
       availableUnits: (property && 'availableUnits' in property) ? property.availableUnits : 0,
-      priceFrom: (property && 'priceFrom' in property) ? property.priceFrom : 0,
-      priceTo: (property && 'priceTo' in property) ? property.priceTo : 0,
+      priceFrom: (property && 'priceFrom' in property) ? property.priceFrom : '',
+      priceTo: (property && 'priceTo' in property) ? property.priceTo : '',
       startDate: (property && 'startDate' in property) ? property.startDate : '',
       estimatedDelivery: (property && 'estimatedDelivery' in property) ? property.estimatedDelivery : '',
       areaFrom: (property && 'areaFrom' in property) ? property.areaFrom : 0,
@@ -154,21 +155,128 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
     onStepChange?.(step);
   };
 
-  const handleChange = (field: string, value: any) =>
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const handleChange = (field: string, value: any) => {
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
+    setValidationErrors((prev) => ({ ...prev, [field]: '' }));
+  };
+
+  const validateStep = (step: number) => {
+    const errors: Record<string, string> = {};
+
+    if (formType === 'project') {
+      if (step === 1) {
+        const priceFrom = formData.priceFrom !== '' && formData.priceFrom !== null ? Number(formData.priceFrom) : null;
+        const priceTo = formData.priceTo !== '' && formData.priceTo !== null ? Number(formData.priceTo) : null;
+
+        if (priceFrom === null || priceFrom <= 0) {
+          errors.priceFrom = 'Ingresa un precio desde válido mayor a 0';
+        }
+        if (priceTo === null || priceTo <= 0) {
+          errors.priceTo = 'Ingresa un precio hasta válido mayor a 0';
+        }
+        if (priceFrom !== null && priceTo !== null && priceTo < priceFrom) {
+          errors.priceTo = 'El precio máximo debe ser mayor o igual al mínimo';
+        }
+        if (!formData.name || !formData.name.trim()) {
+          errors.name = 'El nombre del proyecto es obligatorio';
+        }
+        if (!formData.description || formData.description.trim().length < 30) {
+          errors.description = 'La descripción debe tener al menos 30 caracteres';
+        }
+        if (!formData.phase) {
+          errors.phase = 'Selecciona la fase del proyecto';
+        }
+        if (!formData.projectType) {
+          errors.projectType = 'Selecciona el tipo de proyecto';
+        }
+        if (!formData.amenities || formData.amenities.length === 0) {
+          errors.amenities = 'Selecciona al menos una amenidad';
+        }
+    }
+
+      if (step === 2) {
+        if (!formData.address || !formData.address.trim()) {
+          errors.address = 'La dirección es obligatoria';
+        }
+        if (!formData.district || !formData.district.trim()) {
+          errors.district = 'Selecciona el distrito';
+        }
+        if (!formData.province || !formData.province.trim()) {
+          errors.province = 'Selecciona la provincia';
+        }
+        if (!formData.region || !formData.region.trim()) {
+          errors.region = 'Selecciona la región';
+        }
+        if (!formData.street || !formData.street.trim()) {
+          errors.street = 'El nombre de la calle es obligatorio';
+        }
+        if (!formData.streetNumber || !formData.streetNumber.trim()) {
+          errors.streetNumber = 'El número de la calle es obligatorio';
+        }
+      }
+
+      if (step === 3) {
+        const fd = formData as any;
+        const hasUnits = (fd.units?.length || 0) > 0 || (fd.unitGroups?.length || 0) > 0;
+        if (!hasUnits) {
+          errors.units = 'Agrega al menos una unidad o grupo de unidades';
+        }
+      }
+
+      if (step === 4) {
+        if (!formData.startDate) {
+          errors.startDate = 'Ingresa la fecha de inicio';
+        }
+        if (!formData.estimatedDelivery) {
+          errors.estimatedDelivery = 'Ingresa la fecha de entrega estimada';
+        }
+        if (formData.priceFrom && formData.priceTo && Number(formData.priceTo) < Number(formData.priceFrom)) {
+          errors.priceTo = 'El precio máximo debe ser igual o mayor que el mínimo';
+        }
+      }
+    } else {
+      // Property validation
+      if (step === 1) {
+        if (!formData.transactionType) {
+          errors.transactionType = 'Selecciona si deseas vender o alquilar';
+        }
+        if (!formData.type) {
+          errors.type = 'Selecciona el tipo de propiedad';
+        }
+        if (!formData.price || Number(formData.price) <= 0) {
+          errors.price = 'Ingresa un precio válido mayor a 0';
+        }
+      }
+    }
+
+    return errors;
+  };
 
   const handleNext = () => {
+    const stepErrors = validateStep(currentStep);
+    if (Object.keys(stepErrors).length > 0) {
+      setValidationErrors(stepErrors);
+      toast.error('Revisa los campos marcados para continuar');
+      return;
+    }
+    setValidationErrors({});
     // Create project when reaching step 5 (before showing component)
     if (formType === 'project' && currentStep === 4 && !createdPropertyId) {
       // PREVIOUS VALIDATION of required fields
+      const allAreas = [
+        ...(formData.units || []).map((u: any) => u.area),
+        ...(formData.unitGroups || []).map((g: any) => g.area)
+      ];
+      const calculatedTotalUnits = (formData.units?.length || 0) + (formData.unitGroups || []).reduce((s: number, g: any) => s + (g.quantity || 0), 0);
+      
       const requiredFields = {
         name: formData.name,
         description: formData.description,
         phase: formData.phase,
         type: formData.type,
-        totalUnits: formData.totalUnits,
-        areaFrom: formData.areaFrom,
-        areaTo: formData.areaTo,
+        totalUnits: calculatedTotalUnits > 0 ? calculatedTotalUnits : formData.totalUnits,
+        areaFrom: allAreas.length > 0 ? Math.min(...allAreas) : formData.areaFrom,
+        areaTo: allAreas.length > 0 ? Math.max(...allAreas) : formData.areaTo,
         address: formData.address,
         district: formData.district,
         province: formData.province,
@@ -664,6 +772,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
           {currentSteps[currentStep - 1].title}
         </h1>
         <p className="text-sm text-gray-400 mt-0.5">{currentSteps[currentStep - 1].description}</p>
+        {/* Mostrar errores solo al lado de cada campo; no resumir globalmente aquí */}
       </div>
 
       {/* ── STEP CONTENT (con contenedor robusto) ── */}
@@ -675,157 +784,160 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
             propertyId={createdPropertyId}
             projectId={createdPropertyId}
             groupBlueprintFiles={formData.groupBlueprintFiles}
+            validationErrors={validationErrors}
           />
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <button
-          onClick={handlePrev}
-          disabled={currentStep === 1}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-gray-500 border border-gray-200 hover:border-gray-300 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all bg-white"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Anterior
-        </button>
-        
-        {/* Botón de Guardar Borrador visible para proyectos */}
-        {formType === 'project' && !createdPropertyId && currentStep === 5 && (
-          <button
-            onClick={async () => {
-              console.log('DEBUG - Datos actuales del formulario:', formData);
-              
-              try {
-                // FIX: Primero subir planos de unidades si existen
-                if (formData.unitBlueprintFiles || formData.groupBlueprintFiles) {
-                  console.log('Subiendo planos de unidades antes de guardar...');
+       <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-8 pt-6 border-t border-gray-100">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button
+              onClick={handlePrev}
+              disabled={currentStep === 1}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-lg text-sm font-medium text-gray-500 border border-gray-200 hover:border-gray-300 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all bg-white"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Anterior
+            </button>
+            
+            {/* Botón de Guardar Borrador visible para proyectos */}
+            {formType === 'project' && !createdPropertyId && currentStep === 5 && (
+              <button
+                onClick={async () => {
+                  console.log('DEBUG - Datos actuales del formulario:', formData);
                   
-                  // Obtener referencia al componente ProjectMultimediaStep
-                  const multimediaStepRef = document.querySelector('[data-multimedia-step]') as any;
-                  if (multimediaStepRef && multimediaStepRef.uploadUnitBlueprints) {
-                    const uploadedBlueprints = await multimediaStepRef.uploadUnitBlueprints();
-                    console.log('Planos subidos:', uploadedBlueprints);
-                    
-                    // FIX: Actualizar las unidades y grupos con las URLs subidas
-                    const updatedUnits = Array.isArray(formData.units) ? formData.units.map((unit: any) => {
-                      if (uploadedBlueprints[unit.id]) {
-                        return { ...unit, blueprintImage: uploadedBlueprints[unit.id] };
+                  try {
+                    // FIX: Primero subir planos de unidades si existen
+                    if (formData.unitBlueprintFiles || formData.groupBlueprintFiles) {
+                      console.log('Subiendo planos de unidades antes de guardar...');
+                      
+                      // Obtener referencia al componente ProjectMultimediaStep
+                      const multimediaStepRef = document.querySelector('[data-multimedia-step]') as any;
+                      if (multimediaStepRef && multimediaStepRef.uploadUnitBlueprints) {
+                        const uploadedBlueprints = await multimediaStepRef.uploadUnitBlueprints();
+                        console.log('Planos subidos:', uploadedBlueprints);
+                        
+                        // FIX: Actualizar las unidades y grupos con las URLs subidas
+                        const updatedUnits = Array.isArray(formData.units) ? formData.units.map((unit: any) => {
+                          if (uploadedBlueprints[unit.id]) {
+                            return { ...unit, blueprintImage: uploadedBlueprints[unit.id] };
+                          }
+                          return unit;
+                        }) : [];
+                        
+                        const updatedGroups = Array.isArray((formData as any).groups) ? (formData as any).groups.map((group: any) => {
+                          if (uploadedBlueprints[group.id]) {
+                            return { ...group, blueprintImage: uploadedBlueprints[group.id] };
+                          }
+                          return group;
+                        }) : [];
+                        
+                        // Actualizar formData con las URLs
+                        const updatedFormData = {
+                          ...formData,
+                          units: updatedUnits,
+                          groups: updatedGroups
+                        };
+                        
+                        console.log('Guardando proyecto con planos actualizados:', updatedFormData);
+                        
+                        const projectData = prepareProjectData(updatedFormData);
+                        createProjectMutation.mutate(projectData, {
+                          onSuccess: (result: any) => { 
+                            console.log('Proyecto guardado como BORRADOR:', result);
+                            toast.success('Proyecto guardado como BORRADOR');
+                            router.push('/my-projects'); // Redirigir a borradores
+                          },
+                          onError: (error: any) => {
+                            console.error('Error guardando borrador:', error);
+                            toast.error('Error al guardar el borrador');
+                          }
+                        });
+                      } else {
+                        console.warn('No se encontro la funcion uploadUnitBlueprints');
+                        // Guardar sin planos si no se encuentra la función
+                        const projectData = prepareProjectData(formData);
+                        createProjectMutation.mutate(projectData, {
+                          onSuccess: (result: any) => { 
+                            console.log('Proyecto guardado como BORRADOR:', result);
+                            toast.success('Proyecto guardado como BORRADOR');
+                            router.push('/my-projects'); // Redirigir a borradores
+                          },
+                          onError: (error: any) => {
+                            console.error('Error guardando borrador:', error);
+                            toast.error('Error al guardar el borrador');
+                          }
+                        });
                       }
-                      return unit;
-                    }) : [];
-                    
-                    const updatedGroups = Array.isArray((formData as any).groups) ? (formData as any).groups.map((group: any) => {
-                      if (uploadedBlueprints[group.id]) {
-                        return { ...group, blueprintImage: uploadedBlueprints[group.id] };
-                      }
-                      return group;
-                    }) : [];
-                    
-                    // Actualizar formData con las URLs
-                    const updatedFormData = {
-                      ...formData,
-                      units: updatedUnits,
-                      groups: updatedGroups
-                    };
-                    
-                    console.log('Guardando proyecto con planos actualizados:', updatedFormData);
-                    
-                    const projectData = prepareProjectData(updatedFormData);
-                    createProjectMutation.mutate(projectData, {
-                      onSuccess: (result: any) => { 
-                        console.log('Proyecto guardado como BORRADOR:', result);
-                        toast.success('Proyecto guardado como BORRADOR');
-                        router.push('/my-projects'); // Redirigir a borradores
-                      },
-                      onError: (error: any) => {
-                        console.error('Error guardando borrador:', error);
-                        toast.error('Error al guardar el borrador');
-                      }
-                    });
-                  } else {
-                    console.warn('No se encontro la funcion uploadUnitBlueprints');
-                    // Guardar sin planos si no se encuentra la función
-                    const projectData = prepareProjectData(formData);
-                    createProjectMutation.mutate(projectData, {
-                      onSuccess: (result: any) => { 
-                        console.log('Proyecto guardado como BORRADOR:', result);
-                        toast.success('Proyecto guardado como BORRADOR');
-                        router.push('/my-projects'); // Redirigir a borradores
-                      },
-                      onError: (error: any) => {
-                        console.error('Error guardando borrador:', error);
-                        toast.error('Error al guardar el borrador');
-                      }
-                    });
-                  }
-                } else {
-                  // Guardar normalmente si no hay planos
-                  const projectData = prepareProjectData(formData);
-                  createProjectMutation.mutate(projectData, {
-                    onSuccess: (result: any) => { 
-                      console.log('Proyecto guardado como BORRADOR:', result);
-                      toast.success('Proyecto guardado como BORRADOR');
-                      router.push('/my-projects'); // Redirigir a borradores
-                    },
-                    onError: (error: any) => {
-                      console.error('Error guardando borrador:', error);
-                      toast.error('Error al guardar el borrador');
+                    } else {
+                      // Guardar normalmente si no hay planos
+                      const projectData = prepareProjectData(formData);
+                      createProjectMutation.mutate(projectData, {
+                        onSuccess: (result: any) => { 
+                          console.log('Proyecto guardado como BORRADOR:', result);
+                          toast.success('Proyecto guardado como BORRADOR');
+                          router.push('/my-projects'); // Redirigir a borradores
+                        },
+                        onError: (error: any) => {
+                          console.error('Error guardando borrador:', error);
+                          toast.error('Error al guardar el borrador');
+                        }
+                      });
                     }
-                  });
-                }
-              } catch (error) {
-                console.error('Error en el proceso de guardado:', error);
-                toast.error('Error al guardar el proyecto');
-              }
-            }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-orange-600 border border-orange-200 hover:bg-orange-50 transition-all"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            Guardar Borrador
-          </button>
-        )}
-      </div>
+                  } catch (error) {
+                    console.error('Error en el proceso de guardado:', error);
+                    toast.error('Error al guardar el proyecto');
+                  }
+                }}
+                 className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-orange-600 border border-orange-200 hover:bg-orange-50 transition-all"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Guardar Borrador
+              </button>
+            )}
+          </div>
 
-      <button
-        onClick={isLastStep ? handleSubmit : handleNext}
-        disabled={isLoading}
-        className="flex items-center gap-2 px-6 py-2.5 text-white text-sm font-semibold rounded-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-        style={{ backgroundColor: '#00a63e' }}
-        onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#009135')}
-        onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#00a63e')}
-      >
-        {isLoading ? (
-          <>
-            <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            Guardando...
-          </>
-        ) : isLastStep ? (
-          <>
-            {mode === 'create' ? (
-              formType === 'project' 
-                ? (canPublish ? ' Publicar Proyecto' : ' Guardar Borrador')
-                : 'Finalizar'
-            ) : 'Guardar cambios'}
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </>
-        ) : (
-          <>
-            Siguiente
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </>
-        )}
-      </button>
+           <button
+             onClick={isLastStep ? handleSubmit : handleNext}
+             disabled={isLoading}
+             className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 text-white text-sm font-semibold rounded-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+             style={{ backgroundColor: '#00a63e' }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#009135')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#00a63e')}
+          >
+            {isLoading ? (
+              <>
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Guardando...
+              </>
+            ) : isLastStep ? (
+              <>
+                {mode === 'create' ? (
+                  formType === 'project' 
+                    ? (canPublish ? ' Publicar Proyecto' : ' Guardar Borrador')
+                    : 'Finalizar'
+                ) : 'Guardar cambios'}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </>
+            ) : (
+              <>
+                Siguiente
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </>
+            )}
+          </button>
+        </div>
     </>
   );
 }

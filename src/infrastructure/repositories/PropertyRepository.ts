@@ -230,13 +230,28 @@ async getById(id: number): Promise<Property> {
 
   async getFeaturedMix(): Promise<PropertySummary[]> {
     try {
-      const response = await publicApiClient.get('/properties/featured/mix', {
+      // El backend tiene el endpoint en /featured/properties que devuelve
+      // propiedades destacadas organizadas en filas por categoría
+      const response = await publicApiClient.get('/featured/properties', {
         timeout: 120000,
       });
 
-      if (response.data && Array.isArray(response.data)) {
-        return response.data.map(PropertyMapper.toSummary);
+      // La respuesta es un objeto con filas (rows), cada fila tiene items
+      // Extraemos todas las propiedades de todas las filas
+      if (response.data?.rows && Array.isArray(response.data.rows)) {
+        const allProperties: PropertySummary[] = [];
+        for (const row of response.data.rows) {
+          if (row.items && Array.isArray(row.items)) {
+            for (const item of row.items) {
+              if (item.property) {
+                allProperties.push(PropertyMapper.toSummary(item.property));
+              }
+            }
+          }
+        }
+        return allProperties;
       }
+      
       return [];
     } catch (error) {
       console.error('Error loading featured mix:', error);

@@ -142,11 +142,11 @@ export class AuthRepository implements IAuthRepository {
       const data = error.response?.data;
       
       if (status === 401) {
-        throw new Error('No se pudo autenticar con Google. Por favor, regístrate primero.');
+        throw new Error(data?.message || 'No se pudo autenticar con Google. Por favor, usa tu correo y contraseña o regístrate.');
       }
       
       if (status === 404) {
-        throw new Error('Usuario no encontrado. Por favor, regístrate primero.');
+        throw new Error(data?.message || 'Usuario no encontrado. Por favor, usa tu correo y contraseña o regístrate.');
       }
       
       throw new Error(data?.message || 'Error al iniciar sesión con Google');

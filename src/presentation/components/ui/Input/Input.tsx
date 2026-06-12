@@ -11,8 +11,8 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, helperText, leftIcon, rightIcon, className = '', required, readOnly, ...props }, ref) => {
     // Strip ALL styling classes from external className — only keep layout/sizing classes
+    // But preserve explicit bg-white if passed
     const cleanClassName = className
-      .replace(/\bbg-\S+/g, '')
       .replace(/\bborder-\S+/g, '')
       .replace(/\bfocus:\S+/g, '')
       .replace(/\btext-\S+/g, '')
@@ -20,8 +20,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       .trim();
 
     const inputClasses = [
-      'w-full px-4 py-3 rounded-xl border transition-all duration-200',
-      'placeholder:text-gray-400',
+      'w-full px-3 py-2 rounded-lg border transition-all duration-200 text-sm',
+      'placeholder:text-gray-400 placeholder:text-sm',
       leftIcon ? 'pl-10' : '',
       rightIcon ? 'pr-10' : '',
       error
@@ -36,7 +36,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-xs font-medium text-gray-700 mb-1.5">
             {label}
             {required && <span className="text-red-500 ml-1">*</span>}
           </label>

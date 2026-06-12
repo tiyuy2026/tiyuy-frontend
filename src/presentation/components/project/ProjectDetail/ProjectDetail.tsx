@@ -8,6 +8,9 @@ import { SimilarProjects } from '../SimilarProjects';
 import { ProjectGallery } from './ProjectGallery';
 import { ProjectContactSidebar } from './ProjectContactSidebar';
 import { ProjectComments } from './ProjectComments';
+import { FavoriteButton } from '../../shared/FavoriteButton/FavoriteButton';
+import { ShareButton } from '../../shared/ShareButton/ShareButton';
+import { StarRating } from '../../property/PropertyDetail/StarRating';
 
 interface ProjectDetailProps {
   project: ProjectFull;
@@ -30,6 +33,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
   const { projectUnits, projectFull } = useProjects();
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [selectedUnit, setSelectedUnit] = useState<ProjectUnit | null>(null);
+  const [rating, setRating] = useState<{ averageRating: number; totalRatings: number } | null>(null);
 
   const { data: unitsData } = projectUnits(project.id, 0, 100);
   const { data: fullProjectData } = projectFull(project.id);
@@ -101,68 +105,82 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
           {/* ════════════════════════════════════════
-              COLUMNA PRINCIPAL (2/3)
+              COLUMNA PRINCIPAL (3/4)
           ════════════════════════════════════════ */}
-          <div className="lg:col-span-8 space-y-6">
+          <div className="lg:col-span-9 space-y-4">
 
-            {/* Breadcrumb */}
-            <div className="text-sm text-gray-500">
-              <span>Proyectos</span>
-              <span className="mx-2">›</span>
-              <span>{currentProject.district}</span>
-              <span className="mx-2">›</span>
-              <span className="text-gray-800 font-medium">{currentProject.name}</span>
+            {/* ── FAVORITO / COMPARTIR (encima de la galería) ── */}
+            <div className="flex items-center justify-end gap-1">
+              <FavoriteButton propertyId={project.id} variant="topbar" />
+              <ShareButton variant="topbar" />
             </div>
 
-            {/* Título del desarrollador */}
-            {currentProject.developer?.companyName && (
-              <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1 text-xs font-semibold text-gray-700">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                {currentProject.developer.companyName}
-              </div>
-            )}
-
             {/* 1. GALERÍA */}
-            <ProjectGallery
-              project={currentProject}
-              galleryImagesOnly={galleryImagesOnly}
-              blueprints={blueprints}
-              video={video}
-            />
+            <div className="rounded-2xl overflow-hidden bg-white shadow-sm -mt-2">
+              <ProjectGallery
+                project={currentProject}
+                galleryImagesOnly={galleryImagesOnly}
+                blueprints={blueprints}
+                video={video}
+              />
+            </div>
 
             {/* 2. INFO PRINCIPAL */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <p className="text-sm text-gray-500 mb-1">
-                {TYPE_LABELS[currentProject.type] || currentProject.type} en {currentProject.district}
-              </p>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-500 mb-1">
+                    {TYPE_LABELS[currentProject.type] || currentProject.type} en {currentProject.district}
+                  </p>
 
-              <div className="flex items-center gap-3 mb-2">
-                <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-                  {PHASE_LABELS[currentProject.phase] || currentProject.phase}
-                  {deliveryDate && ` · Entrega ${deliveryDate}`}
-                </span>
-                {currentProject.isVerified && (
-                  <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">✓ Verificado</span>
-                )}
-                {currentProject.isFeatured && (
-                  <span className="bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-1 rounded-full">⭐ Destacado</span>
-                )}
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                      {PHASE_LABELS[currentProject.phase] || currentProject.phase}
+                      {deliveryDate && ` · Entrega ${deliveryDate}`}
+                    </span>
+                    {currentProject.isVerified && (
+                      <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">✓ Verificado</span>
+                    )}
+                    {currentProject.isFeatured && (
+                      <span className="bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-1 rounded-full">⭐ Destacado</span>
+                    )}
+                  </div>
+
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{currentProject.name}</h1>
+
+                  <p className="text-2xl font-bold text-gray-900 mb-1">
+                    Venta desde {currency} {currentProject.priceFrom?.toLocaleString('en-US')}
+                  </p>
+
+                  {currentProject.address && (
+                    <p className="text-sm text-gray-500 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      </svg>
+                      {currentProject.address}
+                    </p>
+                  )}
+                </div>
+
+                {/* Estrellas de calificación a la derecha */}
+                <div className="flex flex-col items-center gap-1 flex-shrink-0 pt-1">
+                  <StarRating
+                    projectId={project.id}
+                    size="md"
+                    showValue
+                    onRatingSaved={() => {
+                      fetch(`/api/projects/${project.id}/rating`).then(res => {
+                        if (res.ok) res.json().then(data => setRating(data));
+                      }).catch(() => {});
+                    }}
+                  />
+                  {rating && rating.totalRatings > 0 && (
+                    <span className="text-xs text-gray-500">
+                      {rating.averageRating.toFixed(1)} ({rating.totalRatings} {rating.totalRatings === 1 ? 'reseña' : 'reseñas'})
+                    </span>
+                  )}
+                </div>
               </div>
-
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{currentProject.name}</h1>
-
-              <p className="text-2xl font-bold text-gray-900 mb-1">
-                Venta desde {currency} {currentProject.priceFrom?.toLocaleString('en-US')}
-              </p>
-
-              {currentProject.address && (
-                <p className="text-sm text-gray-500 flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  </svg>
-                  {currentProject.address}
-                </p>
-              )}
             </div>
 
             {/* 3. STATS */}
@@ -252,7 +270,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                   {groupedUnitTypes
                     .filter(g => activeGroup === null || (g.units[0].bedrooms ?? 0) === activeGroup)
                     .map(({ units: groupUnits, key }) => {
@@ -539,7 +557,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
           {/* ════════════════════════════════════════
               SIDEBAR (1/3) — sticky
           ════════════════════════════════════════ */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-3">
             <ProjectContactSidebar
               project={currentProject}
               units={units}

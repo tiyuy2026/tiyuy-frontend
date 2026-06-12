@@ -15,23 +15,66 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
     description: '',
   });
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const validateMainDates = (field: string, value: string) => {
+    const newErrors = { ...errors };
+    
+    if (field === 'startDate') {
+      if (formData.estimatedDelivery && value > formData.estimatedDelivery) {
+        newErrors.startDate = 'La fecha de inicio no puede ser posterior a la de entrega';
+      } else {
+        delete newErrors.startDate;
+        delete newErrors.estimatedDelivery;
+      }
+    }
+
+    if (field === 'estimatedDelivery') {
+      const start = formData.startDate || formData.constructionStartDate;
+      if (!value) {
+        newErrors.estimatedDelivery = 'La fecha de entrega estimada es obligatoria';
+      } else if (start && value < start) {
+        newErrors.estimatedDelivery = 'La fecha de entrega no puede ser anterior a la de inicio';
+      } else {
+        delete newErrors.estimatedDelivery;
+        delete newErrors.startDate;
+      }
+    }
+
+    setErrors(newErrors);
+  };
+
   const addMilestone = () => {
+    const milestoneErrors: { [key: string]: string } = {};
+
+    if (!currentMilestone.phase.trim()) {
+      milestoneErrors.phase = 'El nombre de la fase o hito es obligatorio';
+    }
+    if (!currentMilestone.date) {
+      milestoneErrors.date = 'La fecha del hito es obligatoria';
+    }
+
+    if (Object.keys(milestoneErrors).length > 0) {
+      setErrors(p => ({ ...p, ...milestoneErrors }));
+      return;
+    }
+
     const timeline = formData.timeline || [];
-    onChange('timeline', [...timeline, { ...currentMilestone, id: Date.now() }]);
+    onChange('timeline', [...timeline, { ...currentMilestone, phase: currentMilestone.phase.trim(), id: Date.now() }]);
     setCurrentMilestone({ phase: '', date: '', description: '' });
     setShowMilestoneForm(false);
+    
+    setErrors(p => {
+      const { phase, date, ...rest } = p;
+      return rest;
+    });
   };
 
   const removeMilestone = (milestoneId: number) => {
-    const timeline = formData.timeline || [];
-    onChange('timeline', timeline.filter((m: any) => m.id !== milestoneId));
-  };
-
-  const updateMilestone = (milestoneId: number, field: string, value: any) => {
-    const timeline = formData.timeline || [];
-    onChange('timeline', timeline.map((m: any) => 
-      m.id === milestoneId ? { ...m, [field]: value } : m
-    ));
+    if (window.confirm('¿Estás seguro de que deseas eliminar este hito?')) {
+      const timeline = formData.timeline || [];
+      onChange('timeline', timeline.filter((m: any) => m.id !== milestoneId));
+    }
   };
 
   return (
@@ -43,7 +86,6 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
         </p>
       </div>
 
-      {/* Fechas principales */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -51,10 +93,23 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
           </label>
           <input
             type="date"
+            max={formData.estimatedDelivery || undefined}
             value={formData.startDate || formData.constructionStartDate || ''}
-            onChange={(e) => onChange('startDate', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+            onChange={(e) => {
+              onChange('startDate', e.target.value);
+              validateMainDates('startDate', e.target.value);
+            }}
+            className={`w-full px-3 py-2 border rounded-lg outline-none transition focus:ring-2 bg-white text-gray-900 ${
+              errors.startDate 
+                ? 'border-red-500 focus:ring-red-200 focus:border-red-500' 
+                : 'border-gray-300 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]'
+            }`}
           />
+          {errors.startDate && (
+            <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1">
+              <span>⚠️</span> {errors.startDate}
+            </p>
+          )}
         </div>
 
         <div>
@@ -63,15 +118,27 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
           </label>
           <input
             type="date"
+            min={formData.startDate || formData.constructionStartDate || undefined}
             value={formData.estimatedDelivery || ''}
-            onChange={(e) => onChange('estimatedDelivery', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+            onChange={(e) => {
+              onChange('estimatedDelivery', e.target.value);
+              validateMainDates('estimatedDelivery', e.target.value);
+            }}
+            className={`w-full px-3 py-2 border rounded-lg outline-none transition focus:ring-2 bg-white text-gray-900 ${
+              errors.estimatedDelivery 
+                ? 'border-red-500 focus:ring-red-200 focus:border-red-500' 
+                : 'border-gray-300 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]'
+            }`}
             required
           />
+          {errors.estimatedDelivery && (
+            <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1">
+              <span>⚠️</span> {errors.estimatedDelivery}
+            </p>
+          )}
         </div>
       </div>
 
-      {/* Información adicional */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h4 className="font-medium text-blue-900 mb-2">Información importante</h4>
         <ul className="text-sm text-blue-800 space-y-1">
@@ -81,27 +148,31 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
         </ul>
       </div>
 
-      {/* Timeline existente */}
       {formData.timeline && formData.timeline.length > 0 && (
         <div className="space-y-4">
           <h4 className="font-medium text-gray-900">Hitos del Proyecto</h4>
           <div className="space-y-3">
-            {formData.timeline
+            {[...formData.timeline]
               .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
               .map((milestone: any) => (
-                <div key={milestone.id} className="border border-gray-200 rounded-lg p-4">
+                <div key={milestone.id} className="border border-gray-200 rounded-lg p-4 bg-white">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                        <div className="w-2 h-2 bg-[var(--brand-primary)] rounded-full"></div>
                         <span className="font-medium text-gray-900">{milestone.phase}</span>
-                        <span className="text-sm text-gray-500">{new Date(milestone.date).toLocaleDateString('es-PE')}</span>
+                        <span className="text-sm text-gray-500">
+                          {new Date(milestone.date + 'T00:00:00').toLocaleDateString('es-PE')}
+                        </span>
                       </div>
-                      <p className="text-sm text-gray-600">{milestone.description}</p>
+                      {milestone.description && (
+                        <p className="text-sm text-gray-600">{milestone.description}</p>
+                      )}
                     </div>
                     <button
+                      type="button"
                       onClick={() => removeMilestone(milestone.id)}
-                      className="text-red-500 hover:text-red-700 ml-4"
+                      className="text-red-500 hover:text-red-700 ml-4 text-sm font-medium transition-colors"
                     >
                       Eliminar
                     </button>
@@ -112,10 +183,19 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
         </div>
       )}
 
-      {/* Formulario para agregar hito */}
+      {!showMilestoneForm && (
+        <button
+          type="button"
+          onClick={() => setShowMilestoneForm(true)}
+          className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)] transition text-sm font-medium"
+        >
+          + Agregar Hito
+        </button>
+      )}
+
       {showMilestoneForm && (
-        <div className="border border-gray-200 rounded-lg p-4">
-          <h4 className="font-medium text-gray-900 mb-4">Nuevo Hito</h4>
+        <div className="border border-[var(--brand-primary)]/20 rounded-xl p-5 bg-[var(--brand-primary)]/[0.04] space-y-4">
+          <h4 className="font-semibold text-gray-900">Nuevo Hito</h4>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -123,12 +203,27 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
               </label>
               <input
                 type="text"
+                maxLength={100}
                 value={currentMilestone.phase}
-                onChange={(e) => setCurrentMilestone({ ...currentMilestone, phase: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                onChange={(e) => {
+                  setCurrentMilestone({ ...currentMilestone, phase: e.target.value });
+                  if (e.target.value.trim() && errors.phase) {
+                    setErrors(p => { const { phase, ...r } = p; return r; });
+                  }
+                }}
+                className={`w-full px-3 py-2 border rounded-lg outline-none transition focus:ring-2 bg-white text-gray-900 ${
+                  errors.phase 
+                    ? 'border-red-500 focus:ring-red-200 focus:border-red-500' 
+                    : 'border-gray-300 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]'
+                }`}
                 placeholder="Ej: Inicio de cimentación"
                 required
               />
+              {errors.phase && (
+                <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1">
+                  <span>⚠️</span> {errors.phase}
+                </p>
+              )}
             </div>
 
             <div>
@@ -138,9 +233,24 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
               <input
                 type="date"
                 value={currentMilestone.date}
-                onChange={(e) => setCurrentMilestone({...currentMilestone, date: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                onChange={(e) => {
+                  setCurrentMilestone({ ...currentMilestone, date: e.target.value });
+                  if (e.target.value && errors.date) {
+                    setErrors(p => { const { date, ...r } = p; return r; });
+                  }
+                }}
+                className={`w-full px-3 py-2 border rounded-lg outline-none transition focus:ring-2 bg-white text-gray-900 ${
+                  errors.date 
+                    ? 'border-red-500 focus:ring-red-200 focus:border-red-500' 
+                    : 'border-gray-300 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]'
+                }`}
+                required
               />
+              {errors.date && (
+                <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1">
+                  <span>⚠️</span> {errors.date}
+                </p>
+              )}
             </div>
 
             <div>
@@ -149,25 +259,31 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
               </label>
               <input
                 type="text"
+                maxLength={250}
                 value={currentMilestone.description}
-                onChange={(e) => setCurrentMilestone({...currentMilestone, description: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                placeholder="Detalles importantes"
+                onChange={(e) => setCurrentMilestone({ ...currentMilestone, description: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none transition focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] text-gray-900 bg-white"
+                placeholder="Detalles importantes (opcional)"
               />
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 mt-6">
+          <div className="flex justify-end space-x-3 pt-2">
             <button
-              onClick={() => setShowMilestoneForm(false)}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+              type="button"
+              onClick={() => {
+                setCurrentMilestone({ phase: '', date: '', description: '' });
+                setErrors(p => { const { phase, date, ...r } = p; return r; });
+                setShowMilestoneForm(false);
+              }}
+              className="px-4 py-2 border border-[var(--brand-primary)] text-[var(--brand-primary)] rounded-lg hover:bg-[var(--brand-primary)]/[0.06] text-sm font-medium transition-colors"
             >
               Cancelar
             </button>
             <button
+              type="button"
               onClick={addMilestone}
-              disabled={!currentMilestone.phase || !currentMilestone.date}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-[var(--brand-primary)] text-white rounded-lg hover:bg-[var(--brand-primary-hover)] text-sm font-medium transition-colors shadow-sm"
             >
               Agregar Hito
             </button>
@@ -175,7 +291,6 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
         </div>
       )}
 
-      {/* Certificaciones */}
       <div>
         <h4 className="font-medium text-gray-900 mb-3">Certificaciones y Sellos de Calidad</h4>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -184,7 +299,7 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
             'Certificado de Seguridad', 'Sustentable', 'Edificio Inteligente',
             'Certificado Sismorresistente', 'Material Premium', 'Garantía Estructural'
           ].map((cert) => (
-            <label key={cert} className="flex items-center space-x-2">
+            <label key={cert} className="flex items-center space-x-2 cursor-pointer group">
               <input
                 type="checkbox"
                 checked={formData.certifications?.includes(cert) || false}
@@ -196,39 +311,32 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
                     onChange('certifications', current.filter((c: string) => c !== cert));
                   }
                 }}
-                className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                className="rounded border-gray-300 text-[var(--brand-primary)] focus:ring-[var(--brand-primary)] w-4 h-4 cursor-pointer transition"
               />
-              <span className="text-sm text-gray-700">{cert}</span>
+              <span className="text-sm text-gray-700 select-none group-hover:text-gray-900 transition-colors">{cert}</span>
             </label>
           ))}
         </div>
       </div>
 
-      {/* Resumen del timeline */}
       {formData.timeline && formData.timeline.length > 0 && (
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-          <h4 className="font-medium text-purple-900 mb-2">Resumen del Timeline</h4>
+        <div className="bg-[var(--brand-primary)]/[0.04] border border-[var(--brand-primary)]/20 rounded-xl p-4">
+          <h4 className="font-medium text-gray-900 mb-2">Resumen del Timeline</h4>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-purple-700">Total Hitos:</span>
-              <span className="font-semibold text-purple-900">{formData.timeline.length}</span>
+              <span className="text-gray-600">Total Hitos:</span>
+              <span className="font-semibold text-gray-900">{formData.timeline.length}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-purple-700">Inicio:</span>
-              <span className="font-semibold text-purple-900">
-                {formData.timeline.length > 0 ? 
-                  new Date(Math.min(...formData.timeline.map((m: any) => new Date(m.date).getTime()))).toLocaleDateString('es-PE') : 
-                  'No definido'
-                }
+              <span className="text-gray-600">Primer Hito:</span>
+              <span className="font-semibold text-gray-900">
+                {new Date(Math.min(...formData.timeline.map((m: any) => new Date(m.date).getTime())) + 86400000).toLocaleDateString('es-PE')}
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-purple-700">Fin:</span>
-              <span className="font-semibold text-purple-900">
-                {formData.timeline.length > 0 ? 
-                  new Date(Math.max(...formData.timeline.map((m: any) => new Date(m.date).getTime()))).toLocaleDateString('es-PE') : 
-                  'No definido'
-                }
+              <span className="text-gray-600">Último Hito:</span>
+              <span className="font-semibold text-gray-900">
+                {new Date(Math.max(...formData.timeline.map((m: any) => new Date(m.date).getTime())) + 86400000).toLocaleDateString('es-PE')}
               </span>
             </div>
           </div>

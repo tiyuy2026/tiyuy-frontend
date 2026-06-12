@@ -96,17 +96,14 @@ export default function PropertiesContent() {
             </div>
 
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                  <div key={i} className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse">
-                    <div className="w-full h-64 bg-gradient-to-br from-gray-200 to-gray-300" />
-                    <div className="p-6 space-y-4">
-                      <div className="h-4 bg-gray-300 rounded w-3/4" />
-                      <div className="h-4 bg-gray-300 rounded w-1/2" />
-                      <div className="flex justify-between">
-                        <div className="h-6 bg-gray-300 rounded w-20" />
-                        <div className="h-6 bg-gray-300 rounded w-16" />
-                      </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="animate-pulse">
+                    <div className="w-full aspect-square bg-gray-200 rounded-xl mb-3" />
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="h-3 bg-gray-200 rounded w-1/2" />
+                      <div className="h-4 bg-gray-200 rounded w-20" />
                     </div>
                   </div>
                 ))}
@@ -141,7 +138,7 @@ export default function PropertiesContent() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
                   {allProperties.map((property, index) => {
                     const isLastItem = index === allProperties.length - 1;
                     return (
