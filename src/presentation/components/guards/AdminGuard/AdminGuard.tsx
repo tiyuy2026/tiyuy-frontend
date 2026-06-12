@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useAuthStore } from "@/presentation/store/authStore";
-import { adminRepository } from "@/repositories/AdminRepository";
+import { adminRepository } from "@/infrastructure/repositories/AdminRepository";
 
 export default function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user, adminRoleType, isAdminActive } = useAuthStore();
@@ -27,11 +27,10 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
         setLoadingAdmin(true);
         hasAttemptedLoad.current = true;
 
-        const response = await adminRepository.getAdminByUserId(user.id);
-        const admin = response?.data ?? response ?? null;
+        const admin = await adminRepository.getAdminByUserId(user.id);
 
         useAuthStore.getState().setAdminProfile(
-          admin?.roleType || 'ADMIN',
+          admin?.role || 'ADMIN',
           admin?.departments || [],
           admin?.permissions || [],
           admin?.isActive ?? true

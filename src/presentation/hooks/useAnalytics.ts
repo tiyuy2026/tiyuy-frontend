@@ -95,11 +95,13 @@ export function useAuditLogsByDateRange(startDate: string, endDate: string, page
   });
 }
 
-// Activity hooks
-export function useUserActivities(type?: string, dateRange?: string) {
+// Activity hooks - con paginación y filtro por fecha
+export function useUserActivities(type?: string, startDate?: string, endDate?: string, page: number = 0, size: number = 20) {
   return useQuery({
-    queryKey: ['activity', 'user', type, dateRange],
-    queryFn: () => analyticsRepo.getUserActivities(type, dateRange),
+    queryKey: ['activity', 'user', type, startDate, endDate, page, size],
+    queryFn: () => analyticsRepo.getUserActivities(type, startDate, endDate, page, size),
+    staleTime: 30000, // 30 segundos antes de refetch
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -107,6 +109,8 @@ export function useActivityStats(dateRange?: string) {
   return useQuery({
     queryKey: ['activity', 'stats', dateRange],
     queryFn: () => analyticsRepo.getActivityStats(dateRange),
+    staleTime: 30000, // 30 segundos antes de refetch
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -122,6 +126,8 @@ export function useCommunicationStats() {
   return useQuery({
     queryKey: ['communications', 'stats'],
     queryFn: () => analyticsRepo.getCommunicationStats(),
+    staleTime: 60000, // 1 minuto antes de refetch
+    placeholderData: (previousData) => previousData,
   });
 }
 

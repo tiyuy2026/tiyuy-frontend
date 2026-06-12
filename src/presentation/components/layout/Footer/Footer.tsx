@@ -37,6 +37,7 @@ const FOOTER_COLUMNS = [
       { label: 'Apoyo a personas con discapacidad', href: '/#discapacidad' },
       { label: 'Opciones de cancelación', href: '/#cancelacion' },
       { label: 'Libro de Reclamaciones', href: '/#reclamaciones' },
+      { label: 'Centro de Soporte', href: '/soporte' },
     ],
   },
   {
@@ -104,7 +105,8 @@ const SOCIAL_LINKS = [
 
 export function Footer() {
   return (
-    <footer className="w-full mt-12 bg-[#1a1a1a] text-gray-300 font-sans">
+    <>
+      <footer className="w-full mt-12 bg-[#1a1a1a] text-gray-300 font-sans">
       <div className="w-full px-6 xl:px-16 max-w-[1920px] mx-auto py-12 border-b border-white/10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           <div>
@@ -223,6 +225,7 @@ export function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+      </footer>
+    </>
   );
 }

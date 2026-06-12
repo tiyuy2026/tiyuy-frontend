@@ -75,6 +75,8 @@ export function useAllAssociationRequests(status: string | null = null, page: nu
   return useQuery({
     queryKey: [ASSOCIATIONS_QUERY_KEY, 'admin', 'all', status, page, size],
     queryFn: () => adminRepository.getAllAssociationRequests(status, page, size),
+    staleTime: 30000, // 30 segundos antes de refetch
+    placeholderData: (previousData) => previousData,
   });
 }
 

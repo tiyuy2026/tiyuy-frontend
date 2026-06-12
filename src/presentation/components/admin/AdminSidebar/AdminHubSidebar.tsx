@@ -208,25 +208,18 @@ export function GitHubSidebar() {
       icon: <Megaphone className="w-4 h-4" />,
       children: [
         {
-          id: 'events',
-          label: 'Eventos del Sistema',
+          id: 'activities',
+          label: 'Actividades Recientes',
           icon: <Activity className="w-4 h-4" />,
-          path: '/admin/events',
+          path: '/admin/activities',
           requiredPermissions: ['EVENTS_VIEW']
         },
         {
           id: 'communications-view',
-          label: 'Comunicaciones',
-          icon: <Megaphone className="w-4 h-4" />,
+          label: 'Centro de Soporte',
+          icon: <AlertTriangle className="w-4 h-4" />,
           path: '/admin/communications',
           requiredPermissions: ['COMMUNICATIONS_VIEW']
-        },
-        {
-          id: 'manage-communications',
-          label: 'Gestionar Comunicaciones',
-          icon: <Megaphone className="w-4 h-4" />,
-          path: '/admin/communications?action=manage',
-          requiredPermissions: ['COMMUNICATIONS_MANAGE']
         },
         {
           id: 'chat-monitor',

@@ -10,7 +10,6 @@ import { useAuditLogs, useAuditLogsByAction, useAuditLogsByDepartment, useAuditL
 import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { Card } from '@/presentation/components/ui/Card';
 import { Spinner } from '@/presentation/components/ui/Spinner';
-import { GitHubShell } from '@/presentation/components/admin/AdminShell/AdminShell';
 import { format } from 'date-fns';
 import { AuditLogEntry, AuditLogFilters } from '@/core/domain/entities/Analytics';
 
@@ -105,36 +104,31 @@ export default function AuditPage() {
 
   if (isLoading) {
     return (
-      <GitHubShell>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <Spinner size="lg" />
-            <p className="mt-4 text-gray-600">Loading audit logs...</p>
-          </div>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <Spinner size="lg" />
+          <p className="mt-4 text-gray-600">Loading audit logs...</p>
         </div>
-      </GitHubShell>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <GitHubShell>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
-              <span className="text-2xl">?</span>
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Error Loading Audit Logs</h2>
-            <p className="text-gray-600">Please try again later.</p>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+            <span className="text-2xl">?</span>
           </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Error Loading Audit Logs</h2>
+          <p className="text-gray-600">Please try again later.</p>
         </div>
-      </GitHubShell>
+      </div>
     );
   }
 
   return (
-    <GitHubShell>
-      <div className="space-y-6">
+    <div className="space-y-6">
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Audit & Traceability</h1>
@@ -378,6 +372,5 @@ export default function AuditPage() {
           )}
         </Card>
       </div>
-    </GitHubShell>
   );
 }

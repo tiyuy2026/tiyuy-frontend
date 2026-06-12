@@ -88,11 +88,14 @@ export class AnalyticsRepository implements IAnalyticsRepository {
     return response.data;
   }
 
-  // Activity endpoints - Admin (datos de TODOS los usuarios)
-  async getUserActivities(type?: string, dateRange?: string): Promise<UserActivity[]> {
+  // Activity endpoints - Admin (datos de TODOS los usuarios) con paginación y filtro por fecha
+  async getUserActivities(type?: string, startDate?: string, endDate?: string, page: number = 0, size: number = 20): Promise<{ content: UserActivity[]; totalElements: number; totalPages: number; number: number; size: number }> {
     const params = new URLSearchParams();
     if (type) params.append('type', type);
-    if (dateRange) params.append('dateRange', dateRange);
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    params.append('page', page.toString());
+    params.append('size', size.toString());
 
     // Usar endpoint de admin para obtener datos de todos los usuarios
     const response = await axiosClient.get(`/activity/admin/all?${params.toString()}`);
