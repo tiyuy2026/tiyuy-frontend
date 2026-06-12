@@ -1104,7 +1104,8 @@ export function Header() {
               {/* MENÚ HAMBURGUESA - Solo mobile */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="lg:hidden p-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors z-50"
+                aria-label={mobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -1299,6 +1300,187 @@ export function Header() {
           <div className={`flex-1 ${colors[stripeColor][2]} transition-colors duration-500`}></div>
         </div>
       </header>
+
+      {/* OVERLAY + MENÚ MOBILE - Fuera del header para evitar problemas de z-index con sticky */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 bg-black/50 z-[100] lg:hidden" onClick={() => setMobileMenuOpen(false)}>
+          <div
+            className="absolute top-0 right-0 w-80 max-w-[85vw] h-full bg-white shadow-xl overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header del menú mobile */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <span className="font-bold text-gray-900 text-lg">Menú</span>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Perfil del usuario si está autenticado */}
+            {isAuthenticated && (
+              <div className="p-4 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center text-white">
+                    <User className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900 truncate">{user?.firstName} {user?.lastName}</p>
+                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Navegación mobile */}
+            <div className="p-4 space-y-1">
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span className="font-medium">Inicio</span>
+              </Link>
+
+              <Link
+                href="/sale/departamentos/lima"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span className="font-medium">Comprar</span>
+              </Link>
+
+              <Link
+                href="/rent/departamentos/lima"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <span className="font-medium">Alquilar</span>
+              </Link>
+
+              <Link
+                href="/servics"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span className="font-medium">Servicios</span>
+              </Link>
+
+              <Link
+                href="/#inmobiliarias"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+              >
+                <Building className="w-5 h-5" />
+                <span className="font-medium">Buscar inmobiliarias</span>
+              </Link>
+            </div>
+
+            {/* Acciones mobile */}
+            <div className="p-4 border-t border-gray-100 space-y-3">
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    href="/notifications"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    <span className="font-medium">Notificaciones</span>
+                  </Link>
+
+                  <Link
+                    href="/dashboard/my-contacts"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+                  >
+                    <MessageSquare className="w-5 h-5" />
+                    <span className="font-medium">Mis contactos</span>
+                  </Link>
+
+                  <Link
+                    href="/dashboard/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+                  >
+                    <User className="w-5 h-5" />
+                    <span className="font-medium">Mi Perfil</span>
+                  </Link>
+
+                  {user?.role === 'DEVELOPER' ? (
+                    <Link
+                      href="/my-projects"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+                    >
+                      <FolderGit className="w-5 h-5" />
+                      <span className="font-medium">Mis Proyectos</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/my-properties"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl transition-colors"
+                    >
+                      <Building className="w-5 h-5" />
+                      <span className="font-medium">Mis Propiedades</span>
+                    </Link>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      logout?.();
+                      setMobileMenuOpen(false);
+                      router.push('/');
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <span className="font-medium">Cerrar Sesión</span>
+                  </button>
+                </>
+              ) : (
+                <div className="space-y-2">
+                  <button
+                    onClick={() => {
+                      router.push('/profile-selector');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Registrarse
+                  </button>
+                  <button
+                    onClick={() => {
+                      router.push('/login');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full py-3 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 transition-colors"
+                  >
+                    Ingresar
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
