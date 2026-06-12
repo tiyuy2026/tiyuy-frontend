@@ -11,8 +11,8 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, helperText, leftIcon, rightIcon, className = '', required, readOnly, ...props }, ref) => {
     // Strip ALL styling classes from external className — only keep layout/sizing classes
+    // But preserve explicit bg-white if passed
     const cleanClassName = className
-      .replace(/\bbg-\S+/g, '')
       .replace(/\bborder-\S+/g, '')
       .replace(/\bfocus:\S+/g, '')
       .replace(/\btext-\S+/g, '')

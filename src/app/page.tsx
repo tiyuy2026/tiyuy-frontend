@@ -201,7 +201,7 @@ export default function HomePage() {
               <img src={image} alt="" className="w-full h-full object-cover" />
             </div>
           ))}
-          <div className="absolute inset-0 bg-black/30"></div>
+          <div className="absolute inset-0 bg-black/40"></div>
         </div>
 
         <div className="absolute inset-0 flex items-center justify-center">
@@ -212,35 +212,35 @@ export default function HomePage() {
                   Encuentra tu hogar
                 </h1>
 
-                <div className="bg-background rounded-2xl shadow-2xl overflow-visible border border-gray-200/50">
-                  <div className="border-b border-gray-200 rounded-t-2xl">
-                    <div className="flex rounded-t-2xl">
+                <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200/80">
+                  <div className="border-b border-gray-200 rounded-t-2xl bg-white overflow-hidden">
+                    <div className="flex">
                       <button
                         onClick={() => handleTabClick('rent')}
-                        className={`flex-1 py-4 text-base font-semibold transition-colors rounded-tl-2xl ${
+                        className={`flex-1 py-4 text-base font-semibold transition-colors bg-white ${
                           activeTab === 'rent'
-                            ? 'text-brand bg-background border-b-2 border-brand'
-                            : 'text-foreground/70 hover:text-brand'
+                            ? 'text-brand border-b-2 border-brand'
+                            : 'text-gray-500 hover:text-brand hover:bg-gray-50/50'
                         }`}
                       >
                         Alquilar
                       </button>
                       <button
                         onClick={() => handleTabClick('sale')}
-                        className={`flex-1 py-4 text-base font-semibold transition-colors ${
+                        className={`flex-1 py-4 text-base font-semibold transition-colors bg-white ${
                           activeTab === 'sale'
-                            ? 'text-brand bg-background border-b-2 border-brand'
-                            : 'text-foreground/70 hover:text-brand'
+                            ? 'text-brand border-b-2 border-brand'
+                            : 'text-gray-500 hover:text-brand hover:bg-gray-50/50'
                         }`}
                       >
                         Comprar
                       </button>
                       <button
                         onClick={() => handleTabClick('projects')}
-                        className={`flex-1 py-4 text-base font-semibold transition-colors rounded-tr-2xl ${
+                        className={`flex-1 py-4 text-base font-semibold transition-colors bg-white ${
                           activeTab === 'projects'
-                            ? 'text-brand bg-background border-b-2 border-brand'
-                            : 'text-foreground/70 hover:text-brand'
+                            ? 'text-brand border-b-2 border-brand'
+                            : 'text-gray-500 hover:text-brand hover:bg-gray-50/50'
                         }`}
                       >
                         Proyectos
@@ -248,12 +248,12 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  <div className="p-6 overflow-visible">
+                  <div className="p-6 bg-white rounded-b-2xl">
                     <div className="flex flex-col lg:flex-row gap-3 relative">
                       <select 
                         value={selectedPropertyType}
                         onChange={(e) => setSelectedPropertyType(e.target.value)}
-                        className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-foreground/80 bg-background w-full lg:w-[180px]"
+                        className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white w-full lg:w-[180px]"
                       >
                         {getPropertyTypes().map(type => (
                           <option key={type.value} value={type.value}>
@@ -266,7 +266,7 @@ export default function HomePage() {
                         <select 
                           value={selectedBedrooms}
                           onChange={(e) => setSelectedBedrooms(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-foreground/80 bg-background w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white w-full lg:w-[140px]"
                         >
                           <option value="">Habitaciones</option>
                           <option value="1">1 habitación</option>
@@ -279,7 +279,7 @@ export default function HomePage() {
                         <select 
                           value={selectedBathrooms}
                           onChange={(e) => setSelectedBathrooms(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-foreground/80 bg-background w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white w-full lg:w-[140px]"
                         >
                           <option value="">Baños</option>
                           <option value="propio">Propio</option>
@@ -291,7 +291,7 @@ export default function HomePage() {
                           placeholder="Área mínima (m²)"
                           value={selectedMinArea}
                           onChange={(e) => setSelectedMinArea(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-foreground/80 bg-background w-full lg:w-[140px]"
+                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white w-full lg:w-[140px]"
                         />
                       ) : null}
 
@@ -358,7 +358,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               
               <Link href="/blog" className="block group h-full">
-                <div className="flex flex-col h-full bg-background rounded-xl p-10 shadow-sm border-2 border-gray-200/60 hover:border-brand group-hover:scale-[1.02] transition-all duration-300">
+                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm border border-gray-200 hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
                   <div className="flex-grow">
                     <div className="w-14 h-14 bg-brand-light rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-light-hover transition-colors">
                       <Icon icon="material-symbols:article-outline" className="w-7 h-7 text-brand" />
@@ -377,7 +377,7 @@ export default function HomePage() {
 
               {/* Card Guía */}
               <Link href="/rental-guide" className="block group h-full">
-                <div className="flex flex-col h-full bg-background rounded-xl p-10 shadow-sm border-2 border-gray-200/60 hover:border-brand group-hover:scale-[1.02] transition-all duration-300">
+                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm border border-gray-200 hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
                   <div className="flex-grow">
                     <div className="w-14 h-14 bg-brand-light rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-light-hover transition-colors">
                       <Icon icon="material-symbols:assignment-outline" className="w-7 h-7 text-brand" />
@@ -396,7 +396,7 @@ export default function HomePage() {
 
               {/* Card Proyectos */}
               <Link href="/projects" className="block group h-full">
-                <div className="flex flex-col h-full bg-background rounded-xl p-10 shadow-sm border-2 border-gray-200/60 hover:border-brand group-hover:scale-[1.02] transition-all duration-300">
+                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm border border-gray-200 hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
                   <div className="flex-grow">
                     <div className="w-14 h-14 bg-brand-light rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-light-hover transition-colors">
                       <Icon icon="material-symbols:apartment" className="w-7 h-7 text-brand" />
@@ -415,7 +415,7 @@ export default function HomePage() {
 
               {/* Card Conoce TIYUY */}
               <Link href="/about-tiyuy" className="block group h-full">
-                <div className="flex flex-col h-full bg-background rounded-xl p-10 shadow-sm border-2 border-gray-200/60 hover:border-brand group-hover:scale-[1.02] transition-all duration-300">
+                <div className="flex flex-col h-full bg-white rounded-xl p-10 shadow-sm border border-gray-200 hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
                   <div className="flex-grow">
                     <div className="w-14 h-14 bg-brand-light rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-light-hover transition-colors">
                       <Icon icon="material-symbols:info-outline" className="w-7 h-7 text-brand" />

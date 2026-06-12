@@ -11,9 +11,10 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: '#4A9A3E',
-          light: '#5dae4c',
-          dark: '#3d8b35',
+          DEFAULT: '#61BF53',
+          light: 'rgba(74, 154, 62, 0.10)',
+          'light-hover': 'rgba(74, 154, 62, 0.18)',
+          dark: '#498D42',
         },
       },
       animation: {
