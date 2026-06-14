@@ -26,14 +26,14 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
 
   const getChannelEmoji = (city: string) => {
     const cityEmojis: Record<string, string> = {
-      'Lima': '🏙️',
-      'Arequipa': '🌋',
-      'Trujillo': '🏺',
-      'Piura': '☀️',
-      'Chiclayo': '🌿',
-      'Cusco': '🏔️',
+      'Lima': '️',
+      'Arequipa': '',
+      'Trujillo': '',
+      'Piura': '️',
+      'Chiclayo': '',
+      'Cusco': '️',
     };
-    return cityEmojis[city] || '🏘️';
+    return cityEmojis[city] || '️';
   };
 
   if (isLoading) {
@@ -81,10 +81,10 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
           <div className="bg-teal-50 border border-teal-200 rounded-lg p-3">
             <p className="text-teal-700 text-sm font-medium mb-1"> Beneficios de suscribirte:</p>
             <ul className="text-teal-600 text-xs space-y-1">
-              <li>• Recibir actualizaciones de propiedades</li>
-              <li>• Conocer nuevas oportunidades</li>
-              <li>• Comentar y interactuar</li>
-              <li>• Mantenerte informado del mercado</li>
+              <li> Recibir actualizaciones de propiedades</li>
+              <li> Conocer nuevas oportunidades</li>
+              <li> Comentar y interactuar</li>
+              <li> Mantenerte informado del mercado</li>
             </ul>
           </div>
         </div>

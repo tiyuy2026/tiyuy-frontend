@@ -54,7 +54,7 @@ export default function EventDetailView({
   
   // Check if user is already a subscriber
   const isSubscribed = subscribers?.some((sub: any) => sub.userId === currentUserId) ?? false;
-  console.log('🔍 Debug - isSubscribed:', isSubscribed, 'subscribers:', subscribers, 'currentUserId:', currentUserId);
+  console.log(' Debug - isSubscribed:', isSubscribed, 'subscribers:', subscribers, 'currentUserId:', currentUserId);
 
   const handleInvite = (userId: number, userName: string) => {
     setInvitedUsers(prev => new Set(prev).add(userId));
@@ -83,7 +83,7 @@ export default function EventDetailView({
     const organizerName = event.creatorName || event.channelName || 'Organizador';
     const organizerId = event.creatorId;
     
-    console.log('📱 Redirigiendo a mensajes:', { organizerPhone, organizerName, organizerId });
+    console.log(' Redirigiendo a mensajes:', { organizerPhone, organizerName, organizerId });
     
     if (organizerPhone && organizerId) {
       // Store data in localStorage for reliable passing
@@ -103,19 +103,19 @@ export default function EventDetailView({
 
   const handleRsvp = async () => {
     const doRsvp = async () => {
-      console.log('📝 Intentando RSVP...', event.id);
+      console.log(' Intentando RSVP...', event.id);
       await rsvpMutation.mutateAsync(event.id);
-      console.log('✅ RSVP exitoso');
+      console.log(' RSVP exitoso');
     };
 
     const doSubscribe = async () => {
-      console.log('🔄 Suscribiendo al canal...', channelId);
+      console.log(' Suscribiendo al canal...', channelId);
       try {
         await axiosClient.post(`/contacts/extended/channels/${channelId}/subscribe`);
-        console.log('✅ Suscripción exitosa');
+        console.log(' Suscripción exitosa');
       } catch (subError: any) {
         // If already subscribed, that's fine
-        console.log('ℹ️ Subscribe result:', subError.response?.data?.message || 'Unknown');
+        console.log('️ Subscribe result:', subError.response?.data?.message || 'Unknown');
       }
     };
 
@@ -123,12 +123,12 @@ export default function EventDetailView({
       // Try RSVP first - might work if already subscribed
       await doRsvp();
     } catch (rsvpError: any) {
-      console.log('⚠️ RSVP failed:', rsvpError.response?.data?.message || rsvpError.message);
+      console.log('️ RSVP failed:', rsvpError.response?.data?.message || rsvpError.message);
       
       // If not subscribed error, subscribe and retry
       if (rsvpError.response?.data?.message?.includes('must be subscribed') || 
           rsvpError.response?.status === 403) {
-        console.log('🔁 Suscripción necesaria, intentando...');
+        console.log(' Suscripción necesaria, intentando...');
         
         try {
           await doSubscribe();
@@ -137,7 +137,7 @@ export default function EventDetailView({
           // Retry RSVP
           await doRsvp();
         } catch (retryError: any) {
-          console.error('❌ Error en retry:', retryError);
+          console.error(' Error en retry:', retryError);
           toast.error(retryError.response?.data?.message || 'Error al confirmar asistencia');
         }
       } else {
@@ -157,18 +157,18 @@ export default function EventDetailView({
 
   const handleInterested = async () => {
     const doInterested = async () => {
-      console.log('📝 Intentando registrar interés...', event.id);
+      console.log(' Intentando registrar interés...', event.id);
       await interestedMutation.mutateAsync(event.id);
-      console.log('✅ Interés registrado');
+      console.log(' Interés registrado');
     };
 
     const doSubscribe = async () => {
-      console.log('🔄 Suscribiendo al canal...', channelId);
+      console.log(' Suscribiendo al canal...', channelId);
       try {
         await axiosClient.post(`/contacts/extended/channels/${channelId}/subscribe`);
-        console.log('✅ Suscripción exitosa');
+        console.log(' Suscripción exitosa');
       } catch (subError: any) {
-        console.log('ℹ️ Subscribe result:', subError.response?.data?.message || 'Unknown');
+        console.log('️ Subscribe result:', subError.response?.data?.message || 'Unknown');
       }
     };
 
@@ -176,12 +176,12 @@ export default function EventDetailView({
       // Try interested first - might work if already subscribed
       await doInterested();
     } catch (interestedError: any) {
-      console.log('⚠️ Interested failed:', interestedError.response?.data?.message || interestedError.message);
+      console.log('️ Interested failed:', interestedError.response?.data?.message || interestedError.message);
       
       // If not subscribed error, subscribe and retry
       if (interestedError.response?.data?.message?.includes('must be subscribed') || 
           interestedError.response?.status === 403) {
-        console.log('🔁 Suscripción necesaria, intentando...');
+        console.log(' Suscripción necesaria, intentando...');
         
         try {
           await doSubscribe();
@@ -190,7 +190,7 @@ export default function EventDetailView({
           // Retry interested
           await doInterested();
         } catch (retryError: any) {
-          console.error('❌ Error en retry:', retryError);
+          console.error(' Error en retry:', retryError);
           toast.error(retryError.response?.data?.message || 'Error al registrar interés');
         }
       } else {
@@ -271,7 +271,7 @@ export default function EventDetailView({
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center">
+          <div className="w-full h-full bg-gradient-to-br brand flex items-center justify-center">
             <Calendar className="w-24 h-24 text-white/50" />
           </div>
         )}
@@ -320,7 +320,7 @@ export default function EventDetailView({
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                         isRsvped
                           ? 'bg-green-100 text-green-700 border border-green-300'
-                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                          : 'bg-brand text-white hover:bg-blue-700'
                       }`}
                     >
                       {isRsvped ? <Check className="w-4 h-4" /> : <Calendar className="w-4 h-4" />}
@@ -357,7 +357,7 @@ export default function EventDetailView({
                   onClick={() => setActiveTab('info')}
                   className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
                     activeTab === 'info'
-                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      ? 'text-brand border-b-2 border-blue-600'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
@@ -367,7 +367,7 @@ export default function EventDetailView({
                   onClick={() => setActiveTab('conversation')}
                   className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
                     activeTab === 'conversation'
-                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      ? 'text-brand border-b-2 border-blue-600'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
@@ -428,7 +428,7 @@ export default function EventDetailView({
                         {shouldTruncate && (
                           <button
                             onClick={() => setShowFullDescription(!showFullDescription)}
-                            className="text-blue-600 font-medium text-sm mt-2 hover:underline"
+                            className="text-brand font-medium text-sm mt-2 hover:underline"
                           >
                             {showFullDescription ? 'Ver menos' : 'Ver más'}
                           </button>
@@ -450,7 +450,7 @@ export default function EventDetailView({
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h3 className="font-semibold text-gray-900 mb-4">Conoce al organizador</h3>
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                <div className="w-16 h-16 bg-gradient-to-br brand rounded-full flex items-center justify-center text-white font-bold text-xl">
                   {event.channelName?.charAt(0).toUpperCase() || 'C'}
                 </div>
                 <div className="flex-1">
@@ -500,7 +500,7 @@ export default function EventDetailView({
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-gray-900">Invitados</h3>
-                <button className="text-blue-600 text-sm hover:underline">Ver todo</button>
+                <button className="text-brand text-sm hover:underline">Ver todo</button>
               </div>
               
               <div className="flex items-center justify-between py-2 border-b border-gray-100">
@@ -554,7 +554,7 @@ export default function EventDetailView({
                             className="w-10 h-10 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-teal-500 flex items-center justify-center text-white font-bold">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br brand flex items-center justify-center text-white font-bold">
                             {user.userName?.charAt(0).toUpperCase() || 'U'}
                           </div>
                         )}
@@ -568,7 +568,7 @@ export default function EventDetailView({
                           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                             invitedUsers.has(user.userId)
                               ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                              : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                              : 'bg-brand/20 text-brand-dark hover:bg-blue-200'
                           }`}
                         >
                           {invitedUsers.has(user.userId) ? 'Invitado' : 'Invitar'}
@@ -580,7 +580,7 @@ export default function EventDetailView({
                   )}
                 </div>
                 {subscribers && subscribers.length > 3 && (
-                  <button className="w-full text-center text-blue-600 text-sm py-2 mt-3 hover:underline">
+                  <button className="w-full text-center text-brand text-sm py-2 mt-3 hover:underline">
                     Ver más contactos
                   </button>
                 )}
@@ -593,7 +593,7 @@ export default function EventDetailView({
                 <div className="space-y-3">
                   {attendees.slice(0, 5).map((attendee: any) => (
                     <div key={attendee.id} className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-teal-500 flex items-center justify-center text-white font-bold">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br brand flex items-center justify-center text-white font-bold">
                         {attendee.userName?.charAt(0).toUpperCase() || 'U'}
                       </div>
                       <div className="flex-1">
@@ -603,7 +603,7 @@ export default function EventDetailView({
                         onClick={() => handleInvite(attendee.userId, attendee.userName)}
                         disabled={invitedUsers.has(attendee.userId)}
                         className={`text-sm hover:underline ${
-                          invitedUsers.has(attendee.userId) ? 'text-gray-400' : 'text-blue-600'
+                          invitedUsers.has(attendee.userId) ? 'text-gray-400' : 'text-brand'
                         }`}
                       >
                         {invitedUsers.has(attendee.userId) ? 'Invitado' : 'Invitar'}
@@ -611,7 +611,7 @@ export default function EventDetailView({
                     </div>
                   ))}
                   {attendees.length > 5 && (
-                    <button className="w-full text-center text-blue-600 text-sm py-2 hover:underline">
+                    <button className="w-full text-center text-brand text-sm py-2 hover:underline">
                       Ver {attendees.length - 5} más
                     </button>
                   )}

@@ -77,7 +77,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
         avatar: avatarUrl || undefined
       });
       
-      toast.success('¡Canal creado exitosamente! 🎉');
+      toast.success('¡Canal creado exitosamente! ');
       onBack();
     } catch (error: any) {
       if (error.message.includes('403')) {
@@ -132,23 +132,23 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-8 h-8 rounded-full bg-brand/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h-14m0 0v-3m0 3h14" />
                     </svg>
                   </div>
                   <div>
                     <h4 className="font-semibold text-blue-800 mb-1">Empresa</h4>
-                    <p className="text-sm text-blue-600">Gestiona múltiples agentes y propiedades</p>
+                    <p className="text-sm text-brand">Gestiona múltiples agentes y propiedades</p>
                   </div>
                 </div>
               </div>
               <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
                 <p className="text-xs text-amber-700 font-medium mb-2">¿Cómo obtener permisos?</p>
                 <ul className="text-xs text-amber-600 space-y-1 text-left">
-                  <li>• Contacta a nuestro equipo de soporte</li>
-                  <li>• Actualiza tu cuenta a rol Agente/Empresa</li>
-                  <li>• Obtén acceso a todas las herramientas profesionales</li>
+                  <li> Contacta a nuestro equipo de soporte</li>
+                  <li> Actualiza tu cuenta a rol Agente/Empresa</li>
+                  <li> Obtén acceso a todas las herramientas profesionales</li>
                 </ul>
               </div>
             </div>
@@ -257,7 +257,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
                 </p>
                 {avatarFile && (
                   <p className="text-xs text-green-600 mt-1">
-                    ✓ {avatarFile.name} ({(avatarFile.size / 1024 / 1024).toFixed(2)}MB)
+                     {avatarFile.name} ({(avatarFile.size / 1024 / 1024).toFixed(2)}MB)
                   </p>
                 )}
               </div>
@@ -307,24 +307,24 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
           </div>
 
           {/* Channel Type Info */}
-          <div className={`${isPublic ? 'bg-blue-50 border-blue-200' : 'bg-orange-50 border-orange-200'} border rounded-lg p-4`}>
+          <div className={`${isPublic ? 'bg-brand/10 border-blue-200' : 'bg-orange-50 border-orange-200'} border rounded-lg p-4`}>
             <h3 className={`font-semibold mb-2 ${isPublic ? 'text-blue-900' : 'text-orange-900'}`}>
               {isPublic ? 'Canal Público' : 'Canal Privado'}
             </h3>
             <ul className={`text-sm space-y-1 ${isPublic ? 'text-blue-800' : 'text-orange-800'}`}>
               {isPublic ? (
                 <>
-                  <li>• Cualquier usuario puede encontrar y suscribirse</li>
-                  <li>• Ideal para contenido general y noticias</li>
-                  <li>• Mayor alcance y visibilidad</li>
-                  <li>• Los posts expiran automaticamente en 30 dias</li>
+                  <li> Cualquier usuario puede encontrar y suscribirse</li>
+                  <li> Ideal para contenido general y noticias</li>
+                  <li> Mayor alcance y visibilidad</li>
+                  <li> Los posts expiran automaticamente en 30 dias</li>
                 </>
               ) : (
                 <>
-                  <li>• Solo usuarios invitados pueden suscribirse</li>
-                  <li>• Ideal para contenido exclusivo</li>
-                  <li>• Mayor control y privacidad</li>
-                  <li>• Los posts expiran automaticamente en 30 dias</li>
+                  <li> Solo usuarios invitados pueden suscribirse</li>
+                  <li> Ideal para contenido exclusivo</li>
+                  <li> Mayor control y privacidad</li>
+                  <li> Los posts expiran automaticamente en 30 dias</li>
                 </>
               )}
             </ul>
@@ -342,7 +342,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
             <button
               type="submit"
               disabled={isCreating || !name.trim() || !city.trim() || !description.trim()}
-              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
+              className="flex-1 px-6 py-3 bg-brand text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
             >
               {isCreating ? (
                 <>

@@ -117,7 +117,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
     setBackgroundColor(color);
     const optimalTextColor = getOptimalTextColor(color);
     setTextColor(optimalTextColor);
-    console.log(`Background: ${color} → Text: ${optimalTextColor}`);
+    console.log(`Background: ${color}  Text: ${optimalTextColor}`);
   };
 
   // State for managing comments per post - Initialize properly to prevent undefined
@@ -343,7 +343,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
       setReplyingTo(null);
       setReplyingToName('');
       
-      // 👇 LIMPIA TAMBIÉN EL INPUT PRINCIPAL para evitar doble submit
+      //  LIMPIA TAMBIÉN EL INPUT PRINCIPAL para evitar doble submit
       setCommentInputs(prev => ({ ...prev, [postId]: '' }));
       
       // Trigger refresh in PostCommentsList
@@ -458,7 +458,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
             <div className="flex gap-3">
               <button
                 onClick={handleWriteFirstPost}
-                className="flex-1 py-2.5 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
+                className="flex-1 py-2.5 bg-gradient-to-r brand text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
               >
                 Escribir mi primera publicación
               </button>
@@ -576,7 +576,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                     ))}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
-                    💡 El color del texto se ajusta automáticamente
+                     El color del texto se ajusta automáticamente
                   </div>
                 </div>
 
@@ -584,7 +584,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Emojis:</label>
                   <div className="flex gap-2 flex-wrap">
-                    {['😀', '😂', '❤️', '👍', '🎉', '🔥', '😎', '🤔', '👏', '🙏', '💪', '🌟'].map((emoji) => (
+                    {['', '', '️', '', '', '', '', '', '', '', '', ''].map((emoji) => (
                       <button
                         key={emoji}
                         onClick={() => setNewPost(newPost + emoji)}
@@ -671,7 +671,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                 <button
                   onClick={handleCreatePost}
                   disabled={!newPost.trim() && selectedImages.length === 0 || isCreatingPost}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-6 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {isCreatingPost ? (
                     <>
@@ -796,7 +796,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                           </button>
                           <button
                             onClick={() => handleSaveEdit(post)}
-                            className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                            className="px-3 py-1 text-sm bg-brand text-white rounded hover:bg-blue-700 transition-colors"
                           >
                             Guardar
                           </button>
@@ -872,7 +872,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                       disabled={isLikingPost}
                       className={`flex-1 py-2 px-3 rounded-lg transition-colors font-medium disabled:opacity-50 ${
                         post.hasUserLiked 
-                          ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' 
+                          ? 'bg-brand/10 text-brand hover:bg-brand/20' 
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
@@ -927,7 +927,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                       <button
                         onClick={() => handleCommentSubmit(post.id)}
                         disabled={!commentInputs[post.id]?.trim()}
-                        className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-3 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Enviar
                       </button>
@@ -938,11 +938,11 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                   <div>
                     <button
                       onClick={() => handleComment(post)}
-                      className="text-sm text-blue-600 hover:text-blue-700 font-medium mb-2"
+                      className="text-sm text-brand hover:text-brand-dark font-medium mb-2"
                     >
                       {(showComments[post.id] || false) 
-                        ? '▲ Ver menos' 
-                        : `▼ Ver comentarios (${post.commentCount || 0})` 
+                        ? ' Ver menos' 
+                        : ` Ver comentarios (${post.commentCount || 0})` 
                       }
                     </button>
 
@@ -986,7 +986,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                   onClick={() => setShowShareModal(prev => ({ ...prev, [post.id]: false }))} 
                   className="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-xl leading-none"
                 >
-                  ✕
+                  
                 </button>
               </div>
               
@@ -1033,12 +1033,12 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setShowShareModal(prev => ({ ...prev, [post.id]: false }))}
-                  className="flex flex-col items-center p-3 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors"
+                  className="flex flex-col items-center p-3 bg-brand/20 hover:bg-blue-200 rounded-lg transition-colors"
                 >
-                  <svg className="w-6 h-6 text-blue-600 mb-1" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-brand mb-1" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                   </svg>
-                  <span className="text-xs text-blue-700 font-bold">Facebook</span>
+                  <span className="text-xs text-brand-dark font-bold">Facebook</span>
                 </a>
 
                 {/* TikTok */}
@@ -1063,7 +1063,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
   );
 }
 
-// ──── COMPONENTE POST COMMENTS LIST ────────────────────────────────────────────────────────
+//  COMPONENTE POST COMMENTS LIST 
 function PostCommentsList({ postId, groupId, currentUserId, currentUserName, currentUser,
   handleCommentLike, handleReplyToComment, handleReplyInputChange, handleReplySubmit,
   commentLikes, commentLikeCounts, replyingTo, replyingToName, setReplyingTo, replyInputs, refreshTrigger }: {
@@ -1090,8 +1090,8 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        console.log('🔍 Fetching comments for postId:', postId, 'groupId:', groupId);
-        console.log('🔍 Full URL should be: /contacts/extended/groups/' + groupId + '/posts/' + postId + '/comments');
+        console.log(' Fetching comments for postId:', postId, 'groupId:', groupId);
+        console.log(' Full URL should be: /contacts/extended/groups/' + groupId + '/posts/' + postId + '/comments');
         
         const groupUseCases = new GroupUseCases(new GroupRepositoryImpl());
         
@@ -1106,7 +1106,7 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
             break; // Success, exit retry loop
           } catch (retryError: any) {
             retryCount++;
-            console.warn(`🔄 Retry ${retryCount}/${maxRetries} for comments:`, retryError.message);
+            console.warn(` Retry ${retryCount}/${maxRetries} for comments:`, retryError.message);
             
             if (retryCount >= maxRetries) {
               throw retryError; // Max retries reached, throw error
@@ -1117,13 +1117,13 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
           }
         }
         
-        console.log('🔍 Comments response:', response);
-        console.log('🔍 Comments response type:', typeof response);
-        console.log('🔍 Comments response keys:', Object.keys(response || {}));
-        console.log('🔍 Comments content:', response?.content);
-        console.log('🔍 Comments content type:', typeof response?.content);
-        console.log('🔍 Comments array:', response?.content || []);
-        console.log('🔍 Comments length:', (response?.content || []).length);
+        console.log(' Comments response:', response);
+        console.log(' Comments response type:', typeof response);
+        console.log(' Comments response keys:', Object.keys(response || {}));
+        console.log(' Comments content:', response?.content);
+        console.log(' Comments content type:', typeof response?.content);
+        console.log(' Comments array:', response?.content || []);
+        console.log(' Comments length:', (response?.content || []).length);
         
         // Try different possible response structures
         let commentsArray = [];
@@ -1136,14 +1136,14 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
         } else if ((response as any)?.comments && Array.isArray((response as any).comments)) {
           commentsArray = (response as any).comments;
         } else {
-          console.warn('🔍 Unknown response structure:', response);
+          console.warn(' Unknown response structure:', response);
         }
         
-        console.log('🔍 Final comments array:', commentsArray);
-        console.log('🔍 Final comments length:', commentsArray.length);
+        console.log(' Final comments array:', commentsArray);
+        console.log(' Final comments length:', commentsArray.length);
         
         if (commentsArray.length === 0) {
-          console.warn('⚠️ No comments found - Check backend logs for this postId:', postId);
+          console.warn('️ No comments found - Check backend logs for this postId:', postId);
         }
         
         setComments(commentsArray);
@@ -1152,15 +1152,15 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
         
         // Handle network errors gracefully for mobile
         if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error') || error.message?.includes('ERR_CONNECTION_CLOSED')) {
-          console.warn('🔗 Mobile network error - showing placeholder');
+          console.warn(' Mobile network error - showing placeholder');
           setComments([]); // Set empty array to avoid infinite loading
           
           // Show user-friendly message for mobile
           if (typeof window !== 'undefined' && window.innerWidth <= 768) {
-            console.log('📱 Mobile detected - showing mobile-friendly message');
+            console.log(' Mobile detected - showing mobile-friendly message');
           }
         } else {
-          console.error('🔥 Different error type:', error.message);
+          console.error(' Different error type:', error.message);
         }
       } finally {
         setLoading(false);
@@ -1181,7 +1181,7 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
   return (
     <div className="space-y-2 mt-2" data-comments-for={postId}>
       {comments
-            .filter((comment: any) => !comment.replyToCommentId) // ← SOLO comentarios principales
+            .filter((comment: any) => !comment.replyToCommentId) //  SOLO comentarios principales
             .map((comment: any, index: number) => (
         <div key={comment.id || index} className="flex gap-2">
           <UserAvatar 
@@ -1203,12 +1203,12 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
                 onClick={() => handleCommentLike(comment.id)}
                 className={`text-xs flex items-center gap-1 transition-colors ${
                   commentLikes[comment.id] || comment.hasUserLiked
-                    ? 'text-blue-500 hover:text-blue-600 font-medium' 
+                    ? 'text-blue-500 hover:text-brand font-medium' 
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
                 <span className={commentLikes[comment.id] || comment.hasUserLiked ? 'text-blue-500' : ''}>
-                  {commentLikes[comment.id] || comment.hasUserLiked ? '👍' : '👍'}
+                  {commentLikes[comment.id] || comment.hasUserLiked ? '' : ''}
                 </span>
                 {(commentLikeCounts[comment.id] || 0) + (commentLikes[comment.id] || comment.hasUserLiked ? 1 : 0) > 0 && (
                   <span className="text-xs font-medium">
@@ -1236,7 +1236,7 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
                       onClick={() => setReplyingTo(null)}
                       className="text-gray-400 hover:text-gray-600"
                     >
-                      ✕
+                      
                     </button>
                   </div>
                   <div className="flex gap-2">
@@ -1253,7 +1253,7 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
                     <button
                       onClick={() => handleReplySubmit(comment.id, postId)}
                       disabled={!replyInputs[comment.id]?.trim()}
-                      className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-2 py-1 bg-brand text-white rounded text-xs hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Enviar
                     </button>

@@ -498,7 +498,7 @@ export default function CreateEventModal({ isOpen, onClose, channelId, onSuccess
                   <X className="w-4 h-4" />
                 </button>
                 {index === 0 && (
-                  <span className="absolute bottom-1 left-1 px-2 py-0.5 bg-blue-600 text-white text-xs rounded">
+                  <span className="absolute bottom-1 left-1 px-2 py-0.5 bg-brand text-white text-xs rounded">
                     Portada
                   </span>
                 )}
@@ -509,7 +509,7 @@ export default function CreateEventModal({ isOpen, onClose, channelId, onSuccess
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-brand/10 transition-colors"
               >
                 <Upload className="w-8 h-8 text-gray-400" />
                 <span className="text-sm text-gray-500">Agregar imagen</span>
@@ -601,7 +601,7 @@ export default function CreateEventModal({ isOpen, onClose, channelId, onSuccess
             {!mapLoaded && (
               <div className="w-full h-64 rounded-lg border border-gray-300 bg-gray-100 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-2">
-                  <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                  <Loader2 className="w-8 h-8 animate-spin text-brand" />
                   <span className="text-sm text-gray-500">Cargando mapa...</span>
                 </div>
               </div>
@@ -694,7 +694,7 @@ export default function CreateEventModal({ isOpen, onClose, channelId, onSuccess
           </button>
           <button
             type="submit"
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={createEventMutation.isPending || uploadEventImagesMutation.isPending}
           >
             {createEventMutation.isPending || uploadEventImagesMutation.isPending ? (

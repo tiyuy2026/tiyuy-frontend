@@ -5,7 +5,7 @@ import { useGetGroups, useJoinGroup } from '@/presentation/hooks/useContacts';
 import { formatCompactNumber } from '@/utils/formatters';
 import { Users, FileText } from 'lucide-react';
 
-console.log('🔍 DiscoverGroupsView: useJoinGroup imported:', useJoinGroup);
+console.log(' DiscoverGroupsView: useJoinGroup imported:', useJoinGroup);
 
 export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any; onGroupSelect: (group: any) => void }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -13,9 +13,9 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
   const joinGroup = useJoinGroup();
   
   // Filtrar grupos donde el usuario NO es miembro
-  console.log('📋 All groups from API:', groups);
+  console.log(' All groups from API:', groups);
   const availableGroups = groups?.filter((g: any) => !g.isMember) ?? [];
-  console.log('🔓 Available groups (not member):', availableGroups);
+  console.log(' Available groups (not member):', availableGroups);
   const filteredGroups = availableGroups.filter((group: any) =>
     group.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -108,7 +108,7 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
                 onClick={() => onGroupSelect(group)}
               >
                 {/* Banner del grupo */}
-                <div className="h-24 bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-4xl">
+                <div className="h-24 bg-gradient-to-br brand flex items-center justify-center text-4xl">
                   {getGroupEmoji(group.name)}
                 </div>
 
@@ -140,7 +140,7 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
                       handleJoinGroup(group.id, e);
                     }}
                     disabled={joinGroup.isPending}
-                    className="w-full py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {joinGroup.isPending ? 'Uniéndose...' : 'Unirse al grupo'}
                   </button>

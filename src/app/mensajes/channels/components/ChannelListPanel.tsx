@@ -46,14 +46,14 @@ function CanalesListPanel({
 
   const getChannelEmoji = (city: string) => {
     const cityEmojis: Record<string, string> = {
-      'Lima': '🏙️',
-      'Arequipa': '🌋',
-      'Trujillo': '🏺',
-      'Piura': '☀️',
-      'Chiclayo': '🌿',
-      'Cusco': '🏔️',
+      'Lima': '️',
+      'Arequipa': '',
+      'Trujillo': '',
+      'Piura': '️',
+      'Chiclayo': '',
+      'Cusco': '️',
     };
-    return cityEmojis[city] || '🏘️';
+    return cityEmojis[city] || '️';
   };
 
   return (
@@ -81,7 +81,7 @@ function CanalesListPanel({
         <button
           onClick={() => onSectionChange('mis-canales-creados')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'mis-canales-creados' ? 'bg-blue-100 text-blue-700' : 'text-gray-800 hover:bg-gray-100'
+            activeSection === 'mis-canales-creados' ? 'bg-brand/20 text-brand-dark' : 'text-gray-800 hover:bg-gray-100'
           }`}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,7 +89,7 @@ function CanalesListPanel({
           </svg>
           Mis canales creados
           {misCanalesCreados.length > 0 && (
-            <span className="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+            <span className="ml-auto bg-brand/100 text-white text-xs px-2 py-1 rounded-full">
               {misCanalesCreados.length}
             </span>
           )}
@@ -98,7 +98,7 @@ function CanalesListPanel({
         <button
           onClick={() => onSectionChange('mis-canales-suscritos')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'mis-canales-suscritos' ? 'bg-blue-100 text-blue-700' : 'text-gray-800 hover:bg-gray-100'
+            activeSection === 'mis-canales-suscritos' ? 'bg-brand/20 text-brand-dark' : 'text-gray-800 hover:bg-gray-100'
           }`}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,7 +115,7 @@ function CanalesListPanel({
         <button
           onClick={() => onSectionChange('descubrir-canales')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'descubrir-canales' ? 'bg-blue-100 text-blue-700' : 'text-gray-800 hover:bg-gray-100'
+            activeSection === 'descubrir-canales' ? 'bg-brand/20 text-brand-dark' : 'text-gray-800 hover:bg-gray-100'
           }`}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,7 +127,7 @@ function CanalesListPanel({
         <button
           onClick={() => onSectionChange('crear-canal')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'crear-canal' ? 'bg-blue-100 text-blue-700' : 'text-gray-800 hover:bg-gray-100'
+            activeSection === 'crear-canal' ? 'bg-brand/20 text-brand-dark' : 'text-gray-800 hover:bg-gray-100'
           }`}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -219,7 +219,7 @@ function CanalesListPanel({
             hasChannel 
               ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
               : (user?.role === 'AGENT' || user?.role === 'INMOBILIARIA')
-                ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                ? 'bg-brand/10 text-brand hover:bg-brand/20'
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
           }`}
         >
@@ -227,8 +227,8 @@ function CanalesListPanel({
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           )}
           <span className="text-lg font-bold leading-none">
-            {hasChannel ? '🚫' : 
-              (user?.role === 'AGENT' || user?.role === 'INMOBILIARIA') ? '+' : '🔒'}
+            {hasChannel ? '' : 
+              (user?.role === 'AGENT' || user?.role === 'INMOBILIARIA') ? '+' : ''}
           </span>
           {hasChannel ? 'Límite alcanzado' : 
             (user?.role === 'AGENT' || user?.role === 'INMOBILIARIA') ? 'Crear nuevo canal' : 'No tienes permisos'}

@@ -60,11 +60,11 @@ export default function EventsView({
   };
 
   const categories = [
-    { id: 'FERIA_INMOBILIARIA', name: 'Ferias inmobiliarias', icon: '🏢' },
-    { id: 'OPEN_HOUSE', name: 'Open House', icon: '🏠' },
-    { id: 'WEBINAR', name: 'Webinars', icon: '💻' },
-    { id: 'REMATE', name: 'Remates', icon: '🔨' },
-    { id: 'OTRO', name: 'Otros', icon: '📋' },
+    { id: 'FERIA_INMOBILIARIA', name: 'Ferias inmobiliarias', icon: '' },
+    { id: 'OPEN_HOUSE', name: 'Open House', icon: '' },
+    { id: 'WEBINAR', name: 'Webinars', icon: '' },
+    { id: 'REMATE', name: 'Remates', icon: '' },
+    { id: 'OTRO', name: 'Otros', icon: '' },
   ];
 
   const filteredEvents = getFilteredEvents();
@@ -133,7 +133,7 @@ export default function EventsView({
           <div className="p-3">
             <button
               onClick={onCreateEvent}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-teal-700 transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r brand text-white rounded-lg font-medium hover:from-blue-700 hover:to-teal-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
               Crear nuevo evento
@@ -146,7 +146,7 @@ export default function EventsView({
           <div className="p-3 border-t border-gray-100">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-gray-900">Eventos recomendados</h3>
-              <button className="text-xs text-blue-600 hover:text-blue-700">Ver todos</button>
+              <button className="text-xs text-brand hover:text-brand-dark">Ver todos</button>
             </div>
             <div className="space-y-2">
               {recommendedEvents.slice(0, 3).map((event: any) => (
@@ -155,11 +155,11 @@ export default function EventsView({
                   onClick={() => onEventSelect(event)}
                   className="w-full flex items-start gap-2 p-2 hover:bg-gray-50 rounded-lg text-left"
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-teal-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-5 h-5 text-blue-600" />
+                  <div className="w-12 h-12 bg-gradient-to-br brand rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-5 h-5 text-brand" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-blue-600 mb-1">
+                    <p className="text-xs font-medium text-brand mb-1">
                       {new Date(event.startDateTime).toLocaleDateString('es-ES', { 
                         day: 'numeric', 
                         month: 'short' 
@@ -183,7 +183,7 @@ export default function EventsView({
                 onClick={() => setSelectedCategory(selectedCategory === category.id ? null : category.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   selectedCategory === category.id
-                    ? 'bg-blue-100 text-blue-700'
+                    ? 'bg-brand/20 text-brand-dark'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
@@ -222,7 +222,7 @@ export default function EventsView({
                   onClick={() => setActiveFilter(filter.toLowerCase() as any)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     activeFilter === filter.toLowerCase()
-                      ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
+                      ? 'bg-gradient-to-r brand text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >

@@ -20,14 +20,14 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
 
   const getChannelEmoji = (city: string) => {
     const cityEmojis: Record<string, string> = {
-      'Lima': '🏙️',
-      'Arequipa': '🌋',
-      'Trujillo': '🏺',
-      'Piura': '☀️',
-      'Chiclayo': '🌿',
-      'Cusco': '🏔️',
+      'Lima': '️',
+      'Arequipa': '',
+      'Trujillo': '',
+      'Piura': '️',
+      'Chiclayo': '',
+      'Cusco': '️',
     };
-    return cityEmojis[city] || '🏘️';
+    return cityEmojis[city] || '️';
   };
 
   const handleSubscribeChannel = (channelId: number, e: React.MouseEvent) => {
@@ -75,7 +75,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
         {!isLoading && filteredChannels.length === 0 && (
           <div className="text-center py-16">
             <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-6">
-              <span className="text-3xl">📢</span>
+              <span className="text-3xl"></span>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               {searchTerm ? 'No se encontraron canales' : 'No hay canales disponibles'}
@@ -99,7 +99,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                 onClick={() => onChannelSelect(channel)}
               >
                 {/* Banner del canal */}
-                <div className="h-24 bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-4xl">
+                <div className="h-24 bg-gradient-to-br brand flex items-center justify-center text-4xl">
                   {getChannelEmoji(channel.city)}
                 </div>
 
@@ -131,7 +131,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                         ? 'bg-green-100 text-green-700' 
                         : 'bg-orange-100 text-orange-700'
                     }`}>
-                      {channel.isPublic ? '🌐 Público' : '🔒 Privado'}
+                      {channel.isPublic ? ' Público' : ' Privado'}
                     </span>
                     <span>{channel.city}</span>
                   </div>
@@ -140,7 +140,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                   <button
                     onClick={(e) => handleSubscribeChannel(channel.id, e)}
                     disabled={isSubscribing}
-                    className="w-full py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubscribing ? 'Suscribiendose...' : 'Suscribirse'}
                   </button>
