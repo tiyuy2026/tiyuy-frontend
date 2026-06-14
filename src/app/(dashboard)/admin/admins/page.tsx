@@ -287,7 +287,7 @@ export default function AdminUsersPage() {
     setEditingAdmin(admin);
     setEditForm({
       departments: admin.departments || [],
-      permissions: [],
+      permissions: admin.additionalPermissions || [],
     });
     setIsEditModalOpen(true);
   };

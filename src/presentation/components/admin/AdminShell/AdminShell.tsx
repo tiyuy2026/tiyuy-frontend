@@ -6,9 +6,10 @@
 
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState, useMemo } from 'react';
 import { useAdminProfile } from '@/presentation/hooks/useAdminProfile';
 import { useAuthStore } from '@/presentation/store/authStore';
+import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { Spinner } from '@/presentation/components/ui/Spinner';
 import { Card } from '@/presentation/components/ui/Card';
 import Link from 'next/link';
@@ -55,9 +56,18 @@ interface NavSection {
   items: NavItem[];
 }
 
-// ─── Configuración del menú ─────────────────────────────────────────────────
+// ─── Configuración del menú con permisos requeridos ─────────────────────────
 
-const NAV_SECTIONS: NavSection[] = [
+interface NavItemWithPermission extends NavItem {
+  requiredPermission?: string;
+}
+
+interface NavSectionWithPermission {
+  title: string;
+  items: NavItemWithPermission[];
+}
+
+const NAV_SECTIONS: NavSectionWithPermission[] = [
   {
     title: '',
     items: [
@@ -67,45 +77,45 @@ const NAV_SECTIONS: NavSection[] = [
   {
     title: 'USUARIOS',
     items: [
-      { label: 'Usuarios', href: '/admin/users', icon: Users },
+      { label: 'Usuarios', href: '/admin/users', icon: Users, requiredPermission: 'USERS_VIEW' },
     ],
   },
   {
     title: 'PROPIEDADES',
     items: [
-      { label: 'Propiedades', href: '/admin/properties', icon: Building },
-      { label: 'Proyectos', href: '/admin/projects', icon: Package },
+      { label: 'Propiedades', href: '/admin/properties', icon: Building, requiredPermission: 'PROPERTIES_VIEW' },
+      { label: 'Proyectos', href: '/admin/projects', icon: Package, requiredPermission: 'PROJECTS_VIEW' },
     ],
   },
   {
     title: 'ACTORES',
     items: [
-      { label: 'Agentes Independientes', href: '/admin/agents', icon: UserCircle },
-      { label: 'Inmobiliarias', href: '/admin/agencies', icon: Building2 },
-      { label: 'Grupos', href: '/admin/groups', icon: Users },
+      { label: 'Agentes Independientes', href: '/admin/agents', icon: UserCircle, requiredPermission: 'USERS_VIEW' },
+      { label: 'Inmobiliarias', href: '/admin/agencies', icon: Building2, requiredPermission: 'AGENCIES_VIEW' },
+      { label: 'Grupos', href: '/admin/groups', icon: Users, requiredPermission: 'GROUPS_VIEW' },
     ],
   },
   {
     title: 'MONETIZACION',
     items: [
-      { label: 'Planes', href: '/admin/plans', icon: Layers },
-      { label: 'Descuentos', href: '/admin/discounts', icon: Tag },
-      { label: 'Campanas', href: '/admin/campaigns', icon: Megaphone },
-      { label: 'Finanzas', href: '/admin/finance', icon: DollarSign },
+      { label: 'Planes', href: '/admin/plans', icon: Layers, requiredPermission: 'FINANCE_VIEW' },
+      { label: 'Descuentos', href: '/admin/discounts', icon: Tag, requiredPermission: 'DISCOUNTS_CREATE' },
+      { label: 'Campanas', href: '/admin/campaigns', icon: Megaphone, requiredPermission: 'COMMUNICATIONS_MANAGE' },
+      { label: 'Finanzas', href: '/admin/finance', icon: DollarSign, requiredPermission: 'FINANCE_VIEW' },
     ],
   },
   {
     title: 'COMUNICACION',
     items: [
-      { label: 'Comunicaciones', href: '/admin/communications', icon: MessageSquare },
-      { label: 'Notificaciones', href: '/admin/notifications', icon: Bell },
+      { label: 'Comunicaciones', href: '/admin/communications', icon: MessageSquare, requiredPermission: 'COMMUNICATIONS_VIEW' },
+      { label: 'Notificaciones', href: '/admin/notifications', icon: Bell, requiredPermission: 'NOTIFICATIONS_SEND' },
     ],
   },
   {
     title: 'SISTEMA',
     items: [
-      { label: 'Administradores', href: '/admin/admins', icon: Users },
-      { label: 'Actividad', href: '/admin/activities', icon: Activity },
+      { label: 'Administradores', href: '/admin/admins', icon: Users, requiredPermission: 'ADMINS_VIEW' },
+      { label: 'Actividad', href: '/admin/activities', icon: Activity, requiredPermission: 'AUDIT_LOGS_VIEW' },
     ],
   },
   {
@@ -154,50 +164,30 @@ function SidebarItem({
 
 function Sidebar({
   collapsed,
-  isSuperAdmin,
-  isSupport,
 }: {
   collapsed: boolean;
-  isSuperAdmin: boolean;
-  isSupport: boolean;
 }) {
   const pathname = usePathname();
+  const { hasPermission, isSuperAdmin, isSupport } = usePermissions();
 
-  // Filtra items según rol y departamentos
-  const filteredSections = NAV_SECTIONS.map((section) => {
-    let items = section.items;
-
-    // Soporte solo ve SISTEMA (actividad) y COMUNICACION
-    if (isSupport) {
-      if (section.title === 'MONETIZACION' || 
-          section.title === 'PROPIEDADES' ||
-          section.title === 'ACTORES' ||
-          section.title === 'USUARIOS') {
-        items = [];
-      }
-      // Sistema: admins solo para super admin
-      if (section.title === 'SISTEMA') {
-        items = items.filter((item) => {
-          if (item.href === '/admin/admins' && !isSuperAdmin) {
-            return false;
-          }
-          return true;
-        });
-      }
-    }
-
-    // Sistema: admins solo para super admin
-    if (section.title === 'SISTEMA') {
-      items = items.filter((item) => {
-        if (item.href === '/admin/admins' && !isSuperAdmin) {
-          return false;
-        }
-        return true;
+  // Filtra items según permisos dinámicos
+  // Ahora se basa en los permisos reales del usuario, no en su roleType
+  // Esto permite que un SUPPORT con departamentos asignados vea esas secciones
+  const filteredSections = useMemo(() => {
+    return NAV_SECTIONS.map((section) => {
+      const items = section.items.filter((item) => {
+        // Items sin permiso requerido siempre se muestran (Dashboard, Mi perfil)
+        if (!item.requiredPermission) return true;
+        // SuperAdmin ve todo
+        if (isSuperAdmin) return true;
+        // Verificar permiso específico - esto funciona para cualquier roleType
+        // (SUPER_ADMIN, ADMIN, SUPPORT) siempre que tenga el permiso asignado
+        return hasPermission(item.requiredPermission);
       });
-    }
+      return { ...section, items };
+    }).filter((s) => s.items.length > 0);
+  }, [isSuperAdmin, hasPermission]);
 
-    return { ...section, items };
-  }).filter((s) => s.items.length > 0);
 
   return (
     <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1 scrollbar-thin scrollbar-thumb-white/10">
@@ -243,18 +233,20 @@ export function GitHubShell({ children }: GitHubShellProps) {
   const { setAdminProfile } = useAuthStore();
   const [collapsed, setCollapsed] = useState(false);
 
-  // Sincroniza auth store manteniendo los permissions existentes del login
+  // Sincroniza auth store con los permisos actualizados del backend
+  // Usamos adminProfile.permissions que incluye TODOS los permisos
+  // (departamentos + adicionales) según AdminUser.getAllPermissions()
   useEffect(() => {
     if (adminProfile) {
-      const currentPermissions = useAuthStore.getState().permissions;
       setAdminProfile(
         adminProfile.roleType,
         adminProfile.departments,
-        currentPermissions || [],
+        adminProfile.permissions || adminProfile.additionalPermissions || [],
         adminProfile.active,
       );
     }
   }, [adminProfile, setAdminProfile]);
+
 
   const isSuperAdmin = adminProfile?.roleType === 'SUPER_ADMIN';
   const isRegularAdmin = adminProfile?.roleType === 'ADMIN';
@@ -340,11 +332,7 @@ export function GitHubShell({ children }: GitHubShellProps) {
             ${collapsed ? 'w-[60px]' : 'w-[240px]'}
           `}
         >
-          <Sidebar
-            collapsed={collapsed}
-            isSuperAdmin={isSuperAdmin}
-            isSupport={isSupport}
-          />
+          <Sidebar collapsed={collapsed} />
         </aside>
 
         {/* Contenido principal - scrollable */}

@@ -133,6 +133,7 @@ export interface AdminUser {
   roleType: AdminRoleType;
   departments: DepartmentType[];
   permissions?: Permission[];
+  additionalPermissions?: Permission[];
   active: boolean;
   lastLoginAt?: Date;
   createdAt: Date;
