@@ -15,6 +15,7 @@ import CreateChannelView from './channels/components/CreateChannelView';
 import { formatCompactNumber } from '@/utils/formatters';
 import CreateGroupView from './groups/components/CreateGroupView';
 import DiscoverGroupsView from './groups/components/DiscoverGroupsView';
+import { AdminRestrictionGuard } from '@/presentation/components/guards/AdminRestrictionGuard';
 import { 
   useReceivedContacts,
   useSentContacts,
@@ -2598,8 +2599,10 @@ function MisContactosPageContent() {
 
 export default function MisContactosPage() {
   return (
+    <AdminRestrictionGuard feature="chat">
     <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" /></div>}>
       <MisContactosPageContent />
     </Suspense>
+    </AdminRestrictionGuard>
   );
 }

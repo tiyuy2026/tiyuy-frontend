@@ -11,6 +11,7 @@ import {
 } from '@/core/domain/repositories/IAdminRepository';
 import {
   AdminUser,
+  CreateAdminAccountRequest,
   CreateAdminUserRequest,
   UpdateAdminUserRequest,
   DashboardStats,
@@ -144,6 +145,22 @@ export class AdminRepository implements IAdminRepository {
 
   async deleteAdminUser(adminId: number): Promise<void> {
     await axiosClient.delete(`${this.basePath}/admins/${adminId}`);
+  }
+
+  async toggleAdminStatus(adminId: number, active: boolean): Promise<AdminUser> {
+    const response = await axiosClient.patch(`${this.basePath}/admins/${adminId}/status`, { active });
+    return response.data;
+  }
+
+  // SuperAdmin: Create admin/support accounts (User creation)
+  async createAdminAccount(request: CreateAdminAccountRequest): Promise<{ userId: number; email: string }> {
+    const response = await axiosClient.post(`${this.basePath}/superadmin/create-admin`, request);
+    return response.data;
+  }
+
+  async createSupportAccount(request: CreateAdminAccountRequest): Promise<{ userId: number; email: string }> {
+    const response = await axiosClient.post(`${this.basePath}/superadmin/create-support`, request);
+    return response.data;
   }
 
   // User Management

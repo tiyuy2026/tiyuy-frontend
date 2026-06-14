@@ -6,6 +6,7 @@ import { PropertyForm } from '@/presentation/components/property/PropertyForm/Pr
 import { useAuthStore } from '@/presentation/store/authStore';
 import { useMyProperties } from '@/presentation/hooks/useProperties';
 import { useActiveSubscription } from '@/presentation/hooks/useFinance';
+import { AdminRestrictionGuard } from '@/presentation/components/guards/AdminRestrictionGuard';
 import { useEffect } from 'react';
 
 const STEPS = [
@@ -71,6 +72,7 @@ export default function NuevaPropiedadPage() {
   }
 
   return (
+    <AdminRestrictionGuard feature="publish">
     <div className="min-h-screen" style={{ backgroundColor: '#f5f5f5' }}>
 
       {/* ── TOP NAV ── */}
@@ -298,5 +300,6 @@ export default function NuevaPropiedadPage() {
         </div>
       </footer>
     </div>
+    </AdminRestrictionGuard>
   );
 }

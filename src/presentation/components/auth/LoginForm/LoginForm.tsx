@@ -115,10 +115,9 @@ export const LoginForm: React.FC = () => {
         authStorage.setUser(userData);
         setAuth(result.authResponse.token, userData, adminData);
 
-        const targetRoute =
-          result.authResponse.role === 'ADMIN' || result.authResponse.adminRoleType === 'SUPER_ADMIN'
-            ? '/admin'
-            : '/';
+        const adminRoles = ['ADMIN', 'SUPER_ADMIN', 'SUPPORT'];
+        const isAdminUser = result.authResponse.adminRoleType !== undefined || adminRoles.includes(result.authResponse.role);
+        const targetRoute = isAdminUser ? '/admin' : '/';
 
         router.replace(targetRoute);
         setTimeout(() => window.location.assign(targetRoute), 100);

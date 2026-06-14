@@ -163,13 +163,27 @@ function Sidebar({
 }) {
   const pathname = usePathname();
 
-  // Filtra items según rol
+  // Filtra items según rol y departamentos
   const filteredSections = NAV_SECTIONS.map((section) => {
     let items = section.items;
 
-    // Monetizacion oculta para soporte
-    if (section.title === 'MONETIZACION' && isSupport) {
-      items = [];
+    // Soporte solo ve SISTEMA (actividad) y COMUNICACION
+    if (isSupport) {
+      if (section.title === 'MONETIZACION' || 
+          section.title === 'PROPIEDADES' ||
+          section.title === 'ACTORES' ||
+          section.title === 'USUARIOS') {
+        items = [];
+      }
+      // Sistema: admins solo para super admin
+      if (section.title === 'SISTEMA') {
+        items = items.filter((item) => {
+          if (item.href === '/admin/admins' && !isSuperAdmin) {
+            return false;
+          }
+          return true;
+        });
+      }
     }
 
     // Sistema: admins solo para super admin
@@ -229,21 +243,22 @@ export function GitHubShell({ children }: GitHubShellProps) {
   const { setAdminProfile } = useAuthStore();
   const [collapsed, setCollapsed] = useState(false);
 
-  // Sincroniza auth store
+  // Sincroniza auth store manteniendo los permissions existentes del login
   useEffect(() => {
     if (adminProfile) {
+      const currentPermissions = useAuthStore.getState().permissions;
       setAdminProfile(
-        adminProfile.role,
+        adminProfile.roleType,
         adminProfile.departments,
-        adminProfile.permissions,
-        adminProfile.isActive,
+        currentPermissions || [],
+        adminProfile.active,
       );
     }
   }, [adminProfile, setAdminProfile]);
 
-  const isSuperAdmin = adminProfile?.role === 'SUPER_ADMIN';
-  const isRegularAdmin = adminProfile?.role === 'ADMIN';
-  const isSupport = adminProfile?.role === 'SUPPORT';
+  const isSuperAdmin = adminProfile?.roleType === 'SUPER_ADMIN';
+  const isRegularAdmin = adminProfile?.roleType === 'ADMIN';
+  const isSupport = adminProfile?.roleType === 'SUPPORT';
 
   // ── Loading ──
   if (isLoading) {

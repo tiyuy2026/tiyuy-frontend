@@ -14,6 +14,8 @@ const PROFILE_TITLES: Record<UserRole, string> = {
   AGENT: 'Agente',
   DEVELOPER: 'Desarrollador',
   ADMIN: 'Administrador',
+  SUPER_ADMIN: 'Super Administrador',
+  SUPPORT: 'Soporte',
 };
 
 export default function ProfileSelector() {

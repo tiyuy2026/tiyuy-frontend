@@ -4,14 +4,16 @@ import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/presentation/store/authStore';
+import { useAdminModeStore } from '@/presentation/store/adminModeStore';
 import { NotificationList } from '@/presentation/components/notifications/NotificationList/NotificationList';
-import { User, Building, MessageSquare, LogOut, ChevronDown, FolderGit, Menu, X } from 'lucide-react';
+import { User, Building, MessageSquare, LogOut, ChevronDown, FolderGit, Menu, X, Shield, ShieldCheck, Headset } from 'lucide-react';
 
 
 
 export function Header() {
   const router = useRouter();
-  const { isAuthenticated, user, logout } = useAuthStore();
+  const { isAuthenticated, user, logout, adminRoleType } = useAuthStore();
+  const { isUserMode, setUserMode } = useAdminModeStore();
   const [visible, setVisible] = useState(true);
   const lastScrollY = useRef(0);
 
@@ -1058,7 +1060,7 @@ export function Header() {
                   
                   {/* Dropdown Menu */}
                   {showUserMenu && (
-                    <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                    <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
                       <div className="px-4 py-3 border-b border-gray-100">
                         <p className="font-medium text-gray-900">{user?.firstName} {user?.lastName}</p>
                         <p className="text-sm text-gray-500">{user?.email}</p>
@@ -1098,6 +1100,65 @@ export function Header() {
                         <MessageSquare className="w-4 h-4" />
                         <span className="text-sm">Mensajes</span>
                       </Link>
+
+                      {/* ── Admin Mode Switcher ── */}
+                      {adminRoleType && (
+                        <>
+                          <div className="border-t border-gray-100 my-1"></div>
+                          <div className="px-4 py-2">
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Modo</p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setUserMode(true);
+                              setShowUserMenu(false);
+                              router.push('/');
+                            }}
+                            className={`w-full flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                              isUserMode
+                                ? 'bg-teal-50 text-teal-700 font-medium'
+                                : 'text-gray-700 hover:bg-gray-50'
+                            }`}
+                          >
+                            <User className="w-4 h-4" />
+                            <span>Modo Usuario</span>
+                            {isUserMode && (
+                              <svg className="w-4 h-4 ml-auto text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setUserMode(false);
+                              setShowUserMenu(false);
+                              router.push('/admin');
+                            }}
+                            className={`w-full flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                              !isUserMode
+                                ? 'bg-teal-50 text-teal-700 font-medium'
+                                : 'text-gray-700 hover:bg-gray-50'
+                            }`}
+                          >
+                            {adminRoleType === 'SUPER_ADMIN' ? (
+                              <ShieldCheck className="w-4 h-4" />
+                            ) : adminRoleType === 'SUPPORT' ? (
+                              <Headset className="w-4 h-4" />
+                            ) : (
+                              <Shield className="w-4 h-4" />
+                            )}
+                            <span>
+                              Modo {adminRoleType === 'SUPER_ADMIN' ? 'SuperAdmin' : adminRoleType === 'SUPPORT' ? 'Support' : 'Admin'}
+                            </span>
+                            {!isUserMode && (
+                              <svg className="w-4 h-4 ml-auto text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </button>
+                        </>
+                      )}
+
                       <div className="border-t border-gray-100 my-1"></div>
                       <button 
                         className="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"

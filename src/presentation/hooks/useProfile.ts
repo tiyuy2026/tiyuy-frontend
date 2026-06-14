@@ -22,6 +22,8 @@ export const useProfile = () => {
       AGENT: '/register/agent',
       DEVELOPER: '/register/developer',
       ADMIN: '/register/admin',
+      SUPER_ADMIN: '/register/admin',
+      SUPPORT: '/register/admin',
     };
 
     router.push(profileRoutes[profile]);

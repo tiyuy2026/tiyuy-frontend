@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AdminRepository } from '@/infrastructure/repositories/AdminRepository';
 import {
   AdminUser,
+  CreateAdminAccountRequest,
   CreateAdminUserRequest,
   UpdateAdminUserRequest,
   DashboardStats,
@@ -222,6 +223,38 @@ export const useDeleteAdmin = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (adminId: number) => adminRepository.deleteAdminUser(adminId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'admins'] });
+    },
+  });
+};
+
+export const useToggleAdminStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ adminId, active }: { adminId: number; active: boolean }) =>
+      adminRepository.toggleAdminStatus(adminId, active),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'admins'] });
+    },
+  });
+};
+
+// SuperAdmin: Create admin/support account hooks
+export const useCreateAdminAccount = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (request: CreateAdminAccountRequest) => adminRepository.createAdminAccount(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'admins'] });
+    },
+  });
+};
+
+export const useCreateSupportAccount = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (request: CreateAdminAccountRequest) => adminRepository.createSupportAccount(request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'admins'] });
     },

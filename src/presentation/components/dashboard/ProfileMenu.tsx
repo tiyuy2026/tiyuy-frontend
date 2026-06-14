@@ -44,7 +44,7 @@ export function ProfileMenu() {
             {user?.role === 'USER' && 'Usuario'}
             {user?.role === 'AGENT' && 'Agente'}
             {user?.role === 'DEVELOPER' && 'Desarrollador'}
-            {user?.role === 'ADMIN' && 'Administrador'}
+            {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' || user?.role === 'SUPPORT') && 'Administrador'}
           </div>
         </div>
         <svg 
@@ -143,9 +143,9 @@ export function ProfileMenu() {
             </div>
           </Link>
 
-          {user?.role === 'ADMIN' && (
+          {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' || user?.role === 'SUPPORT') && (
             <Link
-              href="/dashboard/admin/usuarios"
+              href="/admin"
               className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
               onClick={() => setShowMenu(false)}
             >

@@ -58,6 +58,20 @@ const ROLES_CONFIG: Record<UserRole, any> = {
     icon: 'shield-check',
     color: 'bg-red-500',
     features: ['Gestión usuarios', 'Aprobaciones', 'Analíticas']
+  },
+  SUPER_ADMIN: {
+    title: 'Super Administrador',
+    description: 'Control total del sistema',
+    icon: 'shield-check',
+    color: 'bg-red-500',
+    features: ['Control total', 'Gestión del sistema', 'Auditoría']
+  },
+  SUPPORT: {
+    title: 'Soporte',
+    description: 'Atención y soporte técnico',
+    icon: 'shield-check',
+    color: 'bg-red-500',
+    features: ['Soporte usuarios', 'Gestión tickets', 'Monitoreo']
   }
 };
 

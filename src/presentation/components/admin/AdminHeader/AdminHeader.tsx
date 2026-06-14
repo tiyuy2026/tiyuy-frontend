@@ -11,7 +11,7 @@ import { useAuthStore } from '@/presentation/store/authStore';
 import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { Button } from '@/presentation/components/ui/Button';
 import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
-import { Bell, Search, Plus, LogOut, Camera, User, PlusCircle, Settings, HelpCircle, Building2, Megaphone, Tag, Menu } from 'lucide-react';
+import { Bell, Search, Plus, LogOut, Camera, User, PlusCircle, Settings, HelpCircle, Building2, Megaphone, Tag, Menu, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -79,6 +79,11 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
       case 'admin':
         if (isSuperAdmin) {
           router.push('/admin/admins?action=create');
+        }
+        break;
+      case 'roles':
+        if (isSuperAdmin) {
+          router.push('/admin/admins');
         }
         break;
       default:
@@ -207,6 +212,16 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
                     Nuevo admin
                   </button>
                 )}
+                {isSuperAdmin && (
+                  <button
+                    onClick={() => handleCreateAction('roles')}
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-white/10 flex items-center gap-3 transition-colors duration-200"
+                    style={{ color: 'white' }}
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    Roles del sistema
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -240,7 +255,7 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
             isRegularAdmin ? 'bg-blue-600 text-white' :
             'bg-gray-600 text-white'
           }`}>
-            {adminProfile?.role?.replace('_', ' ')}
+            {adminProfile?.roleType?.replace('_', ' ')}
           </div>
           
           {/* Avatar */}
@@ -274,7 +289,7 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
                         isRegularAdmin ? 'bg-blue-600 text-white' :
                         'bg-gray-600 text-white'
                       }`}>
-                        {adminProfile?.role?.replace('_', ' ')}
+                        {adminProfile?.roleType?.replace('_', ' ')}
                       </div>
                     </div>
                   </div>

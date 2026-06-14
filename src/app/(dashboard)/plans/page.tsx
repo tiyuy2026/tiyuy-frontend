@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
+import { AdminRestrictionGuard } from '@/presentation/components/guards/AdminRestrictionGuard';
 import { useAvailablePlans, useSubscribeToPlan, useActiveSubscription, useAvailableDeveloperDiscountCodes } from '@/presentation/hooks/useFinance';
 import { useValidateDeveloperDiscountCode, useUseDeveloperDiscountCode } from '@/presentation/hooks/admin/useDevelopers';
 import { useMyProperties } from '@/presentation/hooks/useProperties';
@@ -492,6 +493,7 @@ export default function PlansPage() {
 
   return (
     <ProtectedRoute>
+      <AdminRestrictionGuard feature="plans">
       <div className="min-h-screen bg-gray-50">
         <div className="relative bg-white overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand-primary-light)] via-white to-white opacity-50"></div>
@@ -775,6 +777,7 @@ export default function PlansPage() {
           )}
         </div>
       </div>
+      </AdminRestrictionGuard>
 
       <UpgradePlanModal
         isOpen={showUpgradeModal}
