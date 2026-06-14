@@ -60,7 +60,7 @@ export function ChannelStatisticsModal({
   return (
     <div className="h-full flex flex-col bg-white">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-blue-600 to-teal-500 text-white">
+      <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r brand text-white">
         <div className="flex items-center gap-3">
           <BarChart3 className="w-6 h-6" />
           <div>
@@ -87,7 +87,7 @@ export function ChannelStatisticsModal({
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <StatCard
-                icon={<Users className="w-5 h-5 text-blue-600" />}
+                icon={<Users className="w-5 h-5 text-brand" />}
                 label="Suscriptores"
                 value={statistics.subscriberCount}
                 color="blue"
@@ -115,7 +115,7 @@ export function ChannelStatisticsModal({
             {/* Activity Chart */}
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
               <div className="flex items-center gap-2 mb-6">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
+                <TrendingUp className="w-5 h-5 text-brand" />
                 <h3 className="font-semibold text-gray-900">Actividad Diaria (Últimos 7 días)</h3>
               </div>
 
@@ -133,7 +133,7 @@ export function ChannelStatisticsModal({
                       {statistics.dailyActivity.map((day, idx) => (
                         <div key={idx} className="flex-1 flex flex-col items-center gap-1">
                           <div 
-                            className="w-full bg-blue-500 rounded-t-lg transition-all hover:bg-blue-600"
+                            className="w-full bg-brand/100 rounded-t-lg transition-all hover:bg-brand"
                             style={{ 
                               height: `${Math.max((day.posts / maxPosts) * 100, 4)}%`,
                               minHeight: day.posts > 0 ? '4px' : '0'
@@ -142,7 +142,7 @@ export function ChannelStatisticsModal({
                           <span className="text-xs text-gray-500">
                             {new Date(day.date).toLocaleDateString('es-ES', { weekday: 'short' })}
                           </span>
-                          <span className="text-xs font-medium text-blue-600">{day.posts}</span>
+                          <span className="text-xs font-medium text-brand">{day.posts}</span>
                         </div>
                       ))}
                     </div>
@@ -181,14 +181,14 @@ export function ChannelStatisticsModal({
             </div>
 
             {/* Active Users Info */}
-            <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+            <div className="bg-brand/10 rounded-xl p-4 border border-blue-100">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Users className="w-5 h-5 text-blue-600" />
+                <div className="p-2 bg-brand/20 rounded-lg">
+                  <Users className="w-5 h-5 text-brand" />
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">Usuarios activos últimos 7 días</p>
-                  <p className="text-2xl font-bold text-blue-600">{statistics.activeUsersLast7Days}</p>
+                  <p className="text-2xl font-bold text-brand">{statistics.activeUsersLast7Days}</p>
                 </div>
               </div>
             </div>
@@ -216,7 +216,7 @@ export function ChannelStatisticsModal({
                       key={collaborator.id}
                       className="px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors"
                     >
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-semibold">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br brand flex items-center justify-center text-white font-semibold">
                         {collaborator.userAvatar ? (
                           <img
                             src={collaborator.userAvatar}
@@ -237,7 +237,7 @@ export function ChannelStatisticsModal({
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
+                        <span className="px-2 py-1 bg-brand/20 text-brand-dark text-xs rounded-full font-medium">
                           Colaborador
                         </span>
                         {isChannelAdmin && (
@@ -306,7 +306,7 @@ function StatCard({
   color: string;
 }) {
   const colorClasses: Record<string, string> = {
-    blue: 'bg-blue-50 border-blue-100',
+    blue: 'bg-brand/10 border-blue-100',
     green: 'bg-green-50 border-green-100',
     purple: 'bg-purple-50 border-purple-100',
     orange: 'bg-orange-50 border-orange-100',

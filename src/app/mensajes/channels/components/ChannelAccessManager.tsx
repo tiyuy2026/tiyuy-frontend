@@ -144,7 +144,7 @@ export function ChannelAccessManager({
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-blue-600" />
+            <Shield className="w-5 h-5 text-brand" />
             <h3 className="font-semibold text-gray-900">Gestión de Acceso</h3>
             {/* Statistics Button - Only for admin and publishers */}
             {canViewStatistics && (
@@ -169,14 +169,14 @@ export function ChannelAccessManager({
       </div>
 
       {/* Admin Section */}
-      <div className="p-4 border-b border-gray-200 bg-blue-50/50">
+      <div className="p-4 border-b border-gray-200 bg-brand/10/50">
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
           <Crown className="w-4 h-4 text-yellow-500" />
           Administrador del Canal
         </h4>
         {adminUser ? (
           <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100 shadow-sm">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-semibold">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br brand flex items-center justify-center text-white font-semibold">
               {adminUser.avatar ? (
                 <img src={adminUser.avatar} alt="" className="w-full h-full rounded-full object-cover" />
               ) : (
@@ -259,7 +259,7 @@ export function ChannelAccessManager({
                     <button
                       onClick={() => handleGrantPermission(user.id)}
                       disabled={grantPermission.isPending}
-                      className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="p-2 bg-brand text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       title="Dar permiso de publicación"
                     >
                       {grantPermission.isPending ? (
@@ -282,7 +282,7 @@ export function ChannelAccessManager({
           <Users className="w-4 h-4 text-blue-500" />
           Colaboradores con Acceso
           {collaborators && collaborators.length > 0 && (
-            <span className="ml-auto bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs">
+            <span className="ml-auto bg-brand/20 text-brand-dark px-2 py-0.5 rounded-full text-xs">
               {collaborators.length}
             </span>
           )}
@@ -357,7 +357,7 @@ function CollaboratorCard({ collaborator, canManage, onRevoke, isRevoking, isExp
         onClick={onToggle}
         className="flex items-center gap-3 p-3 cursor-pointer"
       >
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br brand flex items-center justify-center text-white font-semibold flex-shrink-0">
           {collaborator.userAvatar ? (
             <img 
               src={collaborator.userAvatar} 

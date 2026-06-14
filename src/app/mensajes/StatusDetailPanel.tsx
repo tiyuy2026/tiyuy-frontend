@@ -16,13 +16,13 @@ interface StatusDetailPanelProps {
 export default function StatusDetailPanel({ status, user, onClose }: StatusDetailPanelProps) {
 
   //  Nombre real del usuario autenticado - usar firstName + lastName (campos válidos)
-  console.log(' StatusDetailPanel - user:', user); // ← DEBUG
+  console.log(' StatusDetailPanel - user:', user); //  DEBUG
   const currentUserName = user?.firstName && user?.lastName
     ? `${user.firstName} ${user.lastName}`
     : user?.firstName
     || user?.lastName
     || `Usuario ${user?.id || ''}`;
-  console.log(' StatusDetailPanel - currentUserName:', currentUserName); // ← DEBUG
+  console.log(' StatusDetailPanel - currentUserName:', currentUserName); //  DEBUG
 
   //  Función helper para detectar si un comentario es del usuario actual
   const isCurrentUserComment = (comment: any) => {
@@ -104,7 +104,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
     }
   }, [comments]);
 
-  // console.log('Render comments:', comments.length, comments[0]); // ← Comentado para evitar payload errors
+  // console.log('Render comments:', comments.length, comments[0]); //  Comentado para evitar payload errors
 
   const handleComment = () => {
     if (!commentText.trim()) return;
@@ -114,8 +114,8 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
       ...(replyingTo && { replyToCommentId: replyingTo.id })
     }, {
       onSuccess: () => {
-        setCommentText(''); // ← Limpiar input
-        setReplyingTo(null); // ← Limpiar respuesta
+        setCommentText(''); //  Limpiar input
+        setReplyingTo(null); //  Limpiar respuesta
         toast.success('Comentario enviado');
         // Refrescar los comentarios para mostrar el nuevo
         queryClient.invalidateQueries({ queryKey: ['status-comments', status.id] });
@@ -268,7 +268,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
               {status.tags.map((tag: string, index: number) => (
                 <span
                   key={index}
-                  className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-full font-medium"
+                  className="px-2 py-1 bg-brand/10 text-brand text-xs rounded-full font-medium"
                 >
                   #{tag}
                 </span>
@@ -290,7 +290,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
             {likeCount > 0 && likeCount}
           </button>
 
-          <button className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">
+          <button className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-brand transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
@@ -358,7 +358,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                     <div className="flex items-center gap-4 mt-2 ml-2">
                       <button
                         onClick={() => handleLikeComment(comment.id, comment.hasUserLiked)}
-                        className={`text-xs flex items-center gap-1 transition-colors ${comment.hasUserLiked ? 'text-blue-600' : 'text-gray-500 hover:text-blue-600'
+                        className={`text-xs flex items-center gap-1 transition-colors ${comment.hasUserLiked ? 'text-brand' : 'text-gray-500 hover:text-brand'
                           }`}
                       >
                         <svg className="w-4 h-4" fill={comment.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
@@ -406,7 +406,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                             <div className="flex items-center gap-3 mt-2">
                               <button
                                 onClick={() => handleLikeComment(reply.id, reply.hasUserLiked)}
-                                className={`text-xs flex items-center gap-1 transition-colors ${reply.hasUserLiked ? 'text-blue-600' : 'text-gray-400 hover:text-blue-600'
+                                className={`text-xs flex items-center gap-1 transition-colors ${reply.hasUserLiked ? 'text-brand' : 'text-gray-400 hover:text-brand'
                                   }`}
                               >
                                 <svg className="w-3 h-3" fill={reply.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
@@ -525,15 +525,15 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
       <div className="border-t border-gray-100 p-4">
         {/* Mostrar respuesta seleccionada */}
         {replyingTo && (
-          <div className="mb-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+          <div className="mb-3 p-3 bg-brand/10 border-l-4 border-blue-500 rounded-lg">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  <span className="text-blue-700 font-semibold text-sm">Respondiendo a</span>
-                  <span className="text-blue-600 font-medium text-sm">
+                  <span className="text-brand-dark font-semibold text-sm">Respondiendo a</span>
+                  <span className="text-brand font-medium text-sm">
                     {replyingTo.userName || replyingTo.user?.name || 'Usuario'}
                   </span>
                 </div>
@@ -571,7 +571,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
               {commentText && (
                 <button
                   onClick={handleComment}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 bg-brand text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -587,13 +587,13 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
       {showShareModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-600 to-teal-500 p-5">
+            <div className="bg-gradient-to-r brand p-5">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-white font-bold text-lg">Compartir Estado</h2>
                   <p className="text-white/70 text-xs mt-0.5">Elige dónde quieres compartir</p>
                 </div>
-                <button onClick={() => setShowShareModal(false)} className="text-white/70 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-xl leading-none">✕</button>
+                <button onClick={() => setShowShareModal(false)} className="text-white/70 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-xl leading-none"></button>
               </div>
             </div>
 
@@ -632,14 +632,14 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setShowShareModal(false)}
-                  className="flex flex-col items-center gap-2 p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors border-2 border-blue-200"
+                  className="flex flex-col items-center gap-2 p-3 bg-brand/10 rounded-xl hover:bg-brand/20 transition-colors border-2 border-blue-200"
                 >
-                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-brand rounded-full flex items-center justify-center">
                     <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                     </svg>
                   </div>
-                  <span className="text-xs text-blue-700 font-bold">Facebook</span>
+                  <span className="text-xs text-brand-dark font-bold">Facebook</span>
                 </a>
               </div>
             </div>

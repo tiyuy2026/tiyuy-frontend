@@ -64,7 +64,7 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
     const eventDate = new Date(event.startDateTime);
     
     if (eventDate > now) {
-      return 'bg-blue-100 text-blue-700';
+      return 'bg-brand/20 text-brand-dark';
     } else {
       return 'bg-gray-100 text-gray-700';
     }
@@ -95,13 +95,13 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
 
   const getEventEmoji = (eventType: string) => {
     const emojis: Record<string, string> = {
-      'MEETING': '🤝',
-      'CONFERENCE': '🎤',
-      'WORKSHOP': '🛠️',
-      'SOCIAL': '🎉',
-      'WEBINAR': '💻',
+      'MEETING': '',
+      'CONFERENCE': '',
+      'WORKSHOP': '️',
+      'SOCIAL': '',
+      'WEBINAR': '',
     };
-    return emojis[eventType] || '📅';
+    return emojis[eventType] || '';
   };
 
   if (eventsLoading) {
@@ -132,7 +132,7 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
           {canCreateEvent && onCreateEvent && (
             <button
               onClick={onCreateEvent}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-teal-700 transition-colors mx-auto"
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r brand text-white rounded-xl font-medium hover:from-blue-700 hover:to-teal-700 transition-colors mx-auto"
             >
               <Calendar className="w-5 h-5" />
               Crear evento
@@ -159,7 +159,7 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
           {canCreateEvent && (
             <button
               onClick={() => setShowCreateEventModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-teal-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r brand text-white rounded-lg font-medium hover:from-blue-700 hover:to-teal-700 transition-colors"
             >
               <Calendar className="w-4 h-4" />
               Crear Evento
@@ -216,7 +216,7 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
               <button
                 onClick={() => { setActiveFilter('todos'); setShowFilterDropdown(false); }}
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                  activeFilter === 'todos' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                  activeFilter === 'todos' ? 'bg-brand/10 text-brand-dark' : 'text-gray-700'
                 }`}
               >
                 Todos los eventos
@@ -224,7 +224,7 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
               <button
                 onClick={() => { setActiveFilter('proximos'); setShowFilterDropdown(false); }}
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                  activeFilter === 'proximos' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                  activeFilter === 'proximos' ? 'bg-brand/10 text-brand-dark' : 'text-gray-700'
                 }`}
               >
                 Eventos próximos
@@ -232,7 +232,7 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
               <button
                 onClick={() => { setActiveFilter('pasados'); setShowFilterDropdown(false); }}
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                  activeFilter === 'pasados' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                  activeFilter === 'pasados' ? 'bg-brand/10 text-brand-dark' : 'text-gray-700'
                 }`}
               >
                 Eventos pasados
@@ -253,7 +253,7 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
             {/* Event Header */}
             <div className="flex items-start gap-4">
               {/* Event Type Icon */}
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-teal-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-gradient-to-br brand rounded-lg flex items-center justify-center flex-shrink-0">
                 <span className="text-xl">{getEventEmoji(event.eventType)}</span>
               </div>
 
@@ -274,7 +274,7 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
 
                 {/* Channel Name */}
                 <p className="text-sm text-gray-600 mb-2">
-                  📢 {event.channelName} {event.channelCity && `• ${event.channelCity}`}
+                   {event.channelName} {event.channelCity && ` ${event.channelCity}`}
                 </p>
 
                 {/* Description */}
@@ -305,7 +305,7 @@ export default function MisEventosView({ user, onEventSelect, onCreateEvent }: M
 
                 {activeFilter === 'pasados' && (
                   <div>
-                    <h4 className="font-medium text-gray-700 mb-2">🗂️ Eventos pasados</h4>
+                    <h4 className="font-medium text-gray-700 mb-2">️ Eventos pasados</h4>
                     <p className="text-sm text-gray-600 mb-4">
                       Eventos que ya finalizaron. ¡Gracias por participar!
                     </p>

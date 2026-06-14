@@ -1,4 +1,4 @@
-// 🏗️ PÁGINA DE GRUPOS - Arquitectura Hexagonal
+// ️ PÁGINA DE GRUPOS - Arquitectura Hexagonal
 // Este archivo pertenece al módulo de GRUPOS (Presentation Layer - Página)
 
 'use client';
@@ -116,7 +116,7 @@ export default function GruposPage() {
         <div className="p-4 border-b border-gray-200">
           <div className="grid grid-cols-3 gap-2 text-center">
             <div>
-              <div className="text-lg font-bold text-blue-600">{groups.length}</div>
+              <div className="text-lg font-bold text-brand">{groups.length}</div>
               <div className="text-xs text-gray-600">Total</div>
             </div>
             <div>
@@ -154,7 +154,7 @@ export default function GruposPage() {
                   key={grupo.id}
                   className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
                     selectedGrupo?.id === grupo.id
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-blue-500 bg-brand/10'
                       : 'border-gray-200 hover:border-gray-300 bg-white'
                   }`}
                   onClick={() => setSelectedGrupo(grupo as Group)}
@@ -169,7 +169,7 @@ export default function GruposPage() {
                       <div className="flex items-center space-x-2 mt-1">
                         <span className="text-xs text-gray-500">{grupo.memberCount} miembros</span>
                         {grupo.postCount > 0 && (
-                          <span className="text-xs text-blue-600">{grupo.postCount} posts</span>
+                          <span className="text-xs text-brand">{grupo.postCount} posts</span>
                         )}
                       </div>
                     </div>
@@ -207,7 +207,7 @@ export default function GruposPage() {
                 onClick={() => setSelectedGrupo(null)}
                 className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                ✕
+                
               </button>
             </div>
           </div>

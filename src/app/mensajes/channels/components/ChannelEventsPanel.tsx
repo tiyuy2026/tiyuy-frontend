@@ -118,8 +118,8 @@ export default function ChannelEventsPanel({
         return {
           id: notificationId,
           title: isCurrentUser 
-            ? '📅 Creaste un nuevo evento'
-            : `📅 ${creatorName} creó un evento`,
+            ? ' Creaste un nuevo evento'
+            : ` ${creatorName} creó un evento`,
           message: `"${event.title}" - ${event.description || 'Sin descripción'}`,
           type: 'EVENT_CREATED' as const,
           read: readNotifications.has(notificationId),
@@ -304,7 +304,7 @@ export default function ChannelEventsPanel({
     
     // PRIMERO: Abrir el evento inmediatamente para mejor UX
     if (eventId) {
-      console.log('🔔 Clic en notificación - eventId:', eventId);
+      console.log(' Clic en notificación - eventId:', eventId);
       
       // Buscar el evento en TODAS las fuentes disponibles
       let eventData = null;
@@ -318,23 +318,23 @@ export default function ChannelEventsPanel({
       
       if (Array.isArray(allEvents1)) {
         eventData = allEvents1.find((e: any) => e.id === eventId || e.id === Number(eventId));
-        if (eventData) console.log('✅ Evento encontrado en channelEventsForNotifications');
+        if (eventData) console.log(' Evento encontrado en channelEventsForNotifications');
       }
       
       // Fuente 2: events (del query principal)
       if (!eventData && events && Array.isArray(events)) {
         eventData = events.find((e: any) => e.id === eventId || e.id === Number(eventId));
-        if (eventData) console.log('✅ Evento encontrado en events');
+        if (eventData) console.log(' Evento encontrado en events');
       }
       
       // Fuente 3: upcomingEvents
       if (!eventData && upcomingEvents && Array.isArray(upcomingEvents)) {
         eventData = upcomingEvents.find((e: any) => e.id === eventId || e.id === Number(eventId));
-        if (eventData) console.log('✅ Evento encontrado en upcomingEvents');
+        if (eventData) console.log(' Evento encontrado en upcomingEvents');
       }
       
       if (eventData) {
-        console.log('📂 Abriendo detalle del evento:', eventData.title || eventData.id);
+        console.log(' Abriendo detalle del evento:', eventData.title || eventData.id);
         // Abrir el detalle del evento INMEDIATAMENTE
         setSelectedEvent(eventData);
         setShowNotifications(false);
@@ -347,7 +347,7 @@ export default function ChannelEventsPanel({
           }
         }
       } else {
-        console.warn('⚠️ Evento no encontrado localmente:', eventId);
+        console.warn('️ Evento no encontrado localmente:', eventId);
         console.log('Recargando eventos del canal...');
         // Forzar recarga de eventos y luego intentar abrir
         queryClient.invalidateQueries({ queryKey: ['channelEvents', channelId] });
@@ -371,7 +371,7 @@ export default function ChannelEventsPanel({
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'EVENT_CREATED':
-        return <Calendar className="w-5 h-5 text-blue-600" />;
+        return <Calendar className="w-5 h-5 text-brand" />;
       case 'EVENT_UPDATED':
         return <Edit className="w-5 h-5 text-orange-600" />;
       case 'EVENT_REMINDER':
@@ -391,7 +391,7 @@ export default function ChannelEventsPanel({
     
     switch (type) {
       case 'EVENT_CREATED':
-        return 'bg-blue-50 border-blue-200';
+        return 'bg-brand/10 border-blue-200';
       case 'EVENT_UPDATED':
         return 'bg-orange-50 border-orange-200';
       case 'EVENT_REMINDER':
@@ -643,11 +643,11 @@ export default function ChannelEventsPanel({
   };
 
   const categories = [
-    { id: 'FERIA_INMOBILIARIA', name: 'Ferias inmobiliarias', icon: '🏢' },
-    { id: 'OPEN_HOUSE', name: 'Open House', icon: '🏠' },
-    { id: 'WEBINAR', name: 'Webinars', icon: '💻' },
-    { id: 'REMATE', name: 'Remates', icon: '🔨' },
-    { id: 'OTRO', name: 'Otros', icon: '📋' },
+    { id: 'FERIA_INMOBILIARIA', name: 'Ferias inmobiliarias', icon: '' },
+    { id: 'OPEN_HOUSE', name: 'Open House', icon: '' },
+    { id: 'WEBINAR', name: 'Webinars', icon: '' },
+    { id: 'REMATE', name: 'Remates', icon: '' },
+    { id: 'OTRO', name: 'Otros', icon: '' },
   ];
 
   const filteredEvents = getFilteredEvents();
@@ -683,7 +683,7 @@ export default function ChannelEventsPanel({
               }}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 showUserEvents
-                  ? 'bg-blue-100 text-blue-700'
+                  ? 'bg-brand/20 text-brand-dark'
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
             >
@@ -701,7 +701,7 @@ export default function ChannelEventsPanel({
             }}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               showNotifications
-                ? 'bg-blue-100 text-blue-700'
+                ? 'bg-brand/20 text-brand-dark'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}
           >
@@ -730,7 +730,7 @@ export default function ChannelEventsPanel({
           <div className="p-3">
             <button
               onClick={onCreateEvent}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-teal-700 transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r brand text-white rounded-lg font-medium hover:from-blue-700 hover:to-teal-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
               Crear nuevo evento
@@ -743,7 +743,7 @@ export default function ChannelEventsPanel({
           <div className="p-3 border-t border-gray-100">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-gray-900">Eventos recomendados</h3>
-              <button className="text-xs text-blue-600 hover:text-blue-700">Ver todos</button>
+              <button className="text-xs text-brand hover:text-brand-dark">Ver todos</button>
             </div>
             <div className="space-y-2">
               {recommendedEvents.slice(0, 3).map((event: any) => (
@@ -752,11 +752,11 @@ export default function ChannelEventsPanel({
                   onClick={() => setSelectedEvent(event)}
                   className="w-full flex items-start gap-2 p-2 hover:bg-gray-50 rounded-lg text-left"
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-teal-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-5 h-5 text-blue-600" />
+                  <div className="w-12 h-12 bg-gradient-to-br brand rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-5 h-5 text-brand" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-blue-600 mb-1">
+                    <p className="text-xs font-medium text-brand mb-1">
                       {new Date(event.startDateTime).toLocaleDateString('es-ES', { 
                         day: 'numeric', 
                         month: 'short' 
@@ -780,7 +780,7 @@ export default function ChannelEventsPanel({
                 onClick={() => handleFilterChange('category', category.id === selectedCategory ? null : category.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   selectedCategory === category.id
-                    ? 'bg-blue-100 text-blue-700'
+                    ? 'bg-brand/20 text-brand-dark'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
@@ -820,7 +820,7 @@ export default function ChannelEventsPanel({
                     <h2 className="text-2xl font-bold text-gray-900">Notificaciones</h2>
                     <p className="text-sm text-gray-500">
                       {totalNotifications > 0 ? `${totalNotifications} total` : 'Sin notificaciones'}
-                      {unreadCount > 0 && ` • ${unreadCount} sin leer`}
+                      {unreadCount > 0 && `  ${unreadCount} sin leer`}
                     </p>
                   </div>
                 </div>
@@ -830,7 +830,7 @@ export default function ChannelEventsPanel({
                   <button
                     onClick={handleMarkAllAsRead}
                     disabled={markAllAsReadMutation.isPending}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand hover:bg-brand/10 rounded-lg transition-colors disabled:opacity-50"
                   >
                     <CheckCheck className="w-4 h-4" />
                     {markAllAsReadMutation.isPending ? 'Marcando...' : 'Marcar todas como leídas'}
@@ -844,7 +844,7 @@ export default function ChannelEventsPanel({
                   onClick={() => setNotificationFilter('all')}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     notificationFilter === 'all'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-brand text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -854,7 +854,7 @@ export default function ChannelEventsPanel({
                   onClick={() => setNotificationFilter('unread')}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     notificationFilter === 'unread'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-brand text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -895,7 +895,7 @@ export default function ChannelEventsPanel({
                   </p>
                   <button
                     onClick={() => refetchNotifications()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Reintentar
                   </button>
@@ -1002,7 +1002,7 @@ export default function ChannelEventsPanel({
                                     queryClient.invalidateQueries({ queryKey: ['channelEvents', channelId] });
                                   }
                                 }}
-                                className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 transition-colors"
+                                className="text-xs bg-brand text-white px-3 py-1.5 rounded hover:bg-blue-700 transition-colors"
                               >
                                 Ver Evento
                               </button>
@@ -1134,7 +1134,7 @@ export default function ChannelEventsPanel({
                               isEditMode: true
                             });
                           }}
-                          className="p-2 bg-white rounded-lg shadow-md text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+                          className="p-2 bg-white rounded-lg shadow-md text-gray-400 hover:text-brand hover:bg-brand/10"
                           title="Editar evento"
                         >
                           <Edit className="w-4 h-4" />
@@ -1192,7 +1192,7 @@ export default function ChannelEventsPanel({
                 onClick={() => handleFilterChange('all', null)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeFilter === 'all'
-                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
+                    ? 'bg-gradient-to-r brand text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -1203,7 +1203,7 @@ export default function ChannelEventsPanel({
                 onClick={() => handleFilterChange('featured', null)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeFilter === 'featured'
-                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
+                    ? 'bg-gradient-to-r brand text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -1214,7 +1214,7 @@ export default function ChannelEventsPanel({
                 onClick={() => handleFilterChange('upcoming', null)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeFilter === 'upcoming'
-                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
+                    ? 'bg-gradient-to-r brand text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -1226,7 +1226,7 @@ export default function ChannelEventsPanel({
                 onClick={() => setShowDatePicker(!showDatePicker)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeFilter === 'date'
-                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
+                    ? 'bg-gradient-to-r brand text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -1242,7 +1242,7 @@ export default function ChannelEventsPanel({
                 }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeFilter === 'location'
-                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white'
+                    ? 'bg-gradient-to-r brand text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -1272,7 +1272,7 @@ export default function ChannelEventsPanel({
                           setShowDatePicker(false);
                         }
                       }}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      className="px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-700"
                     >
                       Filtrar
                     </button>

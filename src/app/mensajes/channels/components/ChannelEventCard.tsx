@@ -53,8 +53,8 @@ export default function ChannelEventCard({
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <div className="text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-teal-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                <span className="text-lg font-bold text-blue-600">
+              <div className="w-12 h-12 bg-gradient-to-br brand rounded-xl flex items-center justify-center mx-auto mb-2">
+                <span className="text-lg font-bold text-brand">
                   {event.startDateTime ? new Date(event.startDateTime).getDate() : '--'}
                 </span>
               </div>
@@ -82,7 +82,7 @@ export default function ChannelEventCard({
       {/* Content */}
       <div className="p-3">
         {/* Date */}
-        <div className="text-xs font-semibold text-blue-600 mb-2">
+        <div className="text-xs font-semibold text-brand mb-2">
           {event.startDateTime ? formatDate(event.startDateTime) : 'Fecha no disponible'}
         </div>
 

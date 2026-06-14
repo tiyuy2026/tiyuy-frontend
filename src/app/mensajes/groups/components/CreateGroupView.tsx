@@ -28,7 +28,7 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
           <p className="text-gray-600 text-sm text-center max-w-md leading-relaxed mb-8">
             Crea tu propio grupo inmobiliario y conecta con otros profesionales
           </p>
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+          <button className="bg-brand text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
             Crear Grupo
           </button>
         </div>

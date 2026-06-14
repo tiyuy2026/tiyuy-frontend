@@ -26,14 +26,14 @@ export default function MisCanalesCreadosView({ user, onChannelSelect }: MisCana
 
   const getChannelEmoji = (city: string) => {
     const cityEmojis: Record<string, string> = {
-      'Lima': '🏙️',
-      'Arequipa': '🌋',
-      'Trujillo': '🏺',
-      'Piura': '☀️',
-      'Chiclayo': '🌿',
-      'Cusco': '🏔️',
+      'Lima': '️',
+      'Arequipa': '',
+      'Trujillo': '',
+      'Piura': '️',
+      'Chiclayo': '',
+      'Cusco': '️',
     };
-    return cityEmojis[city] || '🏘️';
+    return cityEmojis[city] || '️';
   };
 
   if (isLoading) {
@@ -78,13 +78,13 @@ export default function MisCanalesCreadosView({ user, onChannelSelect }: MisCana
           <p className="text-gray-500 text-sm mb-4">
             Como Agente o Inmobiliaria, puedes crear tus propios canales para publicar contenido y conectar con clientes.
           </p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-blue-700 text-sm font-medium mb-1"> Beneficios de crear un canal:</p>
-            <ul className="text-blue-600 text-xs space-y-1">
-              <li>• Publicar propiedades y noticias</li>
-              <li>• Conectar con clientes interesados</li>
-              <li>• Construir tu marca personal</li>
-              <li>• Generar leads de calidad</li>
+          <div className="bg-brand/10 border border-blue-200 rounded-lg p-3">
+            <p className="text-brand-dark text-sm font-medium mb-1"> Beneficios de crear un canal:</p>
+            <ul className="text-brand text-xs space-y-1">
+              <li> Publicar propiedades y noticias</li>
+              <li> Conectar con clientes interesados</li>
+              <li> Construir tu marca personal</li>
+              <li> Generar leads de calidad</li>
             </ul>
           </div>
         </div>
@@ -139,7 +139,7 @@ export default function MisCanalesCreadosView({ user, onChannelSelect }: MisCana
             onClick={() => onChannelSelect(channel)}
           >
             {/* Header del canal */}
-            <div className="h-20 bg-gradient-to-r from-blue-500 to-teal-400 relative">
+            <div className="h-20 bg-gradient-to-r brand relative">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center text-2xl">
                   {getChannelEmoji(channel.city)}
@@ -174,7 +174,7 @@ export default function MisCanalesCreadosView({ user, onChannelSelect }: MisCana
               </div>
 
               <div className="flex gap-2">
-                <button className="flex-1 bg-blue-50 text-blue-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors">
+                <button className="flex-1 bg-brand/10 text-brand py-2 px-3 rounded-lg text-xs font-medium hover:bg-brand/20 transition-colors">
                   Ver posts
                 </button>
                 <button className="flex-1 bg-teal-50 text-teal-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-teal-100 transition-colors">
