@@ -82,7 +82,7 @@ export default function AboutTiyuyContent() {
         onMouseEnter={() => setActiveSection('mision-vision-valores')}
         className="relative py-24 overflow-hidden bg-[var(--bg-secondary)]"
       >
-        <div className="relative max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Título de sección */}
           <div className="text-center mb-16">
             <span className={`inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-4 transition-all duration-300 ${
@@ -210,7 +210,7 @@ export default function AboutTiyuyContent() {
         onMouseEnter={() => setActiveSection('problema')}
         className="py-20 bg-[var(--bg-primary)] border-t border-[var(--border-light)]"
       >
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-4xl font-bold text-[var(--text-primary)] mb-6 tracking-tight">
@@ -258,7 +258,7 @@ export default function AboutTiyuyContent() {
         onMouseEnter={() => setActiveSection('historia')}
         className="py-20 bg-[var(--bg-primary)] border-t border-[var(--border-light)]"
       >
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-[var(--text-primary)] tracking-tight">
               El equipo que decidió cambiarlo todo
@@ -317,7 +317,7 @@ export default function AboutTiyuyContent() {
         onMouseEnter={() => setActiveSection('ayudamos')}
         className="py-20 bg-[var(--bg-primary)] border-t border-[var(--border-light)]"
       >
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-[var(--text-primary)] tracking-tight">
               A quién ayudamos
@@ -376,7 +376,7 @@ export default function AboutTiyuyContent() {
         onMouseEnter={() => setActiveSection('propuesta')}
         className="py-20 bg-[var(--bg-primary)] border-t border-[var(--border-light)]"
       >
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-[var(--text-primary)] tracking-tight">
               Lo que nos hace diferentes

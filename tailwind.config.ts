@@ -18,6 +18,9 @@ const config: Config = {
           dark: '#498D42',
         },
       },
+      maxWidth: {
+        '8xl': '90rem',
+      },
       animation: {
         blob: 'blob 7s infinite',
       },

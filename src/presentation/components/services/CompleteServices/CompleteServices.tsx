@@ -54,8 +54,8 @@ export function CompleteServices() {
   ];
 
   return (
-    <div className="w-full bg-white antialiased text-gray-900 selection:bg-brand/10 py-16">
-      <div className="w-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className=" bg-white antialiased text-gray-900 selection:bg-brand/10 py-16">
+      <div className="w-full max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <header className="text-center mb-16 border-b border-gray-200 pb-10">
           <p className="text-xs font-bold uppercase tracking-widest text-brand mb-3">

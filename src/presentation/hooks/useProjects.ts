@@ -137,9 +137,9 @@ export const useProjects = () => {
         projectId: number; 
         projectData: Parameters<typeof projectRepo.updateProject>[1] 
       }) => projectRepo.updateProject(projectId, projectData),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.lists() });
-        queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.details() });
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.lists() });
+        await queryClient.invalidateQueries({ queryKey: PROJECT_KEYS.details() });
       },
     });
   };

@@ -10,6 +10,7 @@ import { TrialGuard } from '@/presentation/components/guards/TrialGuard/TrialGua
 import { TrialWarningBanner } from '@/presentation/components/guards/TrialGuard/TrialWarningBanner';
 import { PlanExpiredModal } from '@/presentation/components/modals/PlanExpiredModal';
 import { toast } from '@/presentation/store/toastStore';
+import { Footer } from '@/presentation/components/layout/Footer/Footer';
 
 export default function MyProjectsPage() {
   const { user } = useAuthStore();
@@ -153,9 +154,10 @@ export default function MyProjectsPage() {
 
   return (
     <ProtectedRoute>
+
       <TrialGuard>
         <div className="min-h-screen bg-gray-50 py-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Trial warning banner */}
             <TrialWarningBanner />
           {/* Header */}
@@ -467,7 +469,9 @@ export default function MyProjectsPage() {
         isOpen={showPlanExpiredModal}
         onClose={() => setShowPlanExpiredModal(false)}
       />
+      <Footer />
     </ProtectedRoute>
+    
   );
 }
 

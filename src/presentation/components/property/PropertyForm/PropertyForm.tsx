@@ -27,7 +27,7 @@ interface PropertyFormProps {
   property?: Property | Project;
   mode: 'create' | 'edit';
   onStepChange?: (step: number) => void;
-  formType?: 'property' | 'project'; // NEW: to differentiate types
+  formType?: 'property' | 'project';
 }
 
 const STEPS = [
@@ -124,7 +124,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       availableUnits: (property && 'availableUnits' in property) ? property.availableUnits : 0,
       priceFrom: (property && 'priceFrom' in property) ? property.priceFrom : '',
       priceTo: (property && 'priceTo' in property) ? property.priceTo : '',
-      startDate: (property && 'startDate' in property) ? property.startDate : '',
+      startDate: (property && 'startDate' in property) ? property.startDate : (property && 'constructionStart' in property ? (property as any).constructionStart : ''),
       estimatedDelivery: (property && 'estimatedDelivery' in property) ? property.estimatedDelivery : '',
       areaFrom: (property && 'areaFrom' in property) ? property.areaFrom : 0,
       areaTo: (property && 'areaTo' in property) ? property.areaTo : 0,
@@ -162,6 +162,8 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
 
   const validateStep = (step: number) => {
     const errors: Record<string, string> = {};
+
+    if (mode === 'edit') return errors;
 
     if (formType === 'project') {
       if (step === 1) {
@@ -261,7 +263,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
     }
     setValidationErrors({});
     // Create project when reaching step 5 (before showing component)
-    if (formType === 'project' && currentStep === 4 && !createdPropertyId) {
+    if (formType === 'project' && currentStep === 4 && !createdPropertyId && mode === 'create') {
       // PREVIOUS VALIDATION of required fields
       const allAreas = [
         ...(formData.units || []).map((u: any) => u.area),
@@ -499,7 +501,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       currency: data.currency || 'PEN',
       areaFrom: Number(data.areaFrom) || 60,
       areaTo: Number(data.areaTo) || 60,
-      startDate: data.startDate || data.constructionStartDate || undefined,
+      startDate: data.startDate || data.constructionStart || undefined,
       estimatedDelivery: data.estimatedDelivery || undefined,
       floors: data.floors ? Number(data.floors) : undefined,
       
@@ -716,18 +718,16 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       }
     } else if (property) {
       if (formType === 'project') {
-        // Actualizar proyecto existente
         const projectData = prepareProjectData(formData);
-        updateProjectMutation.mutate(
-          {
+        try {
+          await updateProjectMutation.mutateAsync({
             projectId: property.id,
             projectData,
-          },
-          {
-            onSuccess: () => router.push('/my-projects'),
-            onError: () => toast.error('Error al guardar el proyecto'),
-          }
-        );
+          });
+          router.push('/my-projects');
+        } catch {
+          toast.error('Error al guardar el proyecto');
+        }
       } else {
         // Actualizar propiedad existente
         updateMutation.mutate(

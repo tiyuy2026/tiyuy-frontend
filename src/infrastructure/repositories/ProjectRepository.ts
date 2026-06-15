@@ -21,19 +21,10 @@ export class ProjectRepository implements IProjectRepository {
    */
   async getById(projectId: number): Promise<Project> {
     try {
-      // Primero intentar obtener desde my-projects (endpoint autenticado)
-      const response = await apiClient.get('/projects/my-projects');
-      const projects = response.data.content || [];
-      const project = projects.find((p: Project) => p.id === projectId);
-      
-      if (!project) {
-        throw new Error(`Project with ID ${projectId} not found in my-projects`);
-      }
-      
-      return project;
+      const response = await apiClient.get(`/projects/${projectId}`);
+      return response.data;
     } catch (error) {
-      console.error('Error in getById, trying fallback:', error);
-      // Fallback a público si falla
+      console.error('Error in getById, trying public fallback:', error);
       const publicResponse = await publicApiClient.get(`/projects/${projectId}`);
       return publicResponse.data;
     }
