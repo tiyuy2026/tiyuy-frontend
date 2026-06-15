@@ -47,12 +47,12 @@ export default function ProfileSelector() {
   };
 
   return (
-    <div className="min-h-screen py-4 sm:py-8 lg:py-12">
-      <div className="text-center mb-8 sm:mb-12 lg:mb-16 px-4">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4">
+    <div className="min-h-screen py-4 sm:py-5 lg:py-12">
+      <div className="text-center mb-6 sm:mb-8 px-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           Elige tu perfil
         </h1>
-        <p className="text-base sm:text-lg md:text-xl text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           Selecciona cómo quieres usar TIYUY
         </p>
       </div>
@@ -67,7 +67,6 @@ export default function ProfileSelector() {
         </div>
       )}
 
-      {/* Error al llamar a selectProfile */}
       {error && (
         <div className="max-w-md mx-auto mb-6 px-4">
           <AuthErrorBanner
@@ -91,14 +90,13 @@ export default function ProfileSelector() {
       </div>
 
       {/* Botón continuar */}
-      <div className="flex justify-center px-4 sm:px-6 lg:px-8">
+      <div className="flex justify-center px-4 sm:px-6 lg:px-4">
         <Button
           variant="primary"
           size="lg"
           onClick={handleContinue}
           isLoading={isLoading}
-          className="w-full sm:w-auto min-w-[250px] sm:min-w-[300px] text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4"
-        >
+          className="w-full sm:w-auto min-w-[250px] sm:min-w-[300px] text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 cursor-pointer">
           {selectedProfile
             ? `Continuar con ${PROFILE_TITLES[selectedProfile]}`
             : 'Selecciona un perfil'}

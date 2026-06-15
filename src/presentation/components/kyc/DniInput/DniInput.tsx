@@ -72,7 +72,7 @@ export const DniInput: React.FC<DniInputProps> = ({
         DNI {required && <span className="text-red-500">*</span>}
       </label>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-start">
         <div className="flex-1">
           <Input
             type="text"
@@ -88,26 +88,24 @@ export const DniInput: React.FC<DniInputProps> = ({
               </svg>
             }
           />
-          {/* helperText manual */}
-          {helperText && (
-            <p className="mt-1 text-sm text-gray-500">{helperText}</p>
-          )}
-          {disabled && (
-            <p className="mt-1 text-sm text-gray-500">DNI ya validado y verificado</p>
-          )}
         </div>
-        <div className="pt-6">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleValidate}
-            disabled={value.length !== 8 || isValidating}
-            isLoading={isValidating}
-          >
-            {isValidating ? 'Validando...' : 'Validar'}
-          </Button>
-        </div>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleValidate}
+          disabled={value.length !== 8 || isValidating}
+          isLoading={isValidating}
+          className="mt-0"
+        >
+          {isValidating ? 'Validando...' : 'Validar'}
+        </Button>
       </div>
+      {helperText && (
+        <p className="text-sm text-gray-500">{helperText}</p>
+      )}
+      {disabled && (
+        <p className="text-sm text-gray-500">DNI ya validado y verificado</p>
+      )}
 
       {/* Modal de error de validacion */}
       {showErrorModal && (

@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import { LoginForm } from '@/presentation/components/auth';
-// Cambia esto por tu librería de iconos (ej: lucide-react, react-icons, etc.)
 import { User, Home, Shield } from 'lucide-react';
 
 export const metadata: Metadata = {
