@@ -1,29 +1,128 @@
-'use client';
-
+import type { Metadata } from 'next';
 import { Hind } from 'next/font/google';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from 'sonner';
 import './globals.css';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
-import { ConditionalHeader } from '@/presentation/components/layout/ConditionalHeader/ConditionalHeader';
-import { ThemeProvider } from '@/presentation/components/ThemeProvider';
+import { ClientLayout } from './ClientLayout';
 
-const hind = Hind({ 
+const hind = Hind({
   weight: ['300', '400', '500', '600', '700'],
-  subsets: ['latin'] 
+  subsets: ['latin'],
 });
 
-// Configuracion de React Query
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
+const baseUrl = 'https://tiyuy.com';
+
+export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
+  title: {
+    default: 'TIYUY - Encuentra tu hogar ideal en Perú',
+    template: '%s | TIYUY - Bienes Raíces en Perú',
+  },
+  description:
+    'TIYUY es la plataforma líder de bienes raíces en Perú. Encuentra departamentos, casas, terrenos y locales en venta y alquiler en Lima, Arequipa, Trujillo y todo el Perú. Publica tu propiedad gratis.',
+  keywords: [
+    'bienes raíces Perú',
+    'departamentos en venta Lima',
+    'casas en alquiler Perú',
+    'terrenos en venta',
+    'propiedades Perú',
+    'inmobiliaria',
+    'alquiler de departamentos',
+    'venta de casas',
+    'TIYUY',
+    'plataforma inmobiliaria',
+    'publicar propiedad gratis',
+  ],
+  applicationName: 'TIYUY',
+  authors: [{ name: 'TIYUY' }],
+  generator: 'Next.js',
+  referrer: 'origin-when-cross-origin',
+  creator: 'TIYUY',
+  publisher: 'TIYUY',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
     },
   },
-});
+  openGraph: {
+    type: 'website',
+    locale: 'es_PE',
+    siteName: 'TIYUY',
+    url: baseUrl,
+    title: 'TIYUY - Encuentra tu hogar ideal en Perú',
+    description:
+      'Plataforma líder de bienes raíces en Perú. Departamentos, casas, terrenos y locales en venta y alquiler.',
+    images: [
+      {
+        url: '/assets/images/logo.png',
+        width: 512,
+        height: 512,
+        alt: 'TIYUY - Bienes Raíces',
+      },
+    ],
+    countryName: 'Perú',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'TIYUY - Encuentra tu hogar ideal en Perú',
+    description:
+      'Plataforma líder de bienes raíces en Perú. Departamentos, casas, terrenos y locales en venta y alquiler.',
+    images: ['/assets/images/logo.png'],
+    creator: '@tiyuy',
+  },
+  alternates: {
+    canonical: baseUrl,
+    languages: {
+      'es-PE': baseUrl,
+    },
+  },
+  category: 'bienes raíces',
+  classification: 'Bienes Raíces, Inmobiliaria, Propiedades',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/assets/images/logo.png',
+  },
+  appleWebApp: {
+    capable: true,
+    title: 'TIYUY',
+    statusBarStyle: 'default',
+  },
+  formatDetection: {
+    telephone: true,
+    address: true,
+    email: true,
+  },
+  abstract:
+    'TIYUY es la plataforma de bienes raíces que conecta a compradores, vendedores e inquilinos con las mejores propiedades de todo el Perú.',
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'RealEstateOrganization',
+  name: 'TIYUY',
+  url: baseUrl,
+  logo: `${baseUrl}/assets/images/logo.png`,
+  description:
+    'Plataforma líder de bienes raíces en Perú. Encuentra y publica propiedades en venta y alquiler.',
+  address: {
+    '@type': 'PostalAddress',
+    addressCountry: 'PE',
+  },
+  sameAs: [],
+  areaServed: [
+    {
+      '@type': 'Country',
+      name: 'Perú',
+    },
+  ],
+};
 
 export default function RootLayout({
   children,
@@ -31,19 +130,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <html lang="es" suppressHydrationWarning>
-        <head>
-          <script src="https://sdk.mercadopago.com/js/v2" async />
-        </head>
-        <body className={hind.className} suppressHydrationWarning>
-          <ThemeProvider>
-            <ConditionalHeader />
-            <Toaster richColors position="top-right" />
-            {children}
-          </ThemeProvider>
-        </body>
-      </html>
-    </QueryClientProvider>
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <script src="https://sdk.mercadopago.com/js/v2" async />
+      </head>
+      <body className={hind.className} suppressHydrationWarning>
+        <ClientLayout>{children}</ClientLayout>
+      </body>
+    </html>
   );
 }
