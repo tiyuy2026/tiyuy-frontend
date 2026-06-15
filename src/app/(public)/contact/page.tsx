@@ -1,11 +1,11 @@
-"use client"; // <--- Siempre en la línea 1, antes de los imports
+"use client"; 
 
-import { BlogSection } from '@/presentation/components/contact/HeroContact';
+import {HeroSection } from '@/presentation/components/contact/HeroContact';
 import FormContact from '@/presentation/components/contact/FormContact';
 export default function Contact() {
     return (
         <div>
-            <BlogSection />
+            <HeroSection />
             <FormContact />
         </div>
     );

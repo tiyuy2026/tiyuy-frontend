@@ -1,12 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  Shield, User, Building2, BarChart3, CreditCard,
+  CheckCircle, Zap, Mail, ShieldCheck, Sliders,
+  Check, Menu, X
+} from 'lucide-react';
 
 const privacyData = {
   lastUpdated: "3 de junio de 2025",
   intro: {
     title: "Introducción",
-    highlight: "Tiyuy (\"nosotros\", \"nuestra\" o \"la Plataforma\") es una plataforma digital que conecta a compradores, vendedores, arrendadores y arrendatarios de bienes inmuebles en Latinoamérica. Esta Política de Privacidad describe cómo tratamos tus datos personales cuando utilizas nuestros servicios.",
+    highlight: 'Tiyuy ("nosotros", "nuestra" o "la Plataforma") es una plataforma digital que conecta a compradores, vendedores, arrendadores y arrendatarios de bienes inmuebles en Latinoamérica. Esta Política de Privacidad describe cómo tratamos tus datos personales cuando utilizas nuestros servicios.',
     paragraphs: [
       "Cumplimos con las normativas de protección de datos aplicables, incluyendo la Ley N° 29733, Ley de Protección de Datos Personales del Perú y su reglamento, así como los principios del Reglamento General de Protección de Datos (RGPD) de la Unión Europea cuando corresponda.",
       "Al utilizar nuestros servicios, aceptas las prácticas descritas en esta política. Si no estás de acuerdo, te pedimos que no utilices la Plataforma."
@@ -35,12 +40,12 @@ const privacyData = {
     }
   ],
   uses: [
-    { icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z", title: "Prestar servicios", "desc": "Gestionar tu cuenta, publicar propiedades y facilitar conexiones entre usuarios" },
-    { icon: "M13 10V3L4 14h7v7l9-11h-7z", title: "Mejorar la plataforma", "desc": "Analizar el uso para optimizar funcionalidades, rendimiento y experiencia de usuario" },
-    { icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z", title: "Comunicaciones", "desc": "Enviar notificaciones, alertas de propiedades, actualizaciones y soporte" },
-    { icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z", title: "Seguridad", "desc": "Prevenir fraudes, verificar identidades y proteger la integridad de la plataforma" },
-    { icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z", title: "Análisis", "desc": "Generar estadísticas anonimizadas para informes de mercado y mejoras" },
-    { icon: "M3 6l3 1m0 0l-3 1a5.002 5.002 0 006.801 0M6 12l3 1m0 0l-3 1a5.002 5.002 0 006.801 0M15 12l3 1m0 0l-3 1a5.002 5.002 0 006.801 0", title: "Cumplimiento legal", "desc": "Cumplir con obligaciones legales, regulatorias y responder a autoridades" }
+    { icon: "CheckCircle", title: "Prestar servicios", desc: "Gestionar tu cuenta, publicar propiedades y facilitar conexiones entre usuarios" },
+    { icon: "Zap", title: "Mejorar la plataforma", desc: "Analizar el uso para optimizar funcionalidades, rendimiento y experiencia de usuario" },
+    { icon: "Mail", title: "Comunicaciones", desc: "Enviar notificaciones, alertas de propiedades, actualizaciones y soporte" },
+    { icon: "Shield", title: "Seguridad", desc: "Prevenir fraudes, verificar identidades y proteger la integridad de la plataforma" },
+    { icon: "BarChart3", title: "Análisis", desc: "Generar estadísticas anonimizadas para informes de mercado y mejoras" },
+    { icon: "Sliders", title: "Cumplimiento legal", desc: "Cumplir con obligaciones legales, regulatorias y responder a autoridades" }
   ],
   shares: [
     { title: "Proveedores de servicios", desc: "Empresas que nos ayudan a operar la plataforma (hosting, análisis, pasarelas de pago, envío de emails), bajo estrictos acuerdos de confidencialidad." },
@@ -85,17 +90,21 @@ const SECTIONS = [
   { id: 'contact', title: 'Contacto' },
 ];
 
+const ICON_MAP: Record<string, React.ElementType> = {
+  CheckCircle, Zap, Mail, Shield, BarChart3, Sliders
+};
+
 const CategoryIcon = ({ type }: { type: string }) => {
   const baseClass = "w-5 h-5 text-green-600";
   switch (type) {
     case 'user':
-      return <svg className={baseClass} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>;
+      return <User className={baseClass} strokeWidth={1.5} />;
     case 'property':
-      return <svg className={baseClass} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>;
+      return <Building2 className={baseClass} strokeWidth={1.5} />;
     case 'navigation':
-      return <svg className={baseClass} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>;
+      return <BarChart3 className={baseClass} strokeWidth={1.5} />;
     case 'payment':
-      return <svg className={baseClass} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>;
+      return <CreditCard className={baseClass} strokeWidth={1.5} />;
     default:
       return null;
   }
@@ -120,9 +129,7 @@ export default function PrivacyPage() {
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 mb-4">
-              <svg className="w-5 h-5 text-[var(--brand-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
+              <Shield className="w-5 h-5 text-[var(--brand-primary)]" strokeWidth={2} />
               <span className="text-sm font-bold text-[var(--brand-primary)] uppercase tracking-wider">
                 Política de Privacidad
               </span>
@@ -143,7 +150,7 @@ export default function PrivacyPage() {
       {/* Content */}
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="flex gap-8 lg:gap-12">
-          
+
           {/* Sidebar Navigation - Desktop */}
           <aside className="hidden lg:block w-64 flex-shrink-0">
             <nav className="sticky top-24 space-y-1">
@@ -166,13 +173,11 @@ export default function PrivacyPage() {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="w-12 h-12 bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-green-700 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {mobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
+              {mobileMenuOpen ? (
+                <X className="w-5 h-5" strokeWidth={2} />
+              ) : (
+                <Menu className="w-5 h-5" strokeWidth={2} />
+              )}
             </button>
           </div>
 
@@ -183,9 +188,7 @@ export default function PrivacyPage() {
                 <div className="flex items-center justify-between mb-6">
                   <p className="text-sm font-bold text-gray-900">Contenido</p>
                   <button onClick={() => setMobileMenuOpen(false)} className="text-gray-400 hover:text-gray-600">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <X className="w-5 h-5" strokeWidth={2} />
                   </button>
                 </div>
                 <nav className="space-y-1">
@@ -245,15 +248,16 @@ export default function PrivacyPage() {
                   Utilizamos tus datos personales exclusivamente para las siguientes finalidades:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {privacyData.uses.map((item, i) => (
-                    <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 hover:border-green-200 transition-colors">
-                      <svg className="w-5 h-5 text-green-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-                      </svg>
-                      <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
-                      <p className="text-sm text-gray-500">{item.desc}</p>
-                    </div>
-                  ))}
+                  {privacyData.uses.map((item, i) => {
+                    const IconComp = ICON_MAP[item.icon];
+                    return (
+                      <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 hover:border-green-200 transition-colors">
+                        {IconComp && <IconComp className="w-5 h-5 text-green-600 mb-3" strokeWidth={1.5} />}
+                        <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                        <p className="text-sm text-gray-500">{item.desc}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               </section>
 
@@ -312,9 +316,7 @@ export default function PrivacyPage() {
                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-xl bg-green-600 text-white flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
+                      <ShieldCheck className="w-5 h-5" strokeWidth={2} />
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-2">Medidas de seguridad implementadas</h3>
@@ -341,9 +343,7 @@ export default function PrivacyPage() {
                   {privacyData.rights.map((right, i) => (
                     <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 flex items-start gap-3">
                       <div className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
+                        <Check className="w-4 h-4" strokeWidth={2} />
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900 text-sm">{right.title}</h3>

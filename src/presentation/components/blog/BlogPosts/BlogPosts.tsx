@@ -85,7 +85,7 @@ export function BlogPosts() {
 
   return (
     <div className="w-full bg-[var(--bg-secondary)] antialiased text-[var(--text-primary)] py-12 sm:py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* HEADER EDITORIAL */}
         <header className="mb-12 border-b border-[var(--border-light)] pb-8">

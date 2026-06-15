@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, ChangeEvent, FormEvent } from 'react';
+import { Check, ChevronDown, ArrowRight, Loader2 } from 'lucide-react';
 
 interface FormData {
     fullName: string;
@@ -17,7 +18,6 @@ interface FormErrors {
 }
 
 export default function FormContact() {
-    // 1. Estados para el manejo de datos, errores y carga
     const [formData, setFormData] = useState<FormData>({
         fullName: '',
         emailAddress: '',
@@ -29,11 +29,9 @@ export default function FormContact() {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
 
-    // 2. Manejador de cambios reactivos en inputs
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
 
-        // Mapeamos el id del HTML a la propiedad del estado correspondiente
         const fieldMap: Record<string, keyof FormData> = {
             'full-name': 'fullName',
             'email-address': 'emailAddress',
@@ -44,14 +42,12 @@ export default function FormContact() {
         const field = fieldMap[id];
         if (field) {
             setFormData((prev) => ({ ...prev, [field]: value }));
-            // Limpiamos el error del campo en tiempo real si el usuario ya está escribiendo
             if (errors[field]) {
                 setErrors((prev) => ({ ...prev, [field]: undefined }));
             }
         }
     };
 
-    // 3. Validación de campos del lado del cliente
     const validateForm = (): boolean => {
         const newErrors: FormErrors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -82,18 +78,13 @@ export default function FormContact() {
         return Object.keys(newErrors).length === 0;
     };
 
-    // 4. Envío del formulario
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
         if (!validateForm()) return;
-
         setIsSubmitting(true);
 
         try {
-            // Simulación de petición API (reemplazar por tu fetch/axios correspondiente)
             await new Promise((resolve) => setTimeout(resolve, 1500));
-
             setSubmitSuccess(true);
             setFormData({ fullName: '', emailAddress: '', procedureType: '', messageText: '' });
         } catch (error) {
@@ -104,10 +95,9 @@ export default function FormContact() {
     };
 
     return (
-        <section className="mt-12 bg-[var(--bg-card)] rounded-2xl border border-[var(--border-light)] overflow-hidden shadow-sm transition-colors duration-300">
+        <section className="mt-12 bg-[var(--bg-card)] rounded-2xl border-gray-200 dark:border-gray-800 overflow-hidden shadow-md transition-colors duration-300">
 
-            {/* Encabezado del Formulario */}
-            <div className="p-6 sm:p-10 border-b border-[var(--border-light)] bg-[var(--brand-primary)]/[0.02] text-center">
+            <div className="p-6 sm:p-10  border-gray-200 dark:border-gray-800 bg-[var(--brand-primary)]/[0.02] text-center">
                 <p className="text-xs font-bold uppercase tracking-wider text-[var(--brand-primary)] mb-2">
                     Asesoría
                 </p>
@@ -121,12 +111,9 @@ export default function FormContact() {
 
             <div className="p-6 sm:p-10 max-w-3xl mx-auto">
                 {submitSuccess ? (
-                    /* Mensaje de Éxito Premium */
                     <div className="text-center py-8 space-y-4 animate-fade-in">
-                        <div className="w-16 h-16 bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] rounded-full flex items-center justify-center mx-auto">
-                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                            </svg>
+                        <div className="w-16 h-16 bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] rounded-full flex items-center justify-center mx-auto border border-[var(--brand-primary)]/20">
+                            <Check className="w-8 h-8" strokeWidth={2.5} />
                         </div>
                         <h3 className="text-xl font-bold text-[var(--text-primary)]">¡Consulta Recibida con Éxito!</h3>
                         <p className="text-[var(--text-secondary)] max-w-md mx-auto text-sm font-medium">
@@ -134,16 +121,14 @@ export default function FormContact() {
                         </p>
                         <button
                             onClick={() => setSubmitSuccess(false)}
-                            className="mt-4 text-xs font-bold text-[var(--brand-primary)] uppercase tracking-wider hover:underline"
+                            className="mt-4 text-xs font-bold text-[var(--brand-primary)] uppercase tracking-wider hover:underline cursor-pointer"
                         >
                             Enviar otra consulta
                         </button>
                     </div>
                 ) : (
-                    /* Formulario Activo */
                     <form onSubmit={handleSubmit} className="space-y-6" noValidate>
 
-                        {/* Grupo: Nombre y Email */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
                                 <label htmlFor="full-name" className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block mb-2">
@@ -156,12 +141,15 @@ export default function FormContact() {
                                     value={formData.fullName}
                                     onChange={handleChange}
                                     disabled={isSubmitting}
-                                    className={`w-full bg-[var(--bg-primary)] border ${errors.fullName ? 'border-red-500 focus:ring-red-500/10' : 'border-[var(--border-light)] focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]/10'
-                                        } focus:ring-2 focus:outline-none px-4 py-3 rounded-xl text-[var(--text-primary)] placeholder-[var(--text-secondary)]/50 text-sm transition-all disabled:opacity-50`}
+                                    className={`w-full bg-[var(--bg-primary)] border-2 shadow-sm ${
+                                        errors.fullName 
+                                            ? 'border-red-500 focus:ring-red-500/10' 
+                                            : 'border-gray-300 dark:border-gray-700 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]/10'
+                                    } focus:ring-2 focus:outline-none px-4 py-3 rounded-xl text-[var(--text-primary)] placeholder-[var(--text-secondary)]/40 text-sm font-medium transition-all disabled:opacity-50`}
                                 />
                                 {errors.fullName && (
-                                    <p className="mt-1.5 text-xs font-medium text-red-500 flex items-center gap-1">
-                                        <span>{errors.fullName}</span>
+                                    <p className="mt-1.5 text-xs font-medium text-red-500">
+                                        {errors.fullName}
                                     </p>
                                 )}
                             </div>
@@ -177,8 +165,11 @@ export default function FormContact() {
                                     value={formData.emailAddress}
                                     onChange={handleChange}
                                     disabled={isSubmitting}
-                                    className={`w-full bg-[var(--bg-primary)] border ${errors.emailAddress ? 'border-red-500 focus:ring-red-500/10' : 'border-[var(--border-light)] focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]/10'
-                                        } focus:ring-2 focus:outline-none px-4 py-3 rounded-xl text-[var(--text-primary)] placeholder-[var(--text-secondary)]/50 text-sm transition-all disabled:opacity-50`}
+                                    className={`w-full bg-[var(--bg-primary)] border-2 shadow-sm ${
+                                        errors.emailAddress 
+                                            ? 'border-red-500 focus:ring-red-500/10' 
+                                            : 'border-gray-300 dark:border-gray-700 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]/10'
+                                    } focus:ring-2 focus:outline-none px-4 py-3 rounded-xl text-[var(--text-primary)] placeholder-[var(--text-secondary)]/40 text-sm font-medium transition-all disabled:opacity-50`}
                                 />
                                 {errors.emailAddress && (
                                     <p className="mt-1.5 text-xs font-medium text-red-500">
@@ -188,7 +179,6 @@ export default function FormContact() {
                             </div>
                         </div>
 
-                        {/* Selector de tipo de trámite */}
                         <div>
                             <label htmlFor="procedure-type" className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block mb-2">
                                 Tipo de Trámite
@@ -199,8 +189,11 @@ export default function FormContact() {
                                     value={formData.procedureType}
                                     onChange={handleChange}
                                     disabled={isSubmitting}
-                                    className={`w-full bg-[var(--bg-primary)] border ${errors.procedureType ? 'border-red-500 focus:ring-red-500/10' : 'border-[var(--border-light)] focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]/10'
-                                        } focus:ring-2 focus:outline-none px-4 py-3 rounded-xl text-[var(--text-primary)] text-sm appearance-none cursor-pointer transition-all disabled:opacity-50`}
+                                    className={`w-full bg-[var(--bg-primary)] border-2 shadow-sm ${
+                                        errors.procedureType 
+                                            ? 'border-red-500 focus:ring-red-500/10' 
+                                            : 'border-gray-300 dark:border-gray-700 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]/10'
+                                    } focus:ring-2 focus:outline-none px-4 py-3 rounded-xl text-[var(--text-primary)] text-sm font-medium appearance-none cursor-pointer transition-all disabled:opacity-50`}
                                 >
                                     <option value="" className="text-[var(--text-secondary)]">Selecciona una opción</option>
                                     <option value="compra">Compra de propiedad</option>
@@ -208,9 +201,7 @@ export default function FormContact() {
                                     <option value="registro">Registro de propiedad</option>
                                     <option value="hipoteca">Crédito hipotecario</option>
                                 </select>
-                                <svg className="absolute right-4 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)] pointer-events-none" />
                             </div>
                             {errors.procedureType && (
                                 <p className="mt-1.5 text-xs font-medium text-red-500">
@@ -219,7 +210,6 @@ export default function FormContact() {
                             )}
                         </div>
 
-                        {/* Mensaje o consulta */}
                         <div>
                             <label htmlFor="message-text" className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block mb-2">
                                 Tu Mensaje o Consulta
@@ -231,8 +221,11 @@ export default function FormContact() {
                                 value={formData.messageText}
                                 onChange={handleChange}
                                 disabled={isSubmitting}
-                                className={`w-full bg-[var(--bg-primary)] border ${errors.messageText ? 'border-red-500 focus:ring-red-500/10' : 'border-[var(--border-light)] focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]/10'
-                                    } focus:ring-2 focus:outline-none px-4 py-3 rounded-xl text-[var(--text-primary)] placeholder-[var(--text-secondary)]/50 text-sm resize-none transition-all disabled:opacity-50`}
+                                className={`w-full bg-[var(--bg-primary)] border-2 shadow-sm ${
+                                    errors.messageText 
+                                        ? 'border-red-500 focus:ring-red-500/10' 
+                                        : 'border-gray-300 dark:border-gray-700 focus:border-[var(--brand-primary)] focus:ring-[var(--brand-primary)]/10'
+                                } focus:ring-2 focus:outline-none px-4 py-3 rounded-xl text-[var(--text-primary)] placeholder-[var(--text-secondary)]/40 text-sm font-medium resize-none transition-all disabled:opacity-50`}
                             />
                             {errors.messageText && (
                                 <p className="mt-1.5 text-xs font-medium text-red-500">
@@ -241,7 +234,6 @@ export default function FormContact() {
                             )}
                         </div>
 
-                        {/* Botón de envío con feedback de carga */}
                         <div className="flex justify-center pt-2">
                             <button
                                 type="submit"
@@ -250,18 +242,13 @@ export default function FormContact() {
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                                        </svg>
+                                        <Loader2 className="animate-spin h-5 w-5 text-white" />
                                         <span>Procesando...</span>
                                     </>
                                 ) : (
                                     <>
                                         <span>Enviar mi Consulta</span>
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                        </svg>
+                                        <ArrowRight className="w-5 h-5" />
                                     </>
                                 )}
                             </button>

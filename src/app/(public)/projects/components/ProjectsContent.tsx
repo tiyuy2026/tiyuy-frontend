@@ -59,7 +59,7 @@ export default function ProjectsContent() {
     pageSize: 6,
     threshold: 400,
     deps: [filters],
-    maxInfinitePages: 4, // 4 páginas (24 items) con infinite scroll, luego paginación numérica
+    maxInfinitePages: 4, 
   });
 
   return (
