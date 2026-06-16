@@ -12,7 +12,7 @@ import { ShareButton } from '../../shared/ShareButton/ShareButton';
 import { SimilarProperties } from '../SimilarProperties';
 import { PersonalizedRecommendations } from '../PersonalizedRecommendations';
 import { FeaturePropertyButton } from './FeaturePropertyButton';
-import { Star } from 'lucide-react';
+import { Star, MapPin } from 'lucide-react';
 import { StarRating } from './StarRating';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -135,42 +135,43 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
 
             {/* 2. TIPO · PRECIO · TÍTULO · DIRECCIÓN · STATS */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-400">
-                    {propertyTypeLabel}
-                    {property.totalArea ? ` · ${property.totalArea} m²` : ''}
-                    {property.bedrooms  ? ` · ${property.bedrooms} dormitorio${property.bedrooms > 1 ? 's' : ''}` : ''}
-                  </p>
-
-                  <div className="mt-2 flex items-baseline gap-3 flex-wrap">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                      {transactionLabel}&nbsp;{formatPrice(property.price, property.currency)}
-                      {property.transactionType === 'RENT' && (
-                        <span className="text-base font-normal text-gray-400 ml-1">/ mes</span>
-                      )}
-                    </h2>
-                    {property.pricePerSqm && (
-                      <span className="text-sm text-gray-400">
-                        · {formatPrice(property.pricePerSqm, property.currency)} / m²
-                      </span>
-                    )}
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <span className="bg-blue-50 text-blue-700 border border-blue-100 text-xs font-extrabold px-3 py-1.5 rounded-lg uppercase tracking-wide">
+                      {propertyTypeLabel}
+                    </span>
+                    <span className="bg-gray-100 text-gray-600 border border-gray-200 text-xs font-bold px-3 py-1.5 rounded-lg uppercase tracking-wide">
+                      {transactionLabel}
+                    </span>
                     {property.isNegotiable && (
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full">
+                      <span className="inline-flex items-center gap-1 text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-lg uppercase tracking-wide">
                          Negociable
                       </span>
                     )}
                   </div>
 
-                  <h1 className="mt-3 text-lg font-semibold text-gray-800 leading-snug">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight mb-4">
                     {property.title}
                   </h1>
 
+                  <div className="flex items-baseline gap-3 flex-wrap mb-4">
+                    <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+                      {formatPrice(property.price, property.currency)}
+                      {property.transactionType === 'RENT' && (
+                        <span className="text-lg font-medium text-gray-500 ml-1">/ mes</span>
+                      )}
+                    </h2>
+                    {property.pricePerSqm && (
+                      <span className="text-sm text-gray-500 font-medium bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
+                        {formatPrice(property.pricePerSqm, property.currency)} / m²
+                      </span>
+                    )}
+                  </div>
+
                   {locationLine && (
-                    <p className="mt-2 text-sm text-gray-500 flex items-center gap-1.5">
-                      <svg className="w-4 h-4 text-teal-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
+                    <p className="text-base text-gray-500 flex items-center gap-2 font-medium">
+                      <MapPin className="w-5 h-5 text-gray-400" />
                       {locationLine}
                     </p>
                   )}
@@ -207,10 +208,10 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
               <DescriptionSection description={property.description} />
             )}
             
-            {/* Debug: mostrar si hay descripción */}
+            {/* Si no hay descripción */}
             {!property.description && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-sm text-yellow-800">
-                 No hay descripción disponible para esta propiedad
+              <div className="bg-gray-50 border border-dashed border-gray-200 rounded-3xl p-8 text-center flex flex-col items-center justify-center">
+                 <p className="text-gray-400 font-medium">El anunciante no ha proporcionado una descripción detallada.</p>
               </div>
             )}
 
@@ -239,34 +240,35 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
             <div className="sticky top-4 space-y-4">
 
               {/* Contactar */}
-              <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-                <div className="px-4 pt-4 pb-2 border-b border-gray-100">
-                  <h3 className="text-sm font-bold text-gray-900">Contacta al anunciante</h3>
+              <div className="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden">
+                <div className="px-6 pt-6 pb-4 border-b border-gray-50">
+                  <h3 className="text-lg font-bold text-gray-900">Contacta al anunciante</h3>
                 </div>
-                <div className="px-4 py-3">
+                <div className="px-6 py-4">
                   <ContactForm propertyId={property.id} ownerId={property.owner.id} />
                 </div>
-                <div className="px-4 pb-4">
+                <div className="px-6 pb-6 pt-2">
                   <WhatsAppButton property={property} className="w-full" />
                 </div>
               </div>
 
               {/* Agente */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-teal-600 flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
+              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Anunciante</h3>
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-2xl flex-shrink-0 shadow-inner">
                     {property.owner.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-900 text-sm truncate">{property.owner.name}</p>
-                    <p className="text-xs text-gray-500">{property.owner.role}</p>
+                    <p className="font-bold text-gray-900 text-base truncate">{property.owner.name}</p>
+                    <p className="text-sm text-gray-500">{property.owner.role}</p>
                   </div>
                   {(property.owner as any).phone && (
                     <a
                       href={`tel:${(property.owner as any).phone}`}
-                      className="text-xs text-teal-600 hover:text-teal-700 font-semibold border border-teal-200 rounded-lg px-2.5 py-1.5 whitespace-nowrap transition-colors"
+                      className="text-xs text-blue-700 bg-blue-50 hover:bg-blue-100 font-bold rounded-lg px-3 py-2 whitespace-nowrap transition-colors"
                     >
-                      Ver teléfono
+                      Llamar
                     </a>
                   )}
                 </div>

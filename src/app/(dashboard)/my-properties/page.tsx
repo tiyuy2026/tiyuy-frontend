@@ -13,6 +13,7 @@ import { UpgradePlanModal } from '@/presentation/components/modals/UpgradePlanMo
 import { PlanExpiredModal } from '@/presentation/components/modals/PlanExpiredModal';
 import { useQueryClient } from '@tanstack/react-query';
 import { PropertyRepository } from '@/infrastructure/repositories/PropertyRepository';
+import { Plus, History, RefreshCw, Home, FolderOpen, MapPin, Eye, Star, ImageOff, Search } from 'lucide-react';
 
 export default function MyPropertiesPage() {
   const { data, isLoading, refetch } = useMyProperties();
@@ -23,6 +24,11 @@ export default function MyPropertiesPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'ALL' | 'PUBLISHED' | 'DRAFT' | 'RENTED' | 'SOLD' | 'PAUSED' | 'INACTIVE'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; id: number | null; title: string }>({
+    isOpen: false,
+    id: null,
+    title: '',
+  });
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showPlanExpiredModal, setShowPlanExpiredModal] = useState(false);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
@@ -183,16 +189,22 @@ export default function MyPropertiesPage() {
     router.push(`/my-properties/${parsedId}/edit`);
   };
 
-  const handleDelete = async (id: number, title: string, status: string) => {
-    // Solo permitir eliminar si está en borrador
+  const handleDeleteClick = (id: number, title: string, status: string) => {
     if (status !== 'DRAFT') {
-      toast.error('Solo se pueden eliminar propiedades en estado BORRADOR');
+      toast.error('Solo se pueden eliminar propiedades en estado borrador');
       return;
     }
-    
-    const confirmMessage = `¿Estás seguro de eliminar la propiedad "${title}"?\n\nEsta acción no se puede deshacer.`;
-    if (confirm(confirmMessage)) {
-      await deleteMutation.mutateAsync(id);
+    setDeleteModal({ isOpen: true, id, title });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteModal.id) {
+      try {
+        await deleteMutation.mutateAsync(deleteModal.id);
+        setDeleteModal({ isOpen: false, id: null, title: '' });
+      } catch (error) {
+        console.error('Error al eliminar:', error);
+      }
     }
   };
 
@@ -271,13 +283,13 @@ export default function MyPropertiesPage() {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Mis Propiedades</h1>
-            <p className="text-gray-600 mt-1">
-              {counts.PUBLISHED} de {data?.pagination.totalElements || 0} propiedades
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Mis Propiedades</h1>
+            <p className="text-gray-500 mt-1.5 text-sm">
+              {counts.PUBLISHED} de {data?.pagination.totalElements || 0} propiedades publicadas
             </p>
           </div>
 
@@ -285,48 +297,56 @@ export default function MyPropertiesPage() {
             <button
               type="button"
               onClick={handleRefresh}
-              className="px-5 py-3 rounded-lg font-semibold transition-colors bg-red-100 text-red-800 hover:bg-red-200"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 shadow-sm active:scale-95"
               disabled={isLoading}
+              title="Actualizar datos"
             >
-              {isLoading ? 'Actualizando...' : 'Forzar Actualizacion'}
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-blue-500' : ''}`} />
+              <span className="hidden sm:inline">{isLoading ? 'Actualizando...' : 'Actualizar'}</span>
             </button>
             <button
               type="button"
               onClick={goToPublishedHistory}
-              className="px-5 py-3 rounded-lg font-semibold transition-colors bg-gray-100 text-gray-800 hover:bg-gray-200"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm active:scale-95"
             >
-              Historial Publicados ({counts.PUBLISHED})
+              <History className="w-4 h-4 text-gray-500" />
+              <span className="hidden sm:inline">Historial</span>
+              <span className="bg-gray-100 text-gray-600 text-xs py-0.5 px-2 rounded-full font-semibold">{counts.PUBLISHED}</span>
             </button>
 
             <Link
               href="/my-properties/new"
               className={`
-                px-6 py-3 rounded-lg font-semibold transition-colors
+                flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-sm
                 ${canPublish
-                  ? 'text-white hover:opacity-90'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  ? 'text-white hover:-translate-y-0.5 hover:shadow-md active:scale-95'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
                 }
               `}
               style={{
                 backgroundColor: canPublish ? '#00a63e' : undefined
               }}
             >
-              + Nueva Propiedad
+              <Plus className="w-5 h-5" />
+              Nueva Propiedad
             </Link>
           </div>
         </div>
 
         {/* Tabs */}
         {!isLoading && properties.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-            <div className="flex flex-col gap-3">
-              <input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Buscar por titulo, distrito o provincia"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <div className="flex flex-wrap gap-2">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-8">
+            <div className="flex flex-col gap-5">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Buscar por título, distrito o provincia..."
+                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-gray-700 placeholder-gray-400"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2 border-t border-gray-100 pt-5">
                 <TabButton
                   label="Todas"
                   count={counts.ALL}
@@ -374,8 +394,6 @@ export default function MyPropertiesPage() {
           </div>
         )}
 
-        {/* Debug Panel - Deleted */}
-
         {/* Welcome message for new plan */}
         {showWelcomeMessage && activeSubscription && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 animate-pulse">
@@ -415,19 +433,22 @@ export default function MyPropertiesPage() {
 
         {/* Empty State */}
         {!isLoading && properties.length === 0 && (
-          <div className="text-center py-16 bg-white rounded-lg shadow-md">
-            <div className="text-6xl mb-4">HOME</div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          <div className="flex flex-col items-center justify-center text-center py-24 px-6 bg-white rounded-2xl shadow-sm border border-gray-100 mt-4">
+            <div className="w-20 h-20 bg-green-50/80 rounded-full flex items-center justify-center mb-6 ring-8 ring-green-50/30">
+              <Home className="w-10 h-10 text-[#00a63e]" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">
               Aún no tienes propiedades
             </h3>
-            <p className="text-gray-500 mb-6">
-              Publica tu primera propiedad y empieza a recibir contactos
+            <p className="text-gray-500 mb-8 max-w-md mx-auto text-base leading-relaxed">
+              Publica tu primera propiedad y empieza a recibir contactos interesados inmediatamente en nuestra plataforma.
             </p>
             <Link
               href="/my-properties/new"
-              className="inline-block px-6 py-3 text-white rounded-lg font-semibold hover:opacity-90"
+              className="flex items-center justify-center gap-2 px-6 py-3.5 text-white rounded-xl font-semibold transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
               style={{ backgroundColor: '#00a63e' }}
             >
+              <Plus className="w-5 h-5" />
               Publicar Primera Propiedad
             </Link>
           </div>
@@ -435,27 +456,30 @@ export default function MyPropertiesPage() {
 
         {/* Empty tab state */}
         {!isLoading && properties.length > 0 && filteredProperties.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-lg shadow-md">
-            <div className="text-5xl mb-3">FOLDER</div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+          <div className="flex flex-col items-center justify-center text-center py-16 px-6 bg-white rounded-xl shadow-sm border-2 border-dashed border-gray-100">
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-5">
+              <FolderOpen className="w-10 h-10 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
               No tienes propiedades en esta sección
             </h3>
-            <p className="text-gray-500 mb-6">
+            <p className="text-gray-500 mb-8">
               Cambia de pestaña o crea una nueva propiedad.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
                 onClick={() => setActiveTab('ALL')}
-                className="px-6 py-3 bg-gray-100 text-gray-800 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                className="px-6 py-3 bg-gray-100 text-gray-800 rounded-lg font-semibold hover:bg-gray-200 transition-all duration-200 active:scale-95"
               >
                 Ver todas
               </button>
               <Link
                 href="/my-properties/new"
-                className="px-6 py-3 text-white rounded-lg font-semibold hover:opacity-90"
+                className="flex items-center gap-2 px-6 py-3 text-white rounded-lg font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-95"
                 style={{ backgroundColor: '#00a63e' }}
               >
-                + Nueva Propiedad
+                <Plus className="w-4 h-4" />
+                Nueva Propiedad
               </Link>
             </div>
           </div>
@@ -466,137 +490,136 @@ export default function MyPropertiesPage() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProperties.map((property: any) => (
-                <div key={property.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div key={property.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col group">
                   {/* Imagen */}
-                  <div className="relative h-48 bg-gray-200">
+                  <div className="relative h-48 bg-gray-50 overflow-hidden">
                     {property.coverPhotoUrl ? (
                     <img
                       src={`/api/images/proxy?url=${encodeURIComponent(property.coverPhotoUrl)}`}
                       alt={property.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         console.error('Error loading image:', property.coverPhotoUrl);
                         e.currentTarget.style.display = 'none';
                         e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
-                        e.currentTarget.parentElement!.innerHTML = '<span class="text-4xl">🏠</span>';
+                        e.currentTarget.parentElement!.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-300"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>';
                       }}
                     />
                   ) : property.media && property.media.length > 0 ? (
                     <img
                       src={`/api/images/proxy?url=${encodeURIComponent(property.media.find((m: any) => m.isCover)?.url || property.media[0].url)}`}
                       alt={property.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {
                         console.error('Error loading media image:', property.media[0]?.url);
                         e.currentTarget.style.display = 'none';
                         e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
-                        e.currentTarget.parentElement!.innerHTML = '<span class="text-4xl">🏠</span>';
+                        e.currentTarget.parentElement!.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-300"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>';
                       }}
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-4xl"></span>
+                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 gap-2">
+                      <ImageOff className="w-8 h-8 opacity-50 text-gray-300" />
+                      <span className="text-xs font-medium opacity-70">Sin imagen</span>
                     </div>
                   )}
                     
                     {/* Status badge */}
-                    <div className="absolute top-3 left-3">
-                      <StatusBadge 
-                        status={property.status} 
-                        lifecycleStatus={property.lifecycleStatus}
-                        remainingGraceDays={property.remainingGraceDays}
-                      />
+                    {/* Status badge */}
+                    <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                      <span className={`px-2.5 py-1 text-[10px] font-extrabold rounded-md shadow-sm text-white uppercase tracking-wider border border-white/20 backdrop-blur-sm ${
+                        property.status === 'PUBLISHED' ? 'bg-emerald-500/90' :
+                        property.status === 'DRAFT' ? 'bg-gray-600/90' :
+                        property.status === 'PAUSED' ? 'bg-amber-500/90' :
+                        property.status === 'INACTIVE' ? 'bg-rose-500/90' :
+                        property.status === 'RENTED' ? 'bg-purple-500/90' :
+                        property.status === 'SOLD' ? 'bg-blue-600/90' :
+                        'bg-gray-500/90'
+                      }`}>
+                        {property.status === 'PUBLISHED' ? 'Publicada' :
+                         property.status === 'DRAFT' ? 'Borrador' :
+                         property.status === 'PAUSED' ? 'Pausada' :
+                         property.status === 'INACTIVE' ? 'Inactiva' :
+                         property.status === 'RENTED' ? 'Alquilada' :
+                         property.status === 'SOLD' ? 'Vendida' : property.status}
+                      </span>
+                      
+                      {property.status === 'PUBLISHED' && property.isFeatured && (
+                        <span className="px-2.5 py-1 text-[10px] font-extrabold bg-amber-400/90 text-amber-950 rounded-md shadow-sm flex items-center gap-1 w-max uppercase tracking-wider border border-amber-300/50 backdrop-blur-sm">
+                          <Star className="w-3 h-3 fill-amber-950" />
+                          Destacada
+                        </span>
+                      )}
                     </div>
                   </div>
 
                   {/* Content */}
-                  <div className="p-4">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
+                  <div className="p-3 flex flex-col flex-grow">
+                    <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-2 leading-tight min-h-[2.5rem]">
                       {property.title}
                     </h3>
                     
-                    <p className="text-sm text-gray-600 mb-3">
-                      📍 {property.district}, {property.province}
+                    <p className="text-[11px] text-gray-500 mb-2 flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                      <span className="truncate">{property.district}, {property.province}</span>
                     </p>
                     
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-xl font-bold text-blue-600">
+                    <div className="flex items-center justify-between mb-3 bg-gray-50 p-2 rounded-md border border-gray-100">
+                      <span className="text-sm font-bold text-gray-900 tracking-tight">
                         {property.currency === 'USD' ? 'US$' : 'S/'} {property.price.toLocaleString()}
                       </span>
-                      <span className="text-sm text-gray-500">
-                        👁️ {property.viewsCount}
+                      <span className="text-[11px] text-gray-500 flex items-center gap-1 font-medium">
+                        <Eye className="w-3 h-3 text-gray-400" />
+                        {property.viewsCount}
                       </span>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-2 flex-wrap">
-                      {/* Reactivate button for PAUSED properties */}
-                      {property.status === 'PAUSED' && (
+                    <div className="grid grid-cols-2 gap-1 mt-auto">
+                      {/* Publish / Reactivate Button */}
+                      {(property.status === 'DRAFT' || property.status === 'PAUSED') && (
                         <button
                           onClick={() => handlePublish(property.id)}
                           disabled={publishMutation.isPending}
-                          className="px-3 py-1 bg-amber-600 text-white text-sm rounded hover:bg-amber-700 disabled:bg-gray-400"
+                          className="col-span-2 py-1 bg-green-50 text-green-700 border border-green-200 text-xs font-semibold rounded-md hover:bg-green-100 disabled:opacity-50 transition-colors flex items-center justify-center gap-1"
                         >
-                          {publishMutation.isPending ? 'Reactivando...' : 'Reactivar'}
-                        </button>
-                      )}
-                      
-                      {/* Publish button for DRAFT properties */}
-                      {property.status === 'DRAFT' && (
-                        <button
-                          onClick={() => handlePublish(property.id)}
-                          disabled={publishMutation.isPending}
-                          className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:bg-gray-400"
-                        >
-                          {publishMutation.isPending ? 'Publicando...' : 'Publicar'}
+                          {publishMutation.isPending ? 'Procesando...' : (property.status === 'DRAFT' ? 'Publicar Ahora' : 'Reactivar')}
                         </button>
                       )}
 
-                      
-                      {/* Featured property button */}
+                      {/* Featured button */}
                       {property.status === 'PUBLISHED' && !property.isFeatured && (
                         <button
                           onClick={() => handleFeatureProperty(property.id)}
-                          className="px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600 flex items-center gap-1"
+                          className="col-span-2 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 text-xs font-semibold rounded-md hover:bg-yellow-100 transition-colors flex items-center justify-center gap-1"
                         >
-                          ⭐ Destacar
+                          <Star className="w-3 h-3" />
+                          Destacar anuncio
                         </button>
                       )}
-                      
-                      {/* Debug: Show property status */}
-                      <div className="text-xs text-gray-400 hidden">
-                        Status: {property.status} | Featured: {property.isFeatured ? 'true' : 'false'}
-                      </div>
-                      
-                      {/* Featured property badge */}
-                      {property.status === 'PUBLISHED' && property.isFeatured && (
-                        <div className="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full flex items-center gap-1">
-                          ⭐ Destacada
-                        </div>
-                      )}
-                      
+
                       <Link
                         href={`/property/${property.id}`}
                         target="_blank"
-                        className="px-3 py-1 bg-purple-600 text-white text-sm rounded hover:bg-purple-700"
+                        className="py-1 bg-white text-gray-700 text-xs font-semibold rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center justify-center border border-gray-200"
                       >
-                        Ver
+                        Ver página
                       </Link>
                       
                       <Link
                         href={`/my-properties/${property.id}/edit`}
-                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                        className="py-1 bg-blue-50 text-blue-700 border border-blue-100 text-xs font-semibold rounded-md hover:bg-blue-100 transition-colors flex items-center justify-center"
                       >
                         Editar
                       </Link>
                       
                       {property.status === 'DRAFT' && (
                         <button
-                          onClick={() => handleDelete(property.id, property.title, property.status)}
+                          onClick={() => handleDeleteClick(property.id, property.title, property.status)}
                           disabled={deleteMutation.isPending}
-                          className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 disabled:bg-gray-400"
+                          className="col-span-2 py-1 bg-white text-red-600 border border-red-200 text-xs font-semibold rounded-md hover:bg-red-50 disabled:opacity-50 transition-colors"
                         >
-                          {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
+                          Eliminar borrador
                         </button>
                       )}
                     </div>
@@ -619,8 +642,35 @@ export default function MyPropertiesPage() {
         isOpen={showPlanExpiredModal}
         onClose={() => setShowPlanExpiredModal(false)}
       />
-    </ProtectedRoute>
 
+      {/* Delete Confirmation Modal */}
+      {deleteModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Eliminar borrador</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              ¿Estás seguro de eliminar la propiedad <span className="font-semibold text-gray-700">"{deleteModal.title}"</span>? Esta acción no se puede deshacer.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setDeleteModal({ isOpen: false, id: null, title: '' })}
+                className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                disabled={deleteMutation.isPending}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={deleteMutation.isPending}
+                className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+              >
+                {deleteMutation.isPending ? 'Eliminando...' : 'Sí, eliminar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </ProtectedRoute>
   );
 }
 
@@ -699,13 +749,14 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={
-        isActive
-          ? 'px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold text-sm'
-          : 'px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-semibold text-sm hover:bg-gray-200'
-      }
+      className={`
+        px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200
+        ${isActive 
+          ? 'bg-blue-600 text-white shadow-md' 
+          : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 hover:text-gray-900'}
+      `}
     >
-      {label} <span className={isActive ? 'text-white/90' : 'text-gray-500'}>({count})</span>
+      {label} <span className={`ml-1 px-1.5 py-0.5 rounded-md text-xs font-bold ${isActive ? 'bg-blue-500/50 text-white' : 'bg-gray-100 text-gray-500'}`}>{count}</span>
     </button>
   );
 }

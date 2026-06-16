@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Property } from '@/core/domain/entities/Property';
 import { PropertyGallery } from '../PropertyGallery/PropertyGallery';
 import { PropertyLocation } from './PropertyLocation';
@@ -118,25 +119,33 @@ export function PropertyDetailEditable({ property, onSave }: PropertyDetailEdita
               <>
                 <button
                   onClick={() => setIsEditing(false)}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold text-sm rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  Cancelar
+                  Cancelar edición
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={updateMutation.isPending}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+                  className="px-4 py-2 bg-blue-600 text-white font-semibold text-sm rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
                 >
                   {updateMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
                 </button>
               </>
             ) : (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Modo Edición
-              </button>
+              <>
+                <Link
+                  href="/my-properties"
+                  className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold text-sm rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancelar / Volver
+                </Link>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="px-4 py-2 bg-blue-600 text-white font-semibold text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Modo Edición
+                </button>
+              </>
             )}
           </div>
         </div>
