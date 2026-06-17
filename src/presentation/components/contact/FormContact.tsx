@@ -95,7 +95,8 @@ export default function FormContact() {
     };
 
     return (
-        <section className="mt-12 bg-[var(--bg-card)] rounded-2xl border-gray-200 dark:border-gray-800 overflow-hidden shadow-md transition-colors duration-300">
+        <section className="py-8 sm:py-16">
+            <section className="bg-[var(--bg-card)] rounded-2xl border-gray-200 dark:border-gray-800 overflow-hidden shadow-md transition-colors duration-300">
 
             <div className="p-6 sm:p-10  border-gray-200 dark:border-gray-800 bg-[var(--brand-primary)]/[0.02] text-center">
                 <p className="text-xs font-bold uppercase tracking-wider text-[var(--brand-primary)] mb-2">
@@ -256,6 +257,7 @@ export default function FormContact() {
                     </form>
                 )}
             </div>
+            </section>
         </section>
     );
-}
+};

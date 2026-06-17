@@ -126,293 +126,296 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="bg-gradient-to-br from-[var(--brand-primary)]/5 via-transparent to-[var(--brand-primary)]/[0.02] border-b border-[var(--border-light)] transition-colors duration-300">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-4">
-              <Shield className="w-5 h-5 text-[var(--brand-primary)]" strokeWidth={2} />
-              <span className="text-sm font-bold text-[var(--brand-primary)] uppercase tracking-wider">
-                Política de Privacidad
-              </span>
+        <div className="w-full px-8 xl:px-16">
+          <div className="max-w-[1920px] mx-auto py-8 sm:py-16">
+            <div className="max-w-3xl">
+              <div className="flex items-center gap-2 mb-4">
+                <Shield className="w-5 h-5 text-[var(--brand-primary)]" strokeWidth={2} />
+                <span className="text-sm font-bold text-[var(--brand-primary)] uppercase tracking-wider">
+                  Política de Privacidad
+                </span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--text-primary)] tracking-tight mb-4">
+                Tu privacidad es nuestra prioridad
+              </h1>
+              <p className="text-lg text-[var(--text-secondary)] leading-relaxed font-medium">
+                En Tiyuy nos comprometemos a proteger tus datos personales. Esta política explica de manera transparente cómo recopilamos, usamos y protegemos tu información.
+              </p>
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)]/60 mt-6 font-medium tracking-wide">
+                Última actualización: {privacyData.lastUpdated}
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--text-primary)] tracking-tight mb-4">
-              Tu privacidad es nuestra prioridad
-            </h1>
-            <p className="text-lg text-[var(--text-secondary)] leading-relaxed font-medium">
-              En Tiyuy nos comprometemos a proteger tus datos personales. Esta política explica de manera transparente cómo recopilamos, usamos y protegemos tu información.
-            </p>
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)]/60 mt-6 font-medium tracking-wide">
-              Última actualización: {privacyData.lastUpdated}
-            </p>
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="flex gap-8 lg:gap-12">
+        <div className="w-full px-8 xl:px-16">
+          <div className="max-w-[1920px] mx-auto py-8 sm:py-12">
+            <div className="flex gap-8 lg:gap-12">
 
-          {/* Sidebar Navigation - Desktop */}
-          <aside className="hidden lg:block w-64 flex-shrink-0">
-            <nav className="sticky top-24 space-y-1">
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4 px-3">Contenido</p>
-              {SECTIONS.map((section) => (
-                <a
-                  key={section.id}
-                  href={`#${section.id}`}
-                  className="block px-3 py-2 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                >
-                  {section.title}
-                </a>
-              ))}
-            </nav>
-          </aside>
-
-          {/* Mobile Nav Button */}
-          <div className="lg:hidden fixed bottom-6 right-6 z-40">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="w-12 h-12 bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-green-700 transition-colors"
-            >
-              {mobileMenuOpen ? (
-                <X className="w-5 h-5" strokeWidth={2} />
-              ) : (
-                <Menu className="w-5 h-5" strokeWidth={2} />
-              )}
-            </button>
-          </div>
-
-          {/* Mobile Nav Overlay */}
-          {mobileMenuOpen && (
-            <div className="lg:hidden fixed inset-0 z-30 bg-black/30" onClick={() => setMobileMenuOpen(false)}>
-              <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-xl p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center justify-between mb-6">
-                  <p className="text-sm font-bold text-gray-900">Contenido</p>
-                  <button onClick={() => setMobileMenuOpen(false)} className="text-gray-400 hover:text-gray-600">
-                    <X className="w-5 h-5" strokeWidth={2} />
-                  </button>
-                </div>
-                <nav className="space-y-1">
+              {/* Sidebar Navigation - Desktop */}
+              <aside className="hidden lg:block w-64 flex-shrink-0">
+                <nav className="sticky top-24 space-y-1">
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4 px-3">Contenido</p>
                   {SECTIONS.map((section) => (
                     <a
                       key={section.id}
                       href={`#${section.id}`}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block px-3 py-2.5 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                      className="block px-3 py-2 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                     >
                       {section.title}
                     </a>
                   ))}
                 </nav>
+              </aside>
+
+              {/* Mobile Nav Button */}
+              <div className="lg:hidden fixed bottom-6 right-6 z-40">
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="w-12 h-12 bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-green-700 transition-colors"
+                >
+                  {mobileMenuOpen ? (
+                    <X className="w-5 h-5" strokeWidth={2} />
+                  ) : (
+                    <Menu className="w-5 h-5" strokeWidth={2} />
+                  )}
+                </button>
               </div>
-            </div>
-          )}
 
-          {/* Main Content */}
-          <main className="flex-1 min-w-0 max-w-4xl">
-            <div className="prose prose-lg max-w-none">
-
-              {/* 1. Introducción */}
-              <section id="intro" className="mb-12 scroll-mt-24">
-                <SectionHeader num={1} title={privacyData.intro.title} />
-                <div className="bg-green-50 border border-green-100 rounded-xl p-5 mb-6">
-                  <p className="text-gray-700 leading-relaxed">{privacyData.intro.highlight}</p>
-                </div>
-                {privacyData.intro.paragraphs.map((text, index) => (
-                  <p key={index} className="text-gray-600 leading-relaxed mb-4">{text}</p>
-                ))}
-              </section>
-
-              {/* 2. Datos que recopilamos */}
-              <section id="data-collect" className="mb-12 scroll-mt-24">
-                <SectionHeader num={2} title="Datos que recopilamos" />
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  Recopilamos únicamente los datos necesarios para brindarte nuestros servicios. Estos se clasifican en las siguientes categorías:
-                </p>
-                <div className="space-y-4">
-                  {privacyData.categories.map((cat, i) => (
-                    <div key={i} className="bg-white border border-gray-200 rounded-xl p-5">
-                      <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                        <CategoryIcon type={cat.iconType} />
-                        {cat.title}
-                      </h3>
-                      <p className="text-gray-600 text-sm leading-relaxed">{cat.desc}</p>
+              {/* Mobile Nav Overlay */}
+              {mobileMenuOpen && (
+                <div className="lg:hidden fixed inset-0 z-30 bg-black/30" onClick={() => setMobileMenuOpen(false)}>
+                  <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-xl p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between mb-6">
+                      <p className="text-sm font-bold text-gray-900">Contenido</p>
+                      <button onClick={() => setMobileMenuOpen(false)} className="text-gray-400 hover:text-gray-600">
+                        <X className="w-5 h-5" strokeWidth={2} />
+                      </button>
                     </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* 3. Uso de la información */}
-              <section id="data-use" className="mb-12 scroll-mt-24">
-                <SectionHeader num={3} title="Uso de la información" />
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  Utilizamos tus datos personales exclusivamente para las siguientes finalidades:
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {privacyData.uses.map((item, i) => {
-                    const IconComp = ICON_MAP[item.icon];
-                    return (
-                      <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 hover:border-green-200 transition-colors">
-                        {IconComp && <IconComp className="w-5 h-5 text-green-600 mb-3" strokeWidth={1.5} />}
-                        <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
-                        <p className="text-sm text-gray-500">{item.desc}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-
-              {/* 4. Compartir datos */}
-              <section id="data-share" className="mb-12 scroll-mt-24">
-                <SectionHeader num={4} title="Compartir datos con terceros" />
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  <strong>No vendemos tus datos personales.</strong> Solo compartimos información en los siguientes casos:
-                </p>
-                <div className="space-y-3">
-                  {privacyData.shares.map((item, i) => (
-                    <div key={i} className="flex gap-3 bg-white border border-gray-200 rounded-xl p-4">
-                      <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold">
-                        {i + 1}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 text-sm">{item.title}</h3>
-                        <p className="text-sm text-gray-500 mt-1">{item.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* 5. Cookies */}
-              <section id="cookies" className="mb-12 scroll-mt-24">
-                <SectionHeader num={5} title="Cookies y tecnologías similares" />
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  Utilizamos cookies y tecnologías similares para mejorar tu experiencia. Puedes configurar tu navegador para rechazar cookies, aunque esto podría afectar algunas funcionalidades.
-                </p>
-                <div className="overflow-x-auto">
-                  <table className="w-full border border-gray-200 rounded-xl overflow-hidden">
-                    <thead>
-                      <tr className="bg-gray-50">
-                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700 border-b border-gray-200">Tipo</th>
-                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700 border-b border-gray-200">Finalidad</th>
-                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700 border-b border-gray-200">Duración</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {privacyData.cookies.map((row, i) => (
-                        <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                          <td className="px-4 py-3 text-sm font-medium text-gray-900 border-b border-gray-100">{row.type}</td>
-                          <td className="px-4 py-3 text-sm text-gray-600 border-b border-gray-100">{row.purpose}</td>
-                          <td className="px-4 py-3 text-sm text-gray-500 border-b border-gray-100">{row.duration}</td>
-                        </tr>
+                    <nav className="space-y-1">
+                      {SECTIONS.map((section) => (
+                        <a
+                          key={section.id}
+                          href={`#${section.id}`}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="block px-3 py-2.5 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        >
+                          {section.title}
+                        </a>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-
-              {/* 6. Seguridad */}
-              <section id="security" className="mb-12 scroll-mt-24">
-                <SectionHeader num={6} title="Seguridad de tus datos" />
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-green-600 text-white flex items-center justify-center flex-shrink-0">
-                      <ShieldCheck className="w-5 h-5" strokeWidth={2} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-2">Medidas de seguridad implementadas</h3>
-                      <ul className="space-y-2 text-sm text-gray-600">
-                        {privacyData.securityMeasures.map((measure, i) => (
-                          <li key={i} className="flex items-start gap-2">
-                            <span className="text-green-600 mt-1">✓</span>
-                            {measure}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    </nav>
                   </div>
                 </div>
-              </section>
+              )}
 
-              {/* 7. Tus derechos */}
-              <section id="rights" className="mb-12 scroll-mt-24">
-                <SectionHeader num={7} title="Tus derechos" />
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  Asumiendo la titularidad de tus datos personales, tienes los siguientes derechos:
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {privacyData.rights.map((right, i) => (
-                    <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0">
-                        <Check className="w-4 h-4" strokeWidth={2} />
+              {/* Main Content */}
+              <main className="flex-1 min-w-0 max-w-4xl">
+                <div className="prose prose-lg max-w-none">
+
+                  {/* 1. Introducción */}
+                  <section id="intro" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={1} title={privacyData.intro.title} />
+                    <div className="bg-green-50 border border-green-100 rounded-xl p-5 mb-6">
+                      <p className="text-gray-700 leading-relaxed">{privacyData.intro.highlight}</p>
+                    </div>
+                    {privacyData.intro.paragraphs.map((text, index) => (
+                      <p key={index} className="text-gray-600 leading-relaxed mb-4">{text}</p>
+                    ))}
+                  </section>
+
+                  {/* 2. Datos que recopilamos */}
+                  <section id="data-collect" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={2} title="Datos que recopilamos" />
+                    <p className="text-gray-600 leading-relaxed mb-6">
+                      Recopilamos únicamente los datos necesarios para brindarte nuestros servicios. Estos se clasifican en las siguientes categorías:
+                    </p>
+                    <div className="space-y-4">
+                      {privacyData.categories.map((cat, i) => (
+                        <div key={i} className="bg-white border border-gray-200 rounded-xl p-5">
+                          <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                            <CategoryIcon type={cat.iconType} />
+                            {cat.title}
+                          </h3>
+                          <p className="text-gray-600 text-sm leading-relaxed">{cat.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  {/* 3. Uso de la información */}
+                  <section id="data-use" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={3} title="Uso de la información" />
+                    <p className="text-gray-600 leading-relaxed mb-6">
+                      Utilizamos tus datos personales exclusivamente para las siguientes finalidades:
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {privacyData.uses.map((item, i) => {
+                        const IconComp = ICON_MAP[item.icon];
+                        return (
+                          <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 hover:border-green-200 transition-colors">
+                            {IconComp && <IconComp className="w-5 h-5 text-green-600 mb-3" strokeWidth={1.5} />}
+                            <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                            <p className="text-sm text-gray-500">{item.desc}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+
+                  {/* 4. Compartir datos */}
+                  <section id="data-share" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={4} title="Compartir datos con terceros" />
+                    <p className="text-gray-600 leading-relaxed mb-6">
+                      <strong>No vendemos tus datos personales.</strong> Solo compartimos información en los siguientes casos:
+                    </p>
+                    <div className="space-y-3">
+                      {privacyData.shares.map((item, i) => (
+                        <div key={i} className="flex gap-3 bg-white border border-gray-200 rounded-xl p-4">
+                          <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold">
+                            {i + 1}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-gray-900 text-sm">{item.title}</h3>
+                            <p className="text-sm text-gray-500 mt-1">{item.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  {/* 5. Cookies */}
+                  <section id="cookies" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={5} title="Cookies y tecnologías similares" />
+                    <p className="text-gray-600 leading-relaxed mb-6">
+                      Utilizamos cookies y tecnologías similares para mejorar tu experiencia. Puedes configurar tu navegador para rechazar cookies, aunque esto podría afectar algunas funcionalidades.
+                    </p>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border border-gray-200 rounded-xl overflow-hidden">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700 border-b border-gray-200">Tipo</th>
+                            <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700 border-b border-gray-200">Finalidad</th>
+                            <th className="text-left px-4 py-3 text-sm font-semibold text-gray-700 border-b border-gray-200">Duración</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {privacyData.cookies.map((row, i) => (
+                            <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
+                              <td className="px-4 py-3 text-sm font-medium text-gray-900 border-b border-gray-100">{row.type}</td>
+                              <td className="px-4 py-3 text-sm text-gray-600 border-b border-gray-100">{row.purpose}</td>
+                              <td className="px-4 py-3 text-sm text-gray-500 border-b border-gray-100">{row.duration}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </section>
+
+                  {/* 6. Seguridad */}
+                  <section id="security" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={6} title="Seguridad de tus datos" />
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-green-600 text-white flex items-center justify-center flex-shrink-0">
+                          <ShieldCheck className="w-5 h-5" strokeWidth={2} />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900 mb-2">Medidas de seguridad implementadas</h3>
+                          <ul className="space-y-2 text-sm text-gray-600">
+                            {privacyData.securityMeasures.map((measure, i) => (
+                              <li key={i} className="flex items-start gap-2">
+                                <span className="text-green-600 mt-1">✓</span>
+                                {measure}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 text-sm">{right.title}</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">{right.desc}</p>
+                    </div>
+                  </section>
+
+                  {/* 7. Tus derechos */}
+                  <section id="rights" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={7} title="Tus derechos" />
+                    <p className="text-gray-600 leading-relaxed mb-6">
+                      Asumiendo la titularidad de tus datos personales, tienes los siguientes derechos:
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {privacyData.rights.map((right, i) => (
+                        <div key={i} className="bg-white border border-gray-200 rounded-xl p-4 flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0">
+                            <Check className="w-4 h-4" strokeWidth={2} />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-gray-900 text-sm">{right.title}</h3>
+                            <p className="text-xs text-gray-500 mt-0.5">{right.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-sm text-gray-500 mt-6">
+                      Para ejercer cualquiera de estos derechos, contáctanos a <a href="mailto:privacidad@tiyuy.com" className="text-green-600 hover:underline">privacidad@tiyuy.com</a>. Responderemos tu solicitud en un plazo máximo de 15 días hábiles.
+                    </p>
+                  </section>
+
+                  {/* 8. Retención */}
+                  <section id="retention" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={8} title="Retención de datos" />
+                    <p className="text-gray-600 leading-relaxed mb-4">
+                      Conservamos tus datos personales mientras tu cuenta esté activa y durante el tiempo necesario para cumplir con las finalidades descritas en esta política, incluyendo obligaciones legales y fiscales.
+                    </p>
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                      <p className="text-sm text-amber-800">
+                        <strong>Nota:</strong> Tras la eliminación de tu cuenta, algunos datos pueden conservarse de forma anonimizada para fines estadísticos o durante el plazo requerido por ley (mínimo 5 años para datos de transacciones).
+                      </p>
+                    </div>
+                  </section>
+
+                  {/* 9. Menores */}
+                  <section id="minors" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={9} title="Menores de edad" />
+                    <p className="text-gray-600 leading-relaxed">
+                      Nuestros servicios no están dirigidos a menores de 18 años. No recopilamos intencionalmente datos personales de menores. Si descubrimos que un menor ha proporcionado datos personales, procederemos a eliminarlos de inmediato. Si eres padre o tutor y crees que tu hijo ha compartido información con nosotros, contáctanos.
+                    </p>
+                  </section>
+
+                  {/* 10. Cambios */}
+                  <section id="changes" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={10} title="Cambios en esta política" />
+                    <p className="text-gray-600 leading-relaxed">
+                      Podemos actualizar esta Política de Privacidad periódicamente para reflejar cambios en nuestros servicios, tecnologías o requisitos legales. Te notificaremos sobre cambios significativos mediante un aviso en la plataforma o por correo electrónico. Te recomendamos revisar esta política regularmente.
+                    </p>
+                  </section>
+
+                  {/* 11. Contacto */}
+                  <section id="contact" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={11} title="Contacto" />
+                    <p className="text-gray-600 leading-relaxed mb-6">
+                      Si tienes preguntas, dudas o solicitudes sobre esta Política de Privacidad o el tratamiento de tus datos, puedes contactarnos:
+                    </p>
+                    <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl p-6 text-white">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div>
+                          <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Email</p>
+                          <a href="mailto:privacidad@tiyuy.com" className="font-semibold hover:underline">privacidad@tiyuy.com</a>
+                        </div>
+                        <div>
+                          <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Dirección</p>
+                          <p className="font-semibold">Lima, Perú</p>
+                        </div>
+                        <div>
+                          <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Horario de atención</p>
+                          <p className="font-semibold">Lun - Vie, 9:00 - 18:00</p>
+                        </div>
                       </div>
                     </div>
-                  ))}
+                  </section>
                 </div>
-                <p className="text-sm text-gray-500 mt-6">
-                  Para ejercer cualquiera de estos derechos, contáctanos a <a href="mailto:privacidad@tiyuy.com" className="text-green-600 hover:underline">privacidad@tiyuy.com</a>. Responderemos tu solicitud en un plazo máximo de 15 días hábiles.
-                </p>
-              </section>
-
-              {/* 8. Retención */}
-              <section id="retention" className="mb-12 scroll-mt-24">
-                <SectionHeader num={8} title="Retención de datos" />
-                <p className="text-gray-600 leading-relaxed mb-4">
-                  Conservamos tus datos personales mientras tu cuenta esté activa y durante el tiempo necesario para cumplir con las finalidades descritas en esta política, incluyendo obligaciones legales y fiscales.
-                </p>
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                  <p className="text-sm text-amber-800">
-                    <strong>Nota:</strong> Tras la eliminación de tu cuenta, algunos datos pueden conservarse de forma anonimizada para fines estadísticos o durante el plazo requerido por ley (mínimo 5 años para datos de transacciones).
-                  </p>
-                </div>
-              </section>
-
-              {/* 9. Menores */}
-              <section id="minors" className="mb-12 scroll-mt-24">
-                <SectionHeader num={9} title="Menores de edad" />
-                <p className="text-gray-600 leading-relaxed">
-                  Nuestros servicios no están dirigidos a menores de 18 años. No recopilamos intencionalmente datos personales de menores. Si descubrimos que un menor ha proporcionado datos personales, procederemos a eliminarlos de inmediato. Si eres padre o tutor y crees que tu hijo ha compartido información con nosotros, contáctanos.
-                </p>
-              </section>
-
-              {/* 10. Cambios */}
-              <section id="changes" className="mb-12 scroll-mt-24">
-                <SectionHeader num={10} title="Cambios en esta política" />
-                <p className="text-gray-600 leading-relaxed">
-                  Podemos actualizar esta Política de Privacidad periódicamente para reflejar cambios en nuestros servicios, tecnologías o requisitos legales. Te notificaremos sobre cambios significativos mediante un aviso en la plataforma o por correo electrónico. Te recomendamos revisar esta política regularmente.
-                </p>
-              </section>
-
-              {/* 11. Contacto */}
-              <section id="contact" className="mb-12 scroll-mt-24">
-                <SectionHeader num={11} title="Contacto" />
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  Si tienes preguntas, dudas o solicitudes sobre esta Política de Privacidad o el tratamiento de tus datos, puedes contactarnos:
-                </p>
-                <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl p-6 text-white">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div>
-                      <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Email</p>
-                      <a href="mailto:privacidad@tiyuy.com" className="font-semibold hover:underline">privacidad@tiyuy.com</a>
-                    </div>
-                    <div>
-                      <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Dirección</p>
-                      <p className="font-semibold">Lima, Perú</p>
-                    </div>
-                    <div>
-                      <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Horario de atención</p>
-                      <p className="font-semibold">Lun - Vie, 9:00 - 18:00</p>
-                    </div>
-                  </div>
-                </div>
-              </section>
+              </main>
             </div>
-          </main>
+          </div>
         </div>
       </div>
-    </div>
+    </div> 
   );
 }

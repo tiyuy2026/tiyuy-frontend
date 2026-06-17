@@ -1090,11 +1090,18 @@ export function Header() {
           </div>
         </div>
 
-        {/* OVERLAY + MENÚ MOBILE */}
-        {mobileMenuOpen && (
-          <div className="fixed inset-0 bg-black/50 z-50 lg:hidden" onClick={() => setMobileMenuOpen(false)}>
+        <div className="h-1 flex transition-all duration-500">
+          <div className={`flex-1 ${colors[stripeColor][0]} transition-colors duration-500`}></div>
+          <div className={`flex-1 ${colors[stripeColor][1]} transition-colors duration-500`}></div>
+          <div className={`flex-1 ${colors[stripeColor][2]} transition-colors duration-500`}></div>
+        </div>
+      </header>
+
+      {/* OVERLAY + MENÚ MOBILE */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 bg-black/50 z-[60] lg:hidden" onClick={() => setMobileMenuOpen(false)}>
             <div
-              className="absolute top-0 right-0 w-80 max-w-[85vw] h-full bg-white shadow-xl overflow-y-auto"
+              className="absolute top-0 right-0 bottom-0 w-60 max-w-[75vw] bg-white shadow-xl overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header del menú mobile */}
@@ -1260,13 +1267,6 @@ export function Header() {
             </div>
           </div>
         )}
-
-        <div className="h-1 flex transition-all duration-500">
-          <div className={`flex-1 ${colors[stripeColor][0]} transition-colors duration-500`}></div>
-          <div className={`flex-1 ${colors[stripeColor][1]} transition-colors duration-500`}></div>
-          <div className={`flex-1 ${colors[stripeColor][2]} transition-colors duration-500`}></div>
-        </div>
-      </header>
     </>
   );
 }

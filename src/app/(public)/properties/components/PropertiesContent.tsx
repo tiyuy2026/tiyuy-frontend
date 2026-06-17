@@ -56,29 +56,27 @@ export default function PropertiesContent() {
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Sección de Propiedades Destacadas */}
-      <section className="py-16 bg-white">
-        <div className="w-full px-8 xl:px-16">
-          <div className="max-w-[1920px] mx-auto">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 bg-brand-light text-brand px-4 py-2 rounded-full text-sm font-semibold mb-4">
-                <Icon icon="mdi:star" className="w-4 h-4" />
-                <span>PROPIEDADES DESTACADAS</span>
-              </div>
-              <h2 className="text-3xl font-bold text-brand mb-2">
-                Propiedades destacadas cerca de ti
-              </h2>
-              <p className="text-gray-600 text-lg">
-                Descubre los mejores departamentos, casas y terrenos en las principales zonas del Perú
-              </p>
+      <section className="py-8 sm:py-16 bg-white">
+        <div className="w-full max-w-[1920px] mx-auto">
+          <div className="text-center mb-12 px-8 xl:px-16">
+            <div className="inline-flex items-center gap-2 bg-brand-light text-brand px-4 py-2 rounded-full text-sm font-semibold mb-4">
+              <Icon icon="mdi:star" className="w-4 h-4" />
+              <span>PROPIEDADES DESTACADAS</span>
             </div>
-            
-            <FeaturedProperties hideViewAll />
+            <h2 className="text-3xl font-bold text-brand mb-2">
+              Propiedades destacadas cerca de ti
+            </h2>
+            <p className="text-gray-600 text-lg">
+              Descubre los mejores departamentos, casas y terrenos en las principales zonas del Perú
+            </p>
           </div>
+          
+          <FeaturedProperties hideViewAll />
         </div>
       </section>
 
       {/* Todas las Propiedades */}
-      <section className="py-16 bg-white">
+      <section className="py-8 sm:py-16 bg-white">
         <div className="w-full px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             <div className="text-center mb-12">

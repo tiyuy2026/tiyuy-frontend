@@ -45,7 +45,7 @@ export function FilteredProperties({
       <div className="relative">
         <div className="flex overflow-x-auto scrollbar-hide">
           <div className="flex-1 min-w-0" />
-          <div className="flex gap-4 sm:gap-5 md:gap-6 pb-4 px-4 flex-shrink-0">
+          <div className="flex gap-4 sm:gap-5 md:gap-6 pb-4 px-8 flex-shrink-0">
             {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="w-[85vw] sm:w-[280px] md:w-[320px] lg:w-[240px] xl:w-[190px] 2xl:w-[220px] flex-shrink-0">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">

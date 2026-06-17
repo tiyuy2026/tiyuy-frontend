@@ -27,7 +27,7 @@ export function HeroSection({ selectedRole = { color: 'text-[var(--brand-primary
   return (
     <div className="w-full bg-[var(--bg-primary)] antialiased text-[var(--text-primary)] selection:bg-[var(--brand-primary)]/10 overflow-hidden flex flex-col items-center justify-center">
       
-      <section className="relative w-full max-w-8xl bg-gradient-to-b from-[var(--brand-primary)]/5 via-transparent to-transparent border-b border-[var(--border-light)] pt-24 pb-20 px-4 flex flex-col items-center justify-center text-center overflow-hidden">
+      <section className="relative w-full bg-gradient-to-b from-[var(--brand-primary)]/5 via-transparent to-transparent border-b border-[var(--border-light)] pt-24 pb-20 px-4 flex flex-col items-center justify-center text-center overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[300px] bg-gradient-to-r from-[var(--brand-primary)]/10 to-transparent blur-3xl pointer-events-none rounded-full" />
         
         <div className="relative w-full max-w-4xl mx-auto flex flex-col items-center justify-center space-y-8">

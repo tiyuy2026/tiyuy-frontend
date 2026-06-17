@@ -37,7 +37,7 @@ const roles: Role[] = [
     title: 'COMPRADOR',
     color: 'text-[#4A9A3E]',
     bgColor: 'bg-[#4A9A3E]/10',
-    icon: <ShoppingCart className="w-8 h-8 text-[#4A9A3E]" />,
+    icon: <ShoppingCart className="w-5 h-5 md:w-8 md:h-8 text-[#4A9A3E]" />,
     description: 'Persona que quiere comprar una propiedad (casa, departamento, terreno, local).',
     howToKnow: [
       'Estás buscando una propiedad para comprar',
@@ -110,7 +110,7 @@ const roles: Role[] = [
     title: 'VENDEDOR',
     color: 'text-[#4A9A3E]',
     bgColor: 'bg-[#4A9A3E]/10',
-    icon: <DollarSign className="w-8 h-8 text-[#4A9A3E]" />,
+    icon: <DollarSign className="w-5 h-5 md:w-8 md:h-8 text-[#4A9A3E]" />,
     description: 'Eres la persona dueña del inmueble y quieres venderlo.',
     howToKnow: [
       'La propiedad está a tu nombre',
@@ -174,7 +174,7 @@ const roles: Role[] = [
     title: 'ARRENDADOR (Dueño que alquila)',
     color: 'text-[#4A9A3E]',
     bgColor: 'bg-[#4A9A3E]/10',
-    icon: <Home className="w-8 h-8 text-[#4A9A3E]" />,
+    icon: <Home className="w-5 h-5 md:w-8 md:h-8 text-[#4A9A3E]" />,
     description: 'Persona que es dueña de una propiedad y desea alquilarla.',
     howToKnow: [
       'Tienes una propiedad a tu nombre',
@@ -240,7 +240,7 @@ const roles: Role[] = [
     title: 'INQUILINO',
     color: 'text-[#4A9A3E]',
     bgColor: 'bg-[#4A9A3E]/10',
-    icon: <Key className="w-8 h-8 text-[#4A9A3E]" />,
+    icon: <Key className="w-5 h-5 md:w-8 md:h-8 text-[#4A9A3E]" />,
     description: 'Persona que busca alquilar una propiedad.',
     howToKnow: [
       'No tienes propiedad',
@@ -675,7 +675,7 @@ export default function GuiaAlquilarPage() {
                     <div className="absolute top-0 right-0 w-20 h-20 bg-brand-light rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-brand-light-hover transition-colors"></div>
                     
                     <div className="relative">
-                      <div className={`w-14 h-14 ${role.bgColor} rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      <div className={`w-10 h-10 md:w-14 md:h-14 ${role.bgColor} rounded-2xl flex items-center justify-center mb-3 md:mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                         {role.icon}
                       </div>
                       
@@ -684,10 +684,10 @@ export default function GuiaAlquilarPage() {
                       </div>
                     </div>
                     
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-brand transition-colors">
+                    <h3 className="text-base md:text-lg font-bold text-gray-900 mb-2 group-hover:text-brand transition-colors">
                       {role.title}
                     </h3>
-                    <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">
+                    <p className="text-gray-500 text-xs md:text-sm leading-relaxed mb-4 line-clamp-2">
                       {role.description}
                     </p>
                     
@@ -729,20 +729,20 @@ export default function GuiaAlquilarPage() {
                   </p>
                 </div>
 
-                <div className="flex flex-wrap justify-center gap-4">
+                <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                   <button
                     onClick={() => shareGuide(selectedRole)}
-                    className="flex items-center gap-2 bg-white text-brand px-8 py-4 rounded-xl font-semibold hover:bg-brand-light transition-all shadow-md hover:shadow-lg border-2 border-brand cursor-pointer"
+                    className="flex items-center justify-center gap-2 bg-white text-brand w-48 md:w-auto px-4 md:px-8 py-3 md:py-4 rounded-xl font-semibold hover:bg-brand-light transition-all shadow-md hover:shadow-lg border-2 border-brand cursor-pointer"
                   >
-                    <Share2 className="w-5 h-5" />
+                    <Share2 className="w-4 h-4 md:w-5 md:h-5" />
                     Compartir
                   </button>
                   
                   <button
                     onClick={() => downloadGuide(selectedRole)}
-                    className="flex items-center gap-2 bg-gradient-to-r from-brand to-brand text-white px-8 py-4 rounded-xl font-semibold hover:from-brand-hover hover:to-brand-hover transition-all shadow-md hover:shadow-lg cursor-pointer"
+                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-brand to-brand text-white w-48 md:w-auto px-4 md:px-8 py-3 md:py-4 rounded-xl font-semibold hover:from-brand-hover hover:to-brand-hover transition-all shadow-md hover:shadow-lg cursor-pointer"
                   >
-                    <Download className="w-5 h-5" />
+                    <Download className="w-4 h-4 md:w-5 md:h-5" />
                     Descargar PDF
                   </button>
                 </div>
@@ -753,18 +753,18 @@ export default function GuiaAlquilarPage() {
 
       {selectedRole && (
         <div className="w-full px-8 xl:px-16 py-12">
-          <div className="max-w-8xl mx-auto">
+          <div className="max-w-[1920px] mx-auto">
             <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-brand to-brand"></div>
-                <div className="flex items-start gap-6 mb-6">
-                  <div className="w-24 h-24 bg-brand-light rounded-2xl flex items-center justify-center text-5xl shadow-lg flex-shrink-0">
+                <div className="flex items-start gap-4 md:gap-6 mb-6">
+                  <div className="w-14 h-14 md:w-24 md:h-24 bg-brand-light rounded-2xl flex items-center justify-center text-3xl md:text-5xl shadow-lg flex-shrink-0">
                     {selectedRole.icon}
                   </div>
                   <div className="flex-1">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                    <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">
                       {selectedRole.title}
                     </h1>
-                    <p className="text-gray-600 text-lg">
+                    <p className="text-gray-600 text-sm md:text-lg">
                       {selectedRole.description}
                     </p>
                   </div>
@@ -802,12 +802,12 @@ export default function GuiaAlquilarPage() {
 
               {selectedRole.steps.map((step, index) => (
                 <div key={index} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
-                  <div className="flex items-stretch">
-                    <div className="w-16 bg-gradient-to-br from-brand to-brand flex flex-col items-center justify-center py-8 text-white">
-                      <span className="text-3xl font-bold">{index + 1}</span>
-                      <span className="text-xs uppercase mt-1 opacity-80">Paso</span>
+                  <div className="flex flex-col md:flex-row md:items-stretch">
+                    <div className="md:w-16 bg-gradient-to-br from-brand to-brand flex flex-row md:flex-col items-center justify-center gap-2 md:gap-0 py-2 md:py-8 px-4 md:px-0 text-white">
+                      <span className="text-xl md:text-3xl font-bold">{index + 1}</span>
+                      <span className="text-xs uppercase opacity-80">Paso</span>
                     </div>
-                    <div className="flex-1 p-6">
+                    <div className="flex-1 p-4 md:p-6">
                       <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-brand transition-colors">
                         {step.title}
                       </h3>
@@ -832,10 +832,10 @@ export default function GuiaAlquilarPage() {
                                 href={action.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className={`inline-flex items-center gap-2 ${selectedRole.color} font-medium mb-4 hover:underline`}
+                                className={`flex items-start gap-2 ${selectedRole.color} font-medium mb-4 hover:underline break-all`}
                               >
-                                {action.description}
-                                <ExternalLink className="w-4 h-4 text-brand" />
+                                <span className="break-all">{action.description}</span>
+                                <ExternalLink className="w-4 h-4 text-brand flex-shrink-0 mt-0.5" />
                               </a>
 
                               <div className="space-y-2">

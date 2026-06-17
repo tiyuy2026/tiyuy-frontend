@@ -6,7 +6,11 @@ export default function Contact() {
     return (
         <div>
             <HeroSection />
-            <FormContact />
+            <div className="w-full px-8 xl:px-16">
+                <div className="max-w-[1920px] mx-auto">
+                    <FormContact />
+                </div>
+            </div>
         </div>
     );
 }
