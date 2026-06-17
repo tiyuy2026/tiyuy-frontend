@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { PropertyForm } from '@/presentation/components/property/PropertyForm/PropertyForm';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { useMyProperties } from '@/presentation/hooks/useProperties';
 import { useActiveSubscription } from '@/presentation/hooks/useFinance';
-import { useEffect } from 'react';
+import { ChevronLeft, Check, ChevronRight } from 'lucide-react';
 
 const STEPS = [
   { number: 1, title: 'Información básica', description: 'Tipo y precio' },
@@ -34,7 +34,7 @@ export default function NuevaPropiedadPage() {
   const remainingPublications =
     activeSubscription?.remainingPublications ?? (1 - publishedCount);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isAuthenticated) router.push('/login');
   }, [isAuthenticated, router]);
 
@@ -79,17 +79,15 @@ export default function NuevaPropiedadPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/dashboard')}
-              className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+              className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <ChevronLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Volver</span>
             </button>
             <span className="text-gray-300 select-none hidden sm:block">|</span>
             <button
               onClick={() => router.push('/my-properties')}
-              className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors hidden sm:block"
+              className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors hidden sm:block cursor-pointer"
             >
               Ir a historial
             </button>
@@ -138,9 +136,7 @@ export default function NuevaPropiedadPage() {
                       }
                     >
                       {isDone ? (
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                        </svg>
+                        <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                       ) : step.number}
                     </div>
                     <p className={`text-[10px] font-medium mt-1 text-center ${
@@ -191,9 +187,7 @@ export default function NuevaPropiedadPage() {
                         }
                       >
                         {isDone ? (
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                          </svg>
+                          <Check className="w-4 h-4 stroke-[2.5]" />
                         ) : step.number}
                       </div>
                       {index < STEPS.length - 1 && (
@@ -236,9 +230,7 @@ export default function NuevaPropiedadPage() {
                   className="flex items-center gap-2 text-sm font-medium transition-colors hover:opacity-80"
                   style={{ color: '#00a63e' }}
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  <ChevronRight className="w-3.5 h-3.5" />
                   {label}
                 </a>
               ))}
@@ -270,10 +262,7 @@ export default function NuevaPropiedadPage() {
                 'Soporte personalizado 24/7',
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2 text-sm text-gray-500">
-                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"
-                    style={{ color: '#00a63e' }}>
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
+                  <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#00a63e]" />
                   {item}
                 </li>
               ))}
@@ -290,7 +279,7 @@ export default function NuevaPropiedadPage() {
                 'Responde rápidamente a las consultas',
               ].map((tip) => (
                 <li key={tip} className="flex items-start gap-2">
-                  <span className="font-bold mt-0.5" style={{ color: '#00a63e' }}>·</span> {tip}
+                  <span className="font-bold mt-0.5 text-[#00a63e]">·</span> {tip}
                 </li>
               ))}
             </ul>

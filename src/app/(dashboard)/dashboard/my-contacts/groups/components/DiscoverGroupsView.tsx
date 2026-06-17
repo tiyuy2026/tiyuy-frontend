@@ -3,9 +3,7 @@
 import { useState } from 'react';
 import { useGetGroups, useJoinGroup } from '@/presentation/hooks/useContacts';
 import { formatCompactNumber } from '@/utils/formatters';
-import { Users, FileText } from 'lucide-react';
-
-console.log('🔍 DiscoverGroupsView: useJoinGroup imported:', useJoinGroup);
+import { Users, FileText, Search, Radio } from 'lucide-react';
 
 export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any; onGroupSelect: (group: any) => void }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -13,34 +11,15 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
   const joinGroup = useJoinGroup();
   
   // Filtrar grupos donde el usuario NO es miembro
-  console.log('📋 All groups from API:', groups);
   const availableGroups = groups?.filter((g: any) => !g.isMember) ?? [];
-  console.log('🔓 Available groups (not member):', availableGroups);
   const filteredGroups = availableGroups.filter((group: any) =>
     group.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getGroupEmoji = (name: string) => {
-    if (name.includes('Alquiler')) return '';
-    if (name.includes('Venta')) return '';
-    if (name.includes('Terreno') || name.includes('Lote')) return '';
-    if (name.includes('Inversion')) return '';
-    if (name.includes('Lima')) return '';
-    return '';
-  };
-
   const handleJoinGroup = (groupId: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log(' DiscoverGroupsView: handleJoinGroup called for group:', groupId);
-    console.log(' DiscoverGroupsView: joinGroup object:', joinGroup);
-    console.log('DiscoverGroupsView: joinGroup.mutate exists:', typeof joinGroup.mutate);
-    console.log(' DiscoverGroupsView: joinGroup.isPending:', joinGroup.isPending);
-    
     if (joinGroup.mutate) {
-      console.log(' DiscoverGroupsView: Calling joinGroup.mutate...');
       joinGroup.mutate(groupId);
-    } else {
-      console.error(' DiscoverGroupsView: ERROR - joinGroup.mutate is not a function!');
     }
   };
 
@@ -59,9 +38,7 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
         <div className="mb-6">
           <div className="relative max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <Search className="h-5 w-5 text-gray-400" />
             </div>
             <input
               type="text"
@@ -83,8 +60,8 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
         {/* No groups available */}
         {!isLoading && filteredGroups.length === 0 && (
           <div className="text-center py-16">
-            <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-6">
-              <span className="text-3xl"></span>
+            <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-6">
+              <Search className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               {searchTerm ? 'No se encontraron grupos' : 'No hay grupos disponibles'}
@@ -108,8 +85,10 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
                 onClick={() => onGroupSelect(group)}
               >
                 {/* Banner del grupo */}
-                <div className="h-24 bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-4xl">
-                  {getGroupEmoji(group.name)}
+                <div className="h-24 bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center">
+                  <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
+                    <Radio className="w-6 h-6 text-blue-600" />
+                  </div>
                 </div>
 
                 {/* Contenido */}
@@ -125,7 +104,7 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
                   <div className="flex items-center justify-between text-xs text-gray-500 mb-3 pb-2 border-b border-gray-100">
                     <div className="flex items-center gap-1">
                       <Users className="w-3 h-3" />
-                      <span>{formatCompactNumber(group.memberCount)} members</span>
+                      <span>{formatCompactNumber(group.memberCount)} miembros</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <FileText className="w-3 h-3" />
@@ -135,12 +114,9 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
 
                   {/* Botón de unirse */}
                   <button
-                    onClick={(e) => {
-                      console.log(' BUTTON CLICKED! Group ID:', group.id);
-                      handleJoinGroup(group.id, e);
-                    }}
+                    onClick={(e) => handleJoinGroup(group.id, e)}
                     disabled={joinGroup.isPending}
-                    className="w-full py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
                     {joinGroup.isPending ? 'Uniéndose...' : 'Unirse al grupo'}
                   </button>

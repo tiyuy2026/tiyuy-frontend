@@ -2,17 +2,10 @@
 
 import React, { useState, useRef } from 'react';
 import { toast } from '@/presentation/store/toastStore';
-import { 
-  useChannelPosts, 
-  useUserEvents,
-  useChannelCollaborators,
-  useChannelStatistics,
-  useCanUserPublish,
-  useCreateChannelComment,
-  useGetChannelComments
-} from '@/presentation/hooks/useChannels';
+import { useMemo } from 'react';
+import { useChannelPosts, useCanUserPublish, useCreateChannelComment, useGetChannelComments} from '@/presentation/hooks/useChannels';
 import { useLikeChannelComment } from '@/presentation/hooks/useContacts';
-import { Plus, MessageSquare, Heart, Share2, Image, X, Send, MoreVertical, Edit, Trash2, Calendar, Shield, BarChart3, FileText, Paperclip } from 'lucide-react';
+import { Plus, MessageSquare, Heart, Share2, Image,ThumbsUp, CornerDownRight, X, Send, MoreVertical, Edit, Trash2, Calendar, Shield, BarChart3, FileText, Paperclip } from 'lucide-react';
 import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 import ChannelEventsPanel from './ChannelEventsPanel';
 import CreateEventModal from './CreateEventModal';
@@ -1089,9 +1082,7 @@ export function ChannelPostsPanel({
                   }}
                   className="flex flex-col items-center p-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
-                  <svg className="w-6 h-6 text-gray-600 mb-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M3.9 12c0 1.71 1.39 3.1 3.1 3.1h4V7H7.9c-.53 0-1.04.21-1.41.59L2.59 8.41c-.38.38-.59.89-.59 1.41V16c0 1.11.89 2 2 2h4c1.11 0 2-.89 2-2v-4.68l2.29 2.29c.38.38.89.59 1.41.59H16c1.11 0 2-.89 2-2V7.9c0-.53-.21-1.04-.59-1.41L12.59 4.41c-.38-.38-.89-.59-1.41-.59H7.9c-1.11 0-2 .89-2 2v4.68z"/>
-                  </svg>
+                  <span className="text-lg">🔗</span>
                   <span className="text-xs font-medium">Copiar link</span>
                 </button>
 
@@ -1103,9 +1094,7 @@ export function ChannelPostsPanel({
                   onClick={() => setShowShareModal(prev => ({ ...prev, [post.id]: false }))}
                   className="flex flex-col items-center p-3 bg-green-100 hover:bg-green-200 rounded-lg transition-colors"
                 >
-                  <svg className="w-6 h-6 text-green-600 mb-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.149-.67.149-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.123-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                  </svg>
+                  <span className="text-lg">💬</span>
                   <span className="text-xs text-green-700 font-medium">WhatsApp</span>
                 </a>
 
@@ -1117,9 +1106,7 @@ export function ChannelPostsPanel({
                   onClick={() => setShowShareModal(prev => ({ ...prev, [post.id]: false }))}
                   className="flex flex-col items-center p-3 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors"
                 >
-                  <svg className="w-6 h-6 text-blue-600 mb-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                  </svg>
+                  <span className="text-lg">📘</span>
                   <span className="text-xs text-blue-700 font-medium">Facebook</span>
                 </a>
 
@@ -1131,9 +1118,7 @@ export function ChannelPostsPanel({
                   onClick={() => setShowShareModal(prev => ({ ...prev, [post.id]: false }))}
                   className="flex flex-col items-center p-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
-                  <svg className="w-6 h-6 text-gray-800 mb-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
+                  <span className="text-lg">𝕏</span>
                   <span className="text-xs text-gray-700 font-medium">X/Twitter</span>
                 </a>
 
@@ -1145,9 +1130,7 @@ export function ChannelPostsPanel({
                   onClick={() => setShowShareModal(prev => ({ ...prev, [post.id]: false }))}
                   className="flex flex-col items-center p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
                 >
-                  <svg className="w-6 h-6 text-blue-700 mb-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
+                  <span className="text-lg">💼</span>
                   <span className="text-xs text-blue-800 font-medium">LinkedIn</span>
                 </a>
               </div>
@@ -1205,7 +1188,6 @@ export function ChannelPostsPanel({
   );
 }
 
-// Sub-component for comments with replies
 function PostComments({ channelId, postId, currentUserId, currentUserName, currentUser, createCommentMutation }: { 
   channelId: number;
   postId: number; 
@@ -1386,93 +1368,154 @@ function PostComments({ channelId, postId, currentUserId, currentUserName, curre
     replies: c.replies?.map((r: any) => ({ id: r.id, content: r.content?.substring(0, 15), replyToCommentId: r.replyToCommentId, repliesCount: r.replies?.length }))
   })));
   console.log(' FULL comments data:', JSON.stringify(comments, null, 2));
+// Normalización para optimizar el rendimiento y evitar cuellos de botella
+  const { rootComments, replyMap } = useMemo(() => {
+    const roots: any[] = [];
+    const replies: Record<string, any[]> = {};
 
-  return (
-    <div className="space-y-2 mt-2">
-      {comments
-        .filter((comment: any) => !comment.replyToCommentId)
-        .map((comment: any) => (
-          <div key={comment.id} className="flex gap-2">
+    comments.forEach((comment: any) => {
+      if (!comment.replyToCommentId) {
+        roots.push(comment);
+      } else {
+        if (!replies[comment.replyToCommentId]) {
+          replies[comment.replyToCommentId] = [];
+        }
+        replies[comment.replyToCommentId].push(comment);
+      }
+    });
+
+    return { rootComments, replyMap: replies };
+  }, [comments]);
+
+  // Función recursiva optimizada para renderizar las respuestas
+  const renderNestedReplies = (commentId: string) => {
+    const currentReplies = replyMap[commentId];
+    if (!currentReplies || currentReplies.length === 0) return null;
+
+    return (
+      <div className="mt-2 space-y-2 pl-4 border-l border-gray-100">
+        {currentReplies.map((reply: any) => (
+          <div key={reply.id} className="flex gap-2">
             <UserAvatar 
-              user={{ firstName: comment.userFirstName, lastName: comment.userLastName }} 
+              user={{ firstName: reply.userFirstName, lastName: reply.userLastName }} 
               size="xs" 
             />
             <div className="flex-1">
-              <div className="bg-white rounded-lg px-3 py-2 border border-gray-200">
+              <div className="bg-gray-50 rounded-lg px-3 py-2 border border-gray-100">
                 <span className="font-semibold text-xs text-gray-900">
-                  {comment.userFirstName} {comment.userLastName}
+                  {reply.userFirstName} {reply.userLastName}
                 </span>
-                <p className="text-sm text-gray-800 mt-0.5">{comment.content}</p>
-                <span className="text-xs text-gray-400">{formatTimeAgo(comment.createdAt)}</span>
+                <p className="text-sm text-gray-800 mt-0.5">{reply.content}</p>
+                <span className="text-xs text-gray-400">{formatTimeAgo(reply.createdAt)}</span>
               </div>
               
-              {/* Like and Reply buttons */}
               <div className="flex gap-4 px-3 py-1">
                 <button
-                  onClick={() => handleCommentLike(comment.id, comment.hasUserLiked)}
+                  onClick={() => handleCommentLike(reply.id, reply.hasUserLiked)}
                   className={`text-xs flex items-center gap-1 transition-colors ${
-                    commentLikes[comment.id] || comment.hasUserLiked
-                      ? 'text-blue-500 hover:text-blue-600 font-medium' 
+                    commentLikes[reply.id] || reply.hasUserLiked
+                      ? 'text-blue-500 font-medium' 
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  <span>{commentLikes[comment.id] || comment.hasUserLiked ? '👍' : '👍'}</span>
+                  <ThumbsUp className="w-3 h-3" />
                   Me gusta
                 </button>
-                
                 <button
-                  onClick={() => handleReplyToComment(comment.id)}
+                  onClick={() => handleReplyToComment(reply.id)}
                   className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
                 >
                   Responder
                 </button>
               </div>
-              
-              {/* Reply input */}
-              {replyingTo === comment.id && (
-                <div className="mt-2 px-3">
-                  <div className="bg-gray-50 rounded-lg p-2 border border-gray-200">
-                    <div className="flex items-center gap-2 mb-2 text-xs text-gray-600">
-                      <span>Respondiendo a {comment.userFirstName}</span>
-                      <button
-                        onClick={() => setReplyingTo(null)}
-                        className="text-gray-400 hover:text-gray-600"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                    <div className="flex gap-2">
-                      <UserAvatar size="xs" />
-                      <input
-                        type="text"
-                        value={replyInputs[comment.id] || ''}
-                        onChange={(e) => setReplyInputs(prev => ({ ...prev, [comment.id]: e.target.value }))}
-                        onKeyPress={(e) => e.key === 'Enter' && handleReplySubmit(comment.id)}
-                        placeholder="Escribe una respuesta..."
-                        className="flex-1 px-2 py-1 bg-white border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        autoFocus
-                      />
-                      <button
-                        onClick={() => handleReplySubmit(comment.id)}
-                        disabled={!replyInputs[comment.id]?.trim()}
-                        className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Enviar
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-            {/* Replies - Use recursive function for all nesting levels */}
-              {comment.replies && comment.replies.length > 0 && (
-                <div className="mt-2 space-y-2 pl-4 border-l-2 border-gray-200">
-                  {renderNestedReplies(comment.replies)}
-                </div>
-              )}
+
+              {replyingTo === reply.id && renderReplyInput(reply)}
+              {renderNestedReplies(reply.id)}
             </div>
           </div>
         ))}
+      </div>
+    );
+  };
+
+  const renderReplyInput = (comment: any) => (
+    <div className="mt-2 px-3">
+      <div className="bg-gray-50 rounded-lg p-2 border border-gray-200">
+        <div className="flex items-center justify-between mb-2 text-xs text-gray-600">
+          <div className="flex items-center gap-1">
+            <CornerDownRight className="w-3 h-3 text-gray-400" />
+            <span>Respondiendo a {comment.userFirstName}</span>
+          </div>
+          <button onClick={() => setReplyingTo(null)} className="text-gray-400 hover:text-gray-600 cursor-pointer">
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+        <div className="flex gap-2">
+          <UserAvatar size="xs" />
+          <input
+            type="text"
+            value={replyInputs[comment.id] || ''}
+            onChange={(e) => setReplyInputs(prev => ({ ...prev, [comment.id]: e.target.value }))}
+            onKeyPress={(e) => e.key === 'Enter' && handleReplySubmit(comment.id)}
+            placeholder="Escribe una respuesta..."
+            className="flex-1 px-2 py-1 bg-white border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+            autoFocus
+          />
+          <button
+            onClick={() => handleReplySubmit(comment.id)}
+            disabled={!replyInputs[comment.id]?.trim()}
+            className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            Enviar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-2 mt-2">
+      {rootComments.map((comment: any) => (
+        <div key={comment.id} className="flex gap-2">
+          <UserAvatar 
+            user={{ firstName: comment.userFirstName, lastName: comment.userLastName }} 
+            size="xs" 
+          />
+          <div className="flex-1">
+            <div className="bg-white rounded-lg px-3 py-2 border border-gray-200">
+              <span className="font-semibold text-xs text-gray-900">
+                {comment.userFirstName} {comment.userLastName}
+              </span>
+              <p className="text-sm text-gray-800 mt-0.5">{comment.content}</p>
+              <span className="text-xs text-gray-400">{formatTimeAgo(comment.createdAt)}</span>
+            </div>
+            
+            <div className="flex gap-4 px-3 py-1">
+              <button
+                onClick={() => handleCommentLike(comment.id, comment.hasUserLiked)}
+                className={`text-xs flex items-center gap-1 transition-colors ${
+                  commentLikes[comment.id] || comment.hasUserLiked
+                    ? 'text-blue-500 font-medium' 
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <ThumbsUp className="w-3 h-3" />
+                Me gusta
+              </button>
+              
+              <button
+                onClick={() => handleReplyToComment(comment.id)}
+                className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                Responder
+              </button>
+            </div>
+            
+            {replyingTo === comment.id && renderReplyInput(comment)}
+            {renderNestedReplies(comment.id)}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

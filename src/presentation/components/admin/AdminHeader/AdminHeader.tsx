@@ -11,7 +11,7 @@ import { useAuthStore } from '@/presentation/store/authStore';
 import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { Button } from '@/presentation/components/ui/Button';
 import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
-import { Bell, Search, Plus, LogOut, Camera, User, PlusCircle, Settings, HelpCircle, Building2, Megaphone, Tag, Menu } from 'lucide-react';
+import { Bell, Building2, Camera, ChevronDown, HelpCircle, LogOut, Megaphone, Menu, Plus, PlusCircle, Search, Settings, Tag, User } from 'lucide-react';;
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -157,9 +157,7 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
           >
             <PlusCircle className="w-4 h-4" />
             Create
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M4.646 6.646a.5.5 0 0 1 .708 0L8 9.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z"/>
-            </svg>
+            <ChevronDown className="w-3 h-3" />
           </Button>
           
           {showCreateMenu && (

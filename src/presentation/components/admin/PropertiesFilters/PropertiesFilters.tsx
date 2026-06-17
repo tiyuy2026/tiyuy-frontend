@@ -3,6 +3,7 @@
  * Sección de filtros con buscador y dropdowns personalizados
  */
 
+import { Search, X } from 'lucide-react';
 import { CustomDropdown } from '../CustomDropdown/CustomDropdown';
 
 interface PropertiesFiltersProps {
@@ -41,9 +42,7 @@ export function PropertiesFilters({
         <div className="flex-1 w-full">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <Search className="h-5 w-5 text-gray-400" />
             </div>
             <input
               type="text"
@@ -71,9 +70,7 @@ export function PropertiesFilters({
             onClick={onClear}
             className="px-3 py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center gap-1 text-sm"
           >
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="w-3 h-3" />
             Limpiar
           </button>
         )}

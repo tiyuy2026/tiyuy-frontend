@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { BarChart3, Calendar, DollarSign, Search, TrendingUp, UserCheck, Users } from 'lucide-react';
 import { AgentListItem } from '@/core/domain/entities/Admin';
 import { useAgentList, useAgentDashboardStats } from '@/presentation/hooks/useAdmin';
 import { usePermissions } from '@/presentation/hooks/usePermissions';
@@ -39,12 +40,12 @@ ChartJS.register(
   Legend
 );
 
-const IconRevenue  = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5"><circle cx="12" cy="12" r="10"/><path d="M12 6v2m0 8v2M9 9h4.5a1.5 1.5 0 010 3H10a1.5 1.5 0 000 3H15"/></svg>;
-const IconCalendar = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>;
-const IconChart    = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5"><path d="M3 3v18h18M7 16l4-4 4 4 4-4"/></svg>;
-const IconUser     = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>;
-const IconTrend    = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5"><path d="M22 7l-8.5 8.5-5-5L2 17M22 7h-6M22 7v6"/></svg>;
-const IconUsers    = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-5 h-5"><circle cx="9" cy="7" r="4"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="7" r="3"/><path d="M21 20c0-2.7-1.8-5-4-5.5"/></svg>;
+const IconRevenue  = () => <DollarSign className="w-5 h-5" />;
+const IconCalendar = () => <Calendar className="w-5 h-5" />;
+const IconChart    = () => <BarChart3 className="w-5 h-5" />;
+const IconUser     = () => <Users className="w-5 h-5" />;
+const IconTrend    = () => <TrendingUp className="w-5 h-5" />;
+const IconUsers    = () => <UserCheck className="w-5 h-5" />;
 
 const STAT_META = [
   { Icon: IconRevenue,  bg: 'bg-teal-50',   color: 'text-teal-500'   },
@@ -582,9 +583,7 @@ export default function AgentsPage() {
           <input type="text" placeholder="Buscar inmobiliaria..." value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
         </div>
         <FilterDropdown value={statusFilter} options={statusOptions} onChange={(value) => handleFilterChange({ status: value })} />
         <FilterDropdown value={verificationFilter} options={verificationOptions} onChange={(value) => handleFilterChange({ verification: value })} />

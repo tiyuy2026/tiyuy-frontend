@@ -7,7 +7,7 @@ import { useCRMInteraction } from '@/presentation/hooks/useCRMInteraction';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { Input } from '@/presentation/components/ui';
 import { ShareButton } from '../../shared/ShareButton/ShareButton';
-import { Star } from 'lucide-react';
+import { Star, AlertCircle, Calendar, MessageCircle } from 'lucide-react';
 import { axiosClient } from '@/infrastructure/api/axios-client';
 import { toast } from '@/presentation/store/toastStore';
 import { useRouter } from 'next/navigation';
@@ -277,9 +277,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
             />
             {errors.message && (
               <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
+                <AlertCircle className="w-3 h-3" />
                 {errors.message}
               </p>
             )}
@@ -303,10 +301,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
               disabled={isLoading}
               className="w-full bg-green-500 hover:bg-green-600 text-white py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L.057 23.882l6.162-1.616A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.878 9.878 0 01-5.031-1.378l-.361-.214-3.741.981.998-3.648-.235-.374A9.859 9.859 0 012.106 12C2.106 6.579 6.579 2.106 12 2.106S21.894 6.579 21.894 12 17.421 21.894 12 21.894z"/>
-              </svg>
+              <MessageCircle className="w-4 h-4" />
               Escribir por WhatsApp
             </button>
           </div>
@@ -375,9 +370,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
 
         {publishedDate && (
           <p className="mt-3 text-xs text-gray-400 flex items-center gap-1">
-            <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+            <Calendar className="w-3 h-3 flex-shrink-0" />
             Publicado el {publishedDate}
           </p>
         )}

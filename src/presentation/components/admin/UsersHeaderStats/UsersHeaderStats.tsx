@@ -1,3 +1,4 @@
+import { BarChart3, Users } from 'lucide-react';
 /**
  * Users Header Stats Component
  * Muestra las 3 tarjetas de estadísticas en el header
@@ -20,9 +21,7 @@ export function UsersHeaderStats({ activeUsers, pendingUsers }: UsersHeaderStats
       {/* Tarjeta Activos */}
       <div className="bg-white rounded-2xl px-6 py-4 border border-gray-200 shadow-lg flex items-center gap-4 flex-1">
         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center flex-shrink-0 shadow-md">
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
+          <Users className="w-6 h-6 text-white" />
         </div>
         <div>
           <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider">Activos</p>
@@ -33,9 +32,7 @@ export function UsersHeaderStats({ activeUsers, pendingUsers }: UsersHeaderStats
       {/* Tarjeta Pendientes */}
       <div className="bg-white rounded-2xl px-6 py-4 border border-gray-200 shadow-lg flex items-center gap-4 flex-1">
         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-400 flex items-center justify-center flex-shrink-0 shadow-md">
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-          </svg>
+          <BarChart3 className="w-6 h-6 text-white" />
         </div>
         <div>
           <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider">Pendientes</p>

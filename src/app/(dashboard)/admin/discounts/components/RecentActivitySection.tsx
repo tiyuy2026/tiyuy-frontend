@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useCentralDiscounts } from '@/presentation/hooks/useAdmin';
 import { Button } from '@/presentation/components/ui/Button';
+import { Clock } from 'lucide-react';
 
 const sourceColors: Record<string, string> = {
   DISCOUNT_CODE: 'bg-indigo-100 text-indigo-700',
@@ -135,9 +136,7 @@ export default function RecentActivitySection() {
             ) : discounts.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-6 py-12 text-center">
-                  <svg className="w-10 h-10 text-gray-200 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <Clock className="w-10 h-10 text-gray-200 mx-auto mb-3" />
                   <p className="text-sm text-gray-400">Sin actividad en este periodo</p>
                 </td>
               </tr>

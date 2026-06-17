@@ -8,6 +8,7 @@
 import { useState } from 'react';
 import { Button } from '@/presentation/components/ui/Button';
 import { LoadingState, EmptyState } from '@/presentation/components/admin/AdminUIStates';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react';
 
 interface Column<T> {
   key: keyof T;
@@ -186,28 +187,20 @@ export function AdminTable<T extends Record<string, any>>({
                       <span className="text-gray-800">{column.label}</span>
                       {column.sortable && (
                         <div className="flex flex-col gap-0.5">
-                          <svg
+                          <ChevronUp
                             className={`w-3 h-3 transition-colors ${
                               sortConfig.key === column.key && sortConfig.direction === 'asc'
                                 ? 'text-teal-600'
                                 : 'text-gray-400 hover:text-gray-600'
                             }`}
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M5 10l5-5 5 5H5z" />
-                          </svg>
-                          <svg
+                          />
+                          <ChevronDown
                             className={`w-3 h-3 transition-colors ${
                               sortConfig.key === column.key && sortConfig.direction === 'desc'
                                 ? 'text-teal-600'
                                 : 'text-gray-400 hover:text-gray-600'
                             }`}
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M5 10l5 5 5-5H5z" />
-                          </svg>
+                          />
                         </div>
                       )}
                     </div>
@@ -304,9 +297,7 @@ export function AdminTable<T extends Record<string, any>>({
               disabled={pagination.page <= 1}
               className="px-4 py-2 rounded-lg border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all"
             >
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <ChevronLeft className="w-4 h-4 mr-1" />
               Anterior
             </Button>
 
@@ -322,9 +313,7 @@ export function AdminTable<T extends Record<string, any>>({
               className="px-4 py-2 rounded-lg border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all"
             >
               Siguiente
-              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           </div>
         </div>

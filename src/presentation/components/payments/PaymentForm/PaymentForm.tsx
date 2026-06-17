@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { PaymentRequest } from '@/core/domain/entities/Wallet';
 import { useProcessPayment } from '@/presentation/hooks/usePayments';
 import { useValidateDeveloperDiscountCode, useUseDeveloperDiscountCode } from '@/presentation/hooks/admin/useDevelopers';
+import { Icon } from '@iconify/react';
+import { Check, CreditCard, Crown, DollarSign, Globe, Loader, Shield } from 'lucide-react';
 
 interface PaymentFormProps {
   amount: number;
@@ -140,10 +142,7 @@ export function PaymentForm({
       {/* Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full mb-4">
-          <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6z"/>
-            <path d="M18 8H6v6h12V8zm-1 2h-2v2h2v-2z"/>
-          </svg>
+          <CreditCard className="w-8 h-8 text-white" />
         </div>
         <h2 className="text-3xl font-bold text-gray-900 mb-2">
           {planName ? `Suscribirse al ${planName}` : 'Realizar Pago'}
@@ -167,9 +166,7 @@ export function PaymentForm({
       {/* Discount Code Section */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-6">
         <h3 className="text-sm font-semibold text-blue-800 mb-3 flex items-center gap-2">
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2l-5.5 9h11L12 2zm0 3.84L13.93 9h-3.87L12 5.84zM17.5 13c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zm-.88 6.32l-2.06-2.06 1.06-1.06 1 1 2.62-2.62 1.06 1.06-3.68 3.68zM3 21.5h8v-8H3v8zm2-6h4v4H5v-4z"/>
-          </svg>
+          <Crown className="w-4 h-4" />
           ¿Tienes un código de descuento de tu inmobiliaria?
         </h3>
         <div className="flex gap-2">
@@ -192,10 +189,7 @@ export function PaymentForm({
           >
             {isValidating ? (
               <span className="flex items-center gap-1">
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                </svg>
+                <Loader className="animate-spin h-4 w-4" />
                 Validando...
               </span>
             ) : appliedDiscount?.valid ? (
@@ -207,9 +201,7 @@ export function PaymentForm({
         </div>
         {appliedDiscount?.valid && (
           <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-            </svg>
+            <Check className="w-3 h-3" />
             {appliedDiscount.message}
           </p>
         )}
@@ -223,9 +215,7 @@ export function PaymentForm({
         {/* Credit Card Form */}
         <div className="bg-gray-50 p-6 rounded-xl">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1l4 4 4-4h1m-6 0l-4-4 4 4m6-4V5a2 2 0 00-2-2H8a2 2 0 00-2 2v6" />
-            </svg>
+            <DollarSign className="w-5 h-5 text-blue-600" />
             Tarjeta de Crédito/Débito
           </h3>
           <div 
@@ -243,17 +233,12 @@ export function PaymentForm({
         {/* Other Payment Methods */}
         <div className="bg-gray-50 p-6 rounded-xl">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41 1.41L10 14.17l3.59-3.59L15 16l-5-5z"/>
-            </svg>
+            <Globe className="w-5 h-5 text-blue-600" />
             Otros Métodos de Pago
           </h3>
           <div className="space-y-3">
             <button className="w-full p-4 bg-white border-2 border-blue-600 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-3">
-              <svg className="w-8 h-8" viewBox="0 0 40 20">
-                <path fill="#009EE3" d="M11.14 0H7.32c-.68 0-1.3.27-1.78.73l-5.5 7.5c-.48.66-.48 1.54-.48 2.22 0l5.5 7.5c.48.66 1.1.73 1.78.73h3.82c.68 0 1.3-.27 1.78-.73l5.5-7.5C12.44.27 11.82 0 11.14 0zm-1.78 3.5l-2.5 3.5h3.82l2.5-3.5h-3.82z"/>
-                <path fill="#009EE3" d="M28.86 0H25.04c-.68 0-1.3.27-1.78.73l-5.5 7.5c-.48.66-.48 1.54-.48 2.22 0l5.5 7.5c.48.66 1.1.73 1.78.73h3.82c.68 0 1.3-.27 1.78-.73l5.5-7.5C30.16.27 29.54 0 28.86 0zm-1.78 3.5l-2.5 3.5h3.82l2.5-3.5h-3.82z"/>
-              </svg>
+              <Icon icon="simple-icons:mercadopago" className="w-8 h-8" />
               <span className="font-semibold">Pagar con Mercado Pago</span>
             </button>
             
@@ -267,9 +252,7 @@ export function PaymentForm({
       {/* Security Badge */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
         <div className="flex items-center gap-3">
-          <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 1L3 5v6c0 1.66 1.34 3 3h6c1.66 0 3-1.34 3-3V5l-9-4zm0 16H3v2h9v-2zm0-4H3v2h9v-2zm10-16v6c0 1.66 1.34 3 3h6c1.66 0 3-1.34 3-3V5l-9-4zm0 16h-3v2h9v-2zm0-4h-3V2h9v-2z"/>
-          </svg>
+          <Shield className="w-6 h-6 text-blue-600" />
           <div className="text-sm text-blue-800">
             <p className="font-semibold">Pago 100% Seguro</p>
             <p>Tu información está protegida con encriptación SSL</p>

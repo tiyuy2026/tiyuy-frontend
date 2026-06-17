@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { usePaymentById } from '@/presentation/hooks/usePayments';
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
+import { XCircle, CheckCircle2, Loader2, Info } from 'lucide-react';
 
 export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) {
   const router = useRouter();
@@ -26,7 +27,7 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-green-600"></div>
+          <Loader2 className="inline-block animate-spin h-16 w-16 text-green-600" />
           <p className="mt-8 text-xl text-gray-600">Verificando tu pago...</p>
         </div>
       </div>
@@ -38,15 +39,13 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
       <div className="min-h-screen flex items-center justify-center">
         <div className="max-w-md mx-auto p-8 bg-white rounded-2xl shadow-2xl text-center">
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-10 h-10 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41 1.41L10 14.17l3.59-3.59L15 16l-5-5z"/>
-            </svg>
+            <XCircle className="w-10 h-10 text-red-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Error en la Confirmación</h1>
           <p className="text-gray-600 mb-6">{error instanceof Error ? error.message : String(error)}</p>
           <button
             onClick={() => router.push('/payments')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
           >
             Ver Mis Pagos
           </button>
@@ -75,9 +74,7 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
               <div className="bg-gradient-to-br from-green-500 to-green-600 p-12 text-white">
                 <div className="text-center">
                   <div className="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-8">
-                    <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M9 12l2 2m0 0l-2-2m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+                    <CheckCircle2 className="w-10 h-10 text-white" />
                   </div>
                   <h1 className="text-4xl font-bold mb-4">¡Pago Exitoso!</h1>
                   <p className="text-xl mb-8 text-green-100">
@@ -108,7 +105,7 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
                   {isRedirecting && (
                     <div className="mt-8 text-center">
                       <div className="inline-flex items-center gap-2 bg-white bg-opacity-20 px-4 py-2 rounded-full">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b border-white"></div>
+                        <Loader2 className="animate-spin h-4 w-4 text-white" />
                         <span>Redirigiendo al dashboard...</span>
                       </div>
                     </div>
@@ -125,21 +122,15 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">¿Qué sigue ahora?</h3>
                     <ul className="space-y-3 text-gray-600">
                       <li className="flex items-start gap-3">
-                        <svg className="w-5 h-5 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M9 12l2 2m0 0l-2-2m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                        <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
                         <span>Tus créditos han sido acreditados automáticamente</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <svg className="w-5 h-5 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M9 12l2 2m0 0l-2-2m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                        <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
                         <span>Recibirás un email de confirmación</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <svg className="w-5 h-5 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M9 12l2 2m0 0l-2-2m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                        <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
                         <span>Puedes empezar a publicar propiedades</span>
                       </li>
                     </ul>
@@ -168,13 +159,13 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
                 <div className="mt-8 flex gap-4">
                   <button
                     onClick={() => router.push('/dashboard')}
-                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                    className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold cursor-pointer"
                   >
                     Ir al Dashboard
                   </button>
                   <button
                     onClick={() => window.print()}
-                    className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+                    className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-semibold cursor-pointer"
                   >
                     Imprimir Comprobante
                   </button>

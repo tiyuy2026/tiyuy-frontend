@@ -1,3 +1,5 @@
+import { Check } from 'lucide-react';
+
 interface StepProgressProps {
   currentStep: number;
   totalSteps: number;
@@ -33,9 +35,7 @@ export function StepProgress({ currentStep, totalSteps, labels }: StepProgressPr
                 }`}
               >
                 {isCompleted ? (
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check className="w-4 h-4" strokeWidth={3} />
                 ) : (
                   step
                 )}

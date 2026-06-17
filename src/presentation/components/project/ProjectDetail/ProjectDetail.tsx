@@ -11,6 +11,7 @@ import { ProjectComments } from './ProjectComments';
 import { FavoriteButton } from '../../shared/FavoriteButton/FavoriteButton';
 import { ShareButton } from '../../shared/ShareButton/ShareButton';
 import { StarRating } from '../../property/PropertyDetail/StarRating';
+import { Building, Calendar, ChevronDown, Download, FileText, Home, Landmark, MapPin, Maximize, Menu, MessageCircle, ShoppingCart, Tag, Truck, X } from 'lucide-react';
 
 interface ProjectDetailProps {
   project: ProjectFull;
@@ -154,9 +155,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
 
                   {currentProject.address && (
                     <p className="text-sm text-gray-500 flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      </svg>
+                      <MapPin className="w-4 h-4" />
                       {currentProject.address}
                     </p>
                   )}
@@ -187,9 +186,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               {currentProject.totalUnits > 0 && (
                 <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4h4v4H9z" />
-                  </svg>
+                  <Building className="w-5 h-5 text-gray-500" />
                   <div>
                     <p className="text-sm font-semibold text-gray-800">{currentProject.totalUnits} unidades</p>
                   </div>
@@ -197,9 +194,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
               )}
               {currentProject.areaFrom && (
                 <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                  </svg>
+                  <Maximize className="w-5 h-5 text-gray-500" />
                   <div>
                     <p className="text-sm font-semibold text-gray-800">
                       {currentProject.areaFrom}{currentProject.areaTo ? ` a ${currentProject.areaTo}` : ''} m² tot.
@@ -209,9 +204,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
               )}
               {currentProject.floors && (
                 <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4z" />
-                  </svg>
+                  <Landmark className="w-5 h-5 text-gray-500" />
                   <div>
                     <p className="text-sm font-semibold text-gray-800">{currentProject.floors} pisos</p>
                   </div>
@@ -219,9 +212,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
               )}
               {bedroomGroups.length > 0 && (
                 <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M3 12h18M3 12v5h18v-5M7 12V9h4v3M13 12V9h4v3" />
-                  </svg>
+                  <Calendar className="w-5 h-5 text-gray-500" />
                   <div>
                     <p className="text-sm font-semibold text-gray-800">
                       {bedroomGroups[0] === 0
@@ -289,10 +280,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
                         <div key={key} className="border border-gray-200 rounded-2xl overflow-hidden hover:shadow-md transition bg-white">
                           <div className="relative h-40 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center border-b border-gray-100">
                             <div className="text-center">
-                              <svg className="w-10 h-10 text-gray-300 mx-auto mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 22V12h6v10" />
-                              </svg>
+                              <Home className="w-10 h-10 text-gray-300 mx-auto mb-1" />
                               <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
                                 {sample.type === 'APARTMENT' ? 'Departamento' :
                                  sample.type === 'PENTHOUSE' ? 'Penthouse' :
@@ -329,37 +317,27 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
                             <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500 mb-3">
                               {(sample.bedrooms ?? 0) > 0 && (
                                 <span className="flex items-center gap-1">
-                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M3 12h18M3 12v5h18v-5M7 12V9h4v3M13 12V9h4v3" />
-                                  </svg>
+                                  <Calendar className="w-3.5 h-3.5" />
                                   {sample.bedrooms} dorm.
                                 </span>
                               )}
                               <span className="flex items-center gap-1">
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 12h16M4 12a2 2 0 01-2-2V7h4v3M4 12v5a2 2 0 002 2h12a2 2 0 002-2v-5M8 7V5a2 2 0 114 0v2" />
-                                </svg>
+                                <Truck className="w-3.5 h-3.5" />
                                 {sample.bathrooms} baños
                               </span>
                               <span className="flex items-center gap-1">
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                                </svg>
+                                <Maximize className="w-3.5 h-3.5" />
                                 {sample.area} m²
                               </span>
                               {sample.parkingSpots > 0 && (
                                 <span className="flex items-center gap-1">
-                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zm10 0a2 2 0 11-4 0 2 2 0 014 0zM4 9l2-5h12l2 5M4 9h16M4 9H2m18 0h2" />
-                                  </svg>
+                                  <ShoppingCart className="w-3.5 h-3.5" />
                                   {sample.parkingSpots} est.
                                 </span>
                               )}
                               {sample.view && (
                                 <span className="flex items-center gap-1">
-                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" />
-                                  </svg>
+                                  <Menu className="w-3.5 h-3.5" />
                                   {sample.view}
                                 </span>
                               )}
@@ -387,10 +365,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
                                 onClick={() => quotation.generateQuotePDF(groupUnits, groupLabel)}
                                 className="flex-1 bg-blue-600 text-white text-xs py-2 px-3 rounded-lg hover:bg-blue-700 transition font-medium flex items-center justify-center gap-1"
                               >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
+                                <Download className="w-3.5 h-3.5" />
                                 Cotizar PDF
                               </button>
 
@@ -399,10 +374,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
                                 className="flex-1 border border-gray-200 text-gray-600 text-xs py-2 px-3 rounded-lg hover:bg-gray-50 transition flex items-center justify-center gap-1"
                               >
                                 {quotation.expandedGroupKey === key ? 'Ocultar' : `Ver ${groupUnits.length} unidades`}
-                                <svg className={`w-3 h-3 transition-transform ${quotation.expandedGroupKey === key ? 'rotate-180' : ''}`}
-                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
+                                <ChevronDown className="" />
                               </button>
                             </div>
 
@@ -502,12 +474,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-1">Ubicación del proyecto</h2>
               <p className="text-sm text-gray-500 flex items-center gap-1 mb-4">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+                <MapPin className="w-4 h-4 text-gray-400" />
                 {currentProject.fullAddress ||
                   currentProject.address ||
                   `${currentProject.street ? currentProject.street + ' ' : ''}${currentProject.streetNumber || ''}, ${currentProject.district}, ${currentProject.province}`}
@@ -596,9 +563,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
                 </div>
                 <button onClick={() => setSelectedUnit(null)}
                   className="text-gray-400 hover:text-gray-600 rounded-full p-1 hover:bg-gray-100 transition">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
@@ -608,10 +573,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
                     className="w-full h-full object-contain p-4" />
                 ) : (
                   <div className="text-center text-gray-300">
-                    <svg className="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1}
-                        d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" />
-                    </svg>
+                    <FileText className="w-16 h-16 mx-auto mb-2 text-gray-300" />
                     <p className="text-sm text-gray-400">Plano no disponible</p>
                   </div>
                 )}
@@ -628,16 +590,16 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
               <div className="px-6 py-4 space-y-4">
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { icon: <svg className="w-5 h-5 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4h4v4H9z" /></svg>, label: 'Piso', value: selectedUnit.floor },
-                    { icon: <svg className="w-5 h-5 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>, label: 'Área', value: `${selectedUnit.area} m²` },
-                    { icon: <svg className="w-5 h-5 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>, label: 'Tipo', value:
+                    { icon: <Building className="w-5 h-5 text-gray-400 mx-auto" />, label: 'Piso', value: selectedUnit.floor },
+                    { icon: <Maximize className="w-5 h-5 text-gray-400 mx-auto" />, label: 'Área', value: `${selectedUnit.area} m²` },
+                    { icon: <Tag className="w-5 h-5 text-gray-400 mx-auto" />, label: 'Tipo', value:
                       selectedUnit.type === 'APARTMENT' ? 'Depto' :
                       selectedUnit.type === 'PENTHOUSE' ? 'PH' :
                       selectedUnit.type === 'DUPLEX' ? 'Dúplex' :
                       selectedUnit.type === 'OFFICE' ? 'Oficina' : selectedUnit.type },
-                    { icon: <svg className="w-5 h-5 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12V7a2 2 0 012-2h14a2 2 0 012 2v5M3 12h18M3 12v5h18v-5M7 12V9h4v3M13 12V9h4v3" /></svg>, label: 'Dormitorios', value: selectedUnit.bedrooms ?? '-' },
-                    { icon: <svg className="w-5 h-5 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 12h16M4 12a2 2 0 01-2-2V7h4v3M4 12v5a2 2 0 002 2h12a2 2 0 002-2v-5M8 7V5a2 2 0 114 0v2" /></svg>, label: 'Baños', value: selectedUnit.bathrooms },
-                    { icon: <svg className="w-5 h-5 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zm10 0a2 2 0 11-4 0 2 2 0 014 0zM4 9l2-5h12l2 5M4 9h16M4 9H2m18 0h2" /></svg>, label: 'Estac.', value: selectedUnit.parkingSpots },
+                    { icon: <Calendar className="w-5 h-5 text-gray-400 mx-auto" />, label: 'Dormitorios', value: selectedUnit.bedrooms ?? '-' },
+                    { icon: <Truck className="w-5 h-5 text-gray-400 mx-auto" />, label: 'Baños', value: selectedUnit.bathrooms },
+                    { icon: <ShoppingCart className="w-5 h-5 text-gray-400 mx-auto" />, label: 'Estac.', value: selectedUnit.parkingSpots },
                   ].map(({ icon, label, value }) => (
                     <div key={label} className="bg-gray-50 rounded-xl p-3 text-center">
                       <div className="mb-1">{icon}</div>
@@ -649,7 +611,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
 
                 {selectedUnit.view && (
                   <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
-                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                    <Menu className="w-4 h-4 text-gray-400" />
                     <span>Vista: <strong>{selectedUnit.view}</strong></span>
                   </div>
                 )}
@@ -680,10 +642,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
                   rel="noopener noreferrer"
                   className="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition"
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L.057 23.882l6.162-1.616A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.878 9.878 0 01-5.031-1.378l-.361-.214-3.741.981.998-3.648-.235-.374A9.859 9.859 0 012.106 12C2.106 6.579 6.579 2.106 12 2.106S21.894 6.579 21.894 12 17.421 21.894 12 21.894z"/>
-                  </svg>
+                  <MessageCircle className="w-5 h-5" />
                   Escribir por WhatsApp
                 </a>
                 <button

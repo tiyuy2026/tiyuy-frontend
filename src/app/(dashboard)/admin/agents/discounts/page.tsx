@@ -24,6 +24,7 @@ import Link from 'next/link';
 import AssignDiscountModal from './components/AssignDiscountModal';
 import CreateDiscountModal from './components/CreateDiscountModal';
 import PlanDiscountModal from './components/PlanDiscountModal';
+import { Inbox, RefreshCw, Search, Trash2, Users } from 'lucide-react';;
 
 export default function AgentDiscountsPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -378,9 +379,7 @@ export default function AgentDiscountsPage() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 />
-                <svg className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+                <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
               </div>
               <div className="relative">
                 <button
@@ -451,9 +450,7 @@ export default function AgentDiscountsPage() {
         <div className="min-h-[200px]">
           {!selectedAgent && (
             <div className="flex flex-col items-center justify-center h-48 text-gray-400">
-              <svg className="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
+              <Users className="w-12 h-12 mb-3" />
               <p className="text-sm">Selecciona un agente para ver su historial</p>
             </div>
           )}
@@ -467,9 +464,7 @@ export default function AgentDiscountsPage() {
                 </div>
               ) : paginatedDiscounts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-48 text-gray-400">
-                  <svg className="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                  </svg>
+                  <Inbox className="w-12 h-12 mb-3" />
                   <p className="text-sm">Sin descuentos asignados</p>
                   {canManageDiscounts && (
                     <button
@@ -563,18 +558,14 @@ export default function AgentDiscountsPage() {
                                 className="p-1.5 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-600 transition-colors"
                                 title="Cambiar estado"
                               >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
+                                <RefreshCw className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 onClick={() => handleRemoveDiscount(discount.id)}
                                 className="p-1.5 hover:bg-red-100 rounded text-gray-400 hover:text-red-600 transition-colors"
                                 title="Eliminar"
                               >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           )}

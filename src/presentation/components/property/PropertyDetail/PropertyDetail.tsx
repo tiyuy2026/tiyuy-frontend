@@ -12,7 +12,7 @@ import { ShareButton } from '../../shared/ShareButton/ShareButton';
 import { SimilarProperties } from '../SimilarProperties';
 import { PersonalizedRecommendations } from '../PersonalizedRecommendations';
 import { FeaturePropertyButton } from './FeaturePropertyButton';
-import { Star, MapPin } from 'lucide-react';
+import { Star, MapPin, FileText, Calendar } from 'lucide-react';
 import { StarRating } from './StarRating';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -45,9 +45,7 @@ function DescriptionSection({ description }: { description: string }) {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
       <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-        <svg className="w-4 h-4 text-teal-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
-        </svg>
+        <FileText className="w-4 h-4 text-teal-600 flex-shrink-0" />
         Descripción de la propiedad
       </h2>
       <div className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">
@@ -309,9 +307,7 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
                 )}
 
                 <p className="mt-3 text-xs text-gray-400 flex items-center gap-1">
-                  <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                  <Calendar className="w-3 h-3 flex-shrink-0" />
                   Publicado el {new Date(property.createdAt).toLocaleDateString('es-PE', {
                     day: 'numeric', month: 'long', year: 'numeric',
                   })}

@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useChannels } from '@/presentation/hooks/useChannels';
 import { toast } from '@/presentation/store/toastStore';
+import { AlertCircle, Building, CheckCircle, ChevronLeft, ShieldAlert, User, Users } from 'lucide-react';
 
 export default function CreateChannelView({ user, onBack }: { user: any; onBack: () => void }) {
   const [name, setName] = useState('');
@@ -100,9 +101,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
             onClick={onBack}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft className="w-6 h-6" />
           </button>
         </div>
 
@@ -110,9 +109,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
         {!canCreateChannel ? (
           <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-8 text-center">
             <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <AlertCircle className="w-10 h-10 text-amber-600" />
             </div>
             <h3 className="text-xl font-bold text-amber-900 mb-4">¿Quieres crear un canal?</h3>
             <div className="bg-white rounded-lg p-6 border border-amber-200 mb-6">
@@ -122,9 +119,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
               <div className="text-left space-y-3">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a2 2 0 012-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2H6z" />
-                    </svg>
+                    <CheckCircle className="w-4 h-4 text-green-600" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-green-800 mb-1">Agente Inmobiliario</h4>
@@ -133,9 +128,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-full bg-brand/20 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h-14m0 0v-3m0 3h14" />
-                    </svg>
+                    <Building className="w-4 h-4 text-brand" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-blue-800 mb-1">Empresa</h4>
@@ -230,9 +223,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
                 {avatarPreview ? (
                   <img src={avatarPreview} alt="Avatar preview" className="w-full h-full object-cover" />
                 ) : (
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                  <User className="w-8 h-8 text-gray-400" />
                 )}
               </div>
               
@@ -282,9 +273,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
                   <div className="font-medium text-gray-900">Público</div>
                   <div className="text-sm text-gray-500">Cualquier usuario puede encontrar y suscribirse</div>
                 </div>
-                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
+                <Users className="w-5 h-5 text-green-500" />
               </label>
               
               <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
@@ -299,9 +288,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
                   <div className="font-medium text-gray-900">Privado</div>
                   <div className="text-sm text-gray-500">Solo usuarios invitados pueden suscribirse</div>
                 </div>
-                <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
+                <ShieldAlert className="w-5 h-5 text-orange-500" />
               </label>
             </div>
           </div>
