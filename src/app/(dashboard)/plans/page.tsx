@@ -500,7 +500,7 @@ export default function PlansPage() {
           <HeroSection />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 pb-16 pt-12">
+        <div className="max-w-[1920px] mx-auto px-8 xl:px-16 pb-16 pt-12">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Elige tu Plan Ideal</h2>
             <p className="text-lg text-gray-600">Precios transparentes, sin sorpresas. Escalable según tu crecimiento.</p>

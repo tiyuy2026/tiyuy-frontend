@@ -373,7 +373,8 @@ export default function MyProjectsPage() {
                       {/* First row: View and Edit */}
                       <div className="flex gap-2 mb-2">
                         <Link
-                          href={`/projects/${project.slug}`}
+                          href={`/projects/detail/${project.slug}`}
+                          target="_blank"
                           className="flex-1 text-center px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm"
                         >
                           Ver

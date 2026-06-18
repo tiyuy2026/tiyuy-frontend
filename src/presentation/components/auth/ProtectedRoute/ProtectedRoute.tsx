@@ -17,7 +17,6 @@ export function ProtectedRoute({ children, requiredRole, requiredRoles }: Protec
   const { isAuthenticated, user, setAuth, setAdminProfile } = useAuthStore();
   const [isInitializing, setIsInitializing] = useState(true);
 
-  // Combinar requiredRole y requiredRoles en un array de roles permitidos
   const allowedRoles = requiredRoles || (requiredRole ? [requiredRole] : []);
 
   useEffect(() => {
@@ -27,7 +26,6 @@ export function ProtectedRoute({ children, requiredRole, requiredRoles }: Protec
     if (token && savedUser) {
       setAuth(token, savedUser);
 
-      // Si el usuario es admin, refrescar permisos desde el backend
       const adminRoles = ['ADMIN', 'SUPER_ADMIN', 'SUPPORT'];
       if (savedUser && adminRoles.includes(savedUser.role)) {
         const authRepo = new AuthRepository();

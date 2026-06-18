@@ -405,19 +405,27 @@ export default function MyPropertiesPage() {
         )}
 
         {!canPublish && !showWelcomeMessage && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-            <p className="text-yellow-800 font-medium">
-              {activeSubscription && activeSubscription.plan
-                ? `Has alcanzado el limite de ${activeSubscription.plan.maxPublications} publicaciones para tu plan ${activeSubscription.plan.name}.` 
-                : 'Has alcanzado el limite de 1 propiedad gratis.'}{' '}
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-5 mb-6 flex items-start gap-4">
+            <div className="w-10 h-10 rounded-full bg-[var(--brand-primary-light)] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-[var(--brand-primary)] text-lg font-bold">!</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-[var(--text-primary)] mb-1">
+                Límite de publicaciones alcanzado
+              </p>
+              <p className="text-sm text-[var(--text-secondary)] mb-3">
+                {activeSubscription && activeSubscription.plan
+                  ? `Has alcanzado el límite de ${activeSubscription.plan.maxPublications} publicaciones de tu plan ${activeSubscription.plan.name}.` 
+                  : 'Has alcanzado el límite de 1 propiedad gratis.'}
+                {' '}Para seguir publicando, actualiza o renueva tu plan.
+              </p>
               <Link
                 href="/plans"
-                className="text-blue-600 hover:underline font-semibold"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--brand-primary)] text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-all"
               >
-                {activeSubscription && activeSubscription.plan ? 'Renovar plan' : 'Mejorar tu plan'}
-              </Link>{' '}
-              para publicar mas propiedades.
-            </p>
+                Ver Planes
+              </Link>
+            </div>
           </div>
         )}
 
@@ -575,13 +583,13 @@ export default function MyPropertiesPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="grid grid-cols-2 gap-1 mt-auto">
+                    <div className="flex flex-col gap-1.5 mt-auto">
                       {/* Publish / Reactivate Button */}
                       {(property.status === 'DRAFT' || property.status === 'PAUSED') && (
                         <button
                           onClick={() => handlePublish(property.id)}
                           disabled={publishMutation.isPending}
-                          className="col-span-2 py-1 bg-green-50 text-green-700 border border-green-200 text-xs font-semibold rounded-md hover:bg-green-100 disabled:opacity-50 transition-colors flex items-center justify-center gap-1"
+                          className="w-full py-2 bg-[var(--brand-primary-light)] text-[var(--brand-primary)] text-xs font-semibold rounded-md hover:bg-[var(--brand-primary-light-hover)] disabled:opacity-50 transition-colors flex items-center justify-center gap-1"
                         >
                           {publishMutation.isPending ? 'Procesando...' : (property.status === 'DRAFT' ? 'Publicar Ahora' : 'Reactivar')}
                         </button>
@@ -591,37 +599,39 @@ export default function MyPropertiesPage() {
                       {property.status === 'PUBLISHED' && !property.isFeatured && (
                         <button
                           onClick={() => handleFeatureProperty(property.id)}
-                          className="col-span-2 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 text-xs font-semibold rounded-md hover:bg-yellow-100 transition-colors flex items-center justify-center gap-1"
+                          className="w-full py-2 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold rounded-md hover:bg-amber-100 transition-colors flex items-center justify-center gap-1"
                         >
                           <Star className="w-3 h-3" />
                           Destacar anuncio
                         </button>
                       )}
 
-                      <Link
-                        href={`/property/${property.id}`}
-                        target="_blank"
-                        className="py-1 bg-white text-gray-700 text-xs font-semibold rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center justify-center border border-gray-200"
-                      >
-                        Ver página
-                      </Link>
-                      
-                      <Link
-                        href={`/my-properties/${property.id}/edit`}
-                        className="py-1 bg-blue-50 text-blue-700 border border-blue-100 text-xs font-semibold rounded-md hover:bg-blue-100 transition-colors flex items-center justify-center"
-                      >
-                        Editar
-                      </Link>
-                      
-                      {property.status === 'DRAFT' && (
-                        <button
-                          onClick={() => handleDeleteClick(property.id, property.title, property.status)}
-                          disabled={deleteMutation.isPending}
-                          className="col-span-2 py-1 bg-white text-red-600 border border-red-200 text-xs font-semibold rounded-md hover:bg-red-50 disabled:opacity-50 transition-colors"
+                      <div className="flex gap-1.5">
+                        <Link
+                          href={`/property/${property.id}`}
+                          target="_blank"
+                          className="flex-1 py-2 bg-white text-gray-700 text-xs font-semibold rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center justify-center border border-gray-200"
                         >
-                          Eliminar borrador
-                        </button>
-                      )}
+                          Ver página
+                        </Link>
+                        
+                        <Link
+                          href={`/my-properties/${property.id}/edit`}
+                          className="flex-1 py-2 bg-blue-50 text-blue-700 border border-blue-100 text-xs font-semibold rounded-md hover:bg-blue-100 transition-colors flex items-center justify-center"
+                        >
+                          Editar
+                        </Link>
+                        
+                        {property.status === 'DRAFT' && (
+                          <button
+                            onClick={() => handleDeleteClick(property.id, property.title, property.status)}
+                            disabled={deleteMutation.isPending}
+                            className="py-2 px-3 bg-white text-red-600 border border-red-200 text-xs font-semibold rounded-md hover:bg-red-50 disabled:opacity-50 transition-colors whitespace-nowrap"
+                          >
+                            Eliminar
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

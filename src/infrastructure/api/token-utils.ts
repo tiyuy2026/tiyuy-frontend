@@ -3,7 +3,7 @@
  * Permite detectar tokens expirados ANTES de hacer peticiones al backend.
  */
 
-const TOKEN_KEYS = ['tiyuy-auth-token', 'token', 'auth-token'] as const;
+const TOKEN_KEYS = ['tiyuy-auth-token', 'tiyuy-auth-store', 'token', 'auth-token'] as const;
 
 /**
  * Obtiene el token de localStorage, extrayéndolo de objetos Zustand si es necesario.
@@ -12,20 +12,22 @@ export function getToken(): string | null {
   if (typeof window === 'undefined') return null;
 
   for (const key of TOKEN_KEYS) {
-    let token = localStorage.getItem(key);
-    if (!token) continue;
+    const stored = localStorage.getItem(key);
+    if (!stored) continue;
 
-    // Si el token está guardado como objeto Zustand {state: {token: ...}}
-    if (token.startsWith('{"state":')) {
+    let extracted: string = stored;
+    while (extracted.startsWith('{"state":')) {
       try {
-        const parsed = JSON.parse(token);
-        token = parsed.state?.token || null;
+        const parsed = JSON.parse(extracted);
+        const inner: string | undefined = parsed.state?.token;
+        if (!inner || inner === extracted) break;
+        extracted = inner;
       } catch {
-        token = null;
+        break;
       }
     }
 
-    if (token) return token;
+    if (extracted) return extracted;
   }
 
   return null;
@@ -75,6 +77,7 @@ export function clearTokens(): void {
   for (const key of TOKEN_KEYS) {
     localStorage.removeItem(key);
   }
+  localStorage.removeItem('tiyuy-auth-store');
 }
 
 /**

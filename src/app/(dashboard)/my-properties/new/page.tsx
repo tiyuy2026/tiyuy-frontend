@@ -19,21 +19,13 @@ const STEPS = [
 export default function NuevaPropiedadPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
+  const { data: subscription } = useActiveSubscription();
+
   const [currentStep, setCurrentStep] = useState(1);
-  const { data: myPropertiesData } = useMyProperties();
-  const { data: activeSubscription } = useActiveSubscription();
 
-  const publishedCount =
-    myPropertiesData?.properties?.filter((p: any) => p.status === 'PUBLISHED').length || 0;
-
-  const canPublish = useMemo(() => {
-    if (activeSubscription) return activeSubscription.remainingPublications > 0;
-    return publishedCount < 1;
-  }, [activeSubscription, publishedCount]);
-
-  const maxPublications = activeSubscription?.plan?.maxPublications || 1;
-  const remainingPublications =
-    activeSubscription?.remainingPublications ?? (1 - publishedCount);
+  const maxPublications = subscription?.plan?.maxProperties ?? 0;
+  const remainingPublications = subscription?.remainingPublications ?? maxPublications;
+  const canPublish = remainingPublications > 0;
 
   useEffect(() => {
     if (!isAuthenticated) router.push('/login');

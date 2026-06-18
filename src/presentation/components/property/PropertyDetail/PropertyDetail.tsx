@@ -112,8 +112,9 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      <div className="w-full px-4 sm:px-6 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="w-full px-8 xl:px-16 py-6">
+        <div className="max-w-[1920px] mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
           {/* ════════════════════════════════════════
               COLUMNA PRINCIPAL  (2 / 3)
@@ -348,6 +349,7 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
             </div>
           </div>
 
+        </div>
         </div>
       </div>
     </div>

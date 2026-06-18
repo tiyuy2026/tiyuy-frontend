@@ -8,13 +8,11 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  // Admin specific data
   adminRoleType: AdminRoleType | null;
   permissions: string[];
   departments: string[];
   isAdminActive: boolean | null;
-  
-  // Actions
+
   setAuth: (token: string, user: User, adminData?: AdminAuthData) => void;
   setUser: (user: User) => void;
   setAdminProfile: (role: AdminRoleType, departments: string[], permissions: string[], isActive: boolean) => void;
@@ -29,11 +27,6 @@ interface AdminAuthData {
   permissions?: string[];
   departments?: string[];
   isActive?: boolean;
-}
-
-// Limpiar localStorage para eliminar datos viejos con clave incorrecta
-if (typeof window !== 'undefined') {
-  localStorage.removeItem('tiyuy-auth-storage');
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -90,7 +83,7 @@ export const useAuthStore = create<AuthState>()(
       clearError: () => set({ error: null }),
     }),
     {
-      name: 'tiyuy-auth-token',
+      name: 'tiyuy-auth-store',
       partialize: (state) => ({
         token: state.token,
         user: state.user,

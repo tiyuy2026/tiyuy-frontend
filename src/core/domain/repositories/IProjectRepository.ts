@@ -24,7 +24,7 @@ export interface IProjectRepository {
    * Usado para: página pública de detalle
    * Ejemplo: /proyectos/edificio-miraflores
    */
-  getBySlug(slug: string): Promise<Project>;
+  getBySlug(slug: string): Promise<Project | null>;
 
   /**
    * Búsqueda pública de proyectos con filtros

@@ -38,32 +38,41 @@ type SortType = 'newest' | 'oldest' | 'unread' | 'important';
 export default function NotificationsPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuthStore();
+  const {
+    notifications,
+    isLoading,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    isMarkingAllAsRead,
+  } = useUnifiedNotifications();
+
   const [activeTab, setActiveTab] = useState<TabType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortType>('newest');
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
   const [sortOpen, setSortOpen] = useState(false);
+  const [pageSize, setPageSize] = useState(10);
+  const [page, setPage] = useState(0);
+  const [_hydrated, set_hydrated] = useState(false);
   const [markingIds, setMarkingIds] = useState<Set<string>>(new Set());
-  const { notifications, unreadCount: rawUnreadCount, isLoading, markAsRead, markAllAsRead, isMarkingAllAsRead } = useUnifiedNotifications('all');
 
-  const unreadCount = useMemo(() => 
-    notifications.filter(n => !n.read).length,
-  [notifications]);
-
-  const alertsCount = useMemo(() =>
-    notifications.filter(n => n.type === 'ADMIN_NOTIFICATION').length,
-  [notifications]);
-
-  const historyCount = useMemo(() =>
-    notifications.filter(n => n.read).length,
-  [notifications]);
+  useEffect(() => {
+    set_hydrated(true);
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login');
     }
   }, [isAuthenticated, authLoading, router]);
+
+  const alertsCount = useMemo(() =>
+    notifications.filter(n => n.type === 'ADMIN_NOTIFICATION' || n.type === 'SUBSCRIPTION_EXPIRING').length,
+  [notifications]);
+
+  const historyCount = useMemo(() =>
+    notifications.filter(n => n.read).length,
+  [notifications]);
 
   const handleMarkAsRead = (id: string) => {
     setMarkingIds(prev => new Set(prev).add(id));
@@ -142,7 +151,7 @@ export default function NotificationsPage() {
     important: 'Importantes primero'
   };
 
-  if (authLoading || !isAuthenticated) {
+  if (!_hydrated || authLoading || !isAuthenticated) {
     return (
       <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brand-primary)]"></div>

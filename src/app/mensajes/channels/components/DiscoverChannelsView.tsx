@@ -128,8 +128,8 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                   <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
                     <span className={`px-2 py-1 rounded-full ${
                       channel.isPublic 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-orange-100 text-orange-700'
+                        ? 'bg-[var(--brand-primary-light)] text-gray-900' 
+                        : 'bg-gray-100 text-gray-700'
                     }`}>
                       {channel.isPublic ? ' Público' : ' Privado'}
                     </span>

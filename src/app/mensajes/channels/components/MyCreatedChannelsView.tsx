@@ -75,9 +75,9 @@ export default function MisCanalesCreadosView({ user, onChannelSelect }: MisCana
           <p className="text-gray-500 text-sm mb-4">
             Como Agente o Inmobiliaria, puedes crear tus propios canales para publicar contenido y conectar con clientes.
           </p>
-          <div className="bg-brand/10 border border-blue-200 rounded-lg p-3">
-            <p className="text-brand-dark text-sm font-medium mb-1"> Beneficios de crear un canal:</p>
-            <ul className="text-brand text-xs space-y-1">
+          <div className="bg-[var(--brand-primary-light)] border border-[var(--border-color)] rounded-lg p-3">
+            <p className="text-gray-900 text-sm font-medium mb-1"> Beneficios de crear un canal:</p>
+            <ul className="text-gray-700 text-xs space-y-1">
               <li> Publicar propiedades y noticias</li>
               <li> Conectar con clientes interesados</li>
               <li> Construir tu marca personal</li>
@@ -162,10 +162,10 @@ export default function MisCanalesCreadosView({ user, onChannelSelect }: MisCana
               </div>
 
               <div className="flex gap-2">
-                <button className="flex-1 bg-brand/10 text-brand py-2 px-3 rounded-lg text-xs font-medium hover:bg-brand/20 transition-colors">
+                <button className="flex-1 bg-[var(--brand-primary-light)] text-gray-900 py-2 px-3 rounded-lg text-xs font-medium hover:bg-[var(--brand-primary-light-hover)] transition-colors">
                   Ver posts
                 </button>
-                <button className="flex-1 bg-teal-50 text-teal-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-teal-100 transition-colors">
+                <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors">
                   Estadísticas
                 </button>
               </div>

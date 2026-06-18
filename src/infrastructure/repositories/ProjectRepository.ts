@@ -23,8 +23,7 @@ export class ProjectRepository implements IProjectRepository {
     try {
       const response = await apiClient.get(`/projects/${projectId}`);
       return response.data;
-    } catch (error) {
-      console.error('Error in getById, trying public fallback:', error);
+    } catch {
       const publicResponse = await publicApiClient.get(`/projects/${projectId}`);
       return publicResponse.data;
     }
@@ -64,26 +63,29 @@ export class ProjectRepository implements IProjectRepository {
   /**
    * Obtener proyecto por slug (SEO público) - Público
    */
-  async getBySlug(slug: string): Promise<Project> {
-    const response = await publicApiClient.get(`/projects/slug/${slug}`);
-    const data = response.data;
-    
-    //  Mismo mapeo
-    const media: Array<{ url: string; mediaType: string; displayOrder: number }> = data.media || [];
-    
-    return {
-      ...data,
-      images: media
-        .filter(m => m.mediaType === 'PHOTO')
-        .sort((a, b) => a.displayOrder - b.displayOrder)
-        .map(m => m.url),
-      renders: media
-        .filter(m => m.mediaType === 'VIDEO' || m.mediaType === 'RENDER')
-        .map(m => m.url),
-      blueprints: media
-        .filter(m => m.mediaType === 'BLUEPRINT' || m.mediaType === 'PDF')
-        .map(m => m.url),
-    } as Project;
+  async getBySlug(slug: string): Promise<Project | null> {
+    try {
+      const response = await publicApiClient.get(`/projects/slug/${slug}`);
+      const data = response.data;
+      
+      const media: Array<{ url: string; mediaType: string; displayOrder: number }> = data.media || [];
+      
+      return {
+        ...data,
+        images: media
+          .filter(m => m.mediaType === 'PHOTO')
+          .sort((a, b) => a.displayOrder - b.displayOrder)
+          .map(m => m.url),
+        renders: media
+          .filter(m => m.mediaType === 'VIDEO' || m.mediaType === 'RENDER')
+          .map(m => m.url),
+        blueprints: media
+          .filter(m => m.mediaType === 'BLUEPRINT' || m.mediaType === 'PDF')
+          .map(m => m.url),
+      } as Project;
+    } catch {
+      return null;
+    }
   }
 
   /**

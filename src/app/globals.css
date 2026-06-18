@@ -386,6 +386,10 @@ html.dark .text-gray-900 {
   color: #f9fafb !important;
 }
 
+html.dark .text-gray-800 {
+  color: #f1f5f9 !important;
+}
+
 html.dark .text-gray-700 {
   color: #e5e7eb !important;
 }
@@ -604,6 +608,10 @@ html.dark .border-gray-100 {
 html.dark .bg-gray-100.text-gray-600 {
   background-color: #334155 !important;
   color: #cbd5e1 !important;
+}
+
+html.dark .bg-gray-200 {
+  background-color: #475569 !important;
 }
 
 html.dark .hover\:bg-gray-200:hover {

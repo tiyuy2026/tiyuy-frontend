@@ -249,6 +249,47 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
         if (!formData.price || Number(formData.price) <= 0) {
           errors.price = 'Ingresa un precio válido mayor a 0';
         }
+        if (!formData.description || formData.description.trim().length < 30) {
+          errors.description = 'La descripción debe tener al menos 30 caracteres';
+        }
+      }
+
+      if (step === 2) {
+        if (!formData.district || !formData.district.trim()) {
+          errors.district = 'Selecciona el distrito';
+        }
+        if (!formData.province || !formData.province.trim()) {
+          errors.province = 'Selecciona la provincia';
+        }
+        if (!formData.region || !formData.region.trim()) {
+          errors.region = 'Selecciona la región';
+        }
+        if (!formData.street || !formData.street.trim()) {
+          errors.street = 'La calle es obligatoria';
+        }
+        if (!formData.streetNumber || !formData.streetNumber.trim()) {
+          errors.streetNumber = 'El número es obligatorio';
+        }
+      }
+
+      if (step === 3) {
+        // Validaciones específicas según tipo
+        if (formData.type === 'ROOM') {
+          if (!formData.roomArea || Number(formData.roomArea) <= 0) {
+            errors.roomArea = 'Ingresa el área de la habitación';
+          }
+        } else if (formData.type === 'LAND') {
+          if (!formData.totalArea || Number(formData.totalArea) <= 0) {
+            errors.totalArea = 'Ingresa el área total del terreno';
+          }
+        } else {
+          if (!formData.totalArea || Number(formData.totalArea) <= 0) {
+            errors.totalArea = 'Ingresa el área total';
+          }
+          if (!formData.builtArea || Number(formData.builtArea) <= 0) {
+            errors.builtArea = 'Ingresa el área construida';
+          }
+        }
       }
     }
 

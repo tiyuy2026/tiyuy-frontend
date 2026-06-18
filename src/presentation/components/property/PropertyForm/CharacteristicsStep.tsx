@@ -1,7 +1,91 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Minus, Plus } from 'lucide-react';
+
+const Counter = ({ 
+  label, 
+  value, 
+  onChange, 
+  min = 0, 
+  max = 20 
+}: { 
+  label: string; 
+  value: number; 
+  onChange: (value: number) => void; 
+  min?: number; 
+  max?: number; 
+}) => {
+  const [inputValue, setInputValue] = useState(String(value));
+
+  useEffect(() => {
+    setInputValue(String(value));
+  }, [value]);
+
+  const commitValue = (v: string) => {
+    const parsed = parseInt(v, 10);
+    if (!isNaN(parsed)) {
+      onChange(Math.max(min, Math.min(max, parsed)));
+    }
+  };
+
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+        {label}
+      </label>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => {
+            const newVal = Math.max(min, value - 1);
+            onChange(newVal);
+          }}
+          className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors shrink-0"
+          disabled={value <= min}
+        >
+          <Minus className="w-4 h-4" />
+        </button>
+        <div className="w-20">
+          <input
+            type="number"
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+            }}
+            onBlur={(e) => {
+              if (e.target.value === '' || isNaN(parseInt(e.target.value, 10))) {
+                setInputValue(String(min));
+                onChange(min);
+              } else {
+                commitValue(e.target.value);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                (e.target as HTMLInputElement).blur();
+              }
+            }}
+            className="w-full text-center text-lg font-semibold text-gray-900 bg-gray-50 border border-gray-200 rounded-lg py-2 px-2 hide-arrows outline-none focus:ring-2 focus:ring-green-500"
+            min={min}
+            max={max}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            const newVal = Math.min(max, value + 1);
+            onChange(newVal);
+          }}
+          className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors shrink-0"
+          disabled={value >= max}
+        >
+          <Plus className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 interface CharacteristicsStepProps {
   formData: any;
@@ -20,46 +104,6 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
   };
 
   // Contadores para dormitorios, baños y estacionamientos
-  const Counter = ({ 
-    label, 
-    value, 
-    onChange, 
-    min = 0, 
-    max = 20 
-  }: { 
-    label: string; 
-    value: number; 
-    onChange: (value: number) => void; 
-    min?: number; 
-    max?: number; 
-  }) => (
-    <div>
-      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-        {label}
-      </label>
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => onChange(Math.max(min, value - 1))}
-          className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
-          disabled={value <= min}
-        >
-          <Minus className="w-4 h-4" />
-        </button>
-        <div className="w-16 text-center">
-          <span className="text-lg font-semibold text-gray-900">{value}</span>
-        </div>
-        <button
-          type="button"
-          onClick={() => onChange(Math.min(max, value + 1))}
-          className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
-          disabled={value >= max}
-        >
-          <Plus className="w-4 h-4" />
-        </button>
-      </div>
-    </div>
-  );
 
   // Selector de opciones (para baño propio/compartido)
   const OptionSelector = ({ 
@@ -100,7 +144,6 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
     </div>
   );
 
-  // Input para valores monetarios y numéricos
   const NumberInput = ({ 
     label, 
     value, 
@@ -111,38 +154,70 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
     optional = false 
   }: {
     label: string;
-    value: string | number;
+    value: string | number | undefined | null;
     onChange: (value: string) => void;
     placeholder: string;
     suffix?: string;
     prefix?: string;
     optional?: boolean;
-  }) => (
-    <div>
-      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-        {label} {optional && <span className="text-gray-300 font-normal normal-case">(opcional)</span>}
-      </label>
-      <div className="relative">
-        {prefix && (
-          <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-            {prefix}
-          </span>
-        )}
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          className={`${inputClass} ${prefix ? 'pl-8' : ''} ${suffix ? 'pr-12' : ''}`}
-        />
-        {suffix && (
-          <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-            {suffix}
-          </span>
-        )}
+  }) => {
+    const [localValue, setLocalValue] = useState<string>(() => String(value ?? ''));
+    const committedRef = useRef(String(value ?? ''));
+
+    useEffect(() => {
+      const strVal = String(value ?? '');
+      if (strVal !== committedRef.current) {
+        setLocalValue(strVal);
+        committedRef.current = strVal;
+      }
+    }, [value]);
+
+    const commit = () => {
+      const v = localValue.trim();
+      committedRef.current = v || '';
+      if (v === '' || isNaN(Number(v))) {
+        setLocalValue('');
+        onChange('');
+      } else {
+        onChange(v);
+      }
+    };
+
+    return (
+      <div>
+        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+          {label} {optional && <span className="text-gray-300 font-normal normal-case">(opcional)</span>}
+        </label>
+        <div className="relative">
+          {prefix && (
+            <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+              {prefix}
+            </span>
+          )}
+          <input
+            type="text"
+            inputMode="numeric"
+            value={localValue}
+            onChange={(e) => setLocalValue(e.target.value)}
+            onFocus={(e) => e.target.select()}
+            onBlur={commit}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                (e.target as HTMLInputElement).blur();
+              }
+            }}
+            placeholder={placeholder}
+            className={`${inputClass} ${prefix ? 'pl-8' : ''} ${suffix ? 'pr-12' : ''} hide-arrows`}
+          />
+          {suffix && (
+            <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+              {suffix}
+            </span>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Renderizar según el tipo de propiedad
   const renderPropertyCharacteristics = () => {
@@ -170,22 +245,25 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
                   ]}
                 />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <NumberInput
-                    label="Área de la habitación"
-                    value={formData.roomArea || ''}
-                    onChange={(value) => onChange('roomArea', value)}
-                    placeholder="0"
-                    suffix="m²"
-                  />
-                  <NumberInput
-                    label="Capacidad máxima"
-                    value={formData.maxCapacity || ''}
-                    onChange={(value) => onChange('maxCapacity', value)}
-                    placeholder="1"
-                    suffix="personas"
-                  />
-                </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <NumberInput
+                        label="Área de la habitación"
+                        value={formData.roomArea}
+                        onChange={(value) => onChange('roomArea', value)}
+                        placeholder="0"
+                        suffix="m²"
+                      />
+                      {validationErrors?.roomArea && <p className="mt-1 text-sm text-red-600">{validationErrors.roomArea}</p>}
+                    </div>
+                    <NumberInput
+                      label="Capacidad máxima"
+                      value={formData.maxCapacity}
+                      onChange={(value) => onChange('maxCapacity', value)}
+                      placeholder="1"
+                      suffix="personas"
+                    />
+                  </div>
               </div>
             </section>
           </>
@@ -207,14 +285,14 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <NumberInput
                     label="Total de Unidades *"
-                    value={formData.totalUnits || ''}
+                    value={formData.totalUnits}
                     onChange={(value) => handleChangeWithLog('totalUnits', value)}
                     placeholder="0"
                     suffix="unidades"
                   />
                   <NumberInput
                     label="Área Desde *"
-                    value={formData.areaFrom || ''}
+                    value={formData.areaFrom}
                     onChange={(value) => handleChangeWithLog('areaFrom', value)}
                     placeholder="0"
                     suffix="m²"
@@ -224,31 +302,34 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <NumberInput
                     label="Área Hasta *"
-                    value={formData.areaTo || ''}
+                    value={formData.areaTo}
                     onChange={(value) => handleChangeWithLog('areaTo', value)}
                     placeholder="0"
                     suffix="m²"
                   />
-                  <NumberInput
-                    label="Área total"
-                    value={formData.totalArea || ''}
-                    onChange={(value) => handleChangeWithLog('totalArea', value)}
-                    placeholder="0"
-                    suffix="m²"
-                  />
+                  <div>
+                    <NumberInput
+                      label="Área total"
+                      value={formData.totalArea}
+                      onChange={(value) => handleChangeWithLog('totalArea', value)}
+                      placeholder="0"
+                      suffix="m²"
+                    />
+                    {validationErrors?.totalArea && <p className="mt-1 text-sm text-red-600">{validationErrors.totalArea}</p>}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <NumberInput
                     label="Frente"
-                    value={formData.frontage || ''}
+                    value={formData.frontage}
                     onChange={(value) => handleChangeWithLog('frontage', value)}
                     placeholder="0"
                     suffix="ml"
                   />
                   <NumberInput
                     label="Fondo"
-                    value={formData.depth || ''}
+                    value={formData.depth}
                     onChange={(value) => handleChangeWithLog('depth', value)}
                     placeholder="0"
                     suffix="ml"
@@ -258,14 +339,14 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <NumberInput
                     label="Perímetro"
-                    value={formData.perimeter || ''}
+                    value={formData.perimeter}
                     onChange={(value) => handleChangeWithLog('perimeter', value)}
                     placeholder="0"
                     suffix="ml"
                   />
                   <NumberInput
                     label="Número de Pisos"
-                    value={formData.floors || ''}
+                    value={formData.floors}
                     onChange={(value) => handleChangeWithLog('floors', value)}
                     placeholder="0"
                     suffix="pisos"
@@ -325,16 +406,19 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <NumberInput
-                    label="Área total"
-                    value={formData.totalArea || ''}
-                    onChange={(value) => onChange('totalArea', value)}
-                    placeholder="0"
-                    suffix="m²"
-                  />
+                  <div>
+                    <NumberInput
+                      label="Área total"
+                      value={formData.totalArea}
+                      onChange={(value) => onChange('totalArea', value)}
+                      placeholder="0"
+                      suffix="m²"
+                    />
+                    {validationErrors?.totalArea && <p className="mt-1 text-sm text-red-600">{validationErrors.totalArea}</p>}
+                  </div>
                   <NumberInput
                     label="Área útil"
-                    value={formData.usableArea || ''}
+                    value={formData.usableArea}
                     onChange={(value) => onChange('usableArea', value)}
                     placeholder="0"
                     suffix="m²"
@@ -403,20 +487,26 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <NumberInput
-                  label="Área total"
-                  value={formData.totalArea || ''}
-                  onChange={(value) => onChange('totalArea', value)}
-                  placeholder="0"
-                  suffix="m²"
-                />
-                <NumberInput
-                  label="Área construida"
-                  value={formData.builtArea || ''}
-                  onChange={(value) => onChange('builtArea', value)}
-                  placeholder="0"
-                  suffix="m²"
-                />
+                <div>
+                  <NumberInput
+                    label="Área total"
+                    value={formData.totalArea}
+                    onChange={(value) => onChange('totalArea', value)}
+                    placeholder="0"
+                    suffix="m²"
+                  />
+                  {validationErrors?.totalArea && <p className="mt-1 text-sm text-red-600">{validationErrors.totalArea}</p>}
+                </div>
+                <div>
+                  <NumberInput
+                    label="Área construida"
+                    value={formData.builtArea}
+                    onChange={(value) => onChange('builtArea', value)}
+                    placeholder="0"
+                    suffix="m²"
+                  />
+                  {validationErrors?.builtArea && <p className="mt-1 text-sm text-red-600">{validationErrors.builtArea}</p>}
+                </div>
               </div>
             </section>
 
@@ -433,13 +523,13 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <NumberInput
                     label="Piso"
-                    value={formData.floor || ''}
+                    value={formData.floor}
                     onChange={(value) => onChange('floor', value)}
                     placeholder="1"
                   />
                   <NumberInput
                     label="Antigüedad (años)"
-                    value={formData.age || ''}
+                    value={formData.age}
                     onChange={(value) => onChange('age', value)}
                     placeholder="0"
                     suffix="años"
@@ -454,6 +544,16 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
 
   return (
     <div className="space-y-8">
+      <style>{`
+        input[type="number"].hide-arrows::-webkit-outer-spin-button,
+        input[type="number"].hide-arrows::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type="number"].hide-arrows {
+          -moz-appearance: textfield;
+        }
+      `}</style>
       {renderPropertyCharacteristics()}
 
       {/* ── MANTENIMIENTO (no para terrenos) ── */}
@@ -461,7 +561,7 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
         <section>
           <NumberInput
             label="Mantenimiento mensual"
-            value={formData.maintenanceFee || ''}
+            value={formData.maintenanceFee}
             onChange={(value) => onChange('maintenanceFee', value)}
             placeholder="0"
             prefix="$"

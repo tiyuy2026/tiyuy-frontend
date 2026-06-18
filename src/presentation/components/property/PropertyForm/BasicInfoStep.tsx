@@ -240,13 +240,17 @@ export function BasicInfoStep({ formData, onChange, validationErrors }: BasicInf
             value={formData.description}
             onChange={(e) => onChange('description', e.target.value)}
             rows={5}
-            className="form-input resize-none"
-            placeholder="Describe tu propiedad..."
+            className={`form-input resize-none ${validationErrors?.description ? 'border-red-500' : ''}`}
+            placeholder="Describe tu propiedad... (mín. 30 caracteres)"
           />
-          <p className="text-[11px] text-slate-400 mt-2 flex items-center gap-1.5">
-            <Info className="w-3.5 h-3.5 text-green-400 shrink-0" />
-            Una buena descripcion ayuda a vender mas rapido
-          </p>
+          {validationErrors?.description ? (
+            <p className="mt-2 text-sm text-red-600">{validationErrors.description}</p>
+          ) : (
+            <p className="text-[11px] text-slate-400 mt-2 flex items-center gap-1.5">
+              <Info className="w-3.5 h-3.5 text-green-400 shrink-0" />
+              Una buena descripcion ayuda a vender mas rapido (mín. 30 caracteres)
+            </p>
+          )}
         </div>
 
       </div>

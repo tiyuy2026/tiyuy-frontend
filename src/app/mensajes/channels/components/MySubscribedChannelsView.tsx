@@ -75,9 +75,9 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
           <p className="text-gray-500 text-sm mb-4">
             Descubre canales de otros agentes e inmobiliarias para estar al día con las últimas novedades del mercado.
           </p>
-          <div className="bg-teal-50 border border-teal-200 rounded-lg p-3">
-            <p className="text-teal-700 text-sm font-medium mb-1"> Beneficios de suscribirte:</p>
-            <ul className="text-teal-600 text-xs space-y-1">
+          <div className="bg-[var(--brand-primary-light)] border border-[var(--border-color)] rounded-lg p-3">
+            <p className="text-gray-900 text-sm font-medium mb-1"> Beneficios de suscribirte:</p>
+            <ul className="text-gray-700 text-xs space-y-1">
               <li> Recibir actualizaciones de propiedades</li>
               <li> Conocer nuevas oportunidades</li>
               <li> Comentar y interactuar</li>
@@ -162,10 +162,10 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
               </div>
 
               <div className="flex gap-2">
-                <button className="flex-1 bg-teal-50 text-teal-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-teal-100 transition-colors">
+                <button className="flex-1 bg-[var(--brand-primary-light)] text-gray-900 py-2 px-3 rounded-lg text-xs font-medium hover:bg-[var(--brand-primary-light-hover)] transition-colors">
                   Ver posts
                 </button>
-                <button className="flex-1 bg-gray-50 text-gray-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors">
+                <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-xs font-medium hover:bg-gray-200 transition-colors">
                   Comentar
                 </button>
               </div>

@@ -433,7 +433,7 @@ export default function AgentMarketingPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 p-6 bg-[#F8F9FA] min-h-screen">
+      <div className="space-y-6 p-6 bg-[var(--bg-secondary)] min-h-screen">
         <div className="animate-pulse space-y-6">
           <div className="h-10 w-64 bg-gray-200 rounded-xl" />
           <div className="h-5 w-96 bg-gray-200 rounded-xl" />
@@ -453,7 +453,7 @@ export default function AgentMarketingPage() {
 
   if (!hasMarketingAccess) {
     return (
-      <div className="space-y-6 p-6 bg-[#F8F9FA] min-h-screen">
+      <div className="space-y-6 p-6 bg-[var(--bg-secondary)] min-h-screen">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center max-w-lg mx-auto mt-12">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
             <Lock className="w-8 h-8 text-gray-400" />
@@ -489,7 +489,7 @@ export default function AgentMarketingPage() {
     : 'Sin interacciones aún. Revisa la configuración de tu campaña';
 
   return (
-    <div className="space-y-6 p-6 bg-[#F8F9FA] min-h-screen">
+    <div className="space-y-6 p-6 bg-[var(--bg-secondary)] min-h-screen">
 
       {/* MÉTRICAS CLAVE */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
