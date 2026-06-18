@@ -258,6 +258,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
   };
 
   const handleSkip = () => {
+    setShowWelcome(false);
     setShowCreateForm(false);
   };
 
@@ -444,45 +445,52 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
       {/* Conditional area: initial buttons or chat line */}
       {!hasPosts && showWelcome && !postsLoading ? (
         // Initial state: "write first post" and "skip" buttons
-        <div className="bg-white m-4 rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4">
-              <UserAvatar size="lg" />
+        <div className="mx-4 mt-4 rounded-xl shadow-lg border-2 border-blue-300 overflow-hidden">
+          {/* Header con gradiente llamativo */}
+          <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-6 text-center">
+            <div className="w-20 h-20 mx-auto mb-3 bg-white/20 backdrop-blur rounded-full flex items-center justify-center shadow-inner">
+              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-2xl font-bold text-white mb-1 drop-shadow-sm">
               ¡Bienvenido a {groupName}!
             </h3>
-            <p className="text-gray-600 text-sm mb-6">
-              Este es el inicio del grupo. Sé el primero en compartir algo.
+            <p className="text-blue-100 text-sm max-w-md mx-auto">
+              Este es el inicio del grupo. Sé el primero en compartir algo interesante con la comunidad.
             </p>
-            <div className="flex gap-3">
-              <button
-                onClick={handleWriteFirstPost}
-                className="flex-1 py-2.5 bg-gradient-to-r brand text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
-              >
-                Escribir mi primera publicación
-              </button>
-              <button
-                onClick={handleSkip}
-                className="flex-1 py-2.5 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-              >
-                Omitir
-              </button>
-            </div>
+          </div>
+          {/* Footer con botones */}
+          <div className="bg-white p-4 flex gap-3 justify-center">
+            <button
+              onClick={handleWriteFirstPost}
+              className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Escribir mi primera publicación
+            </button>
+            <button
+              onClick={handleSkip}
+              className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all border border-gray-300"
+            >
+              Omitir
+            </button>
           </div>
         </div>
       ) : (
         // Interacted state: Facebook-style chat line
-        <div className="bg-white m-4 rounded-lg shadow-sm border border-gray-200">
-          <div className="p-3">
+        <div className="bg-white mx-4 mt-4 rounded-xl shadow-md border border-gray-200">
+          <div className="p-4">
             <div className="flex items-start gap-3">
               <UserAvatar size="sm" />
               <div className="flex-1">
                 <div
                   onClick={() => setShowCreateForm(true)}
-                  className="w-full px-4 py-2.5 bg-gray-50 rounded-lg text-gray-500 cursor-text hover:bg-gray-100 transition-colors"
+                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-gray-500 cursor-text hover:bg-gray-100 transition-colors border border-gray-200"
                 >
-                  <span className="text-gray-500">¿Qué estás pensando?</span>
+                  <span className="text-gray-500">¿Qué estás pensando, {currentUserName}?</span>
                 </div>
               </div>
             </div>
@@ -584,13 +592,27 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Emojis:</label>
                   <div className="flex gap-2 flex-wrap">
-                    {['', '', '️', '', '', '', '', '', '', '', '', ''].map((emoji) => (
+                    {[
+                      { emoji: '🔥', id: 'fire' },
+                      { emoji: '❤️', id: 'heart' },
+                      { emoji: '👏', id: 'clap' },
+                      { emoji: '😢', id: 'cry' },
+                      { emoji: '😉', id: 'wink' },
+                      { emoji: '😎', id: 'cool' },
+                      { emoji: '💰', id: 'money' },
+                      { emoji: '⭐', id: 'star' },
+                      { emoji: '🚀', id: 'rocket' },
+                      { emoji: '💡', id: 'bulb' },
+                      { emoji: '🎉', id: 'party' },
+                      { emoji: '💯', id: '100' },
+                    ].map((item) => (
                       <button
-                        key={emoji}
-                        onClick={() => setNewPost(newPost + emoji)}
+                        key={item.id}
+                        onClick={() => setNewPost(newPost + item.emoji)}
                         className="text-2xl hover:bg-gray-100 p-1 rounded transition-colors"
+                        title={item.id}
                       >
-                        {emoji}
+                        {item.emoji}
                       </button>
                     ))}
                   </div>
@@ -986,7 +1008,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                   onClick={() => setShowShareModal(prev => ({ ...prev, [post.id]: false }))} 
                   className="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-xl leading-none"
                 >
-                  
+                  ✕
                 </button>
               </div>
               

@@ -32,6 +32,8 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
 
   const handleSubscribeChannel = (channelId: number, e: React.MouseEvent) => {
     e.stopPropagation();
+    // Marcar como suscrito localmente INMEDIATAMENTE para que desaparezca de la lista
+    // El hook useChannels también hace actualización optimista
     subscribeToChannel(channelId);
   };
 

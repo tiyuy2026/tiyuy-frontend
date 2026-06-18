@@ -9,6 +9,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
   const [city, setCity] = useState('');
   const [description, setDescription] = useState('');
   const [isPublic, setIsPublic] = useState(true);
+  const [subscribersCanPost, setSubscribersCanPost] = useState(true);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -74,7 +75,8 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
         name: name.trim(),
         city: city.trim(),
         description: description.trim(),
-        avatar: avatarUrl || undefined
+        avatar: avatarUrl || undefined,
+        subscribersCanPost: subscribersCanPost
       });
       
       toast.success('¡Canal creado exitosamente! ');
@@ -302,6 +304,34 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
                 <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
+              </label>
+            </div>
+          </div>
+
+          {/* Subscribers Can Post Toggle */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Publicación de Suscriptores
+            </label>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <label className="flex items-center justify-between cursor-pointer">
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900">Permitir que suscriptores publiquen</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    {subscribersCanPost 
+                      ? 'Los suscriptores podrán crear posts en el canal'
+                      : 'Solo tú y los colaboradores con permiso podrán publicar'}
+                  </div>
+                </div>
+                <div className="relative ml-4">
+                  <input
+                    type="checkbox"
+                    checked={subscribersCanPost}
+                    onChange={(e) => setSubscribersCanPost(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand/30 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
+                </div>
               </label>
             </div>
           </div>

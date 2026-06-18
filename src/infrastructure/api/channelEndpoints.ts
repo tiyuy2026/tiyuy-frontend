@@ -30,6 +30,9 @@ export const CHANNEL_ENDPOINTS = {
   COLLABORATORS: (channelId: number) => `/contacts/extended/channels/${channelId}/collaborators`,
   CAN_PUBLISH: (channelId: number) => `/contacts/extended/channels/${channelId}/can-publish`,
   
+  // Subscribers Can Post
+  SUBSCRIBERS_CAN_POST: (channelId: number) => `/contacts/extended/channels/${channelId}/subscribers-can-post`,
+
   // Statistics
   STATISTICS: (channelId: number) => `/contacts/extended/channels/${channelId}/statistics`,
 };

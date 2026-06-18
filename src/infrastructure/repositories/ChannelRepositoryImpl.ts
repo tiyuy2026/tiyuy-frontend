@@ -184,6 +184,11 @@ export class ChannelRepositoryImpl implements ChannelRepository {
     return response.data;
   }
 
+  async updateSubscribersCanPost(channelId: number, subscribersCanPost: boolean): Promise<Channel> {
+    const response = await axiosClient.patch(CHANNEL_ENDPOINTS.SUBSCRIBERS_CAN_POST(channelId), { subscribersCanPost });
+    return this.mapToChannel(response.data);
+  }
+
   // Statistics
   async getChannelStatistics(channelId: number, userId: number): Promise<ChannelStatistics> {
     const response = await axiosClient.get(CHANNEL_ENDPOINTS.STATISTICS(channelId));
@@ -201,7 +206,9 @@ export class ChannelRepositoryImpl implements ChannelRepository {
       type: item.type,
       subscriberCount: item.subscriberCount || 0,
       isSubscribed: item.isSubscribed || false,
-      isOwner: item.isOwner || false,
+      isAdmin: item.isAdmin || item.isOwner || false,
+      isOwner: item.isOwner || item.isAdmin || false,
+      subscribersCanPost: item.subscribersCanPost !== undefined ? item.subscribersCanPost : true,
       shareLink: item.shareLink,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,

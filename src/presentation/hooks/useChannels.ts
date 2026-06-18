@@ -34,7 +34,7 @@ export function useChannels(userId?: number) {
   } = useQuery({
     queryKey: ['channels', userId],
     queryFn: () => channelUseCases.getChannels(userId || 0),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 1000 * 30, // 30 seconds - para que se refresque rápido al suscribirse
   });
 
   // Mutation to create channel
@@ -64,6 +64,20 @@ export function useChannels(userId?: number) {
     }
   });
 
+  // Mutation to update subscribersCanPost
+  const updateSubscribersCanPostMutation = useMutation({
+    mutationFn: ({ channelId, subscribersCanPost }: { channelId: number; subscribersCanPost: boolean }) =>
+      channelUseCases.updateSubscribersCanPost(channelId, subscribersCanPost),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channels'] });
+      toast.success('Configuración actualizada');
+    },
+    onError: (error) => {
+      console.error('Error updating subscribersCanPost:', error);
+      toast.error(error instanceof Error ? error.message : 'Error al actualizar configuración');
+    }
+  });
+
   // Mutation to delete channel
   const deleteChannelMutation = useMutation({
     mutationFn: (id: number) => channelUseCases.deleteChannel(id),
@@ -80,26 +94,95 @@ export function useChannels(userId?: number) {
   // Mutation to subscribe to channel
   const subscribeMutation = useMutation({
     mutationFn: (channelId: number) => channelUseCases.subscribeToChannel(channelId, userId || 0),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['channels'] });
-      toast.success('Te suscribiste al canal');
+    onMutate: async (channelId: number) => {
+      // Cancelar refetches en curso
+      await queryClient.cancelQueries({ queryKey: ['channels', userId] });
+      
+      // Actualización optimista: marcar el canal como suscrito inmediatamente
+      const previousChannels = queryClient.getQueryData(['channels', userId]);
+      queryClient.setQueryData(['channels', userId], (old: any) => {
+        if (!old) return old;
+        return old.map((c: any) => 
+          c.id === channelId 
+            ? { ...c, isSubscribed: true, subscriberCount: (c.subscriberCount || 0) + 1 }
+            : c
+        );
+      });
+      
+      return { previousChannels };
     },
-    onError: (error) => {
+    onSuccess: () => {
+      // Invalidar con el userId correcto para que se refresque la lista
+      queryClient.invalidateQueries({ queryKey: ['channels', userId] });
+      toast.success('Te suscribiste al canal correctamente');
+    },
+    onError: (error: any, channelId: number, context: any) => {
+      // Revertir cambio optimista si falla
+      if (context?.previousChannels) {
+        queryClient.setQueryData(['channels', userId], context.previousChannels);
+      }
       console.error('Error subscribing to channel:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al suscribirse al canal');
+      const errorMsg = error instanceof Error ? error.message : '';
+      // Si el backend ya no devuelve error (ahora es idempotente), esto solo se ejecuta en errores reales
+      if (errorMsg?.includes('Ya estás suscrito') || errorMsg?.includes('ALREADY_SUBSCRIBED') || error?.response?.status === 400) {
+        // Si ocurre un 400, forzamos refetch para sincronizar estado real
+        // Y además marcamos el canal como suscrito localmente para que desaparezca de "Descubrir"
+        queryClient.setQueryData(['channels', userId], (old: any) => {
+          if (!old) return old;
+          return old.map((c: any) => 
+            c.id === channelId 
+              ? { ...c, isSubscribed: true }
+              : c
+          );
+        });
+        queryClient.invalidateQueries({ queryKey: ['channels', userId] });
+        toast.info('Ya estás suscrito a este canal');
+      } else {
+        toast.error(errorMsg || 'Error al suscribirse al canal');
+      }
     }
   });
 
   // Mutation to unsubscribe from channel
   const unsubscribeMutation = useMutation({
     mutationFn: (channelId: number) => channelUseCases.unsubscribeFromChannel(channelId, userId || 0),
+    onMutate: async (channelId: number) => {
+      // Cancelar refetches en curso
+      await queryClient.cancelQueries({ queryKey: ['channels', userId] });
+      
+      // Actualización optimista: marcar el canal como no suscrito inmediatamente
+      const previousChannels = queryClient.getQueryData(['channels', userId]);
+      queryClient.setQueryData(['channels', userId], (old: any) => {
+        if (!old) return old;
+        return old.map((c: any) => 
+          c.id === channelId 
+            ? { ...c, isSubscribed: false, subscriberCount: Math.max((c.subscriberCount || 0) - 1, 0) }
+            : c
+        );
+      });
+      
+      return { previousChannels };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['channels'] });
+      // Invalidar con el userId correcto para que se refresque la lista
+      queryClient.invalidateQueries({ queryKey: ['channels', userId] });
       toast.success('Te desuscribiste del canal');
     },
-    onError: (error) => {
+    onError: (error: any, channelId: number, context: any) => {
+      // Revertir cambio optimista si falla
+      if (context?.previousChannels) {
+        queryClient.setQueryData(['channels', userId], context.previousChannels);
+      }
       console.error('Error unsubscribing from channel:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al desuscribirse del canal');
+      // Si el backend ya no devuelve error (ahora es idempotente), esto solo se ejecuta en errores reales
+      const errorMsg = error instanceof Error ? error.message : '';
+      if (error?.response?.status === 404 || errorMsg?.includes('No estas suscrito')) {
+        // Forzar refetch para sincronizar estado real
+        queryClient.invalidateQueries({ queryKey: ['channels', userId] });
+        toast.info('No estabas suscrito a este canal');
+      } else {
+        toast.error(errorMsg || 'Error al desuscribirse del canal');
+      }
     }
   });
 
@@ -113,11 +196,13 @@ export function useChannels(userId?: number) {
     deleteChannel: deleteChannelMutation.mutate,
     subscribeToChannel: subscribeMutation.mutate,
     unsubscribeFromChannel: unsubscribeMutation.mutate,
+    updateSubscribersCanPost: updateSubscribersCanPostMutation.mutate,
     isCreatingChannel: createChannelMutation.isPending,
     isUpdatingChannel: updateChannelMutation.isPending,
     isDeletingChannel: deleteChannelMutation.isPending,
     isSubscribing: subscribeMutation.isPending,
     isUnsubscribing: unsubscribeMutation.isPending,
+    isUpdatingSubscribersCanPost: updateSubscribersCanPostMutation.isPending,
   };
 }
 
