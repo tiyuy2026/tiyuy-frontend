@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import EmojiSelector from './EmojiSelector';
+import { Globe, Loader, Send } from 'lucide-react';;
 
 interface MessageInputProps {
   onSendMessage: (message: string) => void;
@@ -102,9 +103,7 @@ export default function MessageInput({
             className="absolute right-2 bottom-3 p-2 text-gray-400 hover:text-gray-600 transition-colors"
             title="Insertar emoji"
           >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-1.25-2.75L8 12.25l2.75 5.25L14 17l-4-9zm-4.5 0l1.5-1.5L9 9.5l1.5 1.5L12 9l-1.5 1.5z"/>
-            </svg>
+            <Globe className="w-5 h-5" />
           </button>
         </div>
 
@@ -119,13 +118,9 @@ export default function MessageInput({
           }`}
         >
           {disabled ? (
-            <svg className="w-5 h-5 animate-spin" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 0 0-7H17"/>
-            </svg>
+            <Loader className="w-5 h-5 animate-spin" />
           ) : (
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M2.01 21L23 12 2.01 3 9 12l-6.99 9z"/>
-            </svg>
+            <Send className="w-5 h-5" />
           )}
         </button>
       </div>

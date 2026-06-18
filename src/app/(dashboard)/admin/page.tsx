@@ -15,7 +15,7 @@ import { Card } from '@/presentation/components/ui/Card';
 import { Spinner } from '@/presentation/components/ui/Spinner';
 import { LiveAreaChart, TimePeriod } from '@/presentation/components/admin/GraficaPropertyPoyect';
 import { SystemActivityDashboard } from '@/presentation/components/SystemActivityDashboard';
-import { Users, Building, Package, DollarSign, TrendingUp, AlertTriangle, BarChart3, Activity } from 'lucide-react';
+import { Users, Building, Package, DollarSign, TrendingUp, TrendingDown, AlertTriangle, BarChart3, Activity } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminDashboardPage() {
@@ -448,9 +448,10 @@ export default function AdminDashboardPage() {
                     <p className="text-sm text-gray-500 mb-1">Usuarios activos</p>
                     <p className="text-3xl font-bold text-gray-900">{filteredStats.totalUsers.toLocaleString()}</p>
                     <div className="flex items-center gap-1 mt-2">
-                      <svg className={`w-4 h-4 ${(stats.usersGrowthPercent || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={(stats.usersGrowthPercent || 0) >= 0 ? "M7 17l9.2-9.2M17 17V7H7" : "M17 7l-9.2 9.2M7 7v10h10"} />
-                      </svg>
+                      {(stats.usersGrowthPercent || 0) >= 0
+                        ? <TrendingUp className="w-4 h-4 text-green-500" />
+                        : <TrendingDown className="w-4 h-4 text-red-500" />
+                      }
                       <span className={`text-sm font-medium ${(stats.usersGrowthPercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {(stats.usersGrowthPercent || 0) >= 0 ? '+' : ''}{(stats.usersGrowthPercent || 0).toFixed(1)}%
                       </span>
@@ -468,9 +469,10 @@ export default function AdminDashboardPage() {
                     <p className="text-sm text-gray-500 mb-1">Propiedades activas</p>
                     <p className="text-3xl font-bold text-gray-900">{filteredStats.totalProperties.toLocaleString()}</p>
                     <div className="flex items-center gap-1 mt-2">
-                      <svg className={`w-4 h-4 ${(stats.propertiesGrowthPercent || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={(stats.propertiesGrowthPercent || 0) >= 0 ? "M7 17l9.2-9.2M17 17V7H7" : "M17 7l-9.2 9.2M7 7v10h10"} />
-                      </svg>
+                      {(stats.propertiesGrowthPercent || 0) >= 0
+                        ? <TrendingUp className="w-4 h-4 text-green-500" />
+                        : <TrendingDown className="w-4 h-4 text-red-500" />
+                      }
                       <span className={`text-sm font-medium ${(stats.propertiesGrowthPercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {(stats.propertiesGrowthPercent || 0) >= 0 ? '+' : ''}{(stats.propertiesGrowthPercent || 0).toFixed(1)}%
                       </span>
@@ -488,9 +490,10 @@ export default function AdminDashboardPage() {
                     <p className="text-sm text-gray-500 mb-1">Proyectos activos</p>
                     <p className="text-3xl font-bold text-gray-900">{filteredStats.totalProjects.toLocaleString()}</p>
                     <div className="flex items-center gap-1 mt-2">
-                      <svg className={`w-4 h-4 ${(stats.projectsGrowthPercent || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={(stats.projectsGrowthPercent || 0) >= 0 ? "M7 17l9.2-9.2M17 17V7H7" : "M17 7l-9.2 9.2M7 7v10h10"} />
-                      </svg>
+                      {(stats.projectsGrowthPercent || 0) >= 0
+                        ? <TrendingUp className="w-4 h-4 text-green-500" />
+                        : <TrendingDown className="w-4 h-4 text-red-500" />
+                      }
                       <span className={`text-sm font-medium ${(stats.projectsGrowthPercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {(stats.projectsGrowthPercent || 0) >= 0 ? '+' : ''}{(stats.projectsGrowthPercent || 0).toFixed(1)}%
                       </span>
@@ -508,9 +511,10 @@ export default function AdminDashboardPage() {
                     <p className="text-sm text-gray-500 mb-1">Ingresos del mes</p>
                     <p className="text-3xl font-bold text-gray-900">${filteredStats.totalRevenue.toLocaleString()}</p>
                     <div className="flex items-center gap-1 mt-2">
-                      <svg className={`w-4 h-4 ${(stats.revenueGrowthPercent || 0) >= 0 ? 'text-green-500' : 'text-red-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={(stats.revenueGrowthPercent || 0) >= 0 ? "M7 17l9.2-9.2M17 17V7H7" : "M17 7l-9.2 9.2M7 7v10h10"} />
-                      </svg>
+                      {(stats.revenueGrowthPercent || 0) >= 0
+                        ? <TrendingUp className="w-4 h-4 text-green-500" />
+                        : <TrendingDown className="w-4 h-4 text-red-500" />
+                      }
                       <span className={`text-sm font-medium ${(stats.revenueGrowthPercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {(stats.revenueGrowthPercent || 0) >= 0 ? '+' : ''}{(stats.revenueGrowthPercent || 0).toFixed(1)}%
                       </span>

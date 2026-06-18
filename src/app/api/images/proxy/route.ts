@@ -12,8 +12,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log('Proxying image:', imageUrl);
-    
     const response = await fetch(imageUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -23,16 +21,11 @@ export async function GET(request: NextRequest) {
       }
     });
     
-    console.log('Image response status:', response.status);
-    console.log('Image response headers:', Object.fromEntries(response.headers.entries()));
-    
     if (!response.ok) {
       throw new Error(`Image fetch error: ${response.status}`);
     }
     
     const imageBuffer = await response.arrayBuffer();
-    
-    // Obtener el content-type de la imagen
     const contentType = response.headers.get('content-type') || 'image/jpeg';
     
     return new NextResponse(imageBuffer, {
@@ -46,9 +39,7 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('Error in image proxy:', error);
-    
-    // Devolver una imagen placeholder en caso de error
+    // Se elimina el log de error, manteniendo la respuesta controlada con el SVG placeholder
     const placeholderSvg = `
       <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
         <rect width="100%" height="100%" fill="#f3f4f6"/>

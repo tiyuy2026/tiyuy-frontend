@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import jsPDF from 'jspdf';
-import { ShoppingCart, DollarSign, Home, Key, Link2, ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, ChevronLeft, ChevronRight, ClipboardList, DollarSign, Download, ExternalLink, Eye, FileText, Home, Info, Key, Link2, Share2, Shield, ShoppingCart, Sun, TriangleAlert } from 'lucide-react';
 
 interface Role {
   id: 'comprador' | 'vendedor' | 'arrendador' | 'inquilino';
@@ -37,7 +37,7 @@ const roles: Role[] = [
     title: 'COMPRADOR',
     color: 'text-[#4A9A3E]',
     bgColor: 'bg-[#4A9A3E]/10',
-    icon: <ShoppingCart className="w-8 h-8 text-[#4A9A3E]" />,
+    icon: <ShoppingCart className="w-5 h-5 md:w-8 md:h-8 text-[#4A9A3E]" />,
     description: 'Persona que quiere comprar una propiedad (casa, departamento, terreno, local).',
     howToKnow: [
       'Estás buscando una propiedad para comprar',
@@ -110,7 +110,7 @@ const roles: Role[] = [
     title: 'VENDEDOR',
     color: 'text-[#4A9A3E]',
     bgColor: 'bg-[#4A9A3E]/10',
-    icon: <DollarSign className="w-8 h-8 text-[#4A9A3E]" />,
+    icon: <DollarSign className="w-5 h-5 md:w-8 md:h-8 text-[#4A9A3E]" />,
     description: 'Eres la persona dueña del inmueble y quieres venderlo.',
     howToKnow: [
       'La propiedad está a tu nombre',
@@ -174,7 +174,7 @@ const roles: Role[] = [
     title: 'ARRENDADOR (Dueño que alquila)',
     color: 'text-[#4A9A3E]',
     bgColor: 'bg-[#4A9A3E]/10',
-    icon: <Home className="w-8 h-8 text-[#4A9A3E]" />,
+    icon: <Home className="w-5 h-5 md:w-8 md:h-8 text-[#4A9A3E]" />,
     description: 'Persona que es dueña de una propiedad y desea alquilarla.',
     howToKnow: [
       'Tienes una propiedad a tu nombre',
@@ -240,7 +240,7 @@ const roles: Role[] = [
     title: 'INQUILINO',
     color: 'text-[#4A9A3E]',
     bgColor: 'bg-[#4A9A3E]/10',
-    icon: <Key className="w-8 h-8 text-[#4A9A3E]" />,
+    icon: <Key className="w-5 h-5 md:w-8 md:h-8 text-[#4A9A3E]" />,
     description: 'Persona que busca alquilar una propiedad.',
     howToKnow: [
       'No tienes propiedad',
@@ -627,9 +627,7 @@ export default function GuiaAlquilarPage() {
       {showSuccessMessage && (
         <div className="fixed top-6 right-6 z-50 bg-gradient-to-r from-brand to-brand text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce">
           <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+            <Check className="w-5 h-5 text-white" />
           </div>
           <span className="font-semibold">{showSuccessMessage}</span>
         </div>
@@ -641,14 +639,10 @@ export default function GuiaAlquilarPage() {
           <div className="max-w-[1920px] mx-auto py-3">
             <nav className="flex items-center gap-2 text-sm">
               <Link href="/" className="text-gray-500 hover:text-brand transition-colors font-medium flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
+                <Home className="w-4 h-4" />
                 Inicio
               </Link>
-              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <ChevronRight className="w-4 h-4 text-gray-300" />
               <span className="text-brand font-semibold bg-brand-light px-3 py-1 rounded-full">Guía para alquilar</span>
             </nav>
           </div>
@@ -681,7 +675,7 @@ export default function GuiaAlquilarPage() {
                     <div className="absolute top-0 right-0 w-20 h-20 bg-brand-light rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-brand-light-hover transition-colors"></div>
                     
                     <div className="relative">
-                      <div className={`w-14 h-14 ${role.bgColor} rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      <div className={`w-10 h-10 md:w-14 md:h-14 ${role.bgColor} rounded-2xl flex items-center justify-center mb-3 md:mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                         {role.icon}
                       </div>
                       
@@ -690,19 +684,17 @@ export default function GuiaAlquilarPage() {
                       </div>
                     </div>
                     
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-brand transition-colors">
+                    <h3 className="text-base md:text-lg font-bold text-gray-900 mb-2 group-hover:text-brand transition-colors">
                       {role.title}
                     </h3>
-                    <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">
+                    <p className="text-gray-500 text-xs md:text-sm leading-relaxed mb-4 line-clamp-2">
                       {role.description}
                     </p>
                     
                     <div className="pt-4 border-t border-gray-100">
                       <div className="flex items-center gap-2 text-brand font-semibold text-sm group-hover:gap-3 transition-all">
                         <span>Comenzar guía</span>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
+                        <ChevronRight className="w-4 h-4" />
                       </div>
                     </div>
                   </button>
@@ -720,17 +712,13 @@ export default function GuiaAlquilarPage() {
                   onClick={() => setSelectedRole(null)}
                   className="flex items-center gap-2 text-gray-600 hover:text-brand font-medium transition-colors bg-white px-4 py-2 rounded-lg mb-8 shadow-sm hover:shadow-md border border-gray-200 hover:border-brand"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
+                  <ChevronLeft className="w-5 h-5" />
                   Volver a perfiles
                 </button>
 
                 <div className="text-center mb-8">
                   <div className="inline-flex items-center gap-2 bg-brand-light text-brand px-4 py-2 rounded-full text-sm font-medium mb-6">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
+                    <Shield className="w-5 h-5" />
                     <span>GUÍA OFICIAL TIYUY</span>
                   </div>
                   <h1 className="text-4xl xl:text-5xl font-bold text-gray-900 mb-4">
@@ -741,24 +729,20 @@ export default function GuiaAlquilarPage() {
                   </p>
                 </div>
 
-                <div className="flex flex-wrap justify-center gap-4">
+                <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                   <button
                     onClick={() => shareGuide(selectedRole)}
-                    className="flex items-center gap-2 bg-white text-brand px-8 py-4 rounded-xl font-semibold hover:bg-brand-light transition-all shadow-md hover:shadow-lg border-2 border-brand cursor-pointer"
+                    className="flex items-center justify-center gap-2 bg-white text-brand w-48 md:w-auto px-4 md:px-8 py-3 md:py-4 rounded-xl font-semibold hover:bg-brand-light transition-all shadow-md hover:shadow-lg border-2 border-brand cursor-pointer"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-7.432 0m9.032-4.026A9.001 9.001 0 0112 3c-4.474 0-8.268 3.12-9.032 7.326m0 0A9.001 9.001 0012 21c4.474 0 8.268-3.12 9.032-7.326" />
-                    </svg>
+                    <Share2 className="w-4 h-4 md:w-5 md:h-5" />
                     Compartir
                   </button>
                   
                   <button
                     onClick={() => downloadGuide(selectedRole)}
-                    className="flex items-center gap-2 bg-gradient-to-r from-brand to-brand text-white px-8 py-4 rounded-xl font-semibold hover:from-brand-hover hover:to-brand-hover transition-all shadow-md hover:shadow-lg cursor-pointer"
+                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-brand to-brand text-white w-48 md:w-auto px-4 md:px-8 py-3 md:py-4 rounded-xl font-semibold hover:from-brand-hover hover:to-brand-hover transition-all shadow-md hover:shadow-lg cursor-pointer"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+                    <Download className="w-4 h-4 md:w-5 md:h-5" />
                     Descargar PDF
                   </button>
                 </div>
@@ -769,27 +753,25 @@ export default function GuiaAlquilarPage() {
 
       {selectedRole && (
         <div className="w-full px-8 xl:px-16 py-12">
-          <div className="max-w-8xl mx-auto">
+          <div className="max-w-[1920px] mx-auto">
             <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-brand to-brand"></div>
-                <div className="flex items-start gap-6 mb-6">
-                  <div className="w-24 h-24 bg-brand-light rounded-2xl flex items-center justify-center text-5xl shadow-lg flex-shrink-0">
+                <div className="flex items-start gap-4 md:gap-6 mb-6">
+                  <div className="w-14 h-14 md:w-24 md:h-24 bg-brand-light rounded-2xl flex items-center justify-center text-3xl md:text-5xl shadow-lg flex-shrink-0">
                     {selectedRole.icon}
                   </div>
                   <div className="flex-1">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                    <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">
                       {selectedRole.title}
                     </h1>
-                    <p className="text-gray-600 text-lg">
+                    <p className="text-gray-600 text-sm md:text-lg">
                       {selectedRole.description}
                     </p>
                   </div>
                 </div>
                 <div className="bg-gradient-to-br from-brand-light to-brand-light-hover rounded-xl p-6 border border-brand/20">
                   <h3 className="font-bold text-brand mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
+                    <Sun className="w-5 h-5" />
                     ¿Cómo saber si este es tu perfil?
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -810,9 +792,7 @@ export default function GuiaAlquilarPage() {
             <div className="space-y-6">
               <div className="text-center mb-8">
                 <div className="inline-flex items-center gap-2 bg-brand-light text-brand px-4 py-2 rounded-full text-sm font-semibold mb-4">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                  </svg>
+                  <ClipboardList className="w-5 h-5" />
                   <span>PASOS OBLIGATORIOS</span>
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">
@@ -822,12 +802,12 @@ export default function GuiaAlquilarPage() {
 
               {selectedRole.steps.map((step, index) => (
                 <div key={index} className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
-                  <div className="flex items-stretch">
-                    <div className="w-16 bg-gradient-to-br from-brand to-brand flex flex-col items-center justify-center py-8 text-white">
-                      <span className="text-3xl font-bold">{index + 1}</span>
-                      <span className="text-xs uppercase mt-1 opacity-80">Paso</span>
+                  <div className="flex flex-col md:flex-row md:items-stretch">
+                    <div className="md:w-16 bg-gradient-to-br from-brand to-brand flex flex-row md:flex-col items-center justify-center gap-2 md:gap-0 py-2 md:py-8 px-4 md:px-0 text-white">
+                      <span className="text-xl md:text-3xl font-bold">{index + 1}</span>
+                      <span className="text-xs uppercase opacity-80">Paso</span>
                     </div>
-                    <div className="flex-1 p-6">
+                    <div className="flex-1 p-4 md:p-6">
                       <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-brand transition-colors">
                         {step.title}
                       </h3>
@@ -852,12 +832,10 @@ export default function GuiaAlquilarPage() {
                                 href={action.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className={`inline-flex items-center gap-2 ${selectedRole.color} font-medium mb-4 hover:underline`}
+                                className={`flex items-start gap-2 ${selectedRole.color} font-medium mb-4 hover:underline break-all`}
                               >
-                                {action.description}
-                                <svg className="w-4 h-4 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                </svg>
+                                <span className="break-all">{action.description}</span>
+                                <ExternalLink className="w-4 h-4 text-brand flex-shrink-0 mt-0.5" />
                               </a>
 
                               <div className="space-y-2">
@@ -881,9 +859,7 @@ export default function GuiaAlquilarPage() {
                       {step.why && (
                         <div className="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
                           <p className="font-bold text-amber-800 mb-3 flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                            <Info className="w-4 h-4" />
                             ¿Por qué debes hacerlo?
                           </p>
                           <div className="space-y-2">
@@ -900,10 +876,7 @@ export default function GuiaAlquilarPage() {
                       {step.shows && (
                         <div className="mt-4 p-4 bg-brand-light rounded-xl border border-brand/20">
                           <p className="font-bold text-brand mb-3 flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
+                            <Eye className="w-4 h-4" />
                             Esto te mostrará:
                           </p>
                           <div className="space-y-2">
@@ -920,18 +893,14 @@ export default function GuiaAlquilarPage() {
                       {step.documents && (
                         <div className="mt-4 p-4 bg-brand-light rounded-xl border border-brand/20">
                           <p className="font-bold text-brand mb-3 flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
+                            <FileText className="w-4 h-4" />
                             Debes tener:
                           </p>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             {step.documents.map((doc, docIndex) => (
                               <p key={docIndex} className="text-gray-700 text-sm flex items-center gap-2 bg-white/60 rounded-lg px-3 py-2">
                                 <span className="w-5 h-5 bg-brand-light rounded-full flex items-center justify-center flex-shrink-0">
-                                  <svg className="w-3 h-3 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  </svg>
+                                  <Check className="w-3 h-3 text-brand" />
                                 </span>
                                 {doc}
                               </p>
@@ -943,9 +912,7 @@ export default function GuiaAlquilarPage() {
                       {step.tips && (
                         <div className="mt-4 p-4 bg-brand-light rounded-xl border border-brand/20">
                           <p className="font-bold text-brand mb-3 flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                            </svg>
+                            <Sun className="w-4 h-4" />
                             Recomendaciones:
                           </p>
                           <div className="space-y-2">
@@ -962,9 +929,7 @@ export default function GuiaAlquilarPage() {
                       {step.conditions && (
                         <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
                           <p className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                            </svg>
+                            <ClipboardList className="w-4 h-4" />
                             Condiciones a revisar:
                           </p>
                           <div className="space-y-2">
@@ -981,9 +946,7 @@ export default function GuiaAlquilarPage() {
                       {step.important && (
                         <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
                           <p className="font-semibold text-red-800 flex items-center gap-2">
-                            <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
+                            <TriangleAlert className="w-5 h-5 text-red-600" />
                             Importante: {step.important}
                           </p>
                         </div>

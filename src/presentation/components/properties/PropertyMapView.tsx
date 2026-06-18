@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 import { MapPropertySummary } from '@/core/domain/entities/Property';
 import dynamic from 'next/dynamic';
 import { createTiyuyIcon, createColoredPriceIcon } from '@/presentation/components/shared/Map/tiyuyMarkers';
+import { CalendarDays, Folder } from 'lucide-react';
 
 const LeafletMap = dynamic(
   () => import('@/presentation/components/shared/Map/LeafletMap').then((mod) => mod.LeafletMap),
@@ -151,13 +152,13 @@ export function PropertyMapView({
                 <div className="flex items-center gap-3 mt-1.5 text-[11px] text-gray-500">
                   {property.bedrooms && (
                     <span className="flex items-center gap-0.5">
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                      <Folder className="w-3 h-3" />
                       {property.bedrooms}
                     </span>
                   )}
                   {property.bathrooms && (
                     <span className="flex items-center gap-0.5">
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                      <CalendarDays className="w-3 h-3" />
                       {property.bathrooms}
                     </span>
                   )}

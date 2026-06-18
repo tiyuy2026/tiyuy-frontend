@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 import { ProjectMapSummary } from '@/core/domain/entities/PropertyMapResult';
 import dynamic from 'next/dynamic';
 import { createTiyuyIcon, createPriceIcon } from '@/presentation/components/shared/Map/tiyuyMarkers';
+import { Building } from 'lucide-react';
 
 const LeafletMap = dynamic(
   () => import('@/presentation/components/shared/Map/LeafletMap').then((mod) => mod.LeafletMap),
@@ -138,7 +139,7 @@ export function ProjectMapView({
                 <div className="flex items-center gap-3 mt-1.5 text-[11px] text-gray-500">
                   {project.totalUnits && (
                     <span className="flex items-center gap-0.5">
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                      <Building className="w-3 h-3" />
                       {project.totalUnits} {project.totalUnits === 1 ? 'unidad' : 'unidades'}
                     </span>
                   )}

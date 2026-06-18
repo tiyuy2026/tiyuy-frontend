@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { RegisterAgenteForm } from '@/presentation/components/auth/RegisterForm/';
+import { User, Check, ShieldCheck } from 'lucide-react'; 
 
 export const metadata: Metadata = {
   title: 'Registro Agente Inmobiliario - TIYUY | Bienes Raíces en Perú',
@@ -12,55 +13,50 @@ export default function RegisterAgentePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex flex-col lg:flex-row min-h-screen">
-        {/* Columna izquierda - Imagen/Visual */}
-        <div className="lg:w-[45%] relative flex items-center justify-center p-8 lg:p-12">
-          {/* Imagen de fondo */}
+        
+        <div className="lg:w-[45%] relative flex items-center justify-center p-8 lg:p-12 min-h-[40vh] lg:min-h-screen overflow-hidden">
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 hover:scale-105"
             style={{ backgroundImage: "url('/assets/images/registro/usuario.jpg')" }}
           />
-          
-          {/* Contenido superpuesto */}
-          <div className="relative z-10 text-center text-white max-w-md">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-6 drop-shadow-lg">Agente TIYUY</h1>
-            <p className="text-xl mb-8 drop-shadow-lg">
-              Publica propiedades y conecta con miles de clientes en la mejor plataforma inmobiliaria
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/60 to-gray-900/40" />
+          <div className="relative z-10 text-center lg:text-left text-white max-w-md w-full">
+            <h1 className="text-4xl lg:text-5xl font-extrabold mb-4 tracking-tight drop-shadow-sm">
+              Agente TIYUY
+            </h1>
+            <p className="text-base lg:text-lg text-gray-200 mb-8 font-medium">
+              Publica propiedades y conecta con miles de clientes en la mejor plataforma inmobiliaria.
             </p>
-            <div className="space-y-4 text-left">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
-                  </svg>
+            <div className="space-y-4 max-w-xs mx-auto lg:mx-0">
+              <div className="flex items-center gap-3.5 group">
+                <div className="w-9 h-9 bg-blue-600/90 backdrop-blur-sm rounded-xl flex items-center justify-center border border-blue-400/30 transition-transform group-hover:scale-110">
+                  <User className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-lg drop-shadow-lg">Perfil profesional</span>
+                <span className="text-sm lg:text-base font-semibold tracking-wide">Perfil profesional</span>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+
+              <div className="flex items-center gap-3.5 group">
+                <div className="w-9 h-9 bg-blue-600/90 backdrop-blur-sm rounded-xl flex items-center justify-center border border-blue-400/30 transition-transform group-hover:scale-110">
+                  <Check className="w-4 h-4 text-white" strokeWidth={3} />
                 </div>
-                <span className="text-lg drop-shadow-lg">Propiedades ilimitadas</span>
+                <span className="text-sm lg:text-base font-semibold tracking-wide">Propiedades ilimitadas</span>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
+
+              <div className="flex items-center gap-3.5 group">
+                <div className="w-9 h-9 bg-blue-600/90 backdrop-blur-sm rounded-xl flex items-center justify-center border border-blue-400/30 transition-transform group-hover:scale-110">
+                  <ShieldCheck className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-lg drop-shadow-lg">Clientes potenciales</span>
+                <span className="text-sm lg:text-base font-semibold tracking-wide">Clientes potenciales</span>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Columna derecha - Formulario */}
-        <div className="lg:w-[55%] bg-gray-50 flex items-center justify-center p-6 lg:p-8">
-          <div className="w-full max-w-lg">
+        <div className="lg:w-[55%] bg-gray-50 flex items-center justify-center p-6 lg:p-12">
+          <div className="w-full max-w-sm">
             <RegisterAgenteForm />
           </div>
         </div>
+
       </div>
     </div>
   );

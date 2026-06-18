@@ -24,6 +24,7 @@ import { UserPropertiesModal } from '@/presentation/components/admin/UserPropert
 import { UserProjectsModal } from '@/presentation/components/admin/UserProjectsModal/UserProjectsModal';
 import { UserListItem, ChangeUserRoleRequest } from '@/core/domain/entities/Admin';
 import { toast } from '@/presentation/store/toastStore';
+import { ChevronLeft, ChevronRight, Mail, Phone, Users } from 'lucide-react';
 
 export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -252,16 +253,11 @@ export default function UsersPage() {
           <div className="flex items-center gap-2">
             {/* Email */}
             <div className="flex items-center" title={user.emailVerified ? 'Email Verificado' : 'Email Pendiente'}>
-              <svg className={`w-4 h-4 ${user.emailVerified ? 'text-green-500' : 'text-yellow-500'}`} fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-              </svg>
+              <Mail className="" />
             </div>
             {/* Phone */}
             <div className="flex items-center" title={user.phoneVerified ? 'Teléfono Verificado' : 'Teléfono Pendiente'}>
-              <svg className={`w-4 h-4 ${user.phoneVerified ? 'text-green-500' : 'text-yellow-500'}`} fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-              </svg>
+              <Phone className={`w-4 h-4 ${user.phoneVerified ? 'text-green-500' : 'text-yellow-500'}`} />
             </div>
           </div>
         )
@@ -468,9 +464,7 @@ export default function UsersPage() {
         {!isLoading && !error && (!usersData?.content || usersData.content.length === 0) && (
           <div className="p-8 text-center">
             <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
+              <Users className="w-6 h-6 text-gray-400" />
             </div>
             <h4 className="text-base font-medium text-gray-900 mb-2">No se encontraron usuarios</h4>
             <p className="text-gray-500 mb-3 text-sm">Intenta ajustar tu búsqueda o criterios de filtro.</p>
@@ -587,9 +581,7 @@ export default function UsersPage() {
                   disabled={currentPage <= 1}
                   className="px-4 py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
+                  <ChevronLeft className="w-4 h-4" />
                   Anterior
                 </button>
 
@@ -603,9 +595,7 @@ export default function UsersPage() {
                   className="px-4 py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   Siguiente
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             </div>

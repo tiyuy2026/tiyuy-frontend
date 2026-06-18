@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { PropertyRepository } from '@/infrastructure/repositories/PropertyRepository';
 import { useAuthStore } from '@/presentation/store/authStore';
+import { X } from 'lucide-react';
 
 interface PropertyImagesProps {
   propertyId: number;
@@ -92,9 +93,7 @@ export function PropertyImages({ propertyId, onImagesUploaded }: PropertyImagesP
                   className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   disabled={uploading}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             ))}

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { authStorage } from '@/infrastructure/storage';
+import { AuthRepository } from '@/infrastructure/repositories';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -13,7 +14,7 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, requiredRole, requiredRoles }: ProtectedRouteProps) {
   const router = useRouter();
-  const { isAuthenticated, user, setAuth } = useAuthStore();
+  const { isAuthenticated, user, setAuth, setAdminProfile } = useAuthStore();
   const [isInitializing, setIsInitializing] = useState(true);
 
   // Combinar requiredRole y requiredRoles en un array de roles permitidos
@@ -25,6 +26,26 @@ export function ProtectedRoute({ children, requiredRole, requiredRoles }: Protec
 
     if (token && savedUser) {
       setAuth(token, savedUser);
+
+      // Si el usuario es admin, refrescar permisos desde el backend
+      const adminRoles = ['ADMIN', 'SUPER_ADMIN', 'SUPPORT'];
+      if (savedUser && adminRoles.includes(savedUser.role)) {
+        const authRepo = new AuthRepository();
+        authRepo.getAdminProfile()
+          .then((profile: any) => {
+            if (profile) {
+              setAdminProfile(
+                profile.adminRoleType,
+                profile.departments || [],
+                profile.permissions || [],
+                profile.isActive
+              );
+            }
+          })
+          .catch((err: any) => {
+            console.error('Error refreshing admin profile:', err);
+          });
+      }
     }
 
     setIsInitializing(false);

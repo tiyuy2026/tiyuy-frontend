@@ -60,6 +60,7 @@ export interface ChannelRepository {
   revokePublishingPermission(channelId: number, userId: number, adminId: number): Promise<ChannelCollaborator>;
   getChannelCollaborators(channelId: number, adminId: number): Promise<ChannelCollaborator[]>;
   canUserPublish(channelId: number, userId: number): Promise<{ canPublish: boolean }>;
+  updateSubscribersCanPost(channelId: number, subscribersCanPost: boolean): Promise<Channel>;
   
   // Statistics
   getChannelStatistics(channelId: number, userId: number): Promise<ChannelStatistics>;
@@ -72,6 +73,7 @@ export interface CreateChannelData {
   description: string;
   type?: 'PUBLIC' | 'PRIVATE';
   avatar?: string;
+  subscribersCanPost?: boolean;
 }
 
 export interface CreateChannelPostData {

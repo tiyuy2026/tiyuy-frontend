@@ -167,59 +167,44 @@ export function PushNotificationToggle({ className = '' }: PushNotificationToggl
   // Not supported
   if (!isSupported) {
     return (
-      <div className={`text-xs text-slate-400 ${className}`}>
+      <div className={`text-xs text-[var(--text-muted)] ${className}`}>
         No soportado
       </div>
     );
   }
   
-  // Permission denied - Chrome bloqueó permanentemente
+  // Permission denied - botón compacto
   if (permission === 'denied') {
     return (
-      <div className={`flex flex-col gap-2 ${className}`}>
-        <div className="flex items-center gap-2">
-          <BellOff className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
-          <span className="text-xs text-red-600 font-medium">Notificaciones bloqueadas por Chrome</span>
-        </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-          <p className="text-xs text-amber-800 font-medium mb-2">Para activar las notificaciones:</p>
-          <ol className="text-xs text-amber-700 space-y-1.5 list-decimal list-inside">
-            <li>Haz clic en el <strong>icono del candado 🔒</strong> (o <strong>i</strong>) junto a la URL</li>
-            <li>Ve a <strong>Configuración del sitio</strong> o <strong>Permisos</strong></li>
-            <li>Busca <strong>Notificaciones</strong> y cámbialo a <strong>Permitir</strong></li>
-            <li>Recarga la página y haz clic en <strong>Activar</strong></li>
-          </ol>
-        </div>
-        <button
-          onClick={async () => {
-            setIsLoading(true);
-            try {
-              const result = await Notification.requestPermission();
-              setPermission(result);
-              if (result === 'granted') {
-                const subscription = await subscribeToPush();
-                if (subscription) {
-                  await subscribeMutation.mutateAsync(subscription);
-                  setIsSubscribed(true);
-                }
+      <button
+        onClick={async () => {
+          setIsLoading(true);
+          try {
+            const result = await Notification.requestPermission();
+            setPermission(result);
+            if (result === 'granted') {
+              const subscription = await subscribeToPush();
+              if (subscription) {
+                await subscribeMutation.mutateAsync(subscription);
+                setIsSubscribed(true);
               }
-            } catch (error) {
-              console.error('Failed to request permission:', error);
-            } finally {
-              setIsLoading(false);
             }
-          }}
-          disabled={isLoading}
-          className="flex items-center justify-center gap-1.5 px-3 py-2 bg-red-500 text-white hover:bg-red-600 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 w-full"
-        >
-          {isLoading ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : (
-            <BellOff className="w-3.5 h-3.5" />
-          )}
-          {isLoading ? 'Verificando...' : 'Reintentar después de cambiar'}
-        </button>
-      </div>
+          } catch (error) {
+            console.error('Failed to request permission:', error);
+          } finally {
+            setIsLoading(false);
+          }
+        }}
+        disabled={isLoading}
+        className={`flex items-center gap-1.5 px-2.5 py-1.5 bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg text-xs font-medium hover:bg-red-500/20 transition-colors disabled:opacity-50 ${className}`}
+      >
+        {isLoading ? (
+          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        ) : (
+          <BellOff className="w-3.5 h-3.5" />
+        )}
+        {isLoading ? '...' : 'Bloqueado'}
+      </button>
     );
   }
 
@@ -229,8 +214,8 @@ export function PushNotificationToggle({ className = '' }: PushNotificationToggl
       disabled={isLoading || subscribeMutation.isPending || unsubscribeMutation.isPending}
       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 ${
         isSubscribed
-          ? 'bg-green-50 text-green-700 hover:bg-green-100'
-          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          ? 'bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500/20'
+          : 'bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]'
       } ${className}`}
     >
       {isLoading || subscribeMutation.isPending || unsubscribeMutation.isPending ? (

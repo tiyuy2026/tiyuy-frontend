@@ -51,7 +51,7 @@ export default function CRMDashboardPage() {
   }
 
   return (
-    <ProtectedRoute requiredRoles={['AGENT', 'DEVELOPER']}>
+    <ProtectedRoute requiredRoles={['AGENT', 'DEVELOPER', 'ADMIN']}>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow-sm border-b">
@@ -67,11 +67,8 @@ export default function CRMDashboardPage() {
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                     <BarChart3 className="w-7 h-7 text-blue-600" />
-                    CRM Inteligente
-                  </h1>
-                  <p className="text-gray-500 text-sm">
                     Análisis de clientes con interacciones reales en la plataforma
-                  </p>
+                  </h1>
                 </div>
               </div>
               <button

@@ -1,23 +1,27 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  FileText, Home, Search, MessageCircle, BarChart3,
+  CreditCard, MapPin, AlertTriangle, X, Menu, Check
+} from 'lucide-react';
 
 const termsData = {
   lastUpdated: "3 de junio de 2025",
   intro: {
-    highlight: "Bienvenido a Tiyuy. Estos Términos de Servicio (\"Términos\") constituyen un acuerdo legal entre tú (\"Usuario\", \"tu\" o \"tus\") y Tiyuy (\"nosotros\", \"nuestro\" o \"la Plataforma\") que regula el acceso y uso de nuestros servicios.",
+    highlight: 'Bienvenido a Tiyuy. Estos Términos de Servicio ("Términos") constituyen un acuerdo legal entre tú ("Usuario", "tu" o "tus") y Tiyuy ("nosotros", "nuestro" o "la Plataforma") que regula el acceso y uso de nuestros servicios.',
     paragraphs: [
       "Al registrarte, acceder o utilizar cualquier servicio de Tiyuy, declaras que has leído, comprendido y aceptas estar sujeto a estos Términos y a nuestra Política de Privacidad. Si no aceptas estos términos, no debes utilizar la Plataforma.",
       "Nos reservamos el derecho de actualizar estos Términos en cualquier momento. Los cambios entrarán en vigor desde su publicación. El uso continuado de la Plataforma después de modificaciones constituye aceptación de los nuevos Términos."
     ]
   },
   services: [
-    { icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', title: 'Publicación de inmuebles', desc: 'Permite a propietarios, agentes e inmobiliarias publicar propiedades en venta o alquiler' },
-    { icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z', title: 'Búsqueda y descubrimiento', desc: 'Herramientas avanzadas de búsqueda, filtros y geolocalización para encontrar inmuebles' },
-    { icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', title: 'Comunicación entre usuarios', desc: 'Sistema de mensajería para conectar interesados con publicantes de forma segura' },
-    { icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', title: 'Herramientas de gestión', desc: 'Panel de administración para gestionar propiedades, contactos y estadísticas' },
-    { icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', title: 'Planes y suscripciones', desc: 'Servicios premium con funcionalidades avanzadas para profesionales del sector' },
-    { icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z', title: 'Mapas y ubicación', desc: 'Integración con servicios de mapas para mostrar ubicaciones de propiedades' }
+    { icon: "Home", title: 'Publicación de inmuebles', desc: 'Permite a propietarios, agentes e inmobiliarias publicar propiedades en venta o alquiler' },
+    { icon: "Search", title: 'Búsqueda y descubrimiento', desc: 'Herramientas avanzadas de búsqueda, filtros y geolocalización para encontrar inmuebles' },
+    { icon: "MessageCircle", title: 'Comunicación entre usuarios', desc: 'Sistema de mensajería para conectar interesados con publicantes de forma segura' },
+    { icon: "BarChart3", title: 'Herramientas de gestión', desc: 'Panel de administración para gestionar propiedades, contactos y estadísticas' },
+    { icon: "CreditCard", title: 'Planes y suscripciones', desc: 'Servicios premium con funcionalidades avanzadas para profesionales del sector' },
+    { icon: "MapPin", title: 'Mapas y ubicación', desc: 'Integración con servicios de mapas para mostrar ubicaciones de propiedades' }
   ],
   requirements: [
     "Ser mayor de 18 años",
@@ -64,6 +68,10 @@ const SECTIONS = [
   { id: 'contact', title: 'Contacto' },
 ];
 
+const ICON_MAP: Record<string, React.ElementType> = {
+  Home, Search, MessageCircle, BarChart3, CreditCard, MapPin
+};
+
 const SectionHeader = ({ num, title }: { num: number; title: string }) => (
   <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
     <span className="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm font-bold">
@@ -80,363 +88,357 @@ export default function TermsPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="bg-gradient-to-br from-[var(--brand-primary)]/5 via-transparent to-[var(--brand-primary)]/[0.02] border-b border-[var(--border-light)] transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-4">
-              <svg className="w-5 h-5 text-[var(--brand-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <span className="text-sm font-bold text-[var(--brand-primary)] uppercase tracking-wider">
-                Términos de Servicio
-              </span>
+        <div className="w-full px-8 xl:px-16">
+          <div className="max-w-[1920px] mx-auto py-8 sm:py-16">
+            <div className="max-w-3xl">
+              <div className="flex items-center gap-2 mb-4">
+                <FileText className="w-5 h-5 text-[var(--brand-primary)]" strokeWidth={2} />
+                <span className="text-sm font-bold text-[var(--brand-primary)] uppercase tracking-wider">
+                  Términos de Servicio
+                </span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--text-primary)] tracking-tight mb-4">
+                Términos y condiciones de uso
+              </h1>
+              <p className="text-lg text-[var(--text-secondary)] leading-relaxed font-medium">
+                Estos términos establecen las reglas y condiciones bajo las cuales puedes utilizar la plataforma Tiyuy. Al acceder a nuestros servicios, aceptas cumplir con estos términos.
+              </p>
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)]/60 mt-6 font-medium tracking-wide">
+                Última actualización: {termsData.lastUpdated}
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--text-primary)] tracking-tight mb-4">
-              Términos y condiciones de uso
-            </h1>
-            <p className="text-lg text-[var(--text-secondary)] leading-relaxed font-medium">
-              Estos términos establecen las reglas y condiciones bajo las cuales puedes utilizar la plataforma Tiyuy. Al acceder a nuestros servicios, aceptas cumplir con estos términos.
-            </p>
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)]/60 mt-6 font-medium tracking-wide">
-              Última actualización: {termsData.lastUpdated}
-            </p>
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="flex gap-8 lg:gap-12">
-          
-          {/* Sidebar Navigation - Desktop */}
-          <aside className="hidden lg:block w-64 flex-shrink-0">
-            <nav className="sticky top-24 space-y-1">
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4 px-3">Contenido</p>
-              {SECTIONS.map((section) => (
-                <a
-                  key={section.id}
-                  href={`#${section.id}`}
-                  className="block px-3 py-2 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                >
-                  {section.title}
-                </a>
-              ))}
-            </nav>
-          </aside>
+        {/* Content */}
+        <div className="w-full px-8 xl:px-16">
+          <div className="max-w-[1920px] mx-auto py-8 sm:py-12">
+            <div className="flex gap-8 lg:gap-12">
 
-          {/* Mobile Nav Toggle */}
-          <div className="lg:hidden fixed bottom-6 right-6 z-40">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="w-12 h-12 bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-green-700 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {mobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-          </div>
-
-          {/* Mobile Nav Overlay */}
-          {mobileMenuOpen && (
-            <div className="lg:hidden fixed inset-0 z-30 bg-black/30" onClick={() => setMobileMenuOpen(false)}>
-              <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-xl p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center justify-between mb-6">
-                  <p className="text-sm font-bold text-gray-900">Contenido</p>
-                  <button onClick={() => setMobileMenuOpen(false)} className="text-gray-400 hover:text-gray-600">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-                <nav className="space-y-1">
+              {/* Sidebar Navigation - Desktop */}
+              <aside className="hidden lg:block w-64 flex-shrink-0">
+                <nav className="sticky top-24 space-y-1">
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4 px-3">Contenido</p>
                   {SECTIONS.map((section) => (
                     <a
                       key={section.id}
                       href={`#${section.id}`}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block px-3 py-2.5 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                      className="block px-3 py-2 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                     >
                       {section.title}
                     </a>
                   ))}
                 </nav>
+              </aside>
+
+              {/* Mobile Nav Toggle */}
+              <div className="lg:hidden fixed bottom-6 right-6 z-40">
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="w-12 h-12 bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-green-700 transition-colors"
+                >
+                  {mobileMenuOpen ? (
+                    <X className="w-5 h-5" strokeWidth={2} />
+                  ) : (
+                    <Menu className="w-5 h-5" strokeWidth={2} />
+                  )}
+                </button>
               </div>
-            </div>
-          )}
 
-          {/* Main Content */}
-          <main className="flex-1 min-w-0 max-w-4xl">
-            <div className="prose prose-lg max-w-none">
-
-              {/* 1. Introducción */}
-              <section id="intro" className="mb-12 scroll-mt-24">
-                <SectionHeader num={1} title="Introducción" />
-                <div className="bg-green-50 border border-green-100 rounded-xl p-5 mb-6">
-                  <p className="text-gray-700 leading-relaxed">
-                    {termsData.intro.highlight}
-                  </p>
-                </div>
-                {termsData.intro.paragraphs.map((para, i) => (
-                  <p key={i} className="text-gray-600 leading-relaxed mb-4">{para}</p>
-                ))}
-              </section>
-
-              {/* 2. Servicios */}
-              <section id="services" className="mb-12 scroll-mt-24">
-                <SectionHeader num={2} title="Descripción de los servicios" />
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  Tiyuy es una plataforma digital que ofrece los siguientes servicios:
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {termsData.services.map((item, i) => (
-                    <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 hover:border-green-200 transition-colors">
-                      <svg className="w-5 h-5 text-green-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-                      </svg>
-                      <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
-                      <p className="text-sm text-gray-500">{item.desc}</p>
+              {/* Mobile Nav Overlay */}
+              {mobileMenuOpen && (
+                <div className="lg:hidden fixed inset-0 z-30 bg-black/30" onClick={() => setMobileMenuOpen(false)}>
+                  <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-xl p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between mb-6">
+                      <p className="text-sm font-bold text-gray-900">Contenido</p>
+                      <button onClick={() => setMobileMenuOpen(false)} className="text-gray-400 hover:text-gray-600">
+                        <X className="w-5 h-5" strokeWidth={2} />
+                      </button>
                     </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* 3. Cuentas */}
-              <section id="accounts" className="mb-12 scroll-mt-24">
-                <SectionHeader num={3} title="Registro y cuentas de usuario" />
-                <div className="space-y-4">
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3">3.1 Requisitos de registro</h3>
-                    <ul className="space-y-2 text-sm text-gray-600">
-                      {termsData.requirements.map((req, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <span className="text-green-600 mt-0.5">✓</span>
-                          {req}
-                        </li>
+                    <nav className="space-y-1">
+                      {SECTIONS.map((section) => (
+                        <a
+                          key={section.id}
+                          href={`#${section.id}`}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="block px-3 py-2.5 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        >
+                          {section.title}
+                        </a>
                       ))}
-                    </ul>
-                  </div>
-
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3">3.2 Seguridad de la cuenta</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Eres responsable de mantener la confidencialidad de tus credenciales de acceso y de todas las actividades que ocurran bajo tu cuenta. Debes notificarnos inmediatamente de cualquier uso no autorizado. Tiyuy no será responsable de pérdidas derivadas del incumplimiento de esta obligación.
-                    </p>
-                  </div>
-
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3">3.3 Tipos de cuenta</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      {termsData.accountTypes.map((type, i) => (
-                        <div key={i} className="bg-green-50 border border-green-100 rounded-lg p-3">
-                          <h4 className="font-semibold text-green-800 text-sm">{type.name}</h4>
-                          <p className="text-xs text-green-600 mt-1">{type.desc}</p>
-                        </div>
-                      ))}
-                    </div>
+                    </nav>
                   </div>
                 </div>
-              </section>
+              )}
 
-              {/* 4. Publicaciones */}
-              <section id="publications" className="mb-12 scroll-mt-24">
-                <SectionHeader num={4} title="Publicaciones de propiedades" />
-                <div className="space-y-4">
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3">4.1 Responsabilidad del publicante</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      El usuario que publica una propiedad garantiza que: (a) es el propietario legítimo o cuenta con autorización para publicar; (b) la información proporcionada es veraz y actualizada; (c) las fotografías corresponden al inmueble publicado; (d) el precio reflejado es real y vigente.
-                    </p>
-                  </div>
+              {/* Main Content */}
+              <main className="flex-1 min-w-0 max-w-4xl">
+                <div className="prose prose-lg max-w-none">
 
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3">4.2 Moderación de contenido</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Tiyuy se reserva el derecho de revisar, editar o eliminar publicaciones que incumplan estos Términos, contengan información falsa, engañosa o inapropiada. Las publicaciones están sujetas a moderación previa y posterior.
-                    </p>
-                  </div>
-
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-red-800 mb-3">4.3 Contenido prohibido</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {termsData.prohibitedContent.map((item, i) => (
-                        <div key={i} className="flex items-center gap-2 text-sm text-red-700">
-                          <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                          </svg>
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* 5. Conducta */}
-              <section id="conduct" className="mb-12 scroll-mt-24">
-                <SectionHeader num={5} title="Conducta del usuario" />
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  Te comprometes a utilizar la Plataforma de manera responsable y legal. Queda estrictamente prohibido:
-                </p>
-                <div className="space-y-3">
-                  {termsData.badConduct.map((item, i) => (
-                    <div key={i} className="flex gap-3 bg-white border border-gray-200 rounded-xl p-4">
-                      <div className="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold">
-                        {i + 1}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 text-sm">{item.title}</h3>
-                        <p className="text-sm text-gray-500 mt-1">{item.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* 6. Pagos */}
-              <section id="payments" className="mb-12 scroll-mt-24">
-                <SectionHeader num={6} title="Pagos y suscripciones" />
-                <div className="space-y-4">
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3">6.1 Planes disponibles</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Tiyuy ofrece planes gratuitos y de pago. Los detalles de cada plan, incluyendo funcionalidades, límites de publicación y precios, se encuentran disponibles en nuestra página de planes. Los precios están expresados en moneda local (PEN/USD) e incluyen impuestos aplicables.
-                    </p>
-                  </div>
-
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3">6.2 Facturación y renovación</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Las suscripciones de pago se facturan de forma periódica (mensual o anual) y se renuevan automáticamente salvo cancelación previa. Puedes cancelar tu suscripción en cualquier momento desde tu panel de configuración. La cancelación surtirá efecto al final del período facturado vigente.
-                    </p>
-                  </div>
-
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3">6.3 Política de reembolso</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Los pagos realizados son no reembolsables, salvo que se establezca lo contrario por ley o en casos excepcionales evaluados por nuestro equipo de soporte. Si tienes un problema con tu suscripción, contáctanos para buscar una solución.
-                    </p>
-                  </div>
-                </div>
-              </section>
-
-              {/* 7. Propiedad intelectual */}
-              <section id="ip" className="mb-12 scroll-mt-24">
-                <SectionHeader num={7} title="Propiedad intelectual" />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3">De Tiyuy</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Todo el contenido de la Plataforma (logo, diseño, código, textos, gráficos, marcas) es propiedad de Tiyuy y está protegido por leyes de propiedad intelectual. Queda prohibida su reproducción sin autorización expresa.
-                    </p>
-                  </div>
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3">Del usuario</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Al publicar contenido (fotos, descripciones), conservas tu propiedad pero nos otorgas una licencia no exclusiva para mostrar, distribuir y promocionar dicho contenido dentro de la Plataforma y sus canales de marketing.
-                    </p>
-                  </div>
-                </div>
-              </section>
-
-              {/* 8. Limitación de responsabilidad */}
-              <section id="liability" className="mb-12 scroll-mt-24">
-                <SectionHeader num={8} title="Limitación de responsabilidad" />
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center flex-shrink-0">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-amber-900 mb-2">Importante</h3>
-                      <p className="text-sm text-amber-800 leading-relaxed">
-                        Tiyuy actúa como intermediario tecnológico entre publicantes e interesados. <strong>No somos parte</strong> en las transacciones inmobiliarias que se realizan a través de la Plataforma. No garantizamos la exactitud de la información publicada ni la legitimidad de las transacciones entre usuarios.
+                  {/* 1. Introducción */}
+                  <section id="intro" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={1} title="Introducción" />
+                    <div className="bg-green-50 border border-green-100 rounded-xl p-5 mb-6">
+                      <p className="text-gray-700 leading-relaxed">
+                        {termsData.intro.highlight}
                       </p>
                     </div>
-                  </div>
-                </div>
-                <p className="text-gray-600 leading-relaxed mt-6">
-                  En la máxima medida permitida por la ley, Tiyuy no será responsable por daños directos, indirectos, incidentales, especiales o consecuentes derivados del uso o la imposibilidad de uso de la Plataforma, incluyendo pero no limitándose a pérdidas económicas, interrupción del negocio o pérdida de datos.
-                </p>
-              </section>
+                    {termsData.intro.paragraphs.map((para, i) => (
+                      <p key={i} className="text-gray-600 leading-relaxed mb-4">{para}</p>
+                    ))}
+                  </section>
 
-              {/* 9. Terminación */}
-              <section id="termination" className="mb-12 scroll-mt-24">
-                <SectionHeader num={9} title="Terminación del servicio" />
-                <div className="space-y-4">
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3">9.1 Por el usuario</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Puedes cancelar tu cuenta en cualquier momento desde la configuración de tu perfil o solicitándolo a nuestro equipo de soporte. Tras la cancelación, tus datos serán tratados conforme a nuestra Política de Privacidad.
+                  {/* 2. Servicios */}
+                  <section id="services" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={2} title="Descripción de los servicios" />
+                    <p className="text-gray-600 leading-relaxed mb-6">
+                      Tiyuy es una plataforma digital que ofrece los siguientes servicios:
                     </p>
-                  </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {termsData.services.map((item, i) => {
+                        const IconComp = ICON_MAP[item.icon];
+                        return (
+                          <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 hover:border-green-200 transition-colors">
+                            {IconComp && <IconComp className="w-5 h-5 text-green-600 mb-3" strokeWidth={1.5} />}
+                            <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                            <p className="text-sm text-gray-500">{item.desc}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
 
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3">9.2 Por Tiyuy</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Nos reservamos el derecho de suspender o terminar tu acceso a la Plataforma, sin previo aviso, si incumples estos Términos, realizas actividades fraudulentas, o si lo requiere una autoridad competente.
+                  {/* 3. Cuentas */}
+                  <section id="accounts" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={3} title="Registro y cuentas de usuario" />
+                    <div className="space-y-4">
+                      <div className="bg-white border border-gray-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-gray-900 mb-3">3.1 Requisitos de registro</h3>
+                        <ul className="space-y-2 text-sm text-gray-600">
+                          {termsData.requirements.map((req, i) => (
+                            <li key={i} className="flex items-start gap-2">
+                              <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" strokeWidth={2} />
+                              {req}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="bg-white border border-gray-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-gray-900 mb-3">3.2 Seguridad de la cuenta</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Eres responsable de mantener la confidencialidad de tus credenciales de acceso y de todas las actividades que ocurran bajo tu cuenta. Debes notificarnos inmediatamente de cualquier uso no autorizado. Tiyuy no será responsable de pérdidas derivadas del incumplimiento de esta obligación.
+                        </p>
+                      </div>
+
+                      <div className="bg-white border border-gray-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-gray-900 mb-3">3.3 Tipos de cuenta</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {termsData.accountTypes.map((type, i) => (
+                            <div key={i} className="bg-green-50 border border-green-100 rounded-lg p-3">
+                              <h4 className="font-semibold text-green-800 text-sm">{type.name}</h4>
+                              <p className="text-xs text-green-600 mt-1">{type.desc}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* 4. Publicaciones */}
+                  <section id="publications" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={4} title="Publicaciones de propiedades" />
+                    <div className="space-y-4">
+                      <div className="bg-white border border-gray-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-gray-900 mb-3">4.1 Responsabilidad del publicante</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          El usuario que publica una propiedad garantiza que: (a) es el propietario legítimo o cuenta con autorización para publicar; (b) la información proporcionada es veraz y actualizada; (c) las fotografías corresponden al inmueble publicado; (d) el precio reflejado es real y vigente.
+                        </p>
+                      </div>
+
+                      <div className="bg-white border border-gray-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-gray-900 mb-3">4.2 Moderación de contenido</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Tiyuy se reserva el derecho de revisar, editar o eliminar publicaciones que incumplan estos Términos, contengan información falsa, engañosa o inapropiada. Las publicaciones están sujetas a moderación previa y posterior.
+                        </p>
+                      </div>
+
+                      <div className="bg-red-50 border border-red-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-red-800 mb-3">4.3 Contenido prohibido</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {termsData.prohibitedContent.map((item, i) => (
+                            <div key={i} className="flex items-center gap-2 text-sm text-red-700">
+                              <X className="w-4 h-4 flex-shrink-0" strokeWidth={2} />
+                              {item}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* 5. Conducta */}
+                  <section id="conduct" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={5} title="Conducta del usuario" />
+                    <p className="text-gray-600 leading-relaxed mb-6">
+                      Te comprometes a utilizar la Plataforma de manera responsable y legal. Queda estrictamente prohibido:
                     </p>
-                  </div>
+                    <div className="space-y-3">
+                      {termsData.badConduct.map((item, i) => (
+                        <div key={i} className="flex gap-3 bg-white border border-gray-200 rounded-xl p-4">
+                          <div className="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold">
+                            {i + 1}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-gray-900 text-sm">{item.title}</h3>
+                            <p className="text-sm text-gray-500 mt-1">{item.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
 
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3">9.3 Efectos de la terminación</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Tras la terminación, tus publicaciones serán eliminadas o desactivadas. Las obligaciones y limitaciones de responsabilidad establecidas en estos Términos sobrevivirán a la terminación de tu cuenta.
+                  {/* 6. Pagos */}
+                  <section id="payments" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={6} title="Pagos y suscripciones" />
+                    <div className="space-y-4">
+                      <div className="bg-white border border-gray-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-gray-900 mb-3">6.1 Planes disponibles</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Tiyuy ofrece planes gratuitos y de pago. Los detalles de cada plan, incluyendo funcionalidades, límites de publicación y precios, se encuentran disponibles en nuestra página de planes. Los precios están expresados en moneda local (PEN/USD) e incluyen impuestos aplicables.
+                        </p>
+                      </div>
+
+                      <div className="bg-white border border-gray-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-gray-900 mb-3">6.2 Facturación y renovación</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Las suscripciones de pago se facturan de forma periódica (mensual o anual) y se renuevan automáticamente salvo cancelación previa. Puedes cancelar tu suscripción en cualquier momento desde tu panel de configuración. La cancelación surtirá efecto al final del período facturado vigente.
+                        </p>
+                      </div>
+
+                      <div className="bg-white border border-gray-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-gray-900 mb-3">6.3 Política de reembolso</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Los pagos realizados son no reembolsables, salvo que se establezca lo contrario por ley o en casos excepcionales evaluados por nuestro equipo de soporte. Si tienes un problema con tu suscripción, contáctanos para buscar una solución.
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section id="ip" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={7} title="Propiedad intelectual" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="bg-white border border-gray-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-gray-900 mb-3">De Tiyuy</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Todo el contenido de la Plataforma (logo, diseño, código, textos, gráficos, marcas) es propiedad de Tiyuy y está protegido por leyes de propiedad intelectual. Queda prohibida su reproducción sin autorización expresa.
+                        </p>
+                      </div>
+                      <div className="bg-white border border-gray-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-gray-900 mb-3">Del usuario</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Al publicar contenido (fotos, descripciones), conservas tu propiedad pero nos otorgas una licencia no exclusiva para mostrar, distribuir y promocionar dicho contenido dentro de la Plataforma y sus canales de marketing.
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* 8. Limitación de responsabilidad */}
+                  <section id="liability" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={8} title="Limitación de responsabilidad" />
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center flex-shrink-0">
+                          <AlertTriangle className="w-5 h-5" strokeWidth={2} />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-amber-900 mb-2">Importante</h3>
+                          <p className="text-sm text-amber-800 leading-relaxed">
+                            Tiyuy actúa como intermediario tecnológico entre publicantes e interesados. <strong>No somos parte</strong> en las transacciones inmobiliarias que se realizan a través de la Plataforma. No garantizamos la exactitud de la información publicada ni la legitimidad de las transacciones entre usuarios.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-gray-600 leading-relaxed mt-6">
+                      En la máxima medida permitida por la ley, Tiyuy no será responsable por daños directos, indirectos, incidentales, especiales o consecuentes derivados del uso o la imposibilidad de uso de la Plataforma, incluyendo pero no limitándose a pérdidas económicas, interrupción del negocio o pérdida de datos.
                     </p>
-                  </div>
-                </div>
-              </section>
+                  </section>
 
-              {/* 10. Modificaciones */}
-              <section id="changes" className="mb-12 scroll-mt-24">
-                <SectionHeader num={10} title="Modificaciones de los Términos" />
-                <p className="text-gray-600 leading-relaxed">
-                  Tiyuy puede modificar estos Términos en cualquier momento. Notificaremos a los usuarios registrados sobre cambios significativos mediante un aviso en la Plataforma o por correo electrónico. Te recomendamos revisar periódicamente esta página. El uso continuado de la Plataforma después de la publicación de modificaciones constituye tu aceptación de los nuevos Términos.
-                </p>
-              </section>
+                  {/* 9. Terminación */}
+                  <section id="termination" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={9} title="Terminación del servicio" />
+                    <div className="space-y-4">
+                      <div className="bg-white border border-gray-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-gray-900 mb-3">9.1 Por el usuario</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Puedes cancelar tu cuenta en cualquier momento desde la configuración de tu perfil o solicitándolo a nuestro equipo de soporte. Tras la cancelación, tus datos serán tratados conforme a nuestra Política de Privacidad.
+                        </p>
+                      </div>
 
-              {/* 11. Legislación */}
-              <section id="law" className="mb-12 scroll-mt-24">
-                <SectionHeader num={11} title="Legislación aplicable y jurisdicción" />
-                <p className="text-gray-600 leading-relaxed mb-4">
-                  Estos Términos se rigen por las leyes de la República del Perú. Cualquier controversia derivada de la interpretación o ejecución de estos Términos será sometida a la jurisdicción exclusiva de los jueces y tribunales de Lima, Perú.
-                </p>
-                <div className="bg-green-50 border border-green-100 rounded-xl p-4">
-                  <p className="text-sm text-green-800">
-                    <strong>Resolución de conflictos:</strong> En caso de disputa, ambas partes se comprometen a intentar una solución amistosa antes de acudir a vías judiciales. También puedes presentar reclamos ante el Instituto Nacional de Defensa de la Competencia y de la Protección de la Propiedad Intelectual (INDECOPI).
-                  </p>
-                </div>
-              </section>
+                      <div className="bg-white border border-gray-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-gray-900 mb-3">9.2 Por Tiyuy</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Nos reservamos el derecho de suspender o terminar tu acceso a la Plataforma, sin previo aviso, si incumples estos Términos, realizas actividades fraudulentas, o si lo requiere una autoridad competente.
+                        </p>
+                      </div>
 
-              {/* 12. Contacto */}
-              <section id="contact" className="mb-12 scroll-mt-24">
-                <SectionHeader num={12} title="Contacto" />
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  Si tienes preguntas sobre estos Términos de Servicio, contáctanos:
-                </p>
-                <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl p-6 text-white">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div>
-                      <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Email</p>
-                      <a href="mailto:legal@tiyuy.com" className="font-semibold hover:underline">legal@tiyuy.com</a>
+                      <div className="bg-white border border-gray-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-gray-900 mb-3">9.3 Efectos de la terminación</h3>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Tras la terminación, tus publicaciones serán eliminadas o desactivadas. Las obligaciones y limitaciones de responsabilidad establecidas en estos Términos sobrevivirán a la terminación de tu cuenta.
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Dirección</p>
-                      <p className="font-semibold">Lima, Perú</p>
+                  </section>
+
+                  {/* 10. Modificaciones */}
+                  <section id="changes" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={10} title="Modificaciones de los Términos" />
+                    <p className="text-gray-600 leading-relaxed">
+                      Tiyuy puede modificar estos Términos en cualquier momento. Notificaremos a los usuarios registrados sobre cambios significativos mediante un aviso en la Plataforma o por correo electrónico. Te recomendamos revisar periódicamente esta página. El uso continuado de la Plataforma después de la publicación de modificaciones constituye tu aceptación de los nuevos Términos.
+                    </p>
+                  </section>
+
+                  {/* 11. Legislación */}
+                  <section id="law" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={11} title="Legislación aplicable y jurisdicción" />
+                    <p className="text-gray-600 leading-relaxed mb-4">
+                      Estos Términos se rigen por las leyes de la República del Perú. Cualquier controversia derivada de la interpretación o ejecución de estos Términos será sometida a la jurisdicción exclusiva de los jueces y tribunales de Lima, Perú.
+                    </p>
+                    <div className="bg-green-50 border border-green-100 rounded-xl p-4">
+                      <p className="text-sm text-green-800">
+                        <strong>Resolución de conflictos:</strong> En caso de disputa, ambas partes se comprometen a intentar una solución amistosa antes de acudir a vías judiciales. También puedes presentar reclamos ante el Instituto Nacional de Defensa de la Competencia y de la Protección de la Propiedad Intelectual (INDECOPI).
+                      </p>
                     </div>
-                    <div>
-                      <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Horario de atención</p>
-                      <p className="font-semibold">Lun - Vie, 9:00 - 18:00</p>
+                  </section>
+
+                  {/* 12. Contacto */}
+                  <section id="contact" className="mb-12 scroll-mt-24">
+                    <SectionHeader num={12} title="Contacto" />
+                    <p className="text-gray-600 leading-relaxed mb-6">
+                      Si tienes preguntas sobre estos Términos de Servicio, contáctanos:
+                    </p>
+                    <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl p-6 text-white">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div>
+                          <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Email</p>
+                          <a href="mailto:legal@tiyuy.com" className="font-semibold hover:underline">legal@tiyuy.com</a>
+                        </div>
+                        <div>
+                          <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Dirección</p>
+                          <p className="font-semibold">Lima, Perú</p>
+                        </div>
+                        <div>
+                          <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Horario de atención</p>
+                          <p className="font-semibold">Lun - Vie, 9:00 - 18:00</p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </section>
                 </div>
-              </section>
+              </main>
             </div>
-          </main>
+          </div>
         </div>
       </div>
     </div>

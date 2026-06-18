@@ -2,6 +2,7 @@
 
 import { PropertySummary } from '@/core/domain/entities/Property';
 import { PropertyCard } from '../PropertyCard';
+import { Home } from 'lucide-react';
 
 interface PropertyGridProps {
   properties: PropertySummary[];
@@ -22,7 +23,7 @@ export function PropertyGrid({ properties, isLoading }: PropertyGridProps) {
   if (!properties || properties.length === 0) {
     return (
       <div className="text-center py-16">
-        <svg className="w-14 h-14 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9 22V12h6v10"/></svg>
+        <Home className="w-14 h-14 text-gray-300 mx-auto mb-4" />
         <h3 className="text-xl font-semibold text-gray-700 mb-2">
           No se encontraron propiedades
         </h3>

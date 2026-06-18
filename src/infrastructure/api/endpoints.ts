@@ -6,6 +6,7 @@ export const ENDPOINTS = {
     UPDATE_PROFILE: '/auth/update-profile',
     GOOGLE_CHECK_EMAIL: '/auth/google-check-email',
     GOOGLE_LOGIN: '/auth/google-login',
+    ADMIN_PROFILE: '/admin/admins/me/profile',
   },
   
   KYC: {  // ← Cambiado de KYC_ENDPOINTS a KYC (nested)

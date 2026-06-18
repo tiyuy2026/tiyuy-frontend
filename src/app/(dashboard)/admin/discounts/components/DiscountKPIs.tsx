@@ -1,6 +1,7 @@
 'use client';
 
 import { useCentralDiscountSummary } from '@/presentation/hooks/useAdmin';
+import { Ban, CheckCircle, Clock, Tag } from 'lucide-react';
 
 interface KpiCardProps {
   label: string;
@@ -45,10 +46,7 @@ export default function DiscountKPIs() {
       gradient: 'from-indigo-500 to-blue-600',
       subtitle: 'En todo el sistema',
       icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" />
-        </svg>
+        <Tag className="w-5 h-5" />
       ),
     },
     {
@@ -57,9 +55,7 @@ export default function DiscountKPIs() {
       gradient: 'from-emerald-500 to-teal-600',
       subtitle: 'Vigentes y disponibles',
       icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <CheckCircle className="w-5 h-5" />
       ),
     },
     {
@@ -68,9 +64,7 @@ export default function DiscountKPIs() {
       gradient: 'from-gray-500 to-slate-600',
       subtitle: 'Desactivados manualmente',
       icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-        </svg>
+        <Ban className="w-5 h-5" />
       ),
     },
     {
@@ -79,9 +73,7 @@ export default function DiscountKPIs() {
       gradient: 'from-amber-500 to-orange-600',
       subtitle: 'Expirados o agotados',
       icon: (
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Clock className="w-5 h-5" />
       ),
     },
   ];

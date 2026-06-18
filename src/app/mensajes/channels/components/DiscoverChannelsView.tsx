@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useChannels } from '@/presentation/hooks/useChannels';
 import { formatCompactNumber } from '@/utils/formatters';
-import { Users, FileText, Bell, BellOff } from 'lucide-react';
+import { Bell, BellOff, FileText, Search, Users } from 'lucide-react';;
 
 export default function DiscoverChannelsView({ user, onChannelSelect }: { user: any; onChannelSelect: (channel: any) => void }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,18 +20,20 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
 
   const getChannelEmoji = (city: string) => {
     const cityEmojis: Record<string, string> = {
-      'Lima': '🏙️',
-      'Arequipa': '🌋',
-      'Trujillo': '🏺',
-      'Piura': '☀️',
-      'Chiclayo': '🌿',
-      'Cusco': '🏔️',
+      'Lima': '️',
+      'Arequipa': '',
+      'Trujillo': '',
+      'Piura': '️',
+      'Chiclayo': '',
+      'Cusco': '️',
     };
-    return cityEmojis[city] || '🏘️';
+    return cityEmojis[city] || '️';
   };
 
   const handleSubscribeChannel = (channelId: number, e: React.MouseEvent) => {
     e.stopPropagation();
+    // Marcar como suscrito localmente INMEDIATAMENTE para que desaparezca de la lista
+    // El hook useChannels también hace actualización optimista
     subscribeToChannel(channelId);
   };
 
@@ -50,9 +52,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
         <div className="mb-6">
           <div className="relative max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <Search className="h-5 w-5 text-gray-400" />
             </div>
             <input
               type="text"
@@ -75,7 +75,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
         {!isLoading && filteredChannels.length === 0 && (
           <div className="text-center py-16">
             <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-6">
-              <span className="text-3xl">📢</span>
+              <span className="text-3xl"></span>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               {searchTerm ? 'No se encontraron canales' : 'No hay canales disponibles'}
@@ -99,7 +99,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                 onClick={() => onChannelSelect(channel)}
               >
                 {/* Banner del canal */}
-                <div className="h-24 bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-4xl">
+                <div className="h-24 bg-gradient-to-br brand flex items-center justify-center text-4xl">
                   {getChannelEmoji(channel.city)}
                 </div>
 
@@ -131,7 +131,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                         ? 'bg-green-100 text-green-700' 
                         : 'bg-orange-100 text-orange-700'
                     }`}>
-                      {channel.isPublic ? '🌐 Público' : '🔒 Privado'}
+                      {channel.isPublic ? ' Público' : ' Privado'}
                     </span>
                     <span>{channel.city}</span>
                   </div>
@@ -140,7 +140,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                   <button
                     onClick={(e) => handleSubscribeChannel(channel.id, e)}
                     disabled={isSubscribing}
-                    className="w-full py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubscribing ? 'Suscribiendose...' : 'Suscribirse'}
                   </button>

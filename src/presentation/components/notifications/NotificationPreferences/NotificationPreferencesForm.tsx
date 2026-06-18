@@ -1,7 +1,7 @@
 'use client';
 import { useNotifications } from '../../../hooks/useNotifications';
 import { NotificationPreferences } from '../../../../core/domain/entities/Notification';
-import { Mail, Bell, Shield, Clock, Home, Heart, MessageSquare, CreditCard, RefreshCw, Calendar, Smartphone, AlertTriangle } from 'lucide-react';
+import { Loader, Mail, Bell, Shield, Clock, Home, Heart, MessageSquare, CreditCard, RefreshCw, Calendar, Smartphone, AlertTriangle } from 'lucide-react';
 
 interface PreferenceItem {
   key: keyof NotificationPreferences;
@@ -154,23 +154,23 @@ export const NotificationPreferencesForm = ({ className = '' }: Props) => {
 
   if (isLoading) {
     return (
-      <div className={`bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden ${className}`}>
+      <div className={`bg-[var(--bg-card)] rounded-2xl shadow-sm border border-[var(--border-color)] overflow-hidden ${className}`}>
         <div className="p-8 space-y-8">
           {[1, 2, 3].map((section) => (
             <div key={section} className="space-y-4">
-              <div className="h-6 bg-slate-200 rounded w-48 animate-pulse" />
-              <div className="h-4 bg-slate-200 rounded w-72 animate-pulse" />
+              <div className="h-6 bg-[var(--bg-tertiary)] rounded w-48 animate-pulse" />
+              <div className="h-4 bg-[var(--bg-tertiary)] rounded w-72 animate-pulse" />
               <div className="space-y-3">
                 {Array(3).fill(0).map((_, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl animate-pulse">
+                  <div key={i} className="flex items-center justify-between p-4 bg-[var(--bg-secondary)] rounded-xl animate-pulse">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-slate-200 rounded-lg" />
+                      <div className="w-10 h-10 bg-[var(--bg-tertiary)] rounded-lg" />
                       <div>
-                        <div className="h-4 bg-slate-200 w-32 rounded mb-2" />
-                        <div className="h-3 bg-slate-200 w-48 rounded" />
+                        <div className="h-4 bg-[var(--bg-tertiary)] w-32 rounded mb-2" />
+                        <div className="h-3 bg-[var(--bg-tertiary)] w-48 rounded" />
                       </div>
                     </div>
-                    <div className="h-6 w-11 bg-slate-200 rounded-full" />
+                    <div className="h-6 w-11 bg-[var(--bg-tertiary)] rounded-full" />
                   </div>
                 ))}
               </div>
@@ -184,7 +184,7 @@ export const NotificationPreferencesForm = ({ className = '' }: Props) => {
   const sections = ['email', 'push', 'alerts'] as const;
 
   return (
-    <div className={`bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden ${className}`}>
+    <div className={`bg-[var(--bg-card)] rounded-2xl shadow-sm border border-[var(--border-color)] overflow-hidden ${className}`}>
       <div className="p-8 space-y-10">
         {sections.map((sectionKey) => {
           const config = sectionConfig[sectionKey];
@@ -198,8 +198,8 @@ export const NotificationPreferencesForm = ({ className = '' }: Props) => {
                   {config.icon}
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">{config.title}</h3>
-                  <p className="text-sm text-slate-500">{config.description}</p>
+                  <h3 className="text-lg font-bold text-[var(--text-primary)]">{config.title}</h3>
+                  <p className="text-sm text-[var(--text-secondary)]">{config.description}</p>
                 </div>
               </div>
 
@@ -213,25 +213,25 @@ export const NotificationPreferencesForm = ({ className = '' }: Props) => {
                       key={item.key}
                       className={`group flex items-center justify-between p-4 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-sm ${
                         isEnabled 
-                          ? `bg-white ${config.borderColor} border` 
-                          : 'bg-slate-50 border-slate-100 hover:bg-slate-100'
+                          ? `bg-[var(--bg-card)] ${config.borderColor} border` 
+                          : 'bg-[var(--bg-secondary)] border-[var(--border-light)] hover:bg-[var(--bg-tertiary)]'
                       }`}
                       onClick={() => handleToggle(item.key)}
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                          isEnabled ? `${config.bgColor} ${config.textColor}` : 'bg-slate-100 text-slate-400'
+                          isEnabled ? `${config.bgColor} ${config.textColor}` : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)]'
                         }`}>
                           {item.icon}
                         </div>
                         <div className="flex-1 min-w-0">
                           <label className={`block text-sm font-semibold cursor-pointer transition-colors ${
-                            isEnabled ? 'text-slate-900' : 'text-slate-500'
+                            isEnabled ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'
                           }`}>
                             {item.title}
                           </label>
                           <p className={`text-xs mt-0.5 transition-colors ${
-                            isEnabled ? 'text-slate-500' : 'text-slate-400'
+                            isEnabled ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'
                           }`}>
                             {item.description}
                           </p>
@@ -246,7 +246,7 @@ export const NotificationPreferencesForm = ({ className = '' }: Props) => {
                         disabled={isUpdating}
                         className={`
                           relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2
-                          ${isEnabled ? 'bg-blue-600' : 'bg-slate-300'}
+                          ${isEnabled ? 'bg-blue-600' : 'bg-[var(--border-color)]'}
                           ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                         `}
                         onClick={(e) => {
@@ -276,8 +276,8 @@ export const NotificationPreferencesForm = ({ className = '' }: Props) => {
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900">Frecuencia de notificaciones</h3>
-              <p className="text-sm text-slate-500">Con qué frecuencia deseas recibir notificaciones</p>
+              <h3 className="text-lg font-bold text-[var(--text-primary)]">Frecuencia de notificaciones</h3>
+              <p className="text-sm text-[var(--text-secondary)]">Con qué frecuencia deseas recibir notificaciones</p>
             </div>
           </div>
 
@@ -295,17 +295,17 @@ export const NotificationPreferencesForm = ({ className = '' }: Props) => {
                   disabled={isUpdating}
                   className={`p-4 rounded-xl border-2 text-left transition-all ${
                     isActive
-                      ? 'border-emerald-500 bg-emerald-50 shadow-sm'
-                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                      ? 'border-emerald-500 bg-emerald-500/10 shadow-sm'
+                      : 'border-[var(--border-color)] bg-[var(--bg-card)] hover:border-[var(--text-muted)] hover:bg-[var(--bg-secondary)]'
                   } ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                    <span className={`font-semibold text-sm ${isActive ? 'text-emerald-700' : 'text-slate-700'}`}>
+                    <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-[var(--border-color)]'}`} />
+                    <span className={`font-semibold text-sm ${isActive ? 'text-emerald-600' : 'text-[var(--text-primary)]'}`}>
                       {option.label}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 ml-5">{option.desc}</p>
+                  <p className="text-xs text-[var(--text-secondary)] ml-5">{option.desc}</p>
                 </button>
               );
             })}
@@ -316,12 +316,9 @@ export const NotificationPreferencesForm = ({ className = '' }: Props) => {
       {/* Saving indicator */}
       {isUpdating && (
         <div className="px-8 pb-6">
-          <div className="flex items-center gap-2 px-4 py-3 bg-blue-50 rounded-xl border border-blue-100">
-            <svg className="animate-spin h-4 w-4 text-blue-600" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-            </svg>
-            <span className="text-sm font-medium text-blue-700">Guardando cambios...</span>
+          <div className="flex items-center gap-2 px-4 py-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
+            <Loader className="animate-spin h-4 w-4 text-blue-600" />
+            <span className="text-sm font-medium text-blue-600">Guardando cambios...</span>
           </div>
         </div>
       )}

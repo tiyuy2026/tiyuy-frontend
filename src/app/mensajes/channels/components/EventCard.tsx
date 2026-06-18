@@ -43,8 +43,8 @@ export default function EventCard({ event, onEventSelect, onResponse }: EventCar
             onClick={() => onEventSelect(event)}
           >
             <div className="text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-teal-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                <span className="text-lg font-bold text-blue-600">
+              <div className="w-12 h-12 bg-gradient-to-br brand rounded-xl flex items-center justify-center mx-auto mb-2">
+                <span className="text-lg font-bold text-brand">
                   {new Date(event.startDateTime).getDate()}
                 </span>
               </div>
@@ -70,13 +70,13 @@ export default function EventCard({ event, onEventSelect, onResponse }: EventCar
       {/* Content */}
       <div className="p-3">
         {/* Date */}
-        <div className="text-xs font-semibold text-blue-600 mb-2">
+        <div className="text-xs font-semibold text-brand mb-2">
           {formatDate(event.startDateTime)}
         </div>
 
         {/* Title */}
         <h3 
-          className="font-bold text-gray-900 text-sm mb-2 line-clamp-2 leading-5 cursor-pointer hover:text-blue-600 transition-colors"
+          className="font-bold text-gray-900 text-sm mb-2 line-clamp-2 leading-5 cursor-pointer hover:text-brand transition-colors"
           onClick={() => onEventSelect(event)}
         >
           {event.title}

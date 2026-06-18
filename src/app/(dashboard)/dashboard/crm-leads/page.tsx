@@ -15,6 +15,7 @@ import {
 import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 import Link from 'next/link';
 import { toast } from '@/presentation/store/toastStore';
+import { AlignJustify, ChevronDown, ChevronRight, Download, Grid, Mail, MessageCircle, Phone } from 'lucide-react';
 
 const STATUS_COLORS: Record<string, string> = {
   ALL: 'bg-gray-500',
@@ -202,9 +203,7 @@ function LeadRow({
           >
             <span>{getStatusIcon(lead.status)}</span>
             {getStatusLabel(lead.status)}
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            <ChevronDown className="w-3 h-3" />
           </button>
 
           {showStatusMenu && (
@@ -243,9 +242,7 @@ function LeadRow({
               className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors"
               title="WhatsApp"
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.607.941.964-3.515-.233-.374a9.86 9.86 0 01-1.422-5.129c0-5.503 4.462-9.972 9.972-9.972 2.662 0 5.164 1.038 7.043 2.922 1.879 1.879 2.92 4.381 2.92 7.044 0 5.512-4.461 9.973-9.972 9.973M19.14 4.932C16.852 2.645 13.876 1.5 10.7 1.5c-6.455 0-11.71 5.255-11.71 11.71 0 2.054.537 4.068 1.555 5.827L0 23.5l4.55-1.19a11.57 11.57 0 005.15 1.222h.004c6.454 0 11.708-5.254 11.708-11.71 0-3.127-1.222-6.071-3.443-8.294"/>
-              </svg>
+              <MessageCircle className="w-4 h-4" />
             </a>
           )}
           <a
@@ -253,9 +250,7 @@ function LeadRow({
             className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
             title="Email"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
+            <Mail className="w-4 h-4" />
           </a>
         </div>
       </td>
@@ -293,9 +288,7 @@ function LeadRow({
             className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
             title="Ver Detalles"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       </td>
@@ -385,9 +378,7 @@ function LeadCard({
       <div className="flex items-center gap-2 mb-4 text-sm text-gray-600">
         {lead.contactPhone && (
           <span className="flex items-center gap-1">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
+            <Phone className="w-4 h-4" />
             {lead.contactPhone}
           </span>
         )}
@@ -451,9 +442,7 @@ function LeadCard({
             rel="noopener noreferrer"
             className="p-2 bg-green-100 text-green-600 rounded-xl hover:bg-green-200 transition-colors"
           >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.607.941.964-3.515-.233-.374a9.86 9.86 0 01-1.422-5.129c0-5.503 4.462-9.972 9.972-9.972 2.662 0 5.164 1.038 7.043 2.922 1.879 1.879 2.92 4.381 2.92 7.044 0 5.512-4.461 9.973-9.972 9.973M19.14 4.932C16.852 2.645 13.876 1.5 10.7 1.5c-6.455 0-11.71 5.255-11.71 11.71 0 2.054.537 4.068 1.555 5.827L0 23.5l4.55-1.19a11.57 11.57 0 005.15 1.222h.004c6.454 0 11.708-5.254 11.708-11.71 0-3.127-1.222-6.071-3.443-8.294"/>
-            </svg>
+            <MessageCircle className="w-5 h-5" />
           </a>
         )}
       </div>
@@ -547,9 +536,7 @@ export default function CRMLeadsPage() {
                     <span className="text-sm font-medium">En vivo</span>
                   </div>
                   <button className="px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
+                    <Download className="w-4 h-4" />
                     Exportar
                   </button>
                 </div>
@@ -658,17 +645,13 @@ export default function CRMLeadsPage() {
                     onClick={() => setViewMode('table')}
                     className={`p-2 rounded-lg transition-colors ${viewMode === 'table' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18M3 6h18M3 18h18" />
-                    </svg>
+                    <AlignJustify className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => setViewMode('cards')}
                     className={`p-2 rounded-lg transition-colors ${viewMode === 'cards' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                    </svg>
+                    <Grid className="w-5 h-5" />
                   </button>
                 </div>
               </div>

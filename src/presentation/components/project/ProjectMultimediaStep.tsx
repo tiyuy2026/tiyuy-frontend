@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { authStorage } from '@/infrastructure/storage/auth-storage';
 import { toast } from '@/presentation/store/toastStore';
+import { File, Loader, X } from 'lucide-react';;
 
 interface ProjectMultimediaStepProps {
   formData: any;
@@ -292,9 +293,7 @@ export function ProjectMultimediaStep({ formData, onChange, projectId, unitBluep
                   onClick={() => removeFile('images', index)}
                   className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             ))}
@@ -333,9 +332,7 @@ export function ProjectMultimediaStep({ formData, onChange, projectId, unitBluep
               <div key={index} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
-                    </svg>
+                    <File className="w-4 h-4 text-blue-600" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">{blueprint.name}</p>
@@ -410,9 +407,7 @@ export function ProjectMultimediaStep({ formData, onChange, projectId, unitBluep
                     onClick={() => removeFile('renders', index)}
                     className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               );
@@ -442,10 +437,7 @@ export function ProjectMultimediaStep({ formData, onChange, projectId, unitBluep
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-              <svg className="w-4 h-4 text-white animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
+              <Loader className="w-4 h-4 text-white animate-spin" />
             </div>
             <div className="flex-1">
               <p className="text-blue-800 font-medium">Subiendo archivos...</p>

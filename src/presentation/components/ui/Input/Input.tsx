@@ -15,12 +15,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const cleanClassName = className
       .replace(/\bborder-\S+/g, '')
       .replace(/\bfocus:\S+/g, '')
-      .replace(/\btext-\S+/g, '')
       .replace(/\bplaceholder:\S+/g, '')
       .trim();
 
     const inputClasses = [
-      'w-full px-3 py-2 rounded-lg border transition-all duration-200 text-sm',
+      'w-full px-5 py-3.5 rounded-xl border transition-all duration-200 text-base',
       'placeholder:text-gray-400 placeholder:text-sm',
       leftIcon ? 'pl-10' : '',
       rightIcon ? 'pr-10' : '',

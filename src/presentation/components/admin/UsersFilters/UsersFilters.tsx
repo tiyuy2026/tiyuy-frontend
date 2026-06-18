@@ -4,6 +4,7 @@
  */
 
 import { CustomDropdown } from '../CustomDropdown/CustomDropdown';
+import { Search, X } from 'lucide-react';
 
 interface UsersFiltersProps {
   searchQuery: string;
@@ -44,9 +45,7 @@ export function UsersFilters({
         {/* Buscador */}
         <div className="flex-1 w-full">
           <div className="relative">
-            <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               placeholder="Buscar por email, nombre o DNI..."
@@ -80,9 +79,7 @@ export function UsersFilters({
             onClick={onClear}
             className="px-3 py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center gap-1 text-sm"
           >
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="w-3 h-3" />
             Limpiar
           </button>
         )}

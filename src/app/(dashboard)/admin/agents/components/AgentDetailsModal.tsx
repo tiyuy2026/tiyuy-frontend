@@ -2,6 +2,7 @@ import { AgentListItem } from '@/core/domain/entities/Admin';
 import { Button } from '@/presentation/components/ui/Button';
 import { Modal } from '@/presentation/components/ui/Modal';
 import Link from 'next/link';
+import { Building, CheckCircle, Clock, LayoutDashboard, User, UserCheck } from 'lucide-react';
 
 interface AgentDetailsModalProps {
   agent: AgentListItem;
@@ -55,9 +56,7 @@ export default function AgentDetailsModal({ agent, isOpen, onClose }: AgentDetai
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                  <User className="w-4 h-4 text-blue-600" />
                 </div>
                 <h4 className="font-semibold text-gray-900 text-sm">Informacion Personal</h4>
               </div>
@@ -87,9 +86,7 @@ export default function AgentDetailsModal({ agent, isOpen, onClose }: AgentDetai
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <CheckCircle className="w-4 h-4 text-teal-600" />
                 </div>
                 <h4 className="font-semibold text-gray-900 text-sm">Verificaciones</h4>
               </div>
@@ -113,9 +110,7 @@ export default function AgentDetailsModal({ agent, isOpen, onClose }: AgentDetai
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <UserCheck className="w-4 h-4 text-green-600" />
                 </div>
                 <h4 className="font-semibold text-gray-900 text-sm">Ingresos</h4>
               </div>
@@ -139,9 +134,7 @@ export default function AgentDetailsModal({ agent, isOpen, onClose }: AgentDetai
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
+                  <LayoutDashboard className="w-4 h-4 text-purple-600" />
                 </div>
                 <h4 className="font-semibold text-gray-900 text-sm">Actividad</h4>
               </div>
@@ -162,9 +155,7 @@ export default function AgentDetailsModal({ agent, isOpen, onClose }: AgentDetai
           <div className="mt-4 bg-gradient-to-br from-blue-50 to-teal-50 rounded-xl p-4 border border-blue-100">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
+                <Building className="w-4 h-4 text-blue-600" />
               </div>
               <h4 className="font-semibold text-gray-900">Plan Actual</h4>
             </div>
@@ -178,9 +169,7 @@ export default function AgentDetailsModal({ agent, isOpen, onClose }: AgentDetai
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <Clock className="w-4 h-4 text-orange-600" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900 text-sm">Ultimo Login</h4>

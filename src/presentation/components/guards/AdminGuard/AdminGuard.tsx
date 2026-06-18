@@ -1,54 +1,65 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/presentation/store/authStore";
 import { adminRepository } from "@/infrastructure/repositories/AdminRepository";
 
 export default function AdminGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, user, adminRoleType, isAdminActive } = useAuthStore();
-  const [loadingAdmin, setLoadingAdmin] = useState(false);
+  const router = useRouter();
+  const { isAuthenticated, user, adminRoleType } = useAuthStore();
   const hasAttemptedLoad = useRef(false);
-
-  const isSuperAdmin = adminRoleType === 'SUPER_ADMIN';
-  const isAdmin = ['SUPER_ADMIN', 'ADMIN'].includes(adminRoleType || '');
 
   useEffect(() => {
     const loadAdmin = async () => {
       if (!isAuthenticated || !user?.id) {
+        router.replace('/login');
         return;
       }
 
-      // Si ya tiene adminRoleType o ya intentó cargar, no hacer nada
+      // Si no es un rol admin, redirigir a home
+      const adminRoles = ['ADMIN', 'SUPER_ADMIN', 'SUPPORT'];
+      if (!adminRoles.includes(user.role)) {
+        router.replace('/');
+        return;
+      }
+
+      // Si ya tiene adminRoleType (ya se seteó en el login), no hacer nada
       if (adminRoleType || hasAttemptedLoad.current) {
         return;
       }
 
       try {
-        setLoadingAdmin(true);
         hasAttemptedLoad.current = true;
-
         const admin = await adminRepository.getAdminByUserId(user.id);
 
-        useAuthStore.getState().setAdminProfile(
-          admin?.role || 'ADMIN',
-          admin?.departments || [],
-          admin?.permissions || [],
-          admin?.isActive ?? true
-        );
+        if (admin?.roleType) {
+          // Mantener los permissions existentes del login (no sobreescribirlos)
+          useAuthStore.getState().setAdminProfile(
+            admin.roleType,
+            admin.departments || [],
+            useAuthStore.getState().permissions || [],
+            admin.active ?? true
+          );
+        }
       } catch (error) {
         console.error('Error loading admin profile:', error);
-      } finally {
-        setLoadingAdmin(false);
+        // Si no encuentra admin_users pero el user tiene role ADMIN, permitir acceso igual
+        // porque el SuperAdmin puede estar en proceso de asignar permisos
       }
     };
 
     loadAdmin();
-  }, [isAuthenticated, user?.id]);
+  }, [isAuthenticated, user?.id, user?.role, adminRoleType, router]);
 
-  // Solo bloquear si no está autenticado
-  // Si adminRoleType está undefined pero está autenticado, dejar pasar (fallback)
   if (!isAuthenticated) {
     return <div>No autenticado</div>;
+  }
+
+  // Verificar que el usuario tenga un rol admin
+  const adminRoles = ['ADMIN', 'SUPER_ADMIN', 'SUPPORT'];
+  if (!user || !adminRoles.includes(user.role)) {
+    return null; // Se redirigirá en el useEffect
   }
 
   return <>{children}</>;

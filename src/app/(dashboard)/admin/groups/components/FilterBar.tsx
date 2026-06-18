@@ -2,6 +2,7 @@
 
 import { Input } from '@/presentation/components/ui/Input';
 import { ViewType, ViewMode, StatusFilter, SortBy } from '../types';
+import { ChevronDown, Grid, Grid3X3, List, Menu, Search, X } from 'lucide-react';;
 
 interface FilterBarProps {
   viewType: ViewType;
@@ -54,9 +55,7 @@ export function FilterBar({
       <div className="flex flex-wrap items-center gap-3">
         {/* Search Input */}
         <div className="relative flex-1 min-w-[280px]">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
             placeholder={viewType === 'groups' ? 'Buscar grupos...' : viewType === 'channels' ? 'Buscar canales...' : 'Buscar suspendidos...'}
             value={searchQuery}
@@ -78,9 +77,7 @@ export function FilterBar({
             <option value="suspended">Estado: Suspendidos</option>
             <option value="violations">Estado: Con Violaciones</option>
           </select>
-          <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
         </div>
 
         {/* Sort Dropdown */}
@@ -97,9 +94,7 @@ export function FilterBar({
             <option value="most_members">Ordenar: Más miembros</option>
             <option value="least_members">Ordenar: Menos miembros</option>
           </select>
-          <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
         </div>
 
         {/* View Toggle (Grid/List) */}
@@ -113,9 +108,7 @@ export function FilterBar({
             }`}
             title="Vista de cuadrícula"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
+            <Grid className="w-5 h-5" />
           </button>
           <button
             onClick={() => setViewMode('list')}
@@ -126,9 +119,7 @@ export function FilterBar({
             }`}
             title="Vista de lista"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <Menu className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -145,9 +136,7 @@ export function FilterBar({
                 onClick={() => setStatusFilter('all')}
                 className="ml-1 hover:text-green-900"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-4 h-4" />
               </button>
             </span>
           )}
@@ -159,9 +148,7 @@ export function FilterBar({
                 onClick={() => setCityFilter('')}
                 className="ml-1 hover:text-blue-900"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-4 h-4" />
               </button>
             </span>
           )}
@@ -173,9 +160,7 @@ export function FilterBar({
                 onClick={() => setSearchQuery('')}
                 className="ml-1 hover:text-purple-900"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-4 h-4" />
               </button>
             </span>
           )}

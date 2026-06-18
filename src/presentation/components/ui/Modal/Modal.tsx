@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
+import { X } from 'lucide-react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -61,9 +62,7 @@ export const Modal: React.FC<ModalProps> = ({
               onClick={onClose}
               className="text-white/80 hover:text-white transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X className="w-6 h-6" />
             </button>
           </div>
         )}

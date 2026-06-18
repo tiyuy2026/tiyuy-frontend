@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { PropertyMedia } from '@/core/domain/entities/Property';
+import { Image as ImageIcon } from 'lucide-react';
 
 interface PropertyGalleryProps {
   media: PropertyMedia[];
@@ -26,7 +27,7 @@ export function PropertyGallery({ media, coverPhotoUrl }: PropertyGalleryProps) 
     return (
       <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center">
         <div className="text-center">
-          <svg className="w-16 h-16 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9 22V12h6v10"/></svg>
+          <ImageIcon className="w-16 h-16 text-gray-400 mx-auto" />
           <p className="text-gray-400 mt-2">No hay imágenes disponibles</p>
         </div>
       </div>
@@ -51,7 +52,7 @@ export function PropertyGallery({ media, coverPhotoUrl }: PropertyGalleryProps) 
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <svg className="w-16 h-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9 22V12h6v10"/></svg>
+            <ImageIcon className="w-16 h-16 text-gray-400" />
           </div>
         )}
         
@@ -107,7 +108,7 @@ export function PropertyGallery({ media, coverPhotoUrl }: PropertyGalleryProps) 
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9 22V12h6v10"/></svg>
+                  <ImageIcon className="w-6 h-6 text-gray-400" />
                 </div>
               )}
             </button>

@@ -1,5 +1,5 @@
 import axiosClient from '../api/axios-client';
-import { AUTH_ENDPOINTS } from '../api/endpoints';
+import { AUTH_ENDPOINTS, ENDPOINTS } from '../api/endpoints';
 import { IAuthRepository } from '@/core/domain/repositories';
 import { User, AuthResponse, RegisterData } from '@/core/domain/entities';
 
@@ -125,6 +125,16 @@ export class AuthRepository implements IAuthRepository {
         return { exists: false };
       }
       throw new Error('Error al verificar email con Google');
+    }
+  }
+
+  async getAdminProfile(): Promise<{ adminRoleType: string; permissions: string[]; departments: string[]; isActive: boolean }> {
+    try {
+      const response = await axiosClient.get(ENDPOINTS.AUTH.ADMIN_PROFILE);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching admin profile:', error);
+      throw new Error(error.response?.data?.message || 'Error al obtener perfil de administrador');
     }
   }
 

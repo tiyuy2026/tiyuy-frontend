@@ -1,12 +1,16 @@
-"use client"; // <--- Siempre en la línea 1, antes de los imports
+"use client"; 
 
-import { BlogSection } from '@/presentation/components/contact/HeroContact';
+import {HeroSection } from '@/presentation/components/contact/HeroContact';
 import FormContact from '@/presentation/components/contact/FormContact';
 export default function Contact() {
     return (
         <div>
-            <BlogSection />
-            <FormContact />
+            <HeroSection />
+            <div className="w-full px-8 xl:px-16">
+                <div className="max-w-[1920px] mx-auto">
+                    <FormContact />
+                </div>
+            </div>
         </div>
     );
 }

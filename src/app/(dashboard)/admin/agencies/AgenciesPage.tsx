@@ -276,7 +276,7 @@ export default function AgenciesPage() {
         data: requestData,
       });
 
-      console.log('Respuesta del backend:', JSON.stringify(result, null, 2));
+      JSON.stringify(result, null, 2);
 
       // NOTA: El historial se registra automáticamente solo cuando se cambia el estado de la inmobiliaria
       // Las acciones como crear descuentos o aplicar descuentos directos no registran historial automáticamente

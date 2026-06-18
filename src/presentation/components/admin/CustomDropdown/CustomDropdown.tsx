@@ -6,6 +6,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 interface DropdownOption {
   value: string;
@@ -57,9 +58,7 @@ export function CustomDropdown({ value, onChange, options, placeholder, minWidth
         style={{ minWidth }}
       >
         <span>{selectedLabel}</span>
-        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        <ChevronDown className="w-4 h-4 text-gray-400" />
       </button>
       {isOpen && (
         <div className="absolute top-full left-0 mt-1 w-full bg-white rounded-xl shadow-xl border border-gray-200 z-[9999] overflow-hidden">

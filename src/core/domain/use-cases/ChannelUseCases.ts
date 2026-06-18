@@ -56,16 +56,8 @@ export class ChannelUseCases {
       throw new Error('Usuario no autenticado');
     }
 
-    // Check if user is already subscribed
-    const channels = await this.channelRepository.getChannels(userId);
-    const isAlreadySubscribed = channels.some(channel => 
-      channel.id === channelId && channel.isSubscribed
-    );
-
-    if (isAlreadySubscribed) {
-      throw new Error('Ya estás suscrito a este canal');
-    }
-
+    // The backend handles the "already subscribed" check and returns 400
+    // We let it propagate and handle it in the hook's onError
     return this.channelRepository.subscribeToChannel(channelId, userId);
   }
 
@@ -75,6 +67,10 @@ export class ChannelUseCases {
     }
 
     return this.channelRepository.unsubscribeFromChannel(channelId, userId);
+  }
+
+  async updateSubscribersCanPost(channelId: number, subscribersCanPost: boolean): Promise<Channel> {
+    return this.channelRepository.updateSubscribersCanPost(channelId, subscribersCanPost);
   }
 
   // Post operations

@@ -22,12 +22,13 @@ import { useMyProperties } from '@/presentation/hooks/useProperties';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { authStorage } from '@/infrastructure/storage/auth-storage';
 import { toast } from 'sonner';
+import { Check, ChevronLeft, ChevronRight, FileText, Loader } from 'lucide-react';
 
 interface PropertyFormProps {
   property?: Property | Project;
   mode: 'create' | 'edit';
   onStepChange?: (step: number) => void;
-  formType?: 'property' | 'project'; // NEW: to differentiate types
+  formType?: 'property' | 'project';
 }
 
 const STEPS = [
@@ -124,7 +125,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       availableUnits: (property && 'availableUnits' in property) ? property.availableUnits : 0,
       priceFrom: (property && 'priceFrom' in property) ? property.priceFrom : '',
       priceTo: (property && 'priceTo' in property) ? property.priceTo : '',
-      startDate: (property && 'startDate' in property) ? property.startDate : '',
+      startDate: (property && 'startDate' in property) ? property.startDate : (property && 'constructionStart' in property ? (property as any).constructionStart : ''),
       estimatedDelivery: (property && 'estimatedDelivery' in property) ? property.estimatedDelivery : '',
       areaFrom: (property && 'areaFrom' in property) ? property.areaFrom : 0,
       areaTo: (property && 'areaTo' in property) ? property.areaTo : 0,
@@ -162,6 +163,8 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
 
   const validateStep = (step: number) => {
     const errors: Record<string, string> = {};
+
+    if (mode === 'edit') return errors;
 
     if (formType === 'project') {
       if (step === 1) {
@@ -261,7 +264,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
     }
     setValidationErrors({});
     // Create project when reaching step 5 (before showing component)
-    if (formType === 'project' && currentStep === 4 && !createdPropertyId) {
+    if (formType === 'project' && currentStep === 4 && !createdPropertyId && mode === 'create') {
       // PREVIOUS VALIDATION of required fields
       const allAreas = [
         ...(formData.units || []).map((u: any) => u.area),
@@ -499,7 +502,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       currency: data.currency || 'PEN',
       areaFrom: Number(data.areaFrom) || 60,
       areaTo: Number(data.areaTo) || 60,
-      startDate: data.startDate || data.constructionStartDate || undefined,
+      startDate: data.startDate || data.constructionStart || undefined,
       estimatedDelivery: data.estimatedDelivery || undefined,
       floors: data.floors ? Number(data.floors) : undefined,
       
@@ -716,18 +719,16 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
       }
     } else if (property) {
       if (formType === 'project') {
-        // Actualizar proyecto existente
         const projectData = prepareProjectData(formData);
-        updateProjectMutation.mutate(
-          {
+        try {
+          await updateProjectMutation.mutateAsync({
             projectId: property.id,
             projectData,
-          },
-          {
-            onSuccess: () => router.push('/my-projects'),
-            onError: () => toast.error('Error al guardar el proyecto'),
-          }
-        );
+          });
+          router.push('/my-projects');
+        } catch {
+          toast.error('Error al guardar el proyecto');
+        }
       } else {
         // Actualizar propiedad existente
         updateMutation.mutate(
@@ -796,9 +797,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
               disabled={currentStep === 1}
               className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-lg text-sm font-medium text-gray-500 border border-gray-200 hover:border-gray-300 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all bg-white"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <ChevronLeft className="w-4 h-4" />
               Anterior
             </button>
             
@@ -893,9 +892,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
                 }}
                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-orange-600 border border-orange-200 hover:bg-orange-50 transition-all"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+                <FileText className="w-4 h-4" />
                 Guardar Borrador
               </button>
             )}
@@ -911,10 +908,7 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
           >
             {isLoading ? (
               <>
-                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
+                <Loader className="w-4 h-4 animate-spin" />
                 Guardando...
               </>
             ) : isLastStep ? (
@@ -924,16 +918,12 @@ export function PropertyForm({ property, mode, onStepChange, formType = 'propert
                     ? (canPublish ? ' Publicar Proyecto' : ' Guardar Borrador')
                     : 'Finalizar'
                 ) : 'Guardar cambios'}
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="w-4 h-4" />
               </>
             ) : (
               <>
                 Siguiente
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <ChevronRight className="w-4 h-4" />
               </>
             )}
           </button>

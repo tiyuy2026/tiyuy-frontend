@@ -114,7 +114,10 @@ export default function DashboardLayout({
     return pathname.startsWith(path);
   };
 
-  const hideSidebar = pathname === '/dashboard/projects/new' || pathname.startsWith('/dashboard/projects/new/');
+  const hideSidebar =
+    pathname === '/dashboard/projects/new' ||
+    pathname.startsWith('/dashboard/projects/new/') ||
+    /^\/dashboard\/projects\/\d+\/edit(\/|$)/.test(pathname);
 
   return (
     <DashboardSidebarContext.Provider value={{ sidebarOpen, setSidebarOpen, isMobile }}>
@@ -285,7 +288,7 @@ export default function DashboardLayout({
           </aside>
         )}
 
-        <main className="flex-1 overflow-auto">
+        <main className={`${hideSidebar ? 'w-full max-w-8xl mx-auto' : 'flex-1'} overflow-auto`}>
           {children}
         </main>
       </div>

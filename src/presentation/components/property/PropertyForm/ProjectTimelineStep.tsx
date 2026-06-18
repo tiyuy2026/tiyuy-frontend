@@ -30,7 +30,7 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
     }
 
     if (field === 'estimatedDelivery') {
-      const start = formData.startDate || formData.constructionStartDate;
+      const start = formData.startDate || formData.constructionStart;
       if (!value) {
         newErrors.estimatedDelivery = 'La fecha de entrega estimada es obligatoria';
       } else if (start && value < start) {
@@ -94,7 +94,7 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
           <input
             type="date"
             max={formData.estimatedDelivery || undefined}
-            value={formData.startDate || formData.constructionStartDate || ''}
+            value={formData.startDate || formData.constructionStart || ''}
             onChange={(e) => {
               onChange('startDate', e.target.value);
               validateMainDates('startDate', e.target.value);
@@ -118,7 +118,7 @@ export function ProjectTimelineStep({ formData, onChange }: ProjectTimelineStepP
           </label>
           <input
             type="date"
-            min={formData.startDate || formData.constructionStartDate || undefined}
+            min={formData.startDate || formData.constructionStart || undefined}
             value={formData.estimatedDelivery || ''}
             onChange={(e) => {
               onChange('estimatedDelivery', e.target.value);

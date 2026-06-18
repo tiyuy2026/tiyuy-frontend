@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Home, LayoutDashboard, Maximize } from 'lucide-react';
 import {
   PROJECT_UNIT_TYPES_LABELS,
   PROJECT_UNIT_STATUS_LABELS,
@@ -266,9 +267,7 @@ export function ProjectUnitsStep({ formData, onChange, propertyId }: ProjectUnit
         </div>
       )}
       <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-        </svg>
+        <LayoutDashboard className="w-4 h-4" />
         {previewUrl ? 'Cambiar plano' : 'Subir plano'}
         <input type="file" accept="image/*" className="hidden"
           onChange={e => { const f = e.target.files?.[0]; if (f) onFile(f); }} />
@@ -310,9 +309,7 @@ export function ProjectUnitsStep({ formData, onChange, propertyId }: ProjectUnit
                   {preview ? (
                     <img src={preview} alt="Plano" className="w-full h-full object-contain p-1" />
                   ) : (
-                    <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                    </svg>
+                    <Maximize className="w-8 h-8 text-gray-300" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -358,10 +355,7 @@ export function ProjectUnitsStep({ formData, onChange, propertyId }: ProjectUnit
                   {preview ? (
                     <img src={preview} alt="Plano" className="w-full h-full object-contain p-1" />
                   ) : (
-                    <svg className="w-7 h-7 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 22V12h6v10" />
-                    </svg>
+                    <Home className="w-7 h-7 text-gray-300" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">

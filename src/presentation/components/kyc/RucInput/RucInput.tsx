@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Input, Button } from '@/presentation/components/ui';
 import { useKyc } from '@/presentation/hooks';
+import { Folder } from 'lucide-react';
 
 interface RucInputProps {
   value: string;
@@ -81,14 +82,7 @@ export const RucInput: React.FC<RucInputProps> = ({
             maxLength={11}
             disabled={disabled}
             leftIcon={
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 7v10a2 2 0 002 2h3V5H5a2 2 0 00-2 2zm11-2v14h3a2 2 0 002-2V7a2 2 0 00-2-2h-3z"
-                />
-              </svg>
+              <Folder className="w-5 h-5" />
             }
             helperText={
               helperText ??

@@ -2215,12 +2215,12 @@ export function useGetChannels(userId?: number, page = 0, size = 10) {
       const response = await axiosClient.get(`/contacts/extended/channels?page=${page}&size=${size}`);
       return response.data?.content || []; // Return array from Spring Page
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 1000 * 30, // 30 seconds - para que se refresque rápido al suscribirse
   });
 }
 
 // Hook para suscribirse a canal
-export function useSubscribeToChannel() {
+export function useSubscribeToChannel(userId?: number) {
   const queryClient = useQueryClient();
   
   return useMutation({
@@ -2229,18 +2229,27 @@ export function useSubscribeToChannel() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['channels'] });
+      // Invalidar con userId para que se refresque correctamente
+      queryClient.invalidateQueries({ queryKey: ['channels', userId] });
       toast.success('Suscrito al canal correctamente');
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error al suscribirse al canal:', error);
-      toast.error('Error al suscribirse al canal');
+      // Handle "already subscribed" error gracefully
+      const errorMsg = error?.response?.data?.message || error?.message || '';
+      if (errorMsg.includes('ALREADY_SUBSCRIBED') || errorMsg.includes('Ya estás suscrito') || error?.response?.status === 400) {
+        // Forzar refetch para sincronizar estado real
+        queryClient.invalidateQueries({ queryKey: ['channels', userId] });
+        toast.info('Ya estás suscrito a este canal');
+      } else {
+        toast.error(errorMsg || 'Error al suscribirse al canal');
+      }
     },
   });
 }
 
 // Hook para desuscribirse de canal
-export function useUnsubscribeFromChannel() {
+export function useUnsubscribeFromChannel(userId?: number) {
   const queryClient = useQueryClient();
   
   return useMutation({
@@ -2249,7 +2258,7 @@ export function useUnsubscribeFromChannel() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['channels'] });
+      queryClient.invalidateQueries({ queryKey: ['channels', userId] });
       toast.success('Desuscrito del canal correctamente');
     },
     onError: (error) => {

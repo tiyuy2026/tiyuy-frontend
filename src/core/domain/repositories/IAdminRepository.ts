@@ -5,6 +5,7 @@
 
 import {
   AdminUser,
+  CreateAdminAccountRequest,
   CreateAdminUserRequest,
   UpdateAdminUserRequest,
   DashboardStats,
@@ -62,6 +63,11 @@ export interface IAdminRepository {
   createAdminUser(request: CreateAdminUserRequest): Promise<AdminUser>;
   updateAdminUser(adminId: number, request: UpdateAdminUserRequest): Promise<AdminUser>;
   deleteAdminUser(adminId: number): Promise<void>;
+  toggleAdminStatus(adminId: number, active: boolean): Promise<AdminUser>;
+
+  // SuperAdmin: Create admin/support accounts (User creation)
+  createAdminAccount(request: CreateAdminAccountRequest): Promise<{ userId: number; email: string }>;
+  createSupportAccount(request: CreateAdminAccountRequest): Promise<{ userId: number; email: string }>;
 
   // User Management
   getAllUsers(

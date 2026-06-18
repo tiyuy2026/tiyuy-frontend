@@ -1,6 +1,7 @@
 import { Button } from '@/presentation/components/ui/Button';
 import { Modal } from '@/presentation/components/ui/Modal';
 import { InmobiliariaWithStats } from '@/core/domain/entities/Admin';
+import { X } from 'lucide-react';
 
 interface DirectDiscount {
   discountPercentage: string;
@@ -48,9 +49,7 @@ export default function ApplyDirectDiscountModal({
               onClick={onClose}
               className="text-white/70 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>

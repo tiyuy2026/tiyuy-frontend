@@ -45,7 +45,9 @@ import { useGooglePlaces } from '@/presentation/hooks/useGooglePlaces';
 import { useWebSocket, getCurrentUserId } from '@/presentation/hooks/useWebSocket';
 
 // Helper function for API calls - usando axiosClient centralizado
+import { Icon } from '@iconify/react';
 import { axiosClient } from '@/infrastructure/api/axios-client';
+import { ArrowLeft, ChevronLeft, Globe, Lock, LogOut, MessageCircle, MessageSquare, Mic, MoreHorizontal, Paperclip, Play, Plus, PlusSquare, Search, Send, Share2, User, Users, X } from 'lucide-react';
 
 async function apiCall(endpoint: string, options: RequestInit = {}) {
   const url = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
@@ -69,7 +71,7 @@ type NavItem = {
   badge?: number;
 };
 
-// ──── HELPERS ────────────────────────────────────────────────────────────────
+//  HELPERS 
 function timeAgo(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date;
   const diff = Math.floor((Date.now() - d.getTime()) / 1000);
@@ -180,13 +182,13 @@ const ROLE_COLOR: Record<string, string> = {
 };
 
 const ROLE_BADGE: Record<string, string> = {
-  USER: 'bg-blue-100 text-blue-700',
-  AGENT: 'bg-teal-100 text-teal-700',
+  USER: 'bg-brand/10 text-brand',
+  AGENT: 'bg-brand/10 text-brand',
   DEVELOPER: 'bg-purple-100 text-purple-700',
   ADMIN: 'bg-slate-100 text-slate-700',
 };
 
-// ──── AVATAR ────────────────────────────────────────────────────────────────
+//  AVATAR 
 function Avatar({
   name, role, size = 'md', src,
 }: {
@@ -202,37 +204,25 @@ function Avatar({
   );
 }
 
-// ──── ICONOS SVG ELEGANTES ────────────────────────────────────────────────────────
+//  ICONOS SVG ELEGANTES 
 const IC = {
   Chat: (p: { a?: boolean }) => (
-    <svg viewBox="0 0 24 24" className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`}>
-      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
-    </svg>
+    <MessageSquare className="" />
   ),
   Status: (p: { a?: boolean }) => (
-    <svg viewBox="0 0 24 24" className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`}>
-      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm-1-4l6-4-6-4v8z"/>
-    </svg>
+    <Play className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`} />
   ),
   Channel: (p: { a?: boolean }) => (
-    <svg viewBox="0 0 24 24" className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`}>
-      <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 2.5c1.93 0 3.5 1.57 3.5 3.5S13.93 13.5 12 13.5 8.5 11.93 8.5 10s1.57-3.5 3.5-3.5zM20 18H4v-.57c0-2 4-3.08 8-3.08s8 1.08 8 3.08V18z"/>
-    </svg>
+    <User className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`} />
   ),
   Groups: (p: { a?: boolean }) => (
-    <svg viewBox="0 0 24 24" className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`}>
-      <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-    </svg>
+    <Users className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`} />
   ),
   Search: () => (
-    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gray-400">
-      <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-    </svg>
+    <Search className="w-4 h-4 fill-gray-400" />
   ),
   Send: () => (
-    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-    </svg>
+    <Send className="w-5 h-5 fill-white" />
   ),
   Check: () => (
     <svg viewBox="0 0 16 15" className="w-4 h-3 inline ml-1" style={{ fill: '#53bdeb' }}>
@@ -240,43 +230,29 @@ const IC = {
     </svg>
   ),
   Plus: () => (
-    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
-    </svg>
+    <PlusSquare className="w-5 h-5 fill-white" />
   ),
   Share: () => (
-    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
-      <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-    </svg>
+    <Share2 className="w-4 h-4 fill-current" />
   ),
   Lock: () => (
-    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-red-400">
-      <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-    </svg>
+    <Lock className="w-3.5 h-3.5 fill-red-400" />
   ),
   Emoji: () => (
-    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-gray-400">
-      <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-1-4l6-4-6-4v8z"/>
-    </svg>
+    <Globe className="w-5 h-5 fill-gray-400" />
   ),
   Attach: () => (
-    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-gray-400">
-      <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/>
-    </svg>
+    <Paperclip className="w-5 h-5 fill-gray-400" />
   ),
   Mic: () => (
-    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-gray-400">
-      <path d="M12 14c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-    </svg>
+    <Mic className="w-5 h-5 fill-gray-400" />
   ),
   ArrowBack: () => (
-    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-gray-500">
-      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-    </svg>
+    <ArrowLeft className="w-5 h-5 fill-gray-500" />
   ),
 };
 
-// ──── FONDO TIPO WHATSAPP ────────────────────────────────────────────────────────
+//  FONDO TIPO WHATSAPP 
 function ChatBackground({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex-1 overflow-y-auto relative" style={{
@@ -288,7 +264,7 @@ function ChatBackground({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ──── SHARE MODAL ────────────────────────────────────────────────────────────────
+//  SHARE MODAL 
 function ShareModal({ title, link, onClose }: { title: string; link: string; onClose: () => void }) {
   const encoded = encodeURIComponent(`${title} - únete en Tiyuy: ${link}`);
   const [copied, setCopied] = useState(false);
@@ -302,7 +278,7 @@ function ShareModal({ title, link, onClose }: { title: string; link: string; onC
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-teal-500 p-5">
+        <div className="bg-brand p-5">
           <div className="flex items-center justify-between">
             <h3 className="text-white font-semibold text-base">Compartir</h3>
             <button onClick={onClose} className="text-white/70 hover:text-white w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-lg leading-none">×</button>
@@ -313,29 +289,29 @@ function ShareModal({ title, link, onClose }: { title: string; link: string; onC
           <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-3 border border-gray-100">
             <span className="text-xs text-gray-500 truncate flex-1 font-mono">{link}</span>
             <button onClick={copy}
-              className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all flex-shrink-0 ${copied ? 'bg-green-500 text-white' : 'bg-teal-500 text-white hover:bg-teal-600'}`}>
-              {copied ? '✓ Copiado' : 'Copiar'}
+              className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all flex-shrink-0 ${copied ? 'bg-green-500 text-white' : 'bg-brand text-white hover:bg-brand'}`}>
+              {copied ? ' Copiado' : 'Copiar'}
             </button>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <a href={`https://wa.me/?text=${encoded}`} target="_blank" rel="noopener noreferrer"
               className="flex flex-col items-center gap-2 p-3 bg-green-50 rounded-xl hover:bg-green-100 transition-colors group">
               <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                <MessageCircle className="w-5 h-5 fill-white" />
               </div>
               <span className="text-xs text-green-700 font-medium">WhatsApp</span>
             </a>
             <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`} target="_blank" rel="noopener noreferrer"
-              className="flex flex-col items-center gap-2 p-3 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              className="flex flex-col items-center gap-2 p-3 bg-brand rounded-xl hover:bg-brand transition-colors">
+              <div className="w-10 h-10 bg-brand rounded-full flex items-center justify-center">
+                <Icon icon="mdi:facebook" className="w-5 h-5 fill-white" />
               </div>
-              <span className="text-xs text-blue-700 font-medium">Facebook</span>
+              <span className="text-xs text-brand font-medium">Facebook</span>
             </a>
             <a href={`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encoded}`} target="_blank" rel="noopener noreferrer"
               className="flex flex-col items-center gap-2 p-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition-colors">
               <div className="w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                <Icon icon="ic:baseline-telegram" className="w-5 h-5 fill-white" />
               </div>
               <span className="text-xs text-sky-700 font-medium">Telegram</span>
             </a>
@@ -346,7 +322,7 @@ function ShareModal({ title, link, onClose }: { title: string; link: string; onC
   );
 }
 
-// ──── MODAL NUEVO ESTADO ──────────────────────────────────────────────────────────
+//  MODAL NUEVO ESTADO 
 function NewStatusModal({ onClose, userRole }: { onClose: () => void; userRole?: string }) {
   const createStatus = useCreateStatusPost();
 
@@ -371,9 +347,7 @@ function NewStatusModal({ onClose, userRole }: { onClose: () => void; userRole?:
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="w-6 h-6" />
           </button>
         </div>
 
@@ -401,7 +375,7 @@ function NewStatusModal({ onClose, userRole }: { onClose: () => void; userRole?:
   );
 }
 
-// ──── MODAL CREAR GRUPO ──────────────────────────────────────────────────────────
+//  MODAL CREAR GRUPO 
 function NewGroupModal({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -441,7 +415,7 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
     return (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-teal-500 p-5">
+          <div className="bg-brand p-5">
             <div className="text-center">
               <h2 className="text-white font-bold text-lg"> LIMITE ALCANZADO</h2>
             </div>
@@ -466,7 +440,7 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
             </p>
             <button
               onClick={onClose}
-              className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
+              className="w-full py-2.5 bg-brand text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
             >
               ENTENDIDO - NO CREAR GRUPO
             </button>
@@ -487,7 +461,7 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
     />
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-teal-500 p-5">
+        <div className="bg-brand p-5">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-white font-bold text-lg">Crear Grupo</h2>
@@ -515,13 +489,13 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
               <p className="text-xs text-gray-400 mt-0.5">Solo emails aprobados pueden unirse</p>
             </div>
             <button onClick={() => setIsRestricted(!isRestricted)}
-              className={`w-12 h-6 rounded-full transition-colors relative flex-shrink-0 ${isRestricted ? 'bg-teal-500' : 'bg-gray-300'}`}>
+              className={`w-12 h-6 rounded-full transition-colors relative flex-shrink-0 ${isRestricted ? 'bg-brand' : 'bg-gray-300'}`}>
               <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${isRestricted ? 'left-7' : 'left-1'}`} />
             </button>
           </div>
-          <div className="flex items-center gap-2 bg-blue-50 rounded-xl p-3 border border-blue-100">
-            <span className="text-blue-500"></span>
-            <p className="text-xs text-blue-700">Podrás compartir el link del grupo en WhatsApp, Telegram y otras redes para atraer miembros</p>
+          <div className="flex items-center gap-2 bg-brand rounded-xl p-3 border border-brand">
+            <span className="text-brand"></span>
+            <p className="text-xs text-brand">Podrás compartir el link del grupo en WhatsApp, Telegram y otras redes para atraer miembros</p>
           </div>
           <div className="flex gap-3 pt-1">
             <button onClick={onClose}
@@ -529,7 +503,7 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
               Cancelar
             </button>
             <button onClick={handleSubmit} disabled={!name.trim() || createGroup.isPending}
-              className="flex-1 py-2.5 text-sm bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-40">
+              className="flex-1 py-2.5 text-sm bg-brand text-white rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-40">
               {createGroup.isPending ? 'Creando...' : 'Crear Grupo'}
             </button>
           </div>
@@ -540,7 +514,7 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-// ──── MODAL CREAR CANAL ──────────────────────────────────────────────────────────
+//  MODAL CREAR CANAL 
 function NewChannelModal({ onClose, userRole }: { onClose: () => void; userRole?: string }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -556,7 +530,7 @@ function NewChannelModal({ onClose, userRole }: { onClose: () => void; userRole?
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-teal-500 p-5">
+        <div className="bg-brand p-5">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-white font-bold text-lg">Crear Canal</h2>
@@ -600,7 +574,7 @@ function NewChannelModal({ onClose, userRole }: { onClose: () => void; userRole?
               Cancelar
             </button>
             <button onClick={handleSubmit} disabled={!name.trim()}
-              className="flex-1 py-2.5 text-sm bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-40">
+              className="flex-1 py-2.5 text-sm bg-brand text-white rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-40">
               Crear Canal
             </button>
           </div>
@@ -610,7 +584,7 @@ function NewChannelModal({ onClose, userRole }: { onClose: () => void; userRole?
   );
 }
 
-// ──── COMPONENTE RESULTADOS DE BÚSQUEDA ────────────────────────────────────────
+//  COMPONENTE RESULTADOS DE BÚSQUEDA 
 function SearchResultItem({ result, onCreateChat }: { result: any; onCreateChat: (params: any) => void }) {
   const handleAction = (action: string) => {
     switch (result.type) {
@@ -620,21 +594,21 @@ function SearchResultItem({ result, onCreateChat }: { result: any; onCreateChat:
           onCreateChat({
             targetUserId: property.owner.id,
             propertyId: property.id,
-            initialMessage: `👍 Me interesa tu propiedad: ${property.title}`,
+            initialMessage: ` Me interesa tu propiedad: ${property.title}`,
             interactionType: 'like'
           });
         } else if (action === 'info') {
           onCreateChat({
             targetUserId: property.owner.id,
             propertyId: property.id,
-            initialMessage: `👋 Me gustaría más información sobre: ${property.title}`,
+            initialMessage: ` Me gustaría más información sobre: ${property.title}`,
             interactionType: 'info_request'
           });
         } else if (action === 'contact') {
           onCreateChat({
             targetUserId: property.owner.id,
             propertyId: property.id,
-            initialMessage: `💬 Hola, estoy interesado en tu propiedad: ${property.title}`,
+            initialMessage: ` Hola, estoy interesado en tu propiedad: ${property.title}`,
             interactionType: 'contact'
           });
         }
@@ -657,21 +631,21 @@ function SearchResultItem({ result, onCreateChat }: { result: any; onCreateChat:
       <div className="px-4 py-3 border-b border-gray-100">
         <div className="flex items-start gap-3">
           <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center text-lg">
-            🏠
+            
           </div>
           <div className="flex-1 min-w-0">
             <h4 className="text-sm font-semibold text-gray-900 truncate">{property.title}</h4>
-            <p className="text-xs text-gray-600">📍 {property.city} • 💰 {property.price} {property.currency}</p>
-            <p className="text-xs text-gray-500">Dueño: {property.owner.name} 📞 {property.owner.phone}</p>
+            <p className="text-xs text-gray-600"> {property.city}   {property.price} {property.currency}</p>
+            <p className="text-xs text-gray-500">Dueño: {property.owner.name}  {property.owner.phone}</p>
             <div className="flex gap-2 mt-2">
               <button onClick={() => handleAction('like')} className="px-3 py-1 bg-red-100 text-red-600 rounded-full text-xs hover:bg-red-200">
-                ❤️ Like
+                ️ Like
               </button>
-              <button onClick={() => handleAction('info')} className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs hover:bg-blue-200">
-                ℹ️ Info
+              <button onClick={() => handleAction('info')} className="px-3 py-1 bg-brand/10 text-brand rounded-full text-xs hover:bg-brand">
+                ️ Info
               </button>
               <button onClick={() => handleAction('contact')} className="px-3 py-1 bg-green-100 text-green-600 rounded-full text-xs hover:bg-green-200">
-                💬 Contactar
+                 Contactar
               </button>
             </div>
           </div>
@@ -688,13 +662,13 @@ function SearchResultItem({ result, onCreateChat }: { result: any; onCreateChat:
           <Avatar name={user.name} role={user.role} size="md" src={user.avatar} />
           <div className="flex-1 min-w-0">
             <h4 className="text-sm font-semibold text-gray-900 truncate">{user.name}</h4>
-            <p className="text-xs text-gray-600">{user.role} • 📞 {user.phone}</p>
+            <p className="text-xs text-gray-600">{user.role}   {user.phone}</p>
             {user.properties && user.properties.length > 0 && (
               <p className="text-xs text-gray-500">{user.properties.length} propiedades</p>
             )}
           </div>
-          <button onClick={() => handleAction('chat')} className="px-3 py-1 bg-teal-100 text-teal-600 rounded-full text-xs hover:bg-teal-200">
-            💬 Chatear
+          <button onClick={() => handleAction('chat')} className="px-3 py-1 bg-brand/10 text-brand rounded-full text-xs hover:bg-brand">
+             Chatear
           </button>
         </div>
       </div>
@@ -704,7 +678,7 @@ function SearchResultItem({ result, onCreateChat }: { result: any; onCreateChat:
   return null;
 }
 
-// ──── PANEL CHATS ────────────────────────────────────────────────────────────────
+//  PANEL CHATS 
 function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; selectedChatId: number | null; setSelectedChatId: (id: number | null) => void }) {
   const [filter, setFilter] = useState<ChatFilter>('all');
   const [newMessage, setNewMessage] = useState('');
@@ -883,7 +857,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
                 onClick={() => setShowFilterDropdown(!showFilterDropdown)}
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 px-2 py-1 bg-white rounded-full text-xs text-gray-600 hover:bg-gray-50 border border-gray-200"
               >
-                ⚙️
+                ️
               </button>
               
               {/* Dropdown de filtros */}
@@ -896,42 +870,42 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
                     <button 
                       onClick={() => { setSearchType('all'); setShowFilterDropdown(false); }}
                       className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-100 ${
-                        searchType === 'all' ? 'bg-teal-50 text-teal-600' : 'text-gray-700'
+                        searchType === 'all' ? 'bg-brand/10 text-brand' : 'text-gray-700'
                       }`}
                     >
-                      🌐 Todos
+                       Todos
                     </button>
                     <button 
                       onClick={() => { setSearchType('name'); setShowFilterDropdown(false); }}
                       className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-100 ${
-                        searchType === 'name' ? 'bg-teal-50 text-teal-600' : 'text-gray-700'
+                        searchType === 'name' ? 'bg-brand/10 text-brand' : 'text-gray-700'
                       }`}
                     >
-                      👤 Nombre
+                       Nombre
                     </button>
                     <button 
                       onClick={() => { setSearchType('property'); setShowFilterDropdown(false); }}
                       className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-100 ${
-                        searchType === 'property' ? 'bg-teal-50 text-teal-600' : 'text-gray-700'
+                        searchType === 'property' ? 'bg-brand/10 text-brand' : 'text-gray-700'
                       }`}
                     >
-                      🏠 Propiedad
+                       Propiedad
                     </button>
                     <button 
                       onClick={() => { setSearchType('district'); setShowFilterDropdown(false); }}
                       className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-100 ${
-                        searchType === 'district' ? 'bg-teal-50 text-teal-600' : 'text-gray-700'
+                        searchType === 'district' ? 'bg-brand/10 text-brand' : 'text-gray-700'
                       }`}
                     >
-                      📍 Distrito
+                       Distrito
                     </button>
                     <button 
                       onClick={() => { setSearchType('phone'); setShowFilterDropdown(false); }}
                       className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-100 ${
-                        searchType === 'phone' ? 'bg-teal-50 text-teal-600' : 'text-gray-700'
+                        searchType === 'phone' ? 'bg-brand/10 text-brand' : 'text-gray-700'
                       }`}
                     >
-                      📞 Teléfono (PE)
+                       Teléfono (PE)
                     </button>
                   </div>
                 </div>
@@ -945,9 +919,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
               onClick={() => setShowContactMenu(!showContactMenu)}
               className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-                <path d="M12 16a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0-6a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
-              </svg>
+              <MoreHorizontal className="w-5 h-5 fill-current" />
             </button>
             
             {/* Dropdown menú */}
@@ -974,9 +946,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
                   }}
                   className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
                 >
-                  <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-gray-500">
-                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                  </svg>
+                  <Plus className="w-4 h-4 fill-current text-gray-500" />
                   Agregar Contacto
                 </button>
               </div>
@@ -991,7 +961,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
           <button key={f.key} onClick={() => setFilter(f.key)}
             className={`px-4 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
               filter === f.key
-                ? 'bg-[#075e54] text-white shadow-sm'
+                ? 'bg-brand text-white shadow-sm'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}>
             {f.label}
@@ -1003,7 +973,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
       <div className="flex-1 overflow-y-auto bg-white">
         {loadingSearch ? (
           <div className="flex justify-center py-16">
-            <div className="w-8 h-8 rounded-full border-4 border-teal-500 border-t-transparent animate-spin" />
+            <div className="w-8 h-8 rounded-full border-4 border-brand border-t-transparent animate-spin" />
           </div>
         ) : searchTerm ? (
           // Mostrar resultados de búsqueda
@@ -1028,7 +998,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
           </>
         ) : loadingChats ? (
           <div className="flex justify-center py-16">
-            <div className="w-8 h-8 rounded-full border-4 border-teal-500 border-t-transparent animate-spin" />
+            <div className="w-8 h-8 rounded-full border-4 border-brand border-t-transparent animate-spin" />
           </div>
         ) : chatsError ? (
           <div className="text-center py-16 px-6">
@@ -1050,8 +1020,8 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
               <div className="relative">
                 <Avatar name={chat.participantName ?? chat.groupName ?? 'U'} role="USER" size="md" src={chat.participantAvatar} />
                 {chat.type === 'GROUP' && (
-                  <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-teal-500 rounded-full flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 fill-white"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                  <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-brand rounded-full flex items-center justify-center">
+                    <Icon icon="mdi:account-group" className="w-2.5 h-2.5 fill-white" />
                   </div>
                 )}
               </div>
@@ -1084,7 +1054,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
   );
 }
 
-// ──── PANEL ESTADOS ────────────────────────────────────────────────────────────────
+//  PANEL ESTADOS 
 function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: { 
   user: any; 
   onNewStatus: () => void;
@@ -1129,7 +1099,7 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
         <h2 className="font-semibold text-gray-800">Estados · 48h</h2>
         <button onClick={onNewStatus}
-          className="text-xs bg-gradient-to-r from-blue-600 to-teal-500 text-white px-4 py-1.5 rounded-full font-medium hover:opacity-90 transition-opacity shadow-sm">
+          className="text-xs bg-brand text-white px-4 py-1.5 rounded-full font-medium hover:opacity-90 transition-opacity shadow-sm">
           + Publicar
         </button>
       </div>
@@ -1151,12 +1121,12 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
       <div onClick={onNewStatus}
         className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-colors">
         <div className="relative">
-          <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-br from-blue-600 to-teal-500">
+          <div className="w-12 h-12 rounded-full p-0.5 bg-brand">
             <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
               <Avatar name={user?.firstName ?? 'U'} role={user?.role} size="md" />
             </div>
           </div>
-          <div className="absolute bottom-0 right-0 w-5 h-5 bg-gradient-to-br from-blue-600 to-teal-500 rounded-full flex items-center justify-center border-2 border-white">
+          <div className="absolute bottom-0 right-0 w-5 h-5 bg-brand rounded-full flex items-center justify-center border-2 border-white">
             <span className="text-white text-xs font-bold leading-none">+</span>
           </div>
         </div>
@@ -1179,7 +1149,7 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
       <div className="flex-1 overflow-y-auto">
         {isLoading ? (
           <div className="flex justify-center py-12">
-            <div className="w-8 h-8 rounded-full border-4 border-teal-500 border-t-transparent animate-spin" />
+            <div className="w-8 h-8 rounded-full border-4 border-brand border-t-transparent animate-spin" />
           </div>
         ) : allPosts.length === 0 ? (
           <div className="text-center py-16 px-6">
@@ -1195,7 +1165,7 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
               const roleLabel = ROLE_LABEL[post.userRole] ?? 'Usuario';
               return (
                 <div key={post.id} 
-                     className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition-colors cursor-pointer ${selectedStatusId === post.id ? 'bg-blue-50' : ''}`}
+                     className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition-colors cursor-pointer ${selectedStatusId === post.id ? 'bg-brand' : ''}`}
                      onClick={() => handleStatusClick(post.id)}>
                   {/* Avatar con anillo SVG de tiempo */}
                   <div className="relative flex-shrink-0 w-12 h-12">
@@ -1226,20 +1196,20 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                         <span className={`text-[10px] font-medium ${isUrgent ? 'text-red-400' : 'text-gray-400'}`}>
-                          {isUrgent ? '⚠️ ' : ''}{timeLeft(new Date(post.expiresAt))}
+                          {isUrgent ? '️ ' : ''}{timeLeft(new Date(post.expiresAt))}
                         </span>
                       </div>
                     </div>
                     <p className="text-xs text-gray-600 leading-relaxed line-clamp-2">{post.content}</p>
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                       {post.location && (
-                        <span className="inline-flex items-center gap-1 text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">
-                          📍 {post.location}
+                        <span className="inline-flex items-center gap-1 text-[10px] bg-brand/10 text-brand px-2 py-0.5 rounded-full font-medium">
+                           {post.location}
                         </span>
                       )}
                       {post.propertyType && (
-                        <span className="inline-flex items-center gap-1 text-[10px] bg-teal-50 text-teal-600 px-2 py-0.5 rounded-full font-medium">
-                          🏠 {post.propertyType}
+                        <span className="inline-flex items-center gap-1 text-[10px] bg-brand/10 text-brand px-2 py-0.5 rounded-full font-medium">
+                           {post.propertyType}
                         </span>
                       )}
                       <span className="text-[10px] text-gray-400 ml-auto">{post.viewCount} vistas</span>
@@ -1251,7 +1221,7 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
             {hasNextPage && (
               <div className="flex justify-center py-4">
                 <button onClick={() => fetchNextPage()}
-                  className="text-xs text-teal-600 font-medium hover:underline">
+                  className="text-xs text-brand font-medium hover:underline">
                   Cargar más estados
                 </button>
               </div>
@@ -1267,7 +1237,7 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
   );
 }
 
-// ──── PANEL CANALES ────────────────────────────────────────────────────────────────
+//  PANEL CANALES 
 function CanalesPanel({ user }: { user: any }) {
   const [shareTarget, setShareTarget] = useState<{ title: string; link: string } | null>(null);
   const [showNewChannel, setShowNewChannel] = useState(false);
@@ -1296,7 +1266,7 @@ function CanalesPanel({ user }: { user: any }) {
   };
 
   const cityEmojis: Record<string, string> = {
-    Lima: '🏙️', Arequipa: '🌋', Trujillo: '🏺', Piura: '☀️', Chiclayo: '🌿', Cusco: '🏔️',
+    Lima: '️', Arequipa: '', Trujillo: '', Piura: '️', Chiclayo: '', Cusco: '️',
   };
 
   return (
@@ -1309,7 +1279,7 @@ function CanalesPanel({ user }: { user: any }) {
       <div className="flex-1 overflow-y-auto">
         {isLoading ? (
           <div className="flex justify-center py-12">
-            <div className="w-8 h-8 rounded-full border-4 border-teal-500 border-t-transparent animate-spin" />
+            <div className="w-8 h-8 rounded-full border-4 border-brand border-t-transparent animate-spin" />
           </div>
         ) : !displayChannels?.length ? (
           <div className="text-center py-16">
@@ -1319,8 +1289,8 @@ function CanalesPanel({ user }: { user: any }) {
           displayChannels.map((channel: any) => (
             <div key={channel.id}
               className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition-colors">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
-                {cityEmojis[channel.city] ?? '🏘️'}
+              <div className="w-12 h-12 rounded-full bg-brand flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
+                {cityEmojis[channel.city] ?? '️'}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
@@ -1338,13 +1308,13 @@ function CanalesPanel({ user }: { user: any }) {
                   className={`text-xs px-3 py-1 rounded-full font-medium transition-all disabled:opacity-50 ${
                     channel.isSubscribed
                       ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      : 'bg-gradient-to-r from-blue-600 to-teal-500 text-white hover:opacity-90 shadow-sm'
+                      : 'bg-brand text-white hover:opacity-90 shadow-sm'
                   }`}>
-                  {channel.isSubscribed ? '✓ Suscrito' : 'Suscribirse'}
+                  {channel.isSubscribed ? ' Suscrito' : 'Suscribirse'}
                 </button>
                 <button
                   onClick={() => setShareTarget({ title: `Canal ${channel.city} en Tiyuy`, link: `https://tiyuy.com/channels/${channel.shareLink}` })}
-                  className="text-[10px] text-gray-400 hover:text-teal-600 transition-colors flex items-center gap-1">
+                  className="text-[10px] text-gray-400 hover:text-brand transition-colors flex items-center gap-1">
                   <IC.Share /> Compartir
                 </button>
               </div>
@@ -1357,7 +1327,7 @@ function CanalesPanel({ user }: { user: any }) {
       <div className="p-3 border-t border-gray-100 space-y-2">
         <button 
           onClick={() => setShowNewChannel(true)}
-          className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-lg px-4 py-3 font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-sm"
+          className="w-full bg-brand text-white rounded-lg px-4 py-3 font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-sm"
         >
           <IC.Plus />
           Crear canal
@@ -1377,7 +1347,7 @@ function CanalesPanel({ user }: { user: any }) {
   );
 }
 
-// ──── PANEL LISTA DE GRUPOS (columna izquierda — solo navegación) ─────────────
+//  PANEL LISTA DE GRUPOS (columna izquierda  solo navegación) 
 function GruposListPanel({ 
   user, 
   onGroupSelect, 
@@ -1391,19 +1361,19 @@ function GruposListPanel({
 }) {
   const { data: groups, isLoading } = useGetGroups(0, 50);
   const misGrupos = groups?.filter((g: any) => g.isMember) ?? [];
-  console.log('👥 Mis grupos (member) in GruposListPanel:', misGrupos);
+  console.log(' Mis grupos (member) in GruposListPanel:', misGrupos);
   
   // Verificar si el usuario ya es dueño de un grupo
   const userOwnedGroups = groups?.filter((g: any) => g.isMember && g.isOwner) ?? [];
   const hasGroup = userOwnedGroups.length > 0;
 
   const getGroupEmoji = (name: string) => {
-    if (name.includes('Alquiler')) return '🏠';
-    if (name.includes('Venta')) return '💰';
-    if (name.includes('Terreno') || name.includes('Lote')) return '🌍';
-    if (name.includes('Inversion')) return '📈';
-    if (name.includes('Lima')) return '🏙️';
-    return '🏘️';
+    if (name.includes('Alquiler')) return '';
+    if (name.includes('Venta')) return '';
+    if (name.includes('Terreno') || name.includes('Lote')) return '';
+    if (name.includes('Inversion')) return '';
+    if (name.includes('Lima')) return '️';
+    return '️';
   };
 
   return (
@@ -1427,15 +1397,13 @@ function GruposListPanel({
         <button
           onClick={() => onSectionChange('descubrir')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'descubrir' ? 'bg-blue-100 text-blue-700' : 'text-gray-800 hover:bg-gray-100'
+            activeSection === 'descubrir' ? 'bg-brand/10 text-brand-dark' : 'text-gray-800 hover:bg-gray-100'
           }`}
         >
           <span className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
-            activeSection === 'descubrir' ? 'bg-blue-600' : 'bg-gray-200'
+            activeSection === 'descubrir' ? 'bg-brand' : 'bg-gray-200'
           }`}>
-            <svg viewBox="0 0 24 24" className={`w-5 h-5 ${activeSection === 'descubrir' ? 'fill-white' : 'fill-gray-600'}`}>
-              <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-            </svg>
+            <Search className="" />
           </span>
           Descubrir
         </button>
@@ -1443,11 +1411,11 @@ function GruposListPanel({
         <button
           onClick={() => onSectionChange('mis-grupos')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'mis-grupos' ? 'bg-blue-100 text-blue-700' : 'text-gray-800 hover:bg-gray-100'
+            activeSection === 'mis-grupos' ? 'bg-brand/10 text-brand-dark' : 'text-gray-800 hover:bg-gray-100'
           }`}
         >
           <span className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
-            activeSection === 'mis-grupos' ? 'bg-blue-600' : 'bg-gray-200'
+            activeSection === 'mis-grupos' ? 'bg-brand' : 'bg-gray-200'
           }`}>
             <IC.Groups a={activeSection === 'mis-grupos'} />
           </span>
@@ -1459,17 +1427,21 @@ function GruposListPanel({
       <div className="px-3 pb-3">
         <button
           onClick={() => onSectionChange('crear')}
-          className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-colors relative ${
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors relative ${
             hasGroup 
               ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-              : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+              : 'bg-brand/10 text-brand-dark hover:bg-brand/20'
           }`}
         >
           {hasGroup && (
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           )}
-          <span className="text-lg font-bold leading-none">
-            {hasGroup ? '🚫' : '+'}
+          <span className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
+            hasGroup ? 'bg-gray-200' : 'bg-brand'
+          }`}>
+            <span className="text-lg font-bold leading-none text-white">
+              {hasGroup ? '' : '+'}
+            </span>
           </span>
           {hasGroup ? 'Límite alcanzado' : 'Crear nuevo grupo'}
         </button>
@@ -1494,15 +1466,15 @@ function GruposListPanel({
                 key={group.id}
                 onClick={() => {
                   // TEMPORAL DEBUG - BORRAR DESPUÉS
-                  console.log('🔍 Grupo seleccionado en GruposListPanel:', group.id, group.groupId);
-                  console.log('🔍 Grupo object completo:', group);
+                  console.log(' Grupo seleccionado en GruposListPanel:', group.id, group.groupId);
+                  console.log(' Grupo object completo:', group);
                   
                   onGroupSelect(group);
                   onSectionChange('mis-grupos');
                 }}
                 className="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded-xl transition-colors text-left"
               >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-teal-500 flex items-center justify-center text-lg flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-brand flex items-center justify-center text-lg flex-shrink-0">
                   {getGroupEmoji(group.name)}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -1518,21 +1490,21 @@ function GruposListPanel({
   );
 }
 
-// ──── VISTA DERECHA: MIS GRUPOS (grid estilo Facebook) ─────────────────────
+//  VISTA DERECHA: MIS GRUPOS (grid estilo Facebook) 
 function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect: (g: any) => void }) {
   const { data: groups, isLoading } = useGetGroups(0, 50);
   const leaveGroup = useLeaveGroup();
   const [shareTarget, setShareTarget] = useState<{ title: string; link: string } | null>(null);
   const misGrupos = groups?.filter((g: any) => g.isMember) ?? [];
-  console.log('👥 Mis grupos (member) in GruposListPanel:', misGrupos);
+  console.log(' Mis grupos (member) in GruposListPanel:', misGrupos);
 
   const getGroupEmoji = (name: string) => {
-    if (name.includes('Alquiler')) return '🏠';
-    if (name.includes('Venta')) return '💰';
-    if (name.includes('Terreno') || name.includes('Lote')) return '🌍';
-    if (name.includes('Inversion')) return '📈';
-    if (name.includes('Lima')) return '🏙️';
-    return '🏘️';
+    if (name.includes('Alquiler')) return '';
+    if (name.includes('Venta')) return '';
+    if (name.includes('Terreno') || name.includes('Lote')) return '';
+    if (name.includes('Inversion')) return '';
+    if (name.includes('Lima')) return '️';
+    return '️';
   };
 
   return (
@@ -1542,20 +1514,20 @@ function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect
         <h2 className="text-xl font-bold text-gray-900">
           Todos los grupos a los que te uniste ({misGrupos.length})
         </h2>
-        <button className="text-sm text-blue-600 font-medium hover:underline">
+        <button className="text-sm text-brand font-medium hover:underline">
           Ordenar
         </button>
       </div>
 
       {isLoading && (
         <div className="flex justify-center py-16">
-          <div className="w-8 h-8 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
+          <div className="w-8 h-8 rounded-full border-4 border-brand border-t-transparent animate-spin" />
         </div>
       )}
 
       {!isLoading && misGrupos.length === 0 && (
         <div className="text-center py-20">
-          <div className="text-6xl mb-4">👥</div>
+          <div className="text-6xl mb-4"></div>
           <p className="text-gray-700 font-semibold text-lg">No eres miembro de ningún grupo aún</p>
           <p className="text-gray-400 text-sm mt-1">Ve a "Descubrir" para unirte a grupos</p>
         </div>
@@ -1570,11 +1542,11 @@ function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect
           >
             {/* Banner del grupo */}
             <div
-              className="h-28 bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-5xl"
+              className="h-28 bg-brand flex items-center justify-center text-5xl"
               onClick={() => {
                 // TEMPORAL DEBUG - BORRAR DESPUÉS
-                console.log('🔍 Grupo seleccionado en GruposMisGruposView (banner):', group.id, group.groupId);
-                console.log('🔍 Grupo object completo:', group);
+                console.log(' Grupo seleccionado en GruposMisGruposView (banner):', group.id, group.groupId);
+                console.log(' Grupo object completo:', group);
                 
                 onGroupSelect(group);
               }}
@@ -1585,7 +1557,7 @@ function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect
             {/* Info */}
             <div className="p-3" onClick={() => {
               // TEMPORAL DEBUG - BORRAR DESPUÉS
-              console.log('🔍 Grupo seleccionado en GruposMisGruposView (info):', group.id, group.groupId);
+              console.log(' Grupo seleccionado en GruposMisGruposView (info):', group.id, group.groupId);
               
               onGroupSelect(group);
             }}>
@@ -1593,7 +1565,7 @@ function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect
                 {group.name}
               </h3>
               <p className="text-xs text-gray-500">
-                {group.memberCount || 0} miembros • {group.postCount || 0} publicaciones
+                {group.memberCount || 0} miembros  {group.postCount || 0} publicaciones
               </p>
             </div>
 
@@ -1602,11 +1574,11 @@ function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect
               <button
                 onClick={() => {
                   // TEMPORAL DEBUG - BORRAR DESPUÉS
-                  console.log('🔍 Grupo seleccionado en GruposMisGruposView (botón):', group.id, group.groupId);
+                  console.log(' Grupo seleccionado en GruposMisGruposView (botón):', group.id, group.groupId);
                   
                   onGroupSelect(group);
                 }}
-                className="flex-1 py-1.5 bg-blue-50 text-blue-600 text-xs font-semibold rounded-lg hover:bg-blue-100 transition-colors"
+                className="flex-1 py-1.5 bg-brand/10 text-brand text-xs font-semibold rounded-lg hover:bg-brand transition-colors"
               >
                 Ver grupo
               </button>
@@ -1638,7 +1610,7 @@ function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect
   );
 }
 
-// ──── PANEL DETALLES DE GRUPO ────────────────────────────────────────────────────────
+//  PANEL DETALLES DE GRUPO 
 function GrupoDetailPanel({ group, user, onBack }: { group: any; user: any; onBack: () => void }) {
   const leaveGroup = useLeaveGroup();
 
@@ -1652,15 +1624,13 @@ function GrupoDetailPanel({ group, user, onBack }: { group: any; user: any; onBa
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header del grupo estilo Tiyuy */}
-      <div className="bg-gradient-to-r from-blue-600 to-teal-500 p-4 text-white">
+      <div className="bg-brand p-4 text-white">
         <div className="flex items-center justify-between">
           <button 
             onClick={onBack}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft className="w-5 h-5" />
           </button>
           <h1 className="text-xl font-bold">{group.name}</h1>
           <button
@@ -1675,9 +1645,7 @@ function GrupoDetailPanel({ group, user, onBack }: { group: any; user: any; onBa
               </>
             ) : (
               <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
+                <LogOut className="w-4 h-4" />
                 Salir
               </>
             )}
@@ -1685,15 +1653,11 @@ function GrupoDetailPanel({ group, user, onBack }: { group: any; user: any; onBa
         </div>
         <div className="flex items-center gap-4 mt-3">
           <div className="flex items-center gap-2">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-            </svg>
+            <Icon icon="mdi:account-group" className="w-4 h-4" />
             <span className="text-sm">{group.memberCount || 0} miembros</span>
           </div>
           <div className="flex items-center gap-2">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
-            </svg>
+            <MessageSquare className="w-4 h-4" />
             <span className="text-sm">{group.postCount || 0} publicaciones</span>
           </div>
         </div>
@@ -1708,8 +1672,8 @@ function GrupoDetailPanel({ group, user, onBack }: { group: any; user: any; onBa
           currentUser={user}  
           onCreatePost={() => {
             // TEMPORAL DEBUG - BORRAR DESPUÉS
-            console.log('🔍 GrupoPostsPanel groupId:', group.id, group.groupId);
-            console.log('🔍 group object completo:', group);
+            console.log(' GrupoPostsPanel groupId:', group.id, group.groupId);
+            console.log(' group object completo:', group);
             
             // Función para crear post - puede ser implementada después
             console.log('Crear post en grupo:', group.id);
@@ -1720,7 +1684,7 @@ function GrupoDetailPanel({ group, user, onBack }: { group: any; user: any; onBa
   );
 };
 
-// ──── MAIN PAGE COMPONENT ────────────────────────────────────────────────────────────────
+//  MAIN PAGE COMPONENT 
 function MisContactosPageContent() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<MainTab>('chats');
@@ -1753,15 +1717,15 @@ function MisContactosPageContent() {
   
   // Debug messages
   useEffect(() => {
-    console.log('📨 Messages data:', messages);
-    console.log('📨 Loading:', loadingMessages);
-    console.log('📨 Messages Error:', messagesError);
-    console.log('📨 Selected chat ID:', selectedChatId);
+    console.log(' Messages data:', messages);
+    console.log(' Loading:', loadingMessages);
+    console.log(' Messages Error:', messagesError);
+    console.log(' Selected chat ID:', selectedChatId);
     
     // Debug específico para respuestas
     if (messages && messages.length > 0) {
       messages.forEach((msg: any, index: number) => {
-        console.log(`📨 Mensaje ${index}:`, {
+        console.log(` Mensaje ${index}:`, {
           id: msg.id,
           content: msg.content,
           isOwn: msg.isOwn,
@@ -1837,19 +1801,19 @@ function MisContactosPageContent() {
     });
     
     setShowReactionPicker(null);
-    console.log('💫 Reacción local:', emoji, 'Mensaje:', messageId, 'Usuario:', userId);
+    console.log(' Reacción local:', emoji, 'Mensaje:', messageId, 'Usuario:', userId);
   };
 
   // Conectar WebSocket SOLO si está autenticado
   const { isConnected: wsConnected } = useWebSocket({
     enabled: isAuthenticated,
     onNewMessage: (message) => {
-      console.log('💬 Mensaje WebSocket recibido:', message);
+      console.log(' Mensaje WebSocket recibido:', message);
       queryClient.invalidateQueries({ queryKey: ['chat-messages', message.chatId] });
       queryClient.invalidateQueries({ queryKey: ['chats'] });
     },
     onConnectionChange: (connected) => {
-      console.log('🔌 WebSocket conexión:', connected ? 'Conectado' : 'Desconectado');
+      console.log(' WebSocket conexión:', connected ? 'Conectado' : 'Desconectado');
     }
   });
 
@@ -1865,7 +1829,7 @@ function MisContactosPageContent() {
       
       // Only use if less than 30 seconds old
       if (Date.now() - timestamp < 30000) {
-        console.log('📱 Datos de organizador encontrados:', { userId, name, phone });
+        console.log(' Datos de organizador encontrados:', { userId, name, phone });
         
         // Switch to chats tab
         setActiveTab('chats');
@@ -1876,10 +1840,10 @@ function MisContactosPageContent() {
         );
         
         if (existingChat) {
-          console.log('✅ Chat existente encontrado:', existingChat.id);
+          console.log(' Chat existente encontrado:', existingChat.id);
           setSelectedChatId(existingChat.id);
         } else {
-          console.log('🆕 Creando nuevo chat con usuario:', userId);
+          console.log(' Creando nuevo chat con usuario:', userId);
           // Create new chat
           apiCall('/contacts/extended/chats', {
             method: 'POST',
@@ -1889,12 +1853,12 @@ function MisContactosPageContent() {
               interactionType: 'event_contact'
             })
           }).then((response: any) => {
-            console.log('✅ Chat creado:', response);
+            console.log(' Chat creado:', response);
             if (response?.id) {
               setSelectedChatId(response.id);
             }
           }).catch((err: any) => {
-            console.error('❌ Error creando chat:', err);
+            console.error(' Error creando chat:', err);
             toast.error('No se pudo iniciar la conversación');
           });
         }
@@ -1920,7 +1884,7 @@ function MisContactosPageContent() {
     // Agregar replyToMessage si está respondiendo a un mensaje
     if (replyToMessage) {
       messagePayload.replyToMessageId = String(replyToMessage.id);  // Convertir a string
-      console.log('📨 Enviando respuesta:', {
+      console.log(' Enviando respuesta:', {
         chatId: selectedChatId,
         content: newMessage,
         replyToMessageId: String(replyToMessage.id),
@@ -1956,10 +1920,8 @@ function MisContactosPageContent() {
       {!isAuthenticated && (
         <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg viewBox="0 0 24 24" className="w-7 h-7 fill-white">
-                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
-              </svg>
+            <div className="w-14 h-14 bg-brand rounded-full flex items-center justify-center mx-auto mb-4">
+              <MessageSquare className="w-7 h-7 fill-white" />
             </div>
             
             <h2 className="text-xl font-bold text-gray-900 mb-2">Inicia sesión para chatear</h2>
@@ -1970,7 +1932,7 @@ function MisContactosPageContent() {
             <div className="space-y-3">
               <a 
                 href="/login"
-                className="block w-full py-3 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
+                className="block w-full py-3 bg-brand text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
               >
                 Iniciar sesión
               </a>
@@ -1983,16 +1945,16 @@ function MisContactosPageContent() {
             </div>
             
             <a href="/" className="block text-gray-400 text-sm mt-4 hover:text-gray-600">
-              ← Volver
+               Volver
             </a>
           </div>
         </div>
       )}
 
-      {/* ──── Sidebar iconos estilo WhatsApp ──── */}
+      {/*  Sidebar iconos estilo WhatsApp  */}
       <div className="w-[76px] bg-white flex flex-col items-center py-3 gap-1 flex-shrink-0 flex">
         {/* Logo Tiyuy */}
-        <div className="w-10 h-10 mb-6 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center shadow-lg">
+        <div className="w-10 h-10 mb-6 rounded-full bg-brand flex items-center justify-center shadow-lg">
           <span className="text-white font-bold text-sm">T</span>
         </div>
 
@@ -2020,12 +1982,12 @@ function MisContactosPageContent() {
         </div>
       </div>
 
-      {/* ──── Contenedor principal para chats y conversación ──── */}
+      {/*  Contenedor principal para chats y conversación  */}
       <div className="flex-1 flex overflow-hidden">
-        {/* ──── Panel lista izquierdo ──── */}
+        {/*  Panel lista izquierdo  */}
         <div className="flex-initial w-[350px] flex flex-col bg-white border-r border-[#e9edef] overflow-hidden">
         {/* Header del panel con gradiente Tiyuy */}
-        <div className="bg-gradient-to-r from-blue-700 to-teal-600 px-4 py-3 flex-shrink-0">
+        <div className="bg-brand px-4 py-3 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-white font-bold text-base leading-tight">
@@ -2067,15 +2029,15 @@ function MisContactosPageContent() {
         </div>
       </div>
 
-      {/* ──── Panel derecho ──── contenido dinámico segun selección ──── */}
+      {/*  Panel derecho  contenido dinámico segun selección  */}
       {activeTab !== 'canales' && (
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Si hay un chat seleccionado, mostrar conversación ocupando todo el espacio */}
         {activeTab === 'chats' && selectedChatId && chats?.find((c: any) => c.id === selectedChatId) ? (
           <div className="flex flex-col h-full" onClick={() => setContextMenu(null)}>
     
-            {/* ── HEADER ── */}
-            <div className="flex items-center gap-3 px-4 py-3 bg-[#075e54] border-b border-[#054d44] flex-shrink-0">
+            {/*  HEADER  */}
+            <div className="flex items-center gap-3 px-4 py-3 bg-brand border-b border-[#054d44] flex-shrink-0">
               <button onClick={() => {
                 setSelectedChatId(null);
                 setReplyToMessage(null);
@@ -2106,13 +2068,13 @@ function MisContactosPageContent() {
               </button>
             </div>
     
-            {/* ── BANNER MENSAJE FIJADO ── */}
+            {/*  BANNER MENSAJE FIJADO  */}
             {pinnedMessage && (
               <div className="flex items-center gap-2 px-4 py-2 bg-white border-b border-gray-200 flex-shrink-0">
-                <div className="w-1 h-8 rounded-full bg-[#075e54] flex-shrink-0" />
+                <div className="w-1 h-8 rounded-full bg-brand flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] font-semibold text-[#075e54]">
-                    📌 {pinnedMessage.isOwn ? 'Tú' : pinnedMessage.senderName?.split(' ')[0]}
+                     {pinnedMessage.isOwn ? 'Tú' : pinnedMessage.senderName?.split(' ')[0]}
                   </p>
                   <p className="text-xs text-gray-600 truncate">{pinnedMessage.content}</p>
                 </div>
@@ -2125,7 +2087,7 @@ function MisContactosPageContent() {
               </div>
             )}
     
-            {/* ── ÁREA DE MENSAJES ── */}
+            {/*  ÁREA DE MENSAJES  */}
             <div
               className="flex-1 overflow-y-auto px-3 py-3 space-y-1"
               style={{
@@ -2136,7 +2098,7 @@ function MisContactosPageContent() {
               {messagesError ? (
                 <div className="flex flex-col items-center justify-center h-full gap-4 text-red-600 p-4">
                   <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                    <span className="text-2xl">⚠️</span>
+                    <span className="text-2xl">️</span>
                   </div>
                   <div className="text-center">
                     <p className="font-semibold">Error al cargar mensajes</p>
@@ -2164,7 +2126,7 @@ function MisContactosPageContent() {
                   .slice()
                   .sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
                   .map((msg: any, index: number, arr: any[]) => {
-                    // ✅ CAMPO CORRECTO: el backend devuelve isOwn: true/false
+                    //  CAMPO CORRECTO: el backend devuelve isOwn: true/false
                     const isMe = msg.isOwn === true;
     
                     const prevMsg = arr[index - 1] ?? null;
@@ -2218,7 +2180,7 @@ function MisContactosPageContent() {
                           >
                             {/* Mensaje respondido */}
                             {(msg.replyToContent || msg.replyToSenderName) && (
-                              <div className="mb-1 p-2 bg-gray-100 rounded-md border-l-2 border-blue-500">
+                              <div className="mb-1 p-2 bg-gray-100 rounded-md border-l-2 border-brand">
                                 <p className="text-xs text-gray-600 font-medium">
                                   Respondiendo a {msg.replyToIsOwn ? 'ti mismo' : msg.replyToSenderName?.split(' ')[0] || 'alguien'}
                                 </p>
@@ -2229,7 +2191,7 @@ function MisContactosPageContent() {
                             {/* Indicador fijado dentro burbuja */}
                             {isPinned && (
                               <span className="text-[10px] text-[#075e54] font-semibold block mb-0.5">
-                                📌 Fijado
+                                 Fijado
                               </span>
                             )}
                             
@@ -2284,7 +2246,7 @@ function MisContactosPageContent() {
               <div ref={messagesEndRef} />
             </div>
     
-            {/* ── MENÚ CONTEXTUAL (clic derecho sobre mensaje) ── */}
+            {/*  MENÚ CONTEXTUAL (clic derecho sobre mensaje)  */}
             {contextMenu && (
               <>
                 <div
@@ -2299,7 +2261,7 @@ function MisContactosPageContent() {
                       setContextMenu(null);
                     }}
                   >
-                    <span>↩️</span>
+                    <span>️</span>
                     Responder
                   </button>
     
@@ -2310,7 +2272,7 @@ function MisContactosPageContent() {
                       setContextMenu(null);
                     }}
                   >
-                    <span>📋</span>
+                    <span></span>
                     Copiar
                   </button>
                   
@@ -2323,7 +2285,7 @@ function MisContactosPageContent() {
                       }, 100);
                     }}
                   >
-                    <span>😊</span>
+                    <span></span>
                     Reaccionar
                   </button>
     
@@ -2334,7 +2296,7 @@ function MisContactosPageContent() {
                       setContextMenu(null);
                     }}
                   >
-                    <span>📌</span>
+                    <span></span>
                     {pinnedMessage?.id === contextMenu.msg.id ? 'Ya está fijado' : 'Fijar mensaje'}
                   </button>
     
@@ -2346,7 +2308,7 @@ function MisContactosPageContent() {
                         setContextMenu(null);
                       }}
                     >
-                      <span>🗑️</span>
+                      <span>️</span>
                       Desfijar mensaje
                     </button>
                   )}
@@ -2354,14 +2316,14 @@ function MisContactosPageContent() {
               </>
             )}
     
-            {/* ── PICKER DE REACCIONES ── */}
+            {/*  PICKER DE REACCIONES  */}
             {showReactionPicker && (
               <div
                 className="fixed z-[10000] bg-white rounded-xl shadow-2xl border border-gray-100 p-2 flex gap-1"
                 style={{ top: showReactionPicker.y, left: Math.min(showReactionPicker.x, window.innerWidth - 250) }}
                 onClick={(e) => e.stopPropagation()}
               >
-                {['👍', '❤️', '😂', '😮', '😢'].map((emoji) => (
+                {['', '️', '', '', ''].map((emoji) => (
                   <button
                     key={emoji}
                     className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-lg transition-colors"
@@ -2379,7 +2341,7 @@ function MisContactosPageContent() {
               </div>
             )}
     
-            {/* ── INPUT DE MENSAJE ── */}
+            {/*  INPUT DE MENSAJE  */}
             <div className="px-3 py-2 bg-[#f0f2f5] flex-shrink-0">
               {/* Mensaje respondido */}
               {replyToMessage && (
@@ -2411,7 +2373,7 @@ function MisContactosPageContent() {
                 <button
                   onClick={handleSendMessage}
                   disabled={!newMessage.trim() || sendMessage.isPending}
-                  className="w-10 h-10 rounded-full bg-[#128c7e] text-white flex items-center justify-center hover:bg-[#075e54] transition-colors disabled:opacity-50 shadow-sm flex-shrink-0"
+                  className="w-10 h-10 rounded-full bg-[#128c7e] text-white flex items-center justify-center hover:bg-brand transition-colors disabled:opacity-50 shadow-sm flex-shrink-0"
                 >
                   <IC.Send />
                 </button>
@@ -2435,7 +2397,7 @@ function MisContactosPageContent() {
             onClose={() => setSelectedStatusId(null)}
           />
         ) : activeTab === 'grupos' ? (
-          // ── PANEL DERECHO DE GRUPOS — cambia según sección o grupo seleccionado ──
+          //  PANEL DERECHO DE GRUPOS  cambia según sección o grupo seleccionado 
           selectedGroup ? (
             <GrupoDetailPanel
               group={selectedGroup}
@@ -2452,7 +2414,7 @@ function MisContactosPageContent() {
               onGroupSelect={(group: any) => setSelectedGroup(group)}
             />
           ) : (
-            // mis-grupos — grid estilo Facebook
+            // mis-grupos  grid estilo Facebook
             <GruposMisGruposView
               user={user}
               onGroupSelect={(group: any) => setSelectedGroup(group)}
@@ -2467,10 +2429,10 @@ function MisContactosPageContent() {
               backgroundSize: '24px 24px',
             }}>
             
-            {/* Contenido que cambia segÃºn el tab seleccionado */}
+            {/* Contenido que cambia según el tab seleccionado */}
             {activeTab === 'chats' && (
-              <div className="text-center px-6">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center mb-6 shadow-2xl">
+              <div className="text-center px-6 flex flex-col items-center">
+                <div className="w-20 h-20 rounded-full bg-brand flex items-center justify-center mb-6 shadow-2xl">
                   <span className="text-white font-bold text-3xl">T</span>
                 </div>
                 <h2 className="text-gray-800 text-2xl font-light mb-2">Tiyuy Mensajes</h2>
@@ -2479,21 +2441,19 @@ function MisContactosPageContent() {
                 </p>
                 <div className="text-center px-4">
                   <p className="text-gray-500 text-xs mb-2">
-                    Busca y agrega contactos por telÃ©fono (solo PerÃº)
+                    Busca y agrega contactos por teléfono (solo Perú)
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-gray-400 text-xs">
-                  <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current">
-                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
-                  </svg>
-                  Tus mensajes estÃ¡n cifrados de extremo a extremo
+                  <Lock className="w-3 h-3 fill-current" />
+                  Tus mensajes están cifrados de extremo a extremo
                 </div>
               </div>
             )}
 
             {activeTab === 'estados' && (
-              <div className="text-center px-6">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center mb-6 shadow-2xl">
+              <div className="text-center px-6 flex flex-col items-center">
+                <div className="w-20 h-20 rounded-full bg-brand flex items-center justify-center mb-6 shadow-2xl">
                   <span className="text-white font-bold text-3xl">E</span>
                 </div>
                 <h2 className="text-gray-800 text-2xl font-light mb-2">Estados</h2>
@@ -2506,9 +2466,7 @@ function MisContactosPageContent() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-gray-400 text-xs">
-                  <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41 1.41L10 14.17V7h2v7.17l3.59-3.59L18 17l-5-5z"/>
-                  </svg>
+                  <Globe className="w-3 h-3 fill-current" />
                   Actualiza tu estado diariamente
                 </div>
               </div>
@@ -2524,19 +2482,17 @@ function MisContactosPageContent() {
             // Vista detallada del canal seleccionado
             <div className="flex-1 flex flex-col bg-white overflow-hidden">
               {/* Header del canal */}
-              <div className="flex-none flex items-center gap-3 px-4 py-3 bg-[#075e54] border-b border-[#054d44]">
+              <div className="flex-none flex items-center gap-3 px-4 py-3 bg-brand border-b border-[#054d44]">
                 <button onClick={() => setSelectedChannel(null)}
                   className="text-white/70 hover:text-white transition-colors">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-                  </svg>
+                  <ArrowLeft className="w-5 h-5 fill-current" />
                 </button>
                 <div className="flex-1 min-w-0">
                   <p className="text-white font-semibold text-sm">{selectedChannel.name}</p>
                   <p className="text-white/60 text-xs">{selectedChannel.subscriberCount?.toLocaleString('es-PE') || 0} suscriptores</p>
                 </div>
                 <button className="text-white/70 hover:text-white transition-colors text-sm">
-                  ⋯
+                  
                 </button>
               </div>
 
@@ -2598,7 +2554,7 @@ function MisContactosPageContent() {
 
 export default function MisContactosPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" /></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand" /></div>}>
       <MisContactosPageContent />
     </Suspense>
   );

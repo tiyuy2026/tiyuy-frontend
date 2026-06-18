@@ -12,7 +12,9 @@ export type DepartmentType =
   | 'PROPERTY_MANAGEMENT' 
   | 'COMMUNICATIONS' 
   | 'FINANCE' 
-  | 'ANALYTICS';
+  | 'ANALYTICS'
+  | 'ACTORS'
+  | 'SYSTEM';
 
 // Permission enum matching backend Permission.java
 export type Permission =
@@ -121,41 +123,44 @@ export interface Department {
   description: string;
 }
 
-// Admin user entity matching AdminUserResponse
+// Admin user entity matching AdminUserResponse from backend
 export interface AdminUser {
   id: number;
   userId: number;
   email: string;
   firstName: string;
   lastName: string;
-  role: AdminRoleType;
+  roleType: AdminRoleType;
   departments: DepartmentType[];
-  permissions: Permission[];
-  isActive: boolean;
+  permissions?: Permission[];
+  additionalPermissions?: Permission[];
+  active: boolean;
   lastLoginAt?: Date;
   createdAt: Date;
-  updatedAt: Date;
 }
 
-// Admin user creation request
-export interface CreateAdminUserRequest {
+// Request to create a new admin/support account (User) via SuperAdminController
+export interface CreateAdminAccountRequest {
   email: string;
+  phone: string;
+  password: string;
   firstName: string;
   lastName: string;
-  password: string;
-  role: AdminRoleType;
-  departmentIds: number[];
-  permissionIds: Permission[];
 }
 
-// Admin user update request
+// Admin user creation request (matches backend CreateAdminUserRequest DTO)
+export interface CreateAdminUserRequest {
+  userId: number;
+  roleType: AdminRoleType;
+  departments: DepartmentType[];
+  additionalPermissions: Permission[];
+}
+
+// Admin user update request (matches backend UpdateAdminUserRequest DTO)
 export interface UpdateAdminUserRequest {
-  firstName?: string;
-  lastName?: string;
-  role?: AdminRoleType;
-  departmentIds?: number[];
-  permissionIds?: Permission[];
-  isActive?: boolean;
+  departments?: DepartmentType[];
+  additionalPermissions?: Permission[];
+  active?: boolean;
 }
 
 // Dashboard stats

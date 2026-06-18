@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ChevronLeft } from 'lucide-react';
 
 export default function CreateGroupView({ user, onBack }: { user: any; onBack: () => void }) {
   return (
@@ -13,9 +14,7 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
             onClick={onBack}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft className="w-6 h-6" />
           </button>
         </div>
 
@@ -28,7 +27,7 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
           <p className="text-gray-600 text-sm text-center max-w-md leading-relaxed mb-8">
             Crea tu propio grupo inmobiliario y conecta con otros profesionales
           </p>
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+          <button className="bg-brand text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
             Crear Grupo
           </button>
         </div>

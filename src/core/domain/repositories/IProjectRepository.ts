@@ -90,14 +90,7 @@ export interface IProjectRepository {
    * Actualizar proyecto existente
    * Usado para: edición de proyectos
    */
-  updateProject(projectId: number, projectData: {
-    description?: string;
-    status?: 'DRAFT' | 'PUBLISHED';
-    phase?: 'PRE_SALE' | 'SALE' | 'DELIVERY';
-    coverImageUrl?: string;
-    expectedDeliveryDate?: string;
-    isFeatured?: boolean;
-  }): Promise<Project>;
+  updateProject(projectId: number, projectData: Partial<Project>): Promise<Project>;
 
   /**
    * Publicar proyecto (DRAFT → PUBLISHED)

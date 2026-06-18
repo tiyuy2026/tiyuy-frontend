@@ -1,4 +1,4 @@
-export type UserRole = 'USER' | 'AGENT' | 'DEVELOPER' | 'ADMIN';
+export type UserRole = 'USER' | 'AGENT' | 'DEVELOPER' | 'ADMIN' | 'SUPER_ADMIN' | 'SUPPORT';
 export type ProfileType = UserRole;
 
 export type AdminRoleType = 'SUPER_ADMIN' | 'ADMIN' | 'SUPPORT';

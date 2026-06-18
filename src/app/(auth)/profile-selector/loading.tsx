@@ -9,16 +9,10 @@ export const metadata: Metadata = {
 
 export default function RegisterUsuarioPage() {
   return (
-    <div className="max-w-2xl mx-auto py-8">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Registro de Usuario
-        </h1>
-        <p className="text-gray-600">
-          Completa tus datos para crear tu cuenta
-        </p>
+    <div className="min-h-[80vh] flex items-center justify-center py-10 px-4">
+      <div className="w-full max-w-sm bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 transition-all duration-300">
+        <RegisterUsuarioForm />
       </div>
-      <RegisterUsuarioForm />
     </div>
   );
 }

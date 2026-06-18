@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Avatar } from './PropertySearchAndContact';
 import { useDirectChatSearch } from '@/presentation/hooks/useDirectChatSearch';
+import { Phone, MapPin, DollarSign, MessageSquare } from 'lucide-react';
 
 interface User {
   id: number;
@@ -127,8 +128,8 @@ export default function DirectChatSearch({ onChatCreated }: DirectChatSearchProp
                   </span>
                 </div>
 
-                <div className="text-gray-600 mb-3">
-                  📞 {user.phone}
+                <div className="text-gray-600 mb-3 flex items-center gap-1">
+                  <Phone className="w-4 h-4" /> {user.phone}
                 </div>
 
                 {/* Properties */}
@@ -142,8 +143,9 @@ export default function DirectChatSearch({ onChatCreated }: DirectChatSearchProp
                         <div key={property.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                           <div>
                             <div className="font-medium text-sm">{property.title}</div>
-                            <div className="text-xs text-gray-600">
-                              📍 {property.city} • 💰 ${property.price}/mes
+                            <div className="text-xs text-gray-600 flex items-center gap-2 mt-1">
+                              <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {property.city}</span>
+                              <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" /> ${property.price}/mes</span>
                             </div>
                           </div>
                         </div>
@@ -156,9 +158,9 @@ export default function DirectChatSearch({ onChatCreated }: DirectChatSearchProp
                 <button
                   onClick={() => handleStartChat(user)}
                   disabled={createDirectChat.isPending}
-                  className="w-full py-2 px-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-lg hover:opacity-90 transition-opacity font-medium disabled:opacity-50"
+                  className="w-full py-2 px-4 bg-brand hover:bg-brand-dark text-white rounded-lg transition-colors font-medium disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  💬 Iniciar Conversación
+                  <MessageSquare className="w-4 h-4" /> Iniciar Conversación
                 </button>
               </div>
             </div>

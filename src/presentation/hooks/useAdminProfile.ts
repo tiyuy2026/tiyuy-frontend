@@ -4,7 +4,7 @@
  */
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { AdminRepository } from '@/infrastructure/repositories/AdminRepository';
 import { AdminUser } from '@/core/domain/entities/Admin';
 import { useAuthStore } from '@/presentation/store/authStore';
@@ -28,7 +28,10 @@ export const useAdminProfile = () => {
       return adminRepository.getAdminByUserId(user.id);
     },
     enabled: !!user?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 30 * 1000, // 30 seconds - para que los cambios de permisos se reflejen rápido
+    refetchOnWindowFocus: true, // Refresca cuando el usuario vuelve a la pestaña
+    refetchInterval: 60 * 1000, // Refresca cada 60 segundos en background
+
   });
 
   // Invalidate and refetch admin profile

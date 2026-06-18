@@ -10,7 +10,9 @@ export interface Channel {
   type: 'PUBLIC' | 'PRIVATE';
   subscriberCount: number;
   isSubscribed: boolean;
-  isOwner: boolean;
+  isAdmin: boolean;
+  isOwner?: boolean;
+  subscribersCanPost?: boolean;
   shareLink: string;
   createdAt: string;
   updatedAt: string;

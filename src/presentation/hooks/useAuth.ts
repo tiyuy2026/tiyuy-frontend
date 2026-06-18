@@ -50,12 +50,11 @@ export const useAuth = () => {
       authStorage.setUser(userData);
       setAuth(response.token, userData, adminData);
       
-      // Redirigir según el rol - check for both ADMIN and SUPERADMIN
-      const targetRoute = (response.role === 'ADMIN' || response.adminRoleType === 'SUPER_ADMIN') ? '/admin' : '/';
+      // Redirigir según el rol - si tiene adminRoleType o el role es ADMIN/SUPPORT/SUPER_ADMIN, es admin del sistema
+      const adminRoles = ['ADMIN', 'SUPER_ADMIN', 'SUPPORT'];
+      const isAdminUser = response.adminRoleType !== undefined || adminRoles.includes(response.role);
+      const targetRoute = isAdminUser ? '/admin' : '/';
       router.replace(targetRoute);
-      setTimeout(() => {
-        window.location.assign(targetRoute);
-      }, 100);
     } catch (err: any) {
       setError(err.message || 'Error al iniciar sesion');
       // No relanzamos el error para evitar que burbujee y cause crash
@@ -103,7 +102,8 @@ export const useAuth = () => {
       }
 
       // Redirigir a la pantalla principal después del registro
-      const targetRoute = response.role === 'ADMIN' ? '/admin' : '/';
+      const adminRoles = ['ADMIN', 'SUPER_ADMIN', 'SUPPORT'];
+      const targetRoute = adminRoles.includes(response.role) ? '/admin' : '/';
       router.push(targetRoute);
     } catch (err: any) {
       setError(err.message || 'Error al registrar usuario');

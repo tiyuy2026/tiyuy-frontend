@@ -287,56 +287,63 @@ export default function HomePage() {
 
                   <div className="p-6 bg-white rounded-b-2xl">
                     <div className="flex flex-col lg:flex-row gap-3 relative">
-                      <select 
-                        value={selectedPropertyType}
-                        onChange={(e) => setSelectedPropertyType(e.target.value)}
-                        className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white w-full lg:w-[180px]"
-                      >
-                        {getPropertyTypes().map(type => (
-                          <option key={type.value} value={type.value}>
-                            {type.label}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="flex-1">
+                        <select 
+                          value={selectedPropertyType}
+                          onChange={(e) => setSelectedPropertyType(e.target.value)}
+                          className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white"
+                        >
+                          {getPropertyTypes().map(type => (
+                            <option key={type.value} value={type.value}>
+                              {type.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
 
                       {activeTab !== 'projects' && (selectedPropertyType === 'departamentos' || selectedPropertyType === 'casas') ? (
-                        <select 
-                          value={selectedBedrooms}
-                          onChange={(e) => setSelectedBedrooms(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white w-full lg:w-[140px]"
-                        >
-                          <option value="">Habitaciones</option>
-                          <option value="1">1 habitación</option>
-                          <option value="2">2 habitaciones</option>
-                          <option value="3">3 habitaciones</option>
-                          <option value="4">4 habitaciones</option>
-                          <option value="5">5+ habitaciones</option>
-                        </select>
+                        <div className="flex-1">
+                          <select 
+                            value={selectedBedrooms}
+                            onChange={(e) => setSelectedBedrooms(e.target.value)}
+                            className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white"
+                          >
+                            <option value="">Habitaciones</option>
+                            <option value="1">1 habitación</option>
+                            <option value="2">2 habitaciones</option>
+                            <option value="3">3 habitaciones</option>
+                            <option value="4">4 habitaciones</option>
+                            <option value="5">5+ habitaciones</option>
+                          </select>
+                        </div>
                       ) : activeTab !== 'projects' && selectedPropertyType === 'habitaciones' ? (
-                        <select 
-                          value={selectedBathrooms}
-                          onChange={(e) => setSelectedBathrooms(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white w-full lg:w-[140px]"
-                        >
-                          <option value="">Baños</option>
-                          <option value="propio">Propio</option>
-                          <option value="compartido">Compartido</option>
-                        </select>
+                        <div className="flex-1">
+                          <select 
+                            value={selectedBathrooms}
+                            onChange={(e) => setSelectedBathrooms(e.target.value)}
+                            className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white"
+                          >
+                            <option value="">Baños</option>
+                            <option value="propio">Propio</option>
+                            <option value="compartido">Compartido</option>
+                          </select>
+                        </div>
                       ) : activeTab !== 'projects' && ['oficinas', 'terrenos', 'locales', 'lotes'].includes(selectedPropertyType) ? (
-                        <input
-                          type="number"
-                          placeholder="Área mínima (m²)"
-                          value={selectedMinArea}
-                          onChange={(e) => setSelectedMinArea(e.target.value)}
-                          className="px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white w-full lg:w-[140px]"
-                        />
+                        <div className="flex-1">
+                          <input
+                            type="number"
+                            placeholder="Área mínima (m²)"
+                            value={selectedMinArea}
+                            onChange={(e) => setSelectedMinArea(e.target.value)}
+                            className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white"
+                          />
+                        </div>
                       ) : null}
 
-                      <div className="flex-1 relative">
+                      <div className="flex-[2]">
                         <LocationSearch
                           onLocationSelect={handleLocationSelect}
                           placeholder="Ingresa ubicaciones o características (ej: piscina)"
-                          className="w-full"
                         />
                       </div>
 
@@ -355,8 +362,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[var(--bg-primary)] border-b border-[var(--border-light)]">
-        <div className="w-full px-4 sm:px-8 xl:px-16">
+      <section className="bg-[var(--bg-primary)]">
+        <div className="w-full px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             <div className="flex gap-6 sm:gap-8 overflow-x-auto scrollbar-none">
               {links.map(({ href, label }) => {
@@ -380,8 +387,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 bg-[var(--bg-primary)] border-b border-[var(--border-light)]">
-        <div className="w-full px-4 sm:px-8 xl:px-16">
+      <section className="py-2 sm:py-3 bg-[var(--bg-primary)]">
+        <div className="w-full px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
               {quickLinks.map(({ href, icon, title, description, actionText }) => (
@@ -410,14 +417,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-10 bg-background border-b border-gray-100">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto">
           <FeaturedProperties />
         </div>
       </section>
 
       {/* DEPARTAMENTOS EN ALQUILER */}
-      <section className="py-10 bg-background border-b border-gray-100">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto">
           <FilteredProperties 
             title="Departamentos para alquilar" 
@@ -428,7 +435,7 @@ export default function HomePage() {
       </section>
 
       {/* CASAS EN VENTA */}
-      <section className="py-10 bg-background border-b border-gray-100">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto">
           <FilteredProperties 
             title="Casas disponibles para compra" 
@@ -439,14 +446,14 @@ export default function HomePage() {
       </section>
 
       {/* PROYECTOS INMOBILIARIOS */}
-      <section className="py-10 bg-background border-b border-gray-100">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto">
           <FeaturedProjects />
         </div>
       </section>
 
       {/* OFICINAS Y LOCALES */}
-      <section className="py-10 bg-background border-b border-gray-100">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto">
           <FilteredProperties 
             title="Espacios para tu negocio" 
@@ -457,7 +464,7 @@ export default function HomePage() {
       </section>
 
       {/* TERRENOS */}
-      <section className="py-10 bg-background">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto">
           <FilteredProperties 
             title="Terrenos y lotes de inversión" 
@@ -470,7 +477,7 @@ export default function HomePage() {
       {/* CAMPAÑAS DE MARKETING DESTACADAS */}
       <FeaturedCampaigns />
 
-      <section className="py-12 bg-background border-t border-gray-200/60">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             <h2 className="text-2xl font-bold text-foreground mb-6">

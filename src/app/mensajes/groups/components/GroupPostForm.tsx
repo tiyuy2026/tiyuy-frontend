@@ -220,7 +220,7 @@ export function GrupoPostForm({ groupId, currentUserId, onClose, onSuccess }: Gr
                   onClick={() => setFontStyle(style)}
                   className={`px-3 py-1 rounded-lg border ${
                     fontStyle === style
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      ? 'border-blue-500 bg-brand/10 text-brand-dark'
                       : 'border-gray-300 text-gray-700'
                   }`}
                 >
@@ -244,7 +244,7 @@ export function GrupoPostForm({ groupId, currentUserId, onClose, onSuccess }: Gr
                   onClick={() => setBorderStyle(style)}
                   className={`px-3 py-1 rounded-lg border ${
                     borderStyle === style
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      ? 'border-blue-500 bg-brand/10 text-brand-dark'
                       : 'border-gray-300 text-gray-700'
                   }`}
                 >
@@ -369,7 +369,7 @@ export function GrupoPostForm({ groupId, currentUserId, onClose, onSuccess }: Gr
           <button
             type="submit"
             disabled={isCreatingPost || !content.trim()}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="flex-1 px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
             {isCreatingPost ? 'Publicando...' : 'Publicar'}
           </button>

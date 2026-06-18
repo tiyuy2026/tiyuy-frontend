@@ -9,6 +9,7 @@ import { PlanCard } from '@/presentation/components/finance';
 import { SubscriptionPlan } from '@/core/domain/entities/Wallet';
 import { authStorage } from '@/infrastructure/storage/auth-storage';
 import { toast } from 'sonner';
+import { Crown, Loader } from 'lucide-react';
 
 interface PlansTabProps {
   user: User;
@@ -144,9 +145,7 @@ export const PlansTab: React.FC<PlansTabProps> = ({ user }) => {
       {user.role === 'AGENT' && agentDiscounts && agentDiscounts.length > 0 && (
         <div className="mb-8 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6">
           <div className="flex items-center gap-2 mb-4">
-            <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2l-5.5 9h11L12 2zm0 3.84L13.93 9h-3.87L12 5.84zM17.5 13c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zm-.88 6.32l-2.06-2.06 1.06-1.06 1 1 2.62-2.62 1.06 1.06-3.68 3.68zM3 21.5h8v-8H3v8zm2-6h4v4H5v-4z"/>
-            </svg>
+            <Crown className="w-5 h-5 text-green-600" />
             <h3 className="text-lg font-bold text-green-900">Tus Códigos de Descuento</h3>
           </div>
           <div className="space-y-3">
@@ -247,10 +246,7 @@ export const PlansTab: React.FC<PlansTabProps> = ({ user }) => {
           >
             {subscribeMutation.isPending ? (
               <span className="flex items-center gap-2">
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
+                <Loader className="animate-spin h-5 w-5" />
                 Procesando...
               </span>
             ) : (

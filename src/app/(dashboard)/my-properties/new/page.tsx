@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { PropertyForm } from '@/presentation/components/property/PropertyForm/PropertyForm';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { useMyProperties } from '@/presentation/hooks/useProperties';
 import { useActiveSubscription } from '@/presentation/hooks/useFinance';
-import { useEffect } from 'react';
+import { ChevronLeft, Check, ChevronRight } from 'lucide-react';
+import { AdminRestrictionGuard } from '@/presentation/components/guards/AdminRestrictionGuard';
 
 const STEPS = [
   { number: 1, title: 'Información básica', description: 'Tipo y precio' },
@@ -34,22 +35,19 @@ export default function NuevaPropiedadPage() {
   const remainingPublications =
     activeSubscription?.remainingPublications ?? (1 - publishedCount);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isAuthenticated) router.push('/login');
   }, [isAuthenticated, router]);
 
   // Limpiar cualquier estado residual que pueda afectar el formulario
   useEffect(() => {
-    // Forzar limpieza de estilos globales que puedan interferir
     document.body.style.overflow = '';
     document.body.style.margin = '';
     document.body.style.padding = '';
     
-    // Limpiar clases que puedan haber sido agregadas por otras páginas
     document.body.classList.remove('overflow-hidden', 'modal-open');
     
     return () => {
-      // Cleanup al salir de la página
       document.body.style.overflow = '';
       document.body.style.margin = '';
       document.body.style.padding = '';
@@ -58,38 +56,37 @@ export default function NuevaPropiedadPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#0f172a]">
         <div className="text-center">
           <div
             className="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent mx-auto mb-3"
             style={{ borderColor: '#00a63e', borderTopColor: 'transparent' }}
           />
-          <p className="text-sm text-gray-400">Verificando autenticación...</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">Verificando autenticación...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f5f5f5' }}>
+    <AdminRestrictionGuard feature="publish">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#0f172a] transition-colors duration-200">
 
       {/* ── TOP NAV ── */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+      <header className="bg-white dark:bg-[#1a2332] border-b border-gray-200 dark:border-gray-700/50 sticky top-0 z-20">
+        <div className="max-w-9xl mx-auto px-8 xl:px-16 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/dashboard')}
-              className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+              className="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <ChevronLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Volver</span>
             </button>
-            <span className="text-gray-300 select-none hidden sm:block">|</span>
+            <span className="text-gray-300 dark:text-gray-600 select-none hidden sm:block">|</span>
             <button
               onClick={() => router.push('/my-properties')}
-              className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors hidden sm:block"
+              className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors hidden sm:block cursor-pointer"
             >
               Ir a historial
             </button>
@@ -97,12 +94,11 @@ export default function NuevaPropiedadPage() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <span
-              className="text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-full"
-              style={
-                canPublish
-                  ? { backgroundColor: '#f0fdf4', color: '#00a63e' }
-                  : { backgroundColor: '#fef2f2', color: '#dc2626' }
-              }
+              className={`text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-full ${
+                canPublish 
+                  ? 'bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400' 
+                  : 'bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400'
+              }`}
             >
               <span className="hidden sm:inline">{canPublish
                 ? `${remainingPublications}/${maxPublications} publicaciones disponibles`
@@ -120,8 +116,8 @@ export default function NuevaPropiedadPage() {
       </header>
 
       {/* ── MOBILE STEPPER ── */}
-      <div className="lg:hidden bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div className="lg:hidden bg-white dark:bg-[#1a2332] border-b border-gray-200 dark:border-gray-700/50">
+        <div className="max-w-9xl mx-auto px-8 xl:px-16 py-3">
           <div className="flex items-center justify-between">
             {STEPS.map((step, index) => {
               const isDone = currentStep > step.number;
@@ -138,13 +134,11 @@ export default function NuevaPropiedadPage() {
                       }
                     >
                       {isDone ? (
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                        </svg>
+                        <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                       ) : step.number}
                     </div>
                     <p className={`text-[10px] font-medium mt-1 text-center ${
-                      isActive ? 'text-gray-900' : isDone ? 'text-green-600' : 'text-gray-400'
+                      isActive ? 'text-gray-900 dark:text-white' : isDone ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'
                     }`}>
                       {step.title.split(' ')[0]}
                     </p>
@@ -163,14 +157,13 @@ export default function NuevaPropiedadPage() {
       </div>
 
       {/* ── BODY ── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex gap-8 items-start">
+      <div className="max-w-9xl mx-auto px-8 xl:px-16 py-6 sm:py-8 flex gap-8 items-start">
 
         {/* ── SIDEBAR: STEPPER ── */}
         <aside className="w-64 flex-shrink-0 hidden lg:block">
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden sticky top-20"
-            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-            <div className="px-5 py-4 border-b border-gray-100">
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+          <div className="bg-white dark:bg-[#1a2332] rounded-xl border border-gray-200 dark:border-gray-700/50 overflow-hidden sticky top-20 shadow-sm">
+            <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-700/50">
+              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
                 Publicar propiedad
               </p>
             </div>
@@ -191,9 +184,7 @@ export default function NuevaPropiedadPage() {
                         }
                       >
                         {isDone ? (
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                          </svg>
+                          <Check className="w-4 h-4 stroke-[2.5]" />
                         ) : step.number}
                       </div>
                       {index < STEPS.length - 1 && (
@@ -205,11 +196,11 @@ export default function NuevaPropiedadPage() {
                     </div>
                     <div className="pb-10">
                       <p className={`text-sm font-semibold leading-none mt-1.5 ${
-                        isActive ? 'text-gray-900' : isDone ? '' : 'text-gray-400'
-                      }`} style={isDone ? { color: '#00a63e' } : {}}>
+                        isActive ? 'text-gray-900 dark:text-white' : isDone ? 'text-[#00a63e] dark:text-green-400' : 'text-gray-400 dark:text-gray-500'
+                      }`}>
                         {step.title}
                       </p>
-                      <p className="text-xs text-gray-400 mt-1">{step.description}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{step.description}</p>
                     </div>
                   </div>
                 );
@@ -217,10 +208,9 @@ export default function NuevaPropiedadPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 mt-4 overflow-hidden sticky top-[380px]"
-            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-            <div className="px-5 py-4 border-b border-gray-100">
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+          <div className="bg-white dark:bg-[#1a2332] rounded-xl border border-gray-200 dark:border-gray-700/50 mt-4 overflow-hidden sticky top-[380px] shadow-sm">
+            <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-700/50">
+              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
                 ¿Necesitas ayuda?
               </p>
             </div>
@@ -233,12 +223,9 @@ export default function NuevaPropiedadPage() {
                 <a
                   key={label}
                   href={href}
-                  className="flex items-center gap-2 text-sm font-medium transition-colors hover:opacity-80"
-                  style={{ color: '#00a63e' }}
+                  className="flex items-center gap-2 text-sm font-medium transition-colors hover:opacity-80 text-[#00a63e] dark:text-green-400"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  <ChevronRight className="w-3.5 h-3.5" />
                   {label}
                 </a>
               ))}
@@ -248,8 +235,7 @@ export default function NuevaPropiedadPage() {
 
         {/* ── MAIN: FORM ── */}
         <main className="flex-1 min-w-0">
-          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 lg:p-8 min-h-[600px]"
-            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+          <div className="bg-white dark:bg-[#1a2332] rounded-xl border border-gray-200 dark:border-gray-700/50 p-4 sm:p-6 lg:p-8 min-h-[600px] shadow-sm">
             <PropertyForm
               mode="create"
               onStepChange={setCurrentStep}
@@ -259,29 +245,26 @@ export default function NuevaPropiedadPage() {
       </div>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-white border-t border-gray-200 mt-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+      <footer className="bg-white dark:bg-[#1a2332] border-t border-gray-200 dark:border-gray-700/50 mt-6">
+        <div className="max-w-9xl mx-auto px-8 xl:px-16 py-6 sm:py-8 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-3">¿Por qué publicar con nosotros?</h4>
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">¿Por qué publicar con nosotros?</h4>
             <ul className="space-y-2">
               {[
                 'Alcance nacional a miles de compradores',
                 'Publicación gratuita sin comisiones',
                 'Soporte personalizado 24/7',
               ].map((item) => (
-                <li key={item} className="flex items-start gap-2 text-sm text-gray-500">
-                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"
-                    style={{ color: '#00a63e' }}>
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
+                <li key={item} className="flex items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#00a63e] dark:text-green-400" />
                   {item}
                 </li>
               ))}
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-3">Consejos para una buena publicación</h4>
-            <ul className="space-y-1.5 text-sm text-gray-500">
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Consejos para una buena publicación</h4>
+            <ul className="space-y-1.5 text-sm text-gray-500 dark:text-gray-400">
               {[
                 'Toma fotos de alta calidad y buena iluminación',
                 'Describe detalladamente las características',
@@ -290,7 +273,7 @@ export default function NuevaPropiedadPage() {
                 'Responde rápidamente a las consultas',
               ].map((tip) => (
                 <li key={tip} className="flex items-start gap-2">
-                  <span className="font-bold mt-0.5" style={{ color: '#00a63e' }}>·</span> {tip}
+                  <span className="font-bold mt-0.5 text-[#00a63e] dark:text-green-400">·</span> {tip}
                 </li>
               ))}
             </ul>
@@ -298,5 +281,6 @@ export default function NuevaPropiedadPage() {
         </div>
       </footer>
     </div>
+    </AdminRestrictionGuard>
   );
 }

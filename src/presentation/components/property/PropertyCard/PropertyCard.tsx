@@ -11,12 +11,10 @@ interface PropertyCardProps {
   property: Property | PropertySummary;
 }
 
-// Type guard to check if property is full Property (has seo)
 function isFullProperty(property: Property | PropertySummary): property is Property {
   return 'seo' in property && property.seo !== undefined;
 }
 
-// Get the slug from either Property or PropertySummary
 function getPropertySlug(property: Property | PropertySummary): string {
   if (isFullProperty(property)) {
     return property.seo?.slug ?? String(property.id);
@@ -25,8 +23,6 @@ function getPropertySlug(property: Property | PropertySummary): string {
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
-  // Rating y comentarios se obtienen desde el backend en endpoints públicos
-  // cuando estén disponibles. Por ahora se muestran valores por defecto.
   const commentCount: number | null = null;
 
   const PROPERTY_TYPE_LABELS: Record<string, string> = {
@@ -48,7 +44,6 @@ export function PropertyCard({ property }: PropertyCardProps) {
     return `${symbol} ${price.toLocaleString('es-PE')}`;
   };
 
-  // Helper to render lifecycle status badge
   const renderLifecycleBadge = () => {
     const lifecycleStatus = property.lifecycleStatus;
     const remainingDays = property.remainingGraceDays;
@@ -84,9 +79,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
   };
 
   return (
-    <div className="group flex flex-col w-full h-full cursor-pointer">
-      {/* Imagen */}
-      <Link href={`/property/${getPropertySlug(property)}`} className="relative w-full aspect-square rounded-xl overflow-hidden mb-3">
+    <div className="group flex flex-col w-full h-full cursor-pointer overflow-hidden">
+      <Link href={`/property/${getPropertySlug(property)}`} className="relative w-full aspect-square rounded-xl overflow-hidden mb-2.5 block">
         {property.coverPhotoUrl ? (
           <LazyImage
             src={`/api/images/proxy?url=${encodeURIComponent(property.coverPhotoUrl)}`}
@@ -95,52 +89,47 @@ export function PropertyCard({ property }: PropertyCardProps) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-100">
-            <span className="text-gray-400 text-6xl">🏠</span>
+            <span className="text-gray-400 text-5xl">🏠</span>
           </div>
         )}
 
-        {/* Overlay gradient - reducido para un look más limpio */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-transparent opacity-50" />
 
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
+        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
           {property.isFeatured && (
-            <div className="bg-white text-gray-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
+            <div className="bg-white text-gray-900 text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
               Destacado
             </div>
           )}
           {property.isVerified && (
-            <div className="bg-white text-gray-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1">
-              <BadgeCheck className="w-3.5 h-3.5 text-blue-500" />
+            <div className="bg-white text-gray-900 text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1">
+              <BadgeCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-500" />
               Verificado
             </div>
           )}
         </div>
 
-        {/* Botón de favorito */}
-        <div className="absolute top-3 right-3 z-10">
-          <div className="hover:scale-110 transition-transform drop-shadow-md">
+        <div className="absolute top-2.5 right-2.5 z-10">
+          <div className="hover:scale-110 transition-transform drop-shadow-md scale-90 sm:scale-100">
             <FavoriteButton propertyId={property.id} />
           </div>
         </div>
 
-        {/* Lifecycle status badge */}
         {renderLifecycleBadge()}
       </Link>
 
-      {/* Contenido Minimalista estilo Airbnb */}
-      <Link href={`/property/${getPropertySlug(property)}`} className="flex flex-col flex-grow mt-1">
-        <div className="flex justify-between items-start gap-2">
-          <h3 className="text-[15px] font-semibold text-gray-900 line-clamp-1">
+      <Link href={`/property/${getPropertySlug(property)}`} className="flex flex-col flex-grow mt-0.5 w-full min-w-0 overflow-hidden">
+        <div className="flex justify-between items-start gap-1.5 w-full min-w-0">
+          <h3 className="text-[14px] sm:text-[15px] font-semibold text-gray-900 truncate flex-1 min-w-0">
             {PROPERTY_TYPE_LABELS[property.type] || 'Propiedad'} en {'location' in property ? property.location?.district : property.district || 'Ubicación'}
           </h3>
-          <div className="flex items-center gap-1 text-[14px] text-gray-900 flex-shrink-0">
-            <Star className="w-3.5 h-3.5 text-gray-900 fill-gray-900" />
-            <span>Nuevo</span>
+          <div className="flex items-center gap-0.5 sm:gap-1 text-[13px] sm:text-[14px] text-gray-900 flex-shrink-0 min-w-fit pl-0.5">
+            <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-900 fill-gray-900 flex-shrink-0" />
+            <span className="whitespace-nowrap select-none">Nuevo</span>
           </div>
         </div>
 
-        <p className="text-[14px] text-gray-500 truncate mt-0.5">
+        <p className="text-[13px] sm:text-[14px] text-gray-500 truncate mt-0.5 w-full">
           {[
             property.bedrooms && `${property.bedrooms} camas`,
             property.bathrooms && `${property.bathrooms} baños`,
@@ -148,20 +137,19 @@ export function PropertyCard({ property }: PropertyCardProps) {
           ].filter(Boolean).join(' · ')}
         </p>
 
-        <div className="mt-1 flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <span className="text-[15px] font-semibold text-gray-900">
+        <div className="mt-0.5 flex items-center justify-between w-full">
+          <div className="flex items-center gap-1 min-w-0">
+            <span className="text-[14px] sm:text-[15px] font-semibold text-gray-900 truncate">
               {formatPrice(property.price, property.currency)}
             </span>
-            <span className="text-[15px] text-gray-900">
+            <span className="text-[14px] sm:text-[15px] text-gray-900 whitespace-nowrap">
               {property.transactionType === 'RENT' ? ' / mes' : ''}
             </span>
           </div>
           
-          {/* Contador de comentarios pequeño */}
           {commentCount !== null && commentCount > 0 && (
-            <div className="flex items-center gap-1 text-xs text-gray-400">
-              <MessageCircle className="w-3 h-3" />
+            <div className="flex items-center gap-1 text-[11px] text-gray-400 flex-shrink-0">
+              <MessageCircle className="w-2.5 h-2.5" />
               <span>{commentCount}</span>
             </div>
           )}

@@ -6,37 +6,17 @@
 
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState, useMemo } from 'react';
 import { useAdminProfile } from '@/presentation/hooks/useAdminProfile';
 import { useAuthStore } from '@/presentation/store/authStore';
+import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { Spinner } from '@/presentation/components/ui/Spinner';
 import { Card } from '@/presentation/components/ui/Card';
+import { authStorage } from '@/infrastructure/storage/auth-storage';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { AdminHeader } from '@/presentation/components/admin/AdminHeader/AdminHeader';
-import {
-  LayoutDashboard,
-  Users,
-  Building,
-  Package,
-  UserCircle,
-  Building2,
-  Tag,
-  Megaphone,
-  MessageSquare,
-  Bell,
-  Layers,
-  BarChart3,
-  ShieldCheck,
-  Activity,
-  FileText,
-  Menu,
-  X,
-  Search,
-  ChevronDown,
-  ChevronRight,
-  DollarSign,
-} from 'lucide-react';
+import { Activity, Bell, Building, Building2, DollarSign, Layers, LayoutDashboard, LogOut, Megaphone, MessageSquare, Package, ShieldAlert, ShieldCheck, Tag, TriangleAlert, UserCircle, Users } from 'lucide-react';
 
 interface GitHubShellProps {
   children: ReactNode;
@@ -55,9 +35,18 @@ interface NavSection {
   items: NavItem[];
 }
 
-// ─── Configuración del menú ─────────────────────────────────────────────────
+// ─── Configuración del menú con permisos requeridos ─────────────────────────
 
-const NAV_SECTIONS: NavSection[] = [
+interface NavItemWithPermission extends NavItem {
+  requiredPermission?: string;
+}
+
+interface NavSectionWithPermission {
+  title: string;
+  items: NavItemWithPermission[];
+}
+
+const NAV_SECTIONS: NavSectionWithPermission[] = [
   {
     title: '',
     items: [
@@ -67,45 +56,45 @@ const NAV_SECTIONS: NavSection[] = [
   {
     title: 'USUARIOS',
     items: [
-      { label: 'Usuarios', href: '/admin/users', icon: Users },
+      { label: 'Usuarios', href: '/admin/users', icon: Users, requiredPermission: 'USERS_VIEW' },
     ],
   },
   {
     title: 'PROPIEDADES',
     items: [
-      { label: 'Propiedades', href: '/admin/properties', icon: Building },
-      { label: 'Proyectos', href: '/admin/projects', icon: Package },
+      { label: 'Propiedades', href: '/admin/properties', icon: Building, requiredPermission: 'PROPERTIES_VIEW' },
+      { label: 'Proyectos', href: '/admin/projects', icon: Package, requiredPermission: 'PROJECTS_VIEW' },
     ],
   },
   {
     title: 'ACTORES',
     items: [
-      { label: 'Agentes Independientes', href: '/admin/agents', icon: UserCircle },
-      { label: 'Inmobiliarias', href: '/admin/agencies', icon: Building2 },
-      { label: 'Grupos', href: '/admin/groups', icon: Users },
+      { label: 'Agentes Independientes', href: '/admin/agents', icon: UserCircle, requiredPermission: 'USERS_VIEW' },
+      { label: 'Inmobiliarias', href: '/admin/agencies', icon: Building2, requiredPermission: 'AGENCIES_VIEW' },
+      { label: 'Grupos', href: '/admin/groups', icon: Users, requiredPermission: 'GROUPS_VIEW' },
     ],
   },
   {
     title: 'MONETIZACION',
     items: [
-      { label: 'Planes', href: '/admin/plans', icon: Layers },
-      { label: 'Descuentos', href: '/admin/discounts', icon: Tag },
-      { label: 'Campanas', href: '/admin/campaigns', icon: Megaphone },
-      { label: 'Finanzas', href: '/admin/finance', icon: DollarSign },
+      { label: 'Planes', href: '/admin/plans', icon: Layers, requiredPermission: 'FINANCE_VIEW' },
+      { label: 'Descuentos', href: '/admin/discounts', icon: Tag, requiredPermission: 'DISCOUNTS_CREATE' },
+      { label: 'Campanas', href: '/admin/campaigns', icon: Megaphone, requiredPermission: 'COMMUNICATIONS_MANAGE' },
+      { label: 'Finanzas', href: '/admin/finance', icon: DollarSign, requiredPermission: 'FINANCE_VIEW' },
     ],
   },
   {
     title: 'COMUNICACION',
     items: [
-      { label: 'Comunicaciones', href: '/admin/communications', icon: MessageSquare },
-      { label: 'Notificaciones', href: '/admin/notifications', icon: Bell },
+      { label: 'Comunicaciones', href: '/admin/communications', icon: MessageSquare, requiredPermission: 'COMMUNICATIONS_VIEW' },
+      { label: 'Notificaciones', href: '/admin/notifications', icon: Bell, requiredPermission: 'NOTIFICATIONS_SEND' },
     ],
   },
   {
     title: 'SISTEMA',
     items: [
-      { label: 'Administradores', href: '/admin/admins', icon: Users },
-      { label: 'Actividad', href: '/admin/activities', icon: Activity },
+      { label: 'Administradores', href: '/admin/admins', icon: Users, requiredPermission: 'ADMINS_VIEW' },
+      { label: 'Actividad', href: '/admin/activities', icon: Activity, requiredPermission: 'AUDIT_LOGS_VIEW' },
     ],
   },
   {
@@ -154,42 +143,38 @@ function SidebarItem({
 
 function Sidebar({
   collapsed,
-  isSuperAdmin,
-  isSupport,
 }: {
   collapsed: boolean;
-  isSuperAdmin: boolean;
-  isSupport: boolean;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuthStore();
+  const { hasPermission, isSuperAdmin, isSupport } = usePermissions();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  // Filtra items según rol
-  const filteredSections = NAV_SECTIONS.map((section) => {
-    let items = section.items;
+  const handleLogout = () => {
+    authStorage.clear();
+    logout();
+    router.push('/login');
+  };
 
-    // Monetizacion oculta para soporte
-    if (section.title === 'MONETIZACION' && isSupport) {
-      items = [];
-    }
-
-    // Sistema: admins solo para super admin
-    if (section.title === 'SISTEMA') {
-      items = items.filter((item) => {
-        if (item.href === '/admin/admins' && !isSuperAdmin) {
-          return false;
-        }
-        return true;
+  // Filtra items según permisos dinámicos
+  const filteredSections = useMemo(() => {
+    return NAV_SECTIONS.map((section) => {
+      const items = section.items.filter((item) => {
+        if (!item.requiredPermission) return true;
+        if (isSuperAdmin) return true;
+        return hasPermission(item.requiredPermission);
       });
-    }
-
-    return { ...section, items };
-  }).filter((s) => s.items.length > 0);
+      return { ...section, items };
+    }).filter((s) => s.items.length > 0);
+  }, [isSuperAdmin, hasPermission]);
 
   return (
+    <>
     <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1 scrollbar-thin scrollbar-thumb-white/10">
       {filteredSections.map((section, si) => (
         <div key={si} className={si > 0 ? 'pt-3' : ''}>
-          {/* Label de sección */}
           {section.title && !collapsed && (
             <div className="px-3 pb-1">
               <span className="text-[10px] font-semibold tracking-widest text-gray-500 uppercase">
@@ -201,7 +186,6 @@ function Sidebar({
             <div className="border-t border-white/10 my-2" />
           )}
 
-          {/* Items */}
           <div className="space-y-0.5">
             {section.items.map((item) => (
               <SidebarItem
@@ -218,7 +202,57 @@ function Sidebar({
           </div>
         </div>
       ))}
+
+      <div className={collapsed ? 'border-t border-white/10 my-2' : 'pt-3'}>
+        {!collapsed && (
+          <div className="px-3 pb-1">
+            <span className="text-[10px] font-semibold tracking-widest text-gray-500 uppercase">
+              SESION
+            </span>
+          </div>
+        )}
+        {collapsed && <div className="border-t border-white/10 my-2" />}
+        <button
+          onClick={() => setShowLogoutModal(true)}
+          title={collapsed ? 'Cerrar sesión' : undefined}
+          className={`
+            flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-150 w-full
+            text-gray-400 hover:text-red-400 hover:bg-red-900/30
+            ${collapsed ? 'justify-center px-2' : ''}
+          `}
+        >
+          <LogOut className="w-[18px] h-[18px] shrink-0" />
+          {!collapsed && <span className="truncate cursor-pointer">Cerrar sesión</span>}
+        </button>
+      </div>
     </nav>
+
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowLogoutModal(false)} />
+          <div className="relative bg-[#1e2a3a] rounded-xl shadow-2xl w-full max-w-sm p-6 border border-white/10">
+            <h3 className="text-lg font-semibold text-white mb-2">Cerrar sesión</h3>
+            <p className="text-sm text-gray-400 mb-6">
+              ¿Estás seguro de que quieres cerrar sesión?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 text-sm text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition"
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -229,23 +263,21 @@ export function GitHubShell({ children }: GitHubShellProps) {
   const { setAdminProfile } = useAuthStore();
   const [collapsed, setCollapsed] = useState(false);
 
-  // Sincroniza auth store
   useEffect(() => {
     if (adminProfile) {
       setAdminProfile(
-        adminProfile.role,
+        adminProfile.roleType,
         adminProfile.departments,
-        adminProfile.permissions,
-        adminProfile.isActive,
+        adminProfile.permissions || adminProfile.additionalPermissions || [],
+        adminProfile.active,
       );
     }
   }, [adminProfile, setAdminProfile]);
 
-  const isSuperAdmin = adminProfile?.role === 'SUPER_ADMIN';
-  const isRegularAdmin = adminProfile?.role === 'ADMIN';
-  const isSupport = adminProfile?.role === 'SUPPORT';
+  const isSuperAdmin = adminProfile?.roleType === 'SUPER_ADMIN';
+  const isRegularAdmin = adminProfile?.roleType === 'ADMIN';
+  const isSupport = adminProfile?.roleType === 'SUPPORT';
 
-  // ── Loading ──
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -257,16 +289,13 @@ export function GitHubShell({ children }: GitHubShellProps) {
     );
   }
 
-  // ── Error ──
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Card className="max-w-md mx-auto p-6">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
+              <TriangleAlert className="w-8 h-8 text-red-600" />
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Error de Perfil Admin</h2>
             <p className="text-gray-600 mb-4 text-sm">
@@ -284,16 +313,13 @@ export function GitHubShell({ children }: GitHubShellProps) {
     );
   }
 
-  // ── Sin perfil ──
   if (!adminProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Card className="max-w-md mx-auto p-6">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-yellow-100 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
+              <ShieldAlert className="w-8 h-8 text-yellow-600" />
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Acceso Restringido</h2>
             <p className="text-gray-600 mb-4 text-sm">
@@ -311,28 +337,20 @@ export function GitHubShell({ children }: GitHubShellProps) {
     );
   }
 
-  // ── Layout principal ──
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Header fijo */}
       <AdminHeader onToggleSidebar={() => setCollapsed((v) => !v)} />
 
       <div className="flex h-[calc(100vh-56px)] overflow-hidden">
-        {/* Sidebar - full height, dark background */}
         <aside
           className={`
             h-full bg-[#1a2030] shrink-0 transition-all duration-200 ease-in-out overflow-y-auto
             ${collapsed ? 'w-[60px]' : 'w-[240px]'}
           `}
         >
-          <Sidebar
-            collapsed={collapsed}
-            isSuperAdmin={isSuperAdmin}
-            isSupport={isSupport}
-          />
+          <Sidebar collapsed={collapsed} />
         </aside>
 
-        {/* Contenido principal - scrollable */}
         <main className="flex-1 h-full overflow-y-auto bg-gray-50 p-6">
           {children}
         </main>
