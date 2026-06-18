@@ -11,10 +11,11 @@ import { useAdminProfile } from '@/presentation/hooks/useAdminProfile';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { Spinner } from '@/presentation/components/ui/Spinner';
 import { Card } from '@/presentation/components/ui/Card';
+import { authStorage } from '@/infrastructure/storage/auth-storage';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { AdminHeader } from '@/presentation/components/admin/AdminHeader/AdminHeader';
-import { Activity, BarChart3, Bell, Building, Building2, ChevronDown, ChevronRight, DollarSign, FileText, Layers, LayoutDashboard, Megaphone, Menu, MessageSquare, Package, Search, ShieldAlert, ShieldCheck, Tag, TriangleAlert, UserCircle, Users, X } from 'lucide-react';
+import { Activity, BarChart3, Bell, Building, Building2, ChevronDown, ChevronRight, DollarSign, FileText, Layers, LayoutDashboard, LogOut, Megaphone, Menu, MessageSquare, Package, Search, ShieldAlert, ShieldCheck, Tag, TriangleAlert, UserCircle, Users, X } from 'lucide-react';
 
 interface GitHubShellProps {
   children: ReactNode;
@@ -140,6 +141,15 @@ function Sidebar({
   isSupport: boolean;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuthStore();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const handleLogout = () => {
+    authStorage.clear();
+    logout();
+    router.push('/login');
+  };
 
   // Filtra items según rol
   const filteredSections = NAV_SECTIONS.map((section) => {
@@ -164,6 +174,7 @@ function Sidebar({
   }).filter((s) => s.items.length > 0);
 
   return (
+    <>
     <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1 scrollbar-thin scrollbar-thumb-white/10">
       {filteredSections.map((section, si) => (
         <div key={si} className={si > 0 ? 'pt-3' : ''}>
@@ -196,7 +207,58 @@ function Sidebar({
           </div>
         </div>
       ))}
+
+      {/* Cerrar sesión */}
+      <div className={collapsed ? 'border-t border-white/10 my-2' : 'pt-3'}>
+        {!collapsed && (
+          <div className="px-3 pb-1">
+            <span className="text-[10px] font-semibold tracking-widest text-gray-500 uppercase">
+              SESION
+            </span>
+          </div>
+        )}
+        {collapsed && <div className="border-t border-white/10 my-2" />}
+        <button
+          onClick={() => setShowLogoutModal(true)}
+          title={collapsed ? 'Cerrar sesión' : undefined}
+          className={`
+            flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-150 w-full
+            text-gray-400 hover:text-red-400 hover:bg-red-900/30
+            ${collapsed ? 'justify-center px-2' : ''}
+          `}
+        >
+          <LogOut className="w-[18px] h-[18px] shrink-0" />
+          {!collapsed && <span className="truncate cursor-pointer">Cerrar sesión</span>}
+        </button>
+      </div>
     </nav>
+
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowLogoutModal(false)} />
+          <div className="relative bg-[#1e2a3a] rounded-xl shadow-2xl w-full max-w-sm p-6 border border-white/10">
+            <h3 className="text-lg font-semibold text-white mb-2">Cerrar sesión</h3>
+            <p className="text-sm text-gray-400 mb-6">
+              ¿Estás seguro de que quieres cerrar sesión?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 text-sm text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition"
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

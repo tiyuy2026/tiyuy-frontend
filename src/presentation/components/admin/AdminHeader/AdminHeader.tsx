@@ -120,18 +120,13 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
         {/* Search Bar */}
         <div className="flex-1 max-w-2xl">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: '#7cb490' }} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               placeholder="Buscar o saltar a..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-lg text-sm placeholder-gray-300 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200"
-              style={{ 
-                backgroundColor: 'rgba(255, 255, 255, 0.1)', 
-                borderColor: '#7cb490',
-                color: 'white'
-              }}
+              className="w-full pl-10 pr-4 py-2 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 bg-white border border-gray-300 text-gray-900"
               onKeyDown={(e) => {
                 if (e.key === '/' && e.currentTarget !== document.activeElement) {
                   e.preventDefault();
@@ -140,7 +135,7 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
               }}
             />
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 text-xs rounded" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', color: 'white' }}>/</kbd>
+              <kbd className="px-1.5 py-0.5 text-xs rounded bg-gray-200 text-gray-500">/</kbd>
             </div>
           </div>
         </div>
@@ -211,7 +206,7 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
         </div>
 
         {/* Notifications */}
-        <Link href="/admin/notifications" className="relative p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition">
+        <Link href="/admin/notifications" className="relative p-2 text-white/70 hover:text-white hover:bg-white/20 rounded-lg transition">
           <Bell className="w-5 h-5" />
           {notifications > 0 && (
             <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
@@ -221,17 +216,17 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
         </Link>
 
         {/* Help - Configuración */}
-        <Link href="/admin/settings" className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition">
+        <Link href="/admin/settings" className="p-2 text-white/70 hover:text-white hover:bg-white/20 rounded-lg transition">
           <HelpCircle className="w-5 h-5" />
         </Link>
 
         {/* Admin Profile */}
-        <div className="flex items-center gap-3 pl-3 border-l border-gray-700">
+        <div className="flex items-center gap-3 pl-3 border-l border-white/20">
           <div className="text-right">
             <p className="text-sm font-medium text-white">
               {adminProfile?.firstName} {adminProfile?.lastName}
             </p>
-            <p className="text-xs text-gray-400">{adminProfile?.email}</p>
+            <p className="text-xs text-teal-100">{adminProfile?.email}</p>
           </div>
           <div className={`px-2 py-1 rounded-full text-xs font-medium ${
             isSuperAdmin ? 'bg-purple-600 text-white' :
@@ -258,7 +253,7 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
             
             {/* Profile Menu Dropdown */}
             {showProfileMenu && (
-              <div className="absolute right-0 top-full mt-2 w-72 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50">
+              <div className="absolute right-0 top-full mt-2 w-72 bg-gray-900 rounded-lg shadow-xl border border-gray-700 z-50">
                 <div className="p-4 border-b border-gray-700">
                   <div className="flex items-center gap-3">
                     <UserAvatar user={profileUser} size="md" />
@@ -280,21 +275,21 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
                 <div className="p-2">
                   <Link
                     href="/admin/profile"
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition"
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white rounded-lg transition"
                   >
                     <User className="w-4 h-4" />
                     Ver perfil
                   </Link>
                   <Link
                     href="/admin/settings"
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition"
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white rounded-lg transition"
                   >
                     <Settings className="w-4 h-4" />
                     Configuración
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-900 hover:text-red-300 rounded-lg transition"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-900/50 hover:text-red-300 rounded-lg transition"
                   >
                     <LogOut className="w-4 h-4" />
                     Cerrar sesión
