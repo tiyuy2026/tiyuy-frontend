@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="100%" height="100%">
+  <defs>
+    <!-- Degradados de alta visibilidad para pestañas del navegador -->
+    <linearGradient id="roofGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7" /> <!-- Púrpura de marca -->
+      <stop offset="100%" stop-color="#6d28d9" />
+    </linearGradient>
+    <linearGradient id="baseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4" /> <!-- Cian / Azul Eléctrico -->
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+  </defs>
+
+  <!-- Estructura Inmobiliaria + Código -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    
+    <!-- El Techo: Un símbolo de "mayor que" (>) rotado que simula el techo de una propiedad premium -->
+    <path d="M 6,15 L 16,5 L 26,15" 
+          fill="none" 
+          stroke="url(#roofGrad)" 
+          stroke-width="3.5" />
+
+    <!-- El Cuerpo/Base: Un símbolo de "menor que" (<) invertido que cierra la estructura del edificio -->
+    <path d="M 6,19 L 6,26 L 26,26 L 26,19" 
+          fill="none" 
+          stroke="url(#baseGrad)" 
+          stroke-width="3.5" />
+          
+    <!-- Ventana Central / Nodo de Datos (El punto de unión de la tecnología e inmobiliaria) -->
+    <rect x="13" y="15" width="6" height="6" rx="1" fill="#ffffff" />
+    
+  </g>
+</svg>
