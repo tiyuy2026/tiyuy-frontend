@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import EmojiSelector from '@/presentation/components/contacts/EmojiSelector';
+import { Globe } from 'lucide-react';
 
 interface StatusInputProps {
   onSendStatus: (content: string, textStyle?: string, customColor?: string, location?: string, propertyType?: string) => void;
@@ -283,9 +284,7 @@ export default function StatusInput({
           className="absolute right-3 top-3 p-2 text-gray-400 hover:text-gray-600 transition-colors"
           title="Insertar emoji"
         >
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-1.25-2.75L8 12.25l2.75 5.25L14 17l-4-9zm-4.5 0L1.5-1.5L9 9.5l1.5 1.5L12 9l-1.5 1.5z"/>
-          </svg>
+          <Globe className="w-5 h-5" />
         </button>
         
         {/* Contador de caracteres */}

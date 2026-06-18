@@ -36,30 +36,29 @@ export const ForgotPasswordForm: React.FC = () => {
 
   if (isSuccess) {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
-          <CheckCircle className="w-10 h-10 text-green-600" />
+      <div className="text-center w-full">
+        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-green-50 flex items-center justify-center">
+          <CheckCircle className="w-7 h-7 text-green-600" />
         </div>
 
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+        <h2 className="text-xl font-bold text-gray-900 mb-2">
           ¡Email Enviado!
         </h2>
 
-        <p className="text-gray-600 mb-8">
-          Hemos enviado un email a <strong>{email}</strong> con las instrucciones
-          para recuperar tu contraseña.
+        <p className="text-xs text-gray-500 mb-5">
+          Hemos enviado un mensaje a <strong className="text-gray-700">{email}</strong> con los pasos para restablecer tu contraseña.
         </p>
 
         <div className="space-y-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <p className="text-sm text-blue-800">
-              <strong>Importante:</strong> Revisa tu carpeta de spam si no encuentras el email.
+          <div className="bg-blue-50/60 border border-blue-100 rounded-xl p-3 text-left">
+            <p className="text-[11px] text-blue-800 leading-relaxed">
+              <strong>Tip:</strong> Si no lo visualizas en un par de minutos, revisa tu bandeja de correo no deseado o spam.
             </p>
           </div>
 
-          <Link href="/login">
-            <Button variant="outline" size="lg" fullWidth>
-              <ArrowLeft className="w-5 h-5 mr-2" />
+          <Link href="/login" passHref legacyBehavior>
+            <Button variant="outline" size="md" fullWidth className="cursor-pointer py-2 text-sm">
+              <ArrowLeft className="w-4 h-4 mr-2" />
               Volver al Login
             </Button>
           </Link>
@@ -69,58 +68,61 @@ export const ForgotPasswordForm: React.FC = () => {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-8">
+    <div className="w-full">
       {/* Header */}
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center">
-          <Mail className="w-8 h-8 text-white" />
+      <div className="text-center mb-5">
+        <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-50 flex items-center justify-center">
+          <Mail className="w-6 h-6 text-blue-600" />
         </div>
 
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">
+        <h2 className="text-xl font-bold text-gray-900 mb-1">
           ¿Olvidaste tu contraseña?
         </h2>
 
-        <p className="text-gray-600">
-          No te preocupes. Ingresa tu email y te enviaremos las instrucciones
-          para recuperar tu cuenta.
+        <p className="text-xs text-gray-500 max-w-[280px] mx-auto">
+          Ingresa tu correo y te enviaremos de inmediato las instrucciones de recuperación.
         </p>
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         {/* Error de validación o de API */}
-        <AuthErrorBanner error={displayError} onClose={() => setValidationError(null)} />
+        {displayError && (
+          <div className="mb-2">
+            <AuthErrorBanner error={displayError} onClose={() => setValidationError(null)} />
+          </div>
+        )}
 
         <Input
           type="email"
           name="email"
           label="Correo electrónico"
-          leftIcon={<Mail className="w-5 h-5 text-gray-400" />}
+          leftIcon={<Mail className="w-4 h-4 text-gray-400" />}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="ejemplo@correo.com"
           required
+          className="text-sm focus:scale-100 placeholder:text-gray-400 py-2"
         />
 
         <Button
           type="submit"
           variant="primary"
-          size="lg"
+          size="md"
           fullWidth
           isLoading={isLoading}
-          className="bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl py-3 font-semibold"
+          className="cursor-pointer py-2 text-sm font-semibold"
         >
           {isLoading ? 'Enviando...' : 'Enviar Instrucciones'}
         </Button>
       </form>
 
-      {/* Back to Login */}
-      <div className="mt-6 text-center">
+      <div className="mt-5 text-center">
         <Link
           href="/login"
-          className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
+          className="inline-flex items-center text-xs text-blue-600 hover:text-blue-700 font-semibold cursor-pointer transition-colors"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
           Volver al Login
         </Link>
       </div>

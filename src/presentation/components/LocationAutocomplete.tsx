@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { MapPin } from 'lucide-react';
 
 interface LocationAutocompleteProps {
   value?: string;
@@ -79,9 +80,7 @@ export default function LocationAutocomplete({
         className={`w-full px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm ${className}`}
       />
       <div className="absolute right-3 top-2.5 text-gray-400">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 00-1.414 1.414l-1.414 1.414a1 998 1.998 0 001.414-1.414l4.243-4.243a1 998 1.998 0 001.414-1.414l1.414 1.414a1 998 1.998 0 001.414 1.414l4.243 4.243a1 998 1.998 0 001.414 1.414l-1.414-1.414A1.998 1.998 0 011.414-1.414l-4.243-4.243a1 998 1.998 0 01-1.414 1.414z" />
-        </svg>
+        <MapPin className="w-4 h-4" />
       </div>
     </div>
   );

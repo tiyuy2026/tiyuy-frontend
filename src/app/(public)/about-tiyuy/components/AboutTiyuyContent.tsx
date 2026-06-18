@@ -37,37 +37,37 @@ export default function AboutTiyuyContent() {
       <section 
         id="hero" 
         onMouseEnter={() => setActiveSection('hero')}
-        className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat"
+        className="relative min-h-[75vh] lg:min-h-[80vh] flex items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat"
         style={{ 
           backgroundImage: `url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1920&auto=format&fit=crop')` 
         }}
       >
         <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px]"></div>
         
-        <div className="relative max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10 py-20">
+        <div className="relative max-w-8xl mx-auto px-8 xl:px-16 text-center z-10 py-16">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-4 leading-tight tracking-tight">
               TIYUY - Transformando el
-              <span className={`block mt-2 transition-colors duration-500 ${activeSection === 'hero' ? 'text-[var(--brand-primary)]' : 'text-white'}`}>
+              <span className={`block mt-1 transition-colors duration-500 ${activeSection === 'hero' ? 'text-[var(--brand-primary)]' : 'text-white'}`}>
                 mercado inmobiliario peruano
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-200 mb-12 leading-relaxed font-light max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-gray-200 mb-10 leading-relaxed font-light max-w-2xl mx-auto">
               El equipo que nació de la frustración con las plataformas tradicionales
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button 
                 onClick={() => scrollToSection('compromiso')}
-                className="w-full sm:w-auto bg-[var(--brand-primary)] text-[var(--bg-primary)] px-8 py-4 rounded-xl text-lg font-semibold shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2 hover:opacity-95"
+                className="w-full sm:w-auto bg-[var(--brand-primary)] text-[var(--bg-primary)] px-6 py-3.5 rounded-xl text-base font-semibold shadow-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2 hover:opacity-95"
               >
                 Únete al equipo TIYUY
                 <ArrowRight className="w-5 h-5" />
               </button>
               <Link 
                 href="/"
-                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-md px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 text-center"
+                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-md px-6 py-3.5 rounded-xl text-base font-semibold transition-all duration-300 text-center"
               >
                 Explora propiedades
               </Link>
@@ -82,7 +82,7 @@ export default function AboutTiyuyContent() {
         onMouseEnter={() => setActiveSection('mision-vision-valores')}
         className="relative py-24 overflow-hidden bg-[var(--bg-secondary)]"
       >
-        <div className="relative max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative max-w-9xl mx-auto px-8 xl:px-16">
           {/* Título de sección */}
           <div className="text-center mb-16">
             <span className={`inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-4 transition-all duration-300 ${
@@ -210,7 +210,7 @@ export default function AboutTiyuyContent() {
         onMouseEnter={() => setActiveSection('problema')}
         className="py-20 bg-[var(--bg-primary)] border-t border-[var(--border-light)]"
       >
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-9xl mx-auto px-8 xl:px-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-4xl font-bold text-[var(--text-primary)] mb-6 tracking-tight">
@@ -258,7 +258,7 @@ export default function AboutTiyuyContent() {
         onMouseEnter={() => setActiveSection('historia')}
         className="py-20 bg-[var(--bg-primary)] border-t border-[var(--border-light)]"
       >
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-9xl mx-auto px-8 xl:px-16">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-[var(--text-primary)] tracking-tight">
               El equipo que decidió cambiarlo todo
@@ -317,7 +317,7 @@ export default function AboutTiyuyContent() {
         onMouseEnter={() => setActiveSection('ayudamos')}
         className="py-20 bg-[var(--bg-primary)] border-t border-[var(--border-light)]"
       >
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-9xl mx-auto px-8 xl:px-16">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-[var(--text-primary)] tracking-tight">
               A quién ayudamos
@@ -376,7 +376,7 @@ export default function AboutTiyuyContent() {
         onMouseEnter={() => setActiveSection('propuesta')}
         className="py-20 bg-[var(--bg-primary)] border-t border-[var(--border-light)]"
       >
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-9xl mx-auto px-8 xl:px-16">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-[var(--text-primary)] tracking-tight">
               Lo que nos hace diferentes
@@ -424,7 +424,7 @@ export default function AboutTiyuyContent() {
       >
         <div className="absolute inset-0 bg-[var(--bg-primary)] z-0 opacity-95"></div>
 
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
+        <div className="relative max-w-4xl mx-auto px-8 xl:px-16 text-center z-10">
           <h2 className="text-4xl font-bold text-[var(--text-primary)] mb-8 tracking-tight">
             Nuestro compromiso con Perú
           </h2>

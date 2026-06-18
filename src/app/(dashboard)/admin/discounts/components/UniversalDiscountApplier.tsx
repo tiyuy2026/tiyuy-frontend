@@ -36,6 +36,7 @@ import PlanDiscountModal from '@/app/(dashboard)/admin/agents/discounts/componen
 // Reutilizar componentes existentes de inmobiliarias
 import ApplyDirectDiscountModal from '@/app/(dashboard)/admin/agencies/components/ApplyDirectDiscountModal';
 import CreateAgencyDiscountModal from '@/app/(dashboard)/admin/agencies/components/CreateAgencyDiscountModal';
+import { ChevronRight } from 'lucide-react';
 
 // ==================== Types ====================
 
@@ -373,9 +374,7 @@ function AgentDiscountContent({ onClose }: AgentDiscountContentProps) {
                   <h5 className="font-semibold text-gray-900">{plan.name}</h5>
                   <p className="text-lg font-bold text-gray-900">{plan.price}</p>
                 </div>
-                <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <ChevronRight className="w-5 h-5 text-gray-400" />
               </button>
             ))}
           </div>

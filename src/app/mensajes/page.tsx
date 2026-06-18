@@ -45,7 +45,9 @@ import { useGooglePlaces } from '@/presentation/hooks/useGooglePlaces';
 import { useWebSocket, getCurrentUserId } from '@/presentation/hooks/useWebSocket';
 
 // Helper function for API calls - usando axiosClient centralizado
+import { Icon } from '@iconify/react';
 import { axiosClient } from '@/infrastructure/api/axios-client';
+import { ArrowLeft, ChevronLeft, Globe, Lock, LogOut, MessageCircle, MessageSquare, Mic, MoreHorizontal, Paperclip, Play, Plus, PlusSquare, Search, Send, Share2, User, Users, X } from 'lucide-react';
 
 async function apiCall(endpoint: string, options: RequestInit = {}) {
   const url = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
@@ -205,34 +207,22 @@ function Avatar({
 //  ICONOS SVG ELEGANTES 
 const IC = {
   Chat: (p: { a?: boolean }) => (
-    <svg viewBox="0 0 24 24" className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`}>
-      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
-    </svg>
+    <MessageSquare className="" />
   ),
   Status: (p: { a?: boolean }) => (
-    <svg viewBox="0 0 24 24" className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`}>
-      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm-1-4l6-4-6-4v8z"/>
-    </svg>
+    <Play className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`} />
   ),
   Channel: (p: { a?: boolean }) => (
-    <svg viewBox="0 0 24 24" className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`}>
-      <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 2.5c1.93 0 3.5 1.57 3.5 3.5S13.93 13.5 12 13.5 8.5 11.93 8.5 10s1.57-3.5 3.5-3.5zM20 18H4v-.57c0-2 4-3.08 8-3.08s8 1.08 8 3.08V18z"/>
-    </svg>
+    <User className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`} />
   ),
   Groups: (p: { a?: boolean }) => (
-    <svg viewBox="0 0 24 24" className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`}>
-      <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-    </svg>
+    <Users className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`} />
   ),
   Search: () => (
-    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-gray-400">
-      <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-    </svg>
+    <Search className="w-4 h-4 fill-gray-400" />
   ),
   Send: () => (
-    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-    </svg>
+    <Send className="w-5 h-5 fill-white" />
   ),
   Check: () => (
     <svg viewBox="0 0 16 15" className="w-4 h-3 inline ml-1" style={{ fill: '#53bdeb' }}>
@@ -240,39 +230,25 @@ const IC = {
     </svg>
   ),
   Plus: () => (
-    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
-    </svg>
+    <PlusSquare className="w-5 h-5 fill-white" />
   ),
   Share: () => (
-    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
-      <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-    </svg>
+    <Share2 className="w-4 h-4 fill-current" />
   ),
   Lock: () => (
-    <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-red-400">
-      <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-    </svg>
+    <Lock className="w-3.5 h-3.5 fill-red-400" />
   ),
   Emoji: () => (
-    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-gray-400">
-      <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-1-4l6-4-6-4v8z"/>
-    </svg>
+    <Globe className="w-5 h-5 fill-gray-400" />
   ),
   Attach: () => (
-    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-gray-400">
-      <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/>
-    </svg>
+    <Paperclip className="w-5 h-5 fill-gray-400" />
   ),
   Mic: () => (
-    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-gray-400">
-      <path d="M12 14c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-    </svg>
+    <Mic className="w-5 h-5 fill-gray-400" />
   ),
   ArrowBack: () => (
-    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-gray-500">
-      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-    </svg>
+    <ArrowLeft className="w-5 h-5 fill-gray-500" />
   ),
 };
 
@@ -321,21 +297,21 @@ function ShareModal({ title, link, onClose }: { title: string; link: string; onC
             <a href={`https://wa.me/?text=${encoded}`} target="_blank" rel="noopener noreferrer"
               className="flex flex-col items-center gap-2 p-3 bg-green-50 rounded-xl hover:bg-green-100 transition-colors group">
               <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                <MessageCircle className="w-5 h-5 fill-white" />
               </div>
               <span className="text-xs text-green-700 font-medium">WhatsApp</span>
             </a>
             <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`} target="_blank" rel="noopener noreferrer"
               className="flex flex-col items-center gap-2 p-3 bg-brand rounded-xl hover:bg-brand transition-colors">
               <div className="w-10 h-10 bg-brand rounded-full flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                <Icon icon="mdi:facebook" className="w-5 h-5 fill-white" />
               </div>
               <span className="text-xs text-brand font-medium">Facebook</span>
             </a>
             <a href={`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encoded}`} target="_blank" rel="noopener noreferrer"
               className="flex flex-col items-center gap-2 p-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition-colors">
               <div className="w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                <Icon icon="ic:baseline-telegram" className="w-5 h-5 fill-white" />
               </div>
               <span className="text-xs text-sky-700 font-medium">Telegram</span>
             </a>
@@ -371,9 +347,7 @@ function NewStatusModal({ onClose, userRole }: { onClose: () => void; userRole?:
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="w-6 h-6" />
           </button>
         </div>
 
@@ -945,9 +919,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
               onClick={() => setShowContactMenu(!showContactMenu)}
               className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-                <path d="M12 16a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0-6a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm0 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
-              </svg>
+              <MoreHorizontal className="w-5 h-5 fill-current" />
             </button>
             
             {/* Dropdown menú */}
@@ -974,9 +946,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
                   }}
                   className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
                 >
-                  <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current text-gray-500">
-                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                  </svg>
+                  <Plus className="w-4 h-4 fill-current text-gray-500" />
                   Agregar Contacto
                 </button>
               </div>
@@ -1051,7 +1021,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
                 <Avatar name={chat.participantName ?? chat.groupName ?? 'U'} role="USER" size="md" src={chat.participantAvatar} />
                 {chat.type === 'GROUP' && (
                   <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-brand rounded-full flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 fill-white"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                    <Icon icon="mdi:account-group" className="w-2.5 h-2.5 fill-white" />
                   </div>
                 )}
               </div>
@@ -1433,9 +1403,7 @@ function GruposListPanel({
           <span className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
             activeSection === 'descubrir' ? 'bg-brand' : 'bg-gray-200'
           }`}>
-            <svg viewBox="0 0 24 24" className={`w-5 h-5 ${activeSection === 'descubrir' ? 'fill-white' : 'fill-gray-600'}`}>
-              <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-            </svg>
+            <Search className="" />
           </span>
           Descubrir
         </button>
@@ -1662,9 +1630,7 @@ function GrupoDetailPanel({ group, user, onBack }: { group: any; user: any; onBa
             onClick={onBack}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft className="w-5 h-5" />
           </button>
           <h1 className="text-xl font-bold">{group.name}</h1>
           <button
@@ -1679,9 +1645,7 @@ function GrupoDetailPanel({ group, user, onBack }: { group: any; user: any; onBa
               </>
             ) : (
               <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
+                <LogOut className="w-4 h-4" />
                 Salir
               </>
             )}
@@ -1689,15 +1653,11 @@ function GrupoDetailPanel({ group, user, onBack }: { group: any; user: any; onBa
         </div>
         <div className="flex items-center gap-4 mt-3">
           <div className="flex items-center gap-2">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-            </svg>
+            <Icon icon="mdi:account-group" className="w-4 h-4" />
             <span className="text-sm">{group.memberCount || 0} miembros</span>
           </div>
           <div className="flex items-center gap-2">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
-            </svg>
+            <MessageSquare className="w-4 h-4" />
             <span className="text-sm">{group.postCount || 0} publicaciones</span>
           </div>
         </div>
@@ -1961,9 +1921,7 @@ function MisContactosPageContent() {
         <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
             <div className="w-14 h-14 bg-brand rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg viewBox="0 0 24 24" className="w-7 h-7 fill-white">
-                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
-              </svg>
+              <MessageSquare className="w-7 h-7 fill-white" />
             </div>
             
             <h2 className="text-xl font-bold text-gray-900 mb-2">Inicia sesión para chatear</h2>
@@ -2487,9 +2445,7 @@ function MisContactosPageContent() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-gray-400 text-xs">
-                  <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current">
-                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
-                  </svg>
+                  <Lock className="w-3 h-3 fill-current" />
                   Tus mensajes están cifrados de extremo a extremo
                 </div>
               </div>
@@ -2510,9 +2466,7 @@ function MisContactosPageContent() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-gray-400 text-xs">
-                  <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41 1.41L10 14.17V7h2v7.17l3.59-3.59L18 17l-5-5z"/>
-                  </svg>
+                  <Globe className="w-3 h-3 fill-current" />
                   Actualiza tu estado diariamente
                 </div>
               </div>
@@ -2531,9 +2485,7 @@ function MisContactosPageContent() {
               <div className="flex-none flex items-center gap-3 px-4 py-3 bg-brand border-b border-[#054d44]">
                 <button onClick={() => setSelectedChannel(null)}
                   className="text-white/70 hover:text-white transition-colors">
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-                  </svg>
+                  <ArrowLeft className="w-5 h-5 fill-current" />
                 </button>
                 <div className="flex-1 min-w-0">
                   <p className="text-white font-semibold text-sm">{selectedChannel.name}</p>

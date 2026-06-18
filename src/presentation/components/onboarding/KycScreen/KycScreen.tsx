@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useAuth, useKyc } from '@/presentation/hooks';
+import { CheckCircle } from 'lucide-react';
 import { OnboardingStepper } from '../OnboardingStepper';
 import { Button, Badge } from '@/presentation/components/ui';
 
@@ -91,9 +92,7 @@ export const KycScreen: React.FC = () => {
           <div className="bg-green-50 border border-green-200 rounded-2xl p-8 mb-8">
             <div className="text-center mb-6">
               <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-10 h-10 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
+                <CheckCircle className="w-10 h-10 text-green-600" />
               </div>
               <h3 className="text-2xl font-bold text-green-900 mb-2">✓ Verificado</h3>
             </div>

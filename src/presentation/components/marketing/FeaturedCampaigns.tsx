@@ -36,7 +36,7 @@ export function FeaturedCampaigns() {
 
   if (loading) {
     return (
-      <section className="py-10 bg-background border-b border-gray-100">
+      <section className="py-8 sm:py-16 bg-background border-b border-gray-100">
         <div className="w-full max-w-[1920px] mx-auto px-8 xl:px-16">
           <div className="animate-pulse space-y-4">
             <div className="h-8 w-72 bg-gray-200 rounded-lg" />
@@ -59,7 +59,7 @@ export function FeaturedCampaigns() {
   const showViewAllCard = campaigns.length > MAX_VISIBLE_CARDS;
 
   return (
-    <section className="py-10 bg-background border-b border-gray-100">
+    <section className="py-8 sm:py-16 bg-background border-b border-gray-100">
       <div className="w-full max-w-[1920px] mx-auto px-8 xl:px-16">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

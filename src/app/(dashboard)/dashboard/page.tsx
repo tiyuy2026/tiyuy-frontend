@@ -402,33 +402,44 @@ export default function DashboardPage() {
 
             {/* Proyectos y Desarrollos - SOLO para DEVELOPER */}
             {isDeveloper && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><FolderGit className="w-5 h-5" /> Proyectos y Desarrollos</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Link href="/my-projects" className="flex items-center gap-4 p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors">
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                    <FolderGit className="w-6 h-6 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Mis Proyectos</h3>
-                    <p className="text-sm text-gray-600">Desarrollos activos</p>
-                  </div>
-                  <span className="ml-auto text-green-600">→</span>
-                </Link>
+              <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-gray-200 dark:border-zinc-800 p-6 transition-colors">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-zinc-100 mb-6 flex items-center gap-2">
+                  <FolderGit className="w-5 h-5 text-gray-700 dark:text-zinc-300" /> 
+                  Proyectos y Desarrollos
+                </h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Tarjeta: Mis Proyectos */}
+                  <Link 
+                    href="/my-projects" 
+                    className="flex items-center gap-4 p-4 bg-green-50 dark:bg-green-950/30 border border-transparent dark:border-green-900/50 rounded-xl hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors"
+                  >
+                    <div className="w-12 h-12 bg-green-100 dark:bg-green-900/50 rounded-xl flex items-center justify-center">
+                      <FolderGit className="w-6 h-6 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-zinc-100">Mis Proyectos</h3>
+                      <p className="text-sm text-gray-600 dark:text-zinc-400">Desarrollos activos</p>
+                    </div>
+                    <span className="ml-auto text-green-600 dark:text-green-400 font-bold">→</span>
+                  </Link>
 
-                <Link href="/dashboard/projects/new" className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors">
-                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                    <PlusCircle className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Nuevo Proyecto</h3>
-                    <p className="text-sm text-gray-600">Crear desarrollo</p>
-                  </div>
-                  <span className="ml-auto text-purple-600">→</span>
-                </Link>
+                  {/* Tarjeta: Nuevo Proyecto */}
+                  <Link 
+                    href="/dashboard/projects/new" 
+                    className="flex items-center gap-4 p-4 bg-purple-50 dark:bg-purple-950/30 border border-transparent dark:border-purple-900/50 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-colors"
+                  >
+                    <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-xl flex items-center justify-center">
+                      <PlusCircle className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-zinc-100">Nuevo Proyecto</h3>
+                      <p className="text-sm text-gray-600 dark:text-zinc-400">Crear desarrollo</p>
+                    </div>
+                    <span className="ml-auto text-purple-600 dark:text-purple-400 font-bold">→</span>
+                  </Link>
+                </div>
               </div>
-            </div>
             )}
 
             {/* Personalizacion Visual */}

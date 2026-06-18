@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { Icon } from '@iconify/react';
+import { Copy, Heart, MessageCircle, Navigation, Reply, Send, Share2, ThumbsUp, X, Zap } from 'lucide-react';
 import { formatDistanceToNow } from '@/utils/formatters';
 import { useCommentStatusPost, useStatusComments, useLikeStatusPost, useUnlikeStatusPost, useShareStatusPost, useLikeComment, useUnlikeComment, useGetActiveStatusPosts } from '@/presentation/hooks/useContacts';
 import { useQueryClient } from '@tanstack/react-query';
@@ -251,9 +253,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X className="w-5 h-5" />
             </button>
           )}
         </div>
@@ -284,16 +284,12 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
             className={`flex items-center gap-2 text-sm font-medium transition-colors ${isLiked ? 'text-red-600' : 'text-gray-600 hover:text-red-600'
               }`}
           >
-            <svg className="w-5 h-5" fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
+            <Heart className="w-5 h-5" fill={isLiked ? 'currentColor' : 'none'} />
             {likeCount > 0 && likeCount}
           </button>
 
           <button className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-brand transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
+            <MessageCircle className="w-5 h-5" />
             Comentar
           </button>
 
@@ -301,9 +297,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
             onClick={handleShare}
             className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-7.432 0m9.032-4.026A9.001 9.001 0 0112 3c-4.474 0-8.268 3.12-9.032 7.326m0 0A9.001 9.001 0 0012 21c4.474 0 8.268-3.12 9.032-7.326" />
-            </svg>
+            <Share2 className="w-5 h-5" />
             Compartir
             {shareCount > 0 && (
               <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
@@ -361,9 +355,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                         className={`text-xs flex items-center gap-1 transition-colors ${comment.hasUserLiked ? 'text-brand' : 'text-gray-500 hover:text-brand'
                           }`}
                       >
-                        <svg className="w-4 h-4" fill={comment.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                        </svg>
+                        <ThumbsUp className="w-4 h-4" fill={comment.hasUserLiked ? 'currentColor' : 'none'} />
                         <span className="font-medium">{comment.likeCount || 0}</span>
                       </button>
                       <button
@@ -409,9 +401,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                                 className={`text-xs flex items-center gap-1 transition-colors ${reply.hasUserLiked ? 'text-brand' : 'text-gray-400 hover:text-brand'
                                   }`}
                               >
-                                <svg className="w-3 h-3" fill={reply.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                </svg>
+                                <ThumbsUp className="w-3 h-3" fill={reply.hasUserLiked ? 'currentColor' : 'none'} />
                                 <span className="font-medium">{reply.likeCount || 0}</span>
                               </button>
                             </div>
@@ -454,9 +444,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                       className={`text-xs flex items-center gap-1 ${comment.hasUserLiked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
                         }`}
                     >
-                      <svg className="w-3 h-3" fill={comment.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
+                      <Heart className="w-3 h-3" />
                       {comment.likeCount > 0 && comment.likeCount}
                     </button>
                     <button
@@ -497,9 +485,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                       className={`text-xs flex items-center gap-1 ${comment.hasUserLiked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
                         }`}
                     >
-                      <svg className="w-3 h-3" fill={comment.hasUserLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
+                      <Heart className="w-3 h-3" />
                       {comment.likeCount > 0 && comment.likeCount}
                     </button>
                     <button
@@ -529,9 +515,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <svg className="w-4 h-4 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
+                  <Zap className="w-4 h-4 text-brand" />
                   <span className="text-brand-dark font-semibold text-sm">Respondiendo a</span>
                   <span className="text-brand font-medium text-sm">
                     {replyingTo.userName || replyingTo.user?.name || 'Usuario'}
@@ -547,9 +531,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                 onClick={handleCancelReply}
                 className="ml-3 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded hover:bg-gray-200"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -573,9 +555,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                   onClick={handleComment}
                   className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 bg-brand text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors"
                 >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
+                  <Navigation className="w-3 h-3" />
                 </button>
               )}
             </div>
@@ -608,9 +588,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                   className="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
                 >
                   <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-                      <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
-                    </svg>
+                    <Copy className="w-5 h-5 fill-white" />
                   </div>
                   <span className="text-xs text-gray-700 font-medium">Copiar</span>
                 </button>
@@ -619,9 +597,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                 <a href={`https://wa.me/?text=${encoded}`} target="_blank" rel="noopener noreferrer"
                   className="flex flex-col items-center gap-2 p-3 bg-green-50 rounded-xl hover:bg-green-100 transition-colors">
                   <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.488" />
-                    </svg>
+                    <MessageCircle className="w-5 h-5 fill-white" />
                   </div>
                   <span className="text-xs text-green-700 font-medium">WhatsApp</span>
                 </a>
@@ -635,9 +611,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                   className="flex flex-col items-center gap-2 p-3 bg-brand/10 rounded-xl hover:bg-brand/20 transition-colors border-2 border-blue-200"
                 >
                   <div className="w-10 h-10 bg-brand rounded-full flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-white">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                    </svg>
+                    <Icon icon="mdi:facebook" className="w-5 h-5 fill-white" />
                   </div>
                   <span className="text-xs text-brand-dark font-bold">Facebook</span>
                 </a>

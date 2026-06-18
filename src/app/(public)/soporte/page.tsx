@@ -165,8 +165,8 @@ export default function SoportePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Header - Color verde de la app */}
-      <div className="bg-gradient-to-r from-[#1693a5] to-[#137a8a] text-white">
-        <div className="max-w-6xl mx-auto px-4 py-16">
+      <div className="bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-primary-hover)] text-white">
+        <div className="max-w-8xl mx-auto px-4 py-16">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
               <HelpCircle className="w-7 h-7 text-white" />
@@ -179,7 +179,7 @@ export default function SoportePage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Step: Info / Welcome - Layout de 2 columnas con igual altura */}
         {step === 'info' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
@@ -218,7 +218,7 @@ export default function SoportePage() {
                 <div className="mt-6 pt-6 border-t border-gray-100">
                   <button
                     onClick={() => setStep('category')}
-                    className="w-full px-6 py-3 bg-[#1693a5] hover:bg-[#137a8a] text-white rounded-xl font-medium transition-all inline-flex items-center justify-center gap-2 shadow-lg shadow-[#1693a5]/25"
+                    className="w-full px-6 py-3 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white rounded-xl font-medium transition-all inline-flex items-center justify-center gap-2 shadow-lg shadow-[var(--brand-primary)]/25"
                   >
                     <Send className="w-4 h-4" />
                     Reportar Incidencia
@@ -234,7 +234,7 @@ export default function SoportePage() {
             <div className="flex flex-col">
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 flex flex-col flex-1">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                  <HelpCircle className="w-5 h-5 text-[#1693a5]" />
+                  <HelpCircle className="w-5 h-5 text-[var(--brand-primary)]" />
                   Preguntas Frecuentes
                 </h2>
                 <div className="space-y-3 flex-1 overflow-y-auto">
@@ -249,7 +249,7 @@ export default function SoportePage() {
                       >
                         <span className="font-medium text-gray-900 text-sm pr-4">{faq.q}</span>
                         {expandedFaq === index ? (
-                          <ChevronUp className="w-4 h-4 text-[#1693a5] flex-shrink-0" />
+                          <ChevronUp className="w-4 h-4 text-[var(--brand-primary)] flex-shrink-0" />
                         ) : (
                           <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
                         )}
@@ -259,7 +259,7 @@ export default function SoportePage() {
                           <p className="text-sm text-gray-600 leading-relaxed">{faq.a}</p>
                           <button
                             onClick={() => setStep('category')}
-                            className="mt-3 text-sm text-[#1693a5] hover:text-[#137a8a] font-medium flex items-center gap-1 transition-colors"
+                            className="mt-3 text-sm text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] font-medium flex items-center gap-1 transition-colors"
                           >
                             ¿No resolviste tu duda? Reportar incidencia
                             <ExternalLink className="w-3 h-3" />
@@ -295,17 +295,17 @@ export default function SoportePage() {
                 <button
                   key={cat.value}
                   onClick={() => handleSelectCategory(cat.value)}
-                  className="flex items-center gap-4 p-5 rounded-xl border border-gray-200 hover:border-[#1693a5] hover:bg-[#1693a5]/5 transition-all group text-left"
+                  className="flex items-center gap-4 p-5 rounded-xl border border-gray-200 hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/5 transition-all group text-left"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-gray-100 group-hover:bg-[#1693a5]/10 flex items-center justify-center text-gray-500 group-hover:text-[#1693a5] transition-colors">
+                  <div className="w-12 h-12 rounded-xl bg-gray-100 group-hover:bg-[var(--brand-primary)]/10 flex items-center justify-center text-gray-500 group-hover:text-[var(--brand-primary)] transition-colors">
                     {cat.icon}
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-gray-900">{cat.label}</p>
                     <p className="text-sm text-gray-500 mt-0.5">{cat.desc}</p>
                   </div>
-                  <div className="w-7 h-7 rounded-full border-2 border-gray-300 group-hover:border-[#1693a5] flex items-center justify-center">
-                    <div className="w-3 h-3 rounded-full group-hover:bg-[#1693a5] transition-colors" />
+                  <div className="w-7 h-7 rounded-full border-2 border-gray-300 group-hover:border-[var(--brand-primary)] flex items-center justify-center">
+                    <div className="w-3 h-3 rounded-full group-hover:bg-[var(--brand-primary)] transition-colors" />
                   </div>
                 </button>
               ))}
@@ -353,7 +353,7 @@ export default function SoportePage() {
                           value={guestName}
                           onChange={(e) => setGuestName(e.target.value)}
                           placeholder="Tu nombre"
-                          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#1693a5] focus:border-transparent transition-all"
+                          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent transition-all"
                         />
                       </div>
                     </div>
@@ -368,7 +368,7 @@ export default function SoportePage() {
                           value={guestPhone}
                           onChange={(e) => setGuestPhone(e.target.value)}
                           placeholder="+51 999 999 999"
-                          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#1693a5] focus:border-transparent transition-all"
+                          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent transition-all"
                         />
                       </div>
                     </div>
@@ -385,7 +385,7 @@ export default function SoportePage() {
                         value={guestEmail}
                         onChange={(e) => setGuestEmail(e.target.value)}
                         placeholder="tucorreo@ejemplo.com"
-                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#1693a5] focus:border-transparent transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent transition-all"
                       />
                     </div>
                   </div>
@@ -424,7 +424,7 @@ export default function SoportePage() {
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   placeholder="Ej: No puedo publicar una propiedad"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#1693a5] focus:border-transparent transition-all"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent transition-all"
                 />
               </div>
 
@@ -438,7 +438,7 @@ export default function SoportePage() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe el problema en detalle. Cuanto más información nos des, más rápido podremos ayudarte. Incluye capturas de pantalla si es posible."
                   rows={5}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#1693a5] focus:border-transparent resize-none transition-all"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent resize-none transition-all"
                 />
               </div>
 
@@ -459,7 +459,7 @@ export default function SoportePage() {
                   type="checkbox"
                   checked={acceptedTerms}
                   onChange={(e) => setAcceptedTerms(e.target.checked)}
-                  className="mt-0.5 rounded border-gray-300 text-[#1693a5] focus:ring-[#1693a5]"
+                  className="mt-0.5 rounded border-gray-300 text-[var(--brand-primary)] focus:ring-[var(--brand-primary)]"
                 />
                 <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
                   Acepto que mi incidencia sea revisada por el equipo de soporte y que se acceda a
@@ -486,7 +486,7 @@ export default function SoportePage() {
                 <button
                   onClick={handleSubmit}
                   disabled={!subject.trim() || !description.trim() || !acceptedTerms || createMutation.isPending}
-                  className="px-6 py-2.5 bg-[#1693a5] hover:bg-[#137a8a] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl text-sm font-medium transition-all flex items-center gap-2"
+                  className="px-6 py-2.5 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl text-sm font-medium transition-all flex items-center gap-2"
                 >
                   {createMutation.isPending ? (
                     <>
@@ -521,7 +521,7 @@ export default function SoportePage() {
             </p>
             <button
               onClick={resetForm}
-              className="px-6 py-2.5 bg-[#1693a5] hover:bg-[#137a8a] text-white rounded-xl font-medium transition-all"
+              className="px-6 py-2.5 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-hover)] text-white rounded-xl font-medium transition-all"
             >
               Volver al inicio
             </button>

@@ -3,8 +3,8 @@ import { notFound } from 'next/navigation';
 import { ProjectRepository } from '@/infrastructure/repositories/ProjectRepository';
 import { ProjectFull } from '@/core/domain/entities/Project';
 import Script from 'next/script';
-import Image from 'next/image';  // ✅ Agregado
-import ProjectDetail from '@/presentation/components/project/ProjectDetail/ProjectDetail';  // ✅ Componente correcto 
+import Image from 'next/image';  
+import ProjectDetail from '@/presentation/components/project/ProjectDetail/ProjectDetail';  
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -54,7 +54,6 @@ export default async function ProjectDetailPage({ params }: Props) {
   const { slug } = await params;
   
   try {
-    // ✅ Una sola llamada que ya trae TODO
     const projectFull = await projectRepo.getBySlug(slug) as ProjectFull;
     
     if (!projectFull) notFound();

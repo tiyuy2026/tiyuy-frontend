@@ -13,7 +13,7 @@ import { usePermissions } from '@/presentation/hooks/usePermissions';
 
 import { Button } from '@/presentation/components/ui/Button';
 import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
-import { Bell, Search, Plus, LogOut, Camera, User, PlusCircle, Settings, Building2, Megaphone, Tag, Menu, ShieldCheck, LayoutDashboard, Package, Users, DollarSign, Layers, MessageSquare, Activity, UserCircle, Building2 as BuildingIcon, Tag as TagIcon } from 'lucide-react';
+import { Bell, Building2, Camera, ChevronDown, HelpCircle, LogOut, Megaphone, Menu, Plus, PlusCircle, Search, Settings, ShieldCheck, Tag, User, LayoutDashboard, Package, Users, DollarSign, Layers, MessageSquare, Activity, UserCircle, Building2 as BuildingIcon, Tag as TagIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -201,7 +201,7 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
         <div className="flex-1 max-w-xl ml-8 relative">
 
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: '#7cb490' }} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               placeholder="Buscar o saltar a... (Ctrl+K)"
@@ -221,7 +221,7 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
               onKeyDown={handleSearchKeyDown}
             />
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 text-xs rounded" style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', color: 'white' }}>/</kbd>
+              <kbd className="px-1.5 py-0.5 text-xs rounded bg-gray-200 text-gray-500">/</kbd>
             </div>
           </div>
 
@@ -269,9 +269,7 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
           >
             <PlusCircle className="w-4 h-4" />
             Create
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M4.646 6.646a.5.5 0 0 1 .708 0L8 9.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z"/>
-            </svg>
+            <ChevronDown className="w-3 h-3" />
           </Button>
           
           {showCreateMenu && (
@@ -335,7 +333,7 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
         </div>
 
         {/* Notifications */}
-        <Link href="/admin/notifications" className="relative p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition">
+        <Link href="/admin/notifications" className="relative p-2 text-white/70 hover:text-white hover:bg-white/20 rounded-lg transition">
           <Bell className="w-5 h-5" />
           {notifications > 0 && (
             <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
@@ -344,9 +342,20 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
           )}
         </Link>
 
-        {/* Admin Profile - solo muestra el rol */}
-        <div className="flex items-center gap-3 pl-3 border-l border-gray-700">
-          <div className={`px-3 py-1.5 rounded-full text-sm font-semibold ${
+        {/* Help - Configuración */}
+        <Link href="/admin/settings" className="p-2 text-white/70 hover:text-white hover:bg-white/20 rounded-lg transition">
+          <HelpCircle className="w-5 h-5" />
+        </Link>
+
+        {/* Admin Profile */}
+        <div className="flex items-center gap-3 pl-3 border-l border-white/20">
+          <div className="text-right">
+            <p className="text-sm font-medium text-white">
+              {adminProfile?.firstName} {adminProfile?.lastName}
+            </p>
+            <p className="text-xs text-teal-100">{adminProfile?.email}</p>
+          </div>
+          <div className={`px-2 py-1 rounded-full text-xs font-medium ${
             isSuperAdmin ? 'bg-purple-600 text-white' :
             isRegularAdmin ? 'bg-blue-600 text-white' :
             'bg-gray-600 text-white'
@@ -370,40 +379,54 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
               )}
             </button>
             
-            {/* Profile Menu Dropdown - solo switcher de modo */}
+            {/* Profile Menu Dropdown */}
             {showProfileMenu && (
-              <div className="absolute right-0 top-full mt-2 w-64 rounded-lg shadow-xl border z-50" style={{ backgroundColor: '#1693a5', borderColor: '#7cb490' }}>
-                <div className="p-4 border-b" style={{ borderColor: '#7cb490' }}>
+              <div className="absolute right-0 top-full mt-2 w-72 bg-gray-900 rounded-lg shadow-xl border border-gray-700 z-50">
+                <div className="p-4 border-b border-gray-700">
                   <div className="flex items-center gap-3">
                     <UserAvatar user={profileUser} size="md" />
                     <div>
                       <p className="font-medium text-white">
                         {adminProfile?.firstName} {adminProfile?.lastName}
                       </p>
-                      <p className="text-sm" style={{ color: '#d4f0f5' }}>{adminProfile?.email}</p>
+                      <p className="text-sm text-teal-100">{adminProfile?.email}</p>
                     </div>
                   </div>
                 </div>
                 <div className="p-2">
-                  {/* Modo Usuario - siempre visible */}
+                  <Link
+                    href="/admin/profile"
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white rounded-lg transition"
+                  >
+                    <User className="w-4 h-4" />
+                    Ver perfil
+                  </Link>
+                  <Link
+                    href="/admin/settings"
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white rounded-lg transition"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Configuración
+                  </Link>
+
+                  {/* Modo Usuario */}
                   <button
                     onClick={handleSwitchToUserMode}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition mt-1"
                     style={{ color: 'white' }}
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.15)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-
                     <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
                       <User className="w-4 h-4 text-white" />
                     </div>
                     <div className="text-left">
                       <p className="font-medium text-white">Modo Usuario</p>
-                      <p className="text-xs" style={{ color: '#d4f0f5' }}>Ver la plataforma como usuario</p>
+                      <p className="text-xs text-teal-100">Ver la plataforma como usuario</p>
                     </div>
                   </button>
 
-                  {/* Modo Admin - detecta automáticamente el rol */}
+                  {/* Modo Admin */}
                   <button
                     onClick={handleSwitchToAdminMode}
                     className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition mt-1"
@@ -422,7 +445,7 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
                       <p className="font-medium text-white">
                         Modo {adminProfile?.roleType?.replace('_', ' ') || 'Admin'}
                       </p>
-                      <p className="text-xs" style={{ color: '#d4f0f5' }}>Panel de administración</p>
+                      <p className="text-xs text-teal-100">Panel de administración</p>
                     </div>
                   </button>
 

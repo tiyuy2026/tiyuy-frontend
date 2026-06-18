@@ -27,7 +27,6 @@ export class PropertyRepository implements IPropertyRepository {
 
     const data = response.data;
 
-    // Mapear respuesta del backend (PropertySummaryDto) al formato esperado por el frontend (MapPropertySummary)
     const properties: MapPropertySummary[] = (data.properties || []).map((p: any) => ({
       id: p.id,
       title: p.title || '',
@@ -59,9 +58,9 @@ export class PropertyRepository implements IPropertyRepository {
   }
 
   async search(filters: PropertyFilter): Promise<PropertySearchResult> {
-    console.log('Enviando filtros al backend:', JSON.stringify(filters, null, 2));
-    console.log('BaseURL actual:', axiosClient.defaults.baseURL);
-    console.log('Endpoint completo:', `${axiosClient.defaults.baseURL}${ENDPOINTS.PROPERTIES.SEARCH}`);
+    JSON.stringify(filters, null, 2);
+    axiosClient.defaults.baseURL;
+    {axiosClient.defaults.baseURL} {ENDPOINTS.PROPERTIES.SEARCH};
     
     const response = await axiosClient.get(ENDPOINTS.PROPERTIES.SEARCH, {
       params: {

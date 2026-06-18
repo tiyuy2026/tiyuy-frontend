@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Group, Channel, ViewType } from '../types';
+import { MoreVertical, RefreshCw, Eye, Ban, PauseCircle, AlertTriangle } from 'lucide-react';
 
 interface GridCardProps {
   item: Group | Channel;
@@ -91,9 +92,7 @@ export function GridCard({
             onClick={() => setShowDropdown(!showDropdown)}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-            </svg>
+            <MoreVertical className="w-5 h-5 text-gray-600" />
           </button>
           
           {showDropdown && (
@@ -107,9 +106,7 @@ export function GridCard({
                     }}
                     className="w-full text-left px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-50 transition-colors flex items-center gap-2"
                   >
-                    <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
+                    <RefreshCw className="w-4 h-4 text-green-600" />
                     Reactivar
                   </button>
                   <button
@@ -119,10 +116,7 @@ export function GridCard({
                     }}
                     className="w-full text-left px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 transition-colors flex items-center gap-2"
                   >
-                    <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
+<Eye className="w-4 h-4 text-blue-600" />
                     Ver Detalles
                   </button>
                 </>
@@ -135,10 +129,7 @@ export function GridCard({
                     }}
                     className="w-full text-left px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 transition-colors flex items-center gap-2"
                   >
-                    <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
+<Eye className="w-4 h-4 text-blue-600" />
                     Ver Detalles
                   </button>
                   <button
@@ -148,9 +139,7 @@ export function GridCard({
                     }}
                     className="w-full text-left px-3 py-2 text-sm font-medium text-yellow-700 hover:bg-yellow-50 transition-colors flex items-center gap-2"
                   >
-                    <svg className="w-4 h-4 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                    </svg>
+                    <Ban className="w-4 h-4 text-yellow-600" />
                     {item.isActive ? 'Deshabilitar' : 'Habilitar'}
                   </button>
                   <button
@@ -160,9 +149,7 @@ export function GridCard({
                     }}
                     className="w-full text-left px-3 py-2 text-sm font-medium text-orange-700 hover:bg-orange-50 transition-colors flex items-center gap-2"
                   >
-                    <svg className="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <PauseCircle className="w-4 h-4 text-orange-600" />
                     Suspender
                   </button>
                   <button
@@ -172,9 +159,7 @@ export function GridCard({
                     }}
                     className="w-full text-left px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 transition-colors flex items-center gap-2"
                   >
-                    <svg className="w-4 h-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
+                    <AlertTriangle className="w-4 h-4 text-red-600" />
                     Violación
                   </button>
                 </>

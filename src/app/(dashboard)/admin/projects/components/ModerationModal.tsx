@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';;
 import { Button } from '@/presentation/components/ui/Button';
 import { ProjectAdminItem } from '@/core/domain/entities/Admin';
 
@@ -107,9 +107,7 @@ export function ModerationModal({ project, onConfirm, onCancel }: ModerationModa
           onClick={onCancel}
           className="text-white/80 hover:text-white transition-colors"
         >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="w-6 h-6" />
         </button>
       </div>
 

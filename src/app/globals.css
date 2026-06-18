@@ -627,3 +627,40 @@ html.dark .text-gray-300 {
 html.dark .text-gray-400.line-through {
   color: #64748b !important;
 }
+
+/* Soporte page dark mode */
+html.dark .bg-amber-50 {
+  background-color: #451a03 !important;
+}
+
+html.dark .border-amber-200 {
+  border-color: #92400e !important;
+}
+
+html.dark .text-amber-800 {
+  color: #fbbf24 !important;
+}
+
+html.dark .bg-green-100 {
+  background-color: #064e3b !important;
+}
+
+html.dark .text-green-600 {
+  color: #34d399 !important;
+}
+
+html.dark .bg-red-50 {
+  background-color: #450a0a !important;
+}
+
+html.dark .text-red-700 {
+  color: #fca5a5 !important;
+}
+
+html.dark .from-gray-50 {
+  --tw-gradient-from: #0f172a !important;
+}
+
+html.dark .to-white {
+  --tw-gradient-to: #1e293b !important;
+}

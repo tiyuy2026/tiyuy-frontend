@@ -1,85 +1,89 @@
 'use client';
 
 import Link from 'next/link';
+import { FileText, PiggyBank, ExternalLink, Scale, ChevronDown } from 'lucide-react';
 
 export function LegalServices() {
   return (
-    <div className="w-full py-16 bg-gray-50">
+    <div className="w-full py-16 bg-[var(--bg-primary)] antialiased text-[var(--text-primary)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Servicios Legales y Registrales
-          </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Acceso a plataformas oficiales para trámites inmobiliarios
+        <header className="text-center mb-16 border-b-2 border-gray-200 dark:border-gray-800 pb-10">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--brand-primary)] mb-3">
+            Garantía & Soporte Legal
           </p>
-        </div>
+          <h1 className="text-3xl sm:text-5xl font-black text-[var(--text-primary)] tracking-tight">
+            Servicios Legales y Registrales
+          </h1>
+          <p className="mt-3 text-lg text-[var(--text-secondary)] max-w-3xl mx-auto font-medium">
+            Acceso a plataformas oficiales para trámites inmobiliarios y validaciones en el Perú.
+          </p>
+        </header>
 
         {/* Sección 1: SUNARP */}
-        <section className="mb-16">
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 bg-red-50 rounded-xl flex items-center justify-center">
-                <span className="text-red-600 text-2xl">📋</span>
+        <section className="mb-12">
+          <div className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl p-6 sm:p-8 border-2 border-gray-200 dark:border-gray-800">
+            <div className="flex items-center gap-4 mb-8 border-b-2 border-gray-200 dark:border-gray-800 pb-6">
+              <div className="w-14 h-14 bg-[var(--brand-primary)]/10 border-2 border-[var(--brand-primary)]/20 rounded-xl flex items-center justify-center shrink-0">
+                <FileText className="w-6 h-6 text-[var(--brand-primary)]" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
                   SUNARP - Registros Públicos
-                </h3>
-                <p className="text-gray-600">
+                </h2>
+                <p className="text-[var(--text-secondary)] text-sm font-medium mt-0.5">
                   Superintendencia Nacional de los Registros Públicos
                 </p>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-bold text-gray-900 mb-2">Búsqueda de Partidas</h4>
-                <p className="text-gray-600 text-sm mb-3">Consultar registros de propiedades</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-gray-200 dark:border-gray-700 flex flex-col justify-between hover:border-[var(--brand-primary)]/40 dark:hover:border-[var(--brand-primary)]/40 transition-colors shadow-md">
+                <div>
+                  <h3 className="text-base font-bold text-[var(--text-primary)] mb-1">Búsqueda de Partidas</h3>
+                  <p className="text-[var(--text-secondary)] text-xs font-medium leading-relaxed mb-4">Consultar registros de propiedades</p>
+                </div>
                 <Link 
                   href="https://www.sunarp.gob.pe/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--brand-primary)] hover:opacity-80 underline underline-offset-4 cursor-pointer"
                 >
                   <span>Buscar en SUNARP</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V8a2 2 0 00-2-2h-4m-4 0v4m0 0v4m0 0v4" />
-                  </svg>
+                  <ExternalLink className="w-3.5 h-3.5" />
                 </Link>
               </div>
               
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-bold text-gray-900 mb-2">Certificados de Propiedad</h4>
-                <p className="text-gray-600 text-sm mb-3">Obtener certificados registrales</p>
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-gray-200 dark:border-gray-700 flex flex-col justify-between hover:border-[var(--brand-primary)]/40 dark:hover:border-[var(--brand-primary)]/40 transition-colors shadow-md">
+                <div>
+                  <h3 className="text-base font-bold text-[var(--text-primary)] mb-1">Certificados de Propiedad</h3>
+                  <p className="text-[var(--text-secondary)] text-xs font-medium leading-relaxed mb-4">Obtener certificados registrales públicos</p>
+                </div>
                 <Link 
                   href="https://www.sunarp.gob.pe/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--brand-primary)] hover:opacity-80 underline underline-offset-4 cursor-pointer"
                 >
                   <span>Solicitar certificado</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V8a2 2 0 00-2-2h-4m-4 0v4m0 0v4m0 0v4" />
-                  </svg>
+                  <ExternalLink className="w-3.5 h-3.5" />
                 </Link>
               </div>
               
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-bold text-gray-900 mb-2">Trámites en Línea</h4>
-                <p className="text-gray-600 text-sm mb-3">Servicios virtuales SUNARP</p>
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-gray-200 dark:border-gray-700 flex flex-col justify-between hover:border-[var(--brand-primary)]/40 dark:hover:border-[var(--brand-primary)]/40 transition-colors shadow-md">
+                <div>
+                  <h3 className="text-base font-bold text-[var(--text-primary)] mb-1">Trámites en Línea</h3>
+                  <p className="text-[var(--text-secondary)] text-xs font-medium leading-relaxed mb-4">Plataforma de servicios virtuales SUNARP</p>
+                </div>
                 <Link 
                   href="https://www.sunarp.gob.pe/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--brand-primary)] hover:opacity-80 underline underline-offset-4 cursor-pointer"
                 >
                   <span>Acceso virtual</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V8a2 2 0 00-2-2h-4m-4 0v4m0 0v4m0 0v4" />
-                  </svg>
+                  <ExternalLink className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
@@ -87,147 +91,147 @@ export function LegalServices() {
         </section>
 
         {/* Sección 2: Guía Crédito Hipotecario */}
-        <section className="mb-16">
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 bg-green-50 rounded-xl flex items-center justify-center">
-                <span className="text-green-600 text-2xl">💰</span>
+        <section className="mb-12">
+          <div className="bg-gray-50 dark:bg-gray-900/40 rounded-2xl p-6 sm:p-8 border-2 border-gray-200 dark:border-gray-800">
+            <div className="flex items-center gap-4 mb-8 border-b-2 border-gray-200 dark:border-gray-800 pb-6">
+              <div className="w-14 h-14 bg-[var(--brand-primary)]/10 border-2 border-[var(--brand-primary)]/20 rounded-xl flex items-center justify-center shrink-0">
+                <PiggyBank className="w-6 h-6 text-[var(--brand-primary)]" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
                   Guía de Crédito Hipotecario
-                </h3>
-                <p className="text-gray-600">
-                  Información para obtener tu crédito hipotecario
+                </h2>
+                <p className="text-[var(--text-secondary)] text-sm font-medium mt-0.5">
+                  Información para obtener tu crédito hipotecario calificado
                 </p>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-bold text-gray-900 mb-2">Requisitos</h4>
-                <p className="text-gray-600 text-sm mb-3">Documentos necesarios</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-gray-200 dark:border-gray-700 flex flex-col justify-between hover:border-[var(--brand-primary)]/40 dark:hover:border-[var(--brand-primary)]/40 transition-colors shadow-md">
+                <div>
+                  <h3 className="text-base font-bold text-[var(--text-primary)] mb-1">Requisitos</h3>
+                  <p className="text-[var(--text-secondary)] text-xs font-medium leading-relaxed mb-4">Documentos y condiciones necesarias</p>
+                </div>
                 <Link 
                   href="https://www.sbs.gob.pe/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--brand-primary)] hover:opacity-80 underline underline-offset-4 cursor-pointer"
                 >
                   <span>Ver requisitos</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V8a2 2 0 00-2-2h-4m-4 0v4m0 0v4m0 0v4" />
-                  </svg>
+                  <ExternalLink className="w-3.5 h-3.5" />
                 </Link>
               </div>
               
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-bold text-gray-900 mb-2">Tasas de Interés</h4>
-                <p className="text-gray-600 text-sm mb-3">Comparar tasas hipotecarias</p>
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-gray-200 dark:border-gray-700 flex flex-col justify-between hover:border-[var(--brand-primary)]/40 dark:hover:border-[var(--brand-primary)]/40 transition-colors shadow-md">
+                <div>
+                  <h3 className="text-base font-bold text-[var(--text-primary)] mb-1">Tasas de Interés</h3>
+                  <p className="text-[var(--text-secondary)] text-xs font-medium leading-relaxed mb-4">Comparativa de tasas SBS vigentes</p>
+                </div>
                 <Link 
                   href="https://www.sbs.gob.pe/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--brand-primary)] hover:opacity-80 underline underline-offset-4 cursor-pointer"
                 >
                   <span>Consultar tasas</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V8a2 2 0 00-2-2h-4m-4 0v4m0 0v4m0 0v4" />
-                  </svg>
+                  <ExternalLink className="w-3.5 h-3.5" />
                 </Link>
               </div>
               
-              <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-bold text-gray-900 mb-2">Simulador</h4>
-                <p className="text-gray-600 text-sm mb-3">Calcular cuota hipotecaria</p>
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-5 border-2 border-gray-200 dark:border-gray-700 flex flex-col justify-between hover:border-[var(--brand-primary)]/40 dark:hover:border-[var(--brand-primary)]/40 transition-colors shadow-md">
+                <div>
+                  <h3 className="text-base font-bold text-[var(--text-primary)] mb-1">Simulador</h3>
+                  <p className="text-[var(--text-secondary)] text-xs font-medium leading-relaxed mb-4">Calcular cuota y proyección del crédito</p>
+                </div>
                 <Link 
                   href="https://www.sbs.gob.pe/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--brand-primary)] hover:opacity-80 underline underline-offset-4 cursor-pointer"
                 >
                   <span>Simular crédito</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V8a2 2 0 00-2-2h-4m-4 0v4m0 0v4m0 0v4" />
-                  </svg>
+                  <ExternalLink className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Sección 3: Formulario de Contacto Estilo Urbania */}
-<section className="mb-16">
-  <div className="bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
-    {/* Banner Superior Sutil (Opcional, similar a la imagen) */}
-    <div className="bg-gradient-to-r from-teal-50 to-white p-12 text-center border-b border-gray-50">
-      <h3 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
-        ¿Necesitas Asesoría Legal?
-      </h3>
-      <p className="text-lg text-gray-500 max-w-2xl mx-auto font-light">
-        Contáctanos para orientación profesional en trámites inmobiliarios
-      </p>
-    </div>
-    
-    <div className="p-8 md:p-12">
-      <form className="max-w-4xl mx-auto space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Nombre Completo */}
-          <div className="relative">
-            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Nombre Completo</label>
-            <input
-              type="text"
-              className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-[#00a896] focus:ring-4 focus:ring-[#00a896]/10 transition-all duration-300"
-              placeholder="Tu nombre completo"
-            />
-          </div>
+        {/* Sección 3: Formulario de Contacto */}
+        <section className="mb-12">
+          <div className="bg-white dark:bg-gray-800 rounded-[2rem] shadow-xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="bg-gradient-to-r from-[var(--brand-primary)]/[0.03] to-transparent p-8 sm:p-12 text-center border-b-2 border-gray-200 dark:border-gray-700">
+              <div className="w-12 h-12 bg-[var(--brand-primary)]/10 border-2 border-[var(--brand-primary)]/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Scale className="w-6 h-6 text-[var(--brand-primary)]" />
+              </div>
+              <h3 className="text-3xl sm:text-4xl font-black text-[var(--text-primary)] mb-3 tracking-tight">
+                ¿Necesitas Asesoría Legal?
+              </h3>
+              <p className="text-base text-[var(--text-secondary)] max-w-2xl mx-auto font-medium">
+                Contáctanos para recibir orientación profesional especializada en transacciones y normativas inmobiliarias.
+              </p>
+            </div>
+            
+            <div className="p-6 sm:p-12">
+              <form className="max-w-4xl mx-auto space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="relative">
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2 ml-1">Nombre Completo</label>
+                    <input
+                      type="text"
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-900 border-2 border-transparent rounded-2xl text-[var(--text-primary)] placeholder-gray-400 focus:outline-none focus:bg-white dark:focus:bg-gray-800 focus:border-[var(--brand-primary)] transition-all duration-300 font-medium text-sm"
+                      placeholder="Tu nombre completo"
+                    />
+                  </div>
 
-          {/* Correo Electrónico */}
-          <div className="relative">
-            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Correo Electrónico</label>
-            <input
-              type="email"
-              className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-[#00a896] focus:ring-4 focus:ring-[#00a896]/10 transition-all duration-300"
-              placeholder="tu@email.com"
-            />
+                  <div className="relative">
+                    <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2 ml-1">Correo Electrónico</label>
+                    <input
+                      type="email"
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-900 border-2 border-transparent rounded-2xl text-[var(--text-primary)] placeholder-gray-400 focus:outline-none focus:bg-white dark:focus:bg-gray-800 focus:border-[var(--brand-primary)] transition-all duration-300 font-medium text-sm"
+                      placeholder="tu@email.com"
+                    />
+                  </div>
+                </div>
+                
+                <div className="relative">
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2 ml-1">Tipo de Trámite</label>
+                  <div className="relative">
+                    <select className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-900 border-2 border-transparent rounded-2xl text-[var(--text-primary)] focus:outline-none focus:bg-white dark:focus:bg-gray-800 focus:border-[var(--brand-primary)] transition-all duration-300 appearance-none cursor-pointer font-medium text-sm">
+                      <option value="">Selecciona una opción</option>
+                      <option value="compra">Compra de propiedad</option>
+                      <option value="venta">Venta de propiedad</option>
+                      <option value="registro">Registro de propiedad</option>
+                      <option value="hipoteca">Crédito hipotecario</option>
+                      <option value="otro">Otro</option>
+                    </select>
+                    <ChevronDown className="w-4 h-4 absolute right-5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] pointer-events-none" />
+                  </div>
+                </div>
+                
+                <div className="relative">
+                  <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest mb-2 ml-1">Mensaje</label>
+                  <textarea
+                    rows={4}
+                    className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-900 border-2 border-transparent rounded-2xl text-[var(--text-primary)] placeholder-gray-400 focus:outline-none focus:bg-white dark:focus:bg-gray-800 focus:border-[var(--brand-primary)] transition-all duration-300 resize-none font-medium text-sm"
+                    placeholder="Describe tu caso o consulta con el mayor detalle posible..."
+                  ></textarea>
+                </div>
+                
+                <div className="text-center pt-4">
+                  <button
+                    type="submit"
+                    className="w-full md:w-auto bg-[var(--brand-primary)] text-white px-16 py-4.5 rounded-2xl font-bold text-base shadow-lg shadow-[var(--brand-primary)]/20 hover:opacity-90 hover:-translate-y-0.5 transition-all duration-300 active:scale-95 cursor-pointer"
+                  >
+                    Enviar Consulta
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-        
-        {/* Tipo de Trámite */}
-        <div className="relative">
-          <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Tipo de Trámite</label>
-          <select className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl text-gray-900 focus:outline-none focus:bg-white focus:border-[#00a896] focus:ring-4 focus:ring-[#00a896]/10 transition-all duration-300 appearance-none cursor-pointer">
-            <option value="">Selecciona una opción</option>
-            <option value="compra">Compra de propiedad</option>
-            <option value="venta">Venta de propiedad</option>
-            <option value="registro">Registro de propiedad</option>
-            <option value="hipoteca">Crédito hipotecario</option>
-            <option value="otro">Otro</option>
-          </select>
-        </div>
-        
-        {/* Mensaje */}
-        <div className="relative">
-          <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Mensaje</label>
-          <textarea
-            rows={4}
-            className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-[#00a896] focus:ring-4 focus:ring-[#00a896]/10 transition-all duration-300 resize-none"
-            placeholder="Describe tu caso o consulta..."
-          ></textarea>
-        </div>
-        
-        {/* Botón Llamativo */}
-        <div className="text-center pt-6">
-          <button
-            type="submit"
-            className="w-full md:w-auto bg-[#00a896] text-white px-16 py-5 rounded-2xl font-bold text-lg shadow-xl shadow-[#00a896]/30 hover:bg-[#008b7d] hover:-translate-y-1 transition-all duration-300 active:scale-95"
-          >
-            Enviar Consulta
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</section>
+        </section>
 
       </div>
     </div>

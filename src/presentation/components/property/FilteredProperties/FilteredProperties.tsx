@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { PropertyCard } from '../PropertyCard/PropertyCard';
 import { useFilteredProperties } from '@/presentation/hooks/useFilteredProperties';
 import type { PropertyFilter } from '@/core/domain/entities/PropertyFilter';
+import { ChevronLeft, ChevronRight, Image } from 'lucide-react';
 
 interface FilteredPropertiesProps {
   title: string;
@@ -44,7 +45,7 @@ export function FilteredProperties({
       <div className="relative">
         <div className="flex overflow-x-auto scrollbar-hide">
           <div className="flex-1 min-w-0" />
-          <div className="flex gap-4 sm:gap-5 md:gap-6 pb-4 px-4 flex-shrink-0">
+          <div className="flex gap-4 sm:gap-5 md:gap-6 pb-4 px-8 flex-shrink-0">
             {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="w-[85vw] sm:w-[280px] md:w-[320px] lg:w-[240px] xl:w-[190px] 2xl:w-[220px] flex-shrink-0">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
@@ -121,7 +122,7 @@ export function FilteredProperties({
           <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
             {title}
             <Link href={viewAllLink} className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors ml-1">
-              <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <ChevronRight className="w-4 h-4 text-gray-700" />
             </Link>
           </h2>
 
@@ -132,9 +133,7 @@ export function FilteredProperties({
               className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:shadow-md transition-all bg-white text-gray-600 hover:text-gray-900 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
               aria-label="Scroll izquierda"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={scrollRight}
@@ -142,9 +141,7 @@ export function FilteredProperties({
               className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:shadow-md transition-all bg-white text-gray-600 hover:text-gray-900 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
               aria-label="Scroll derecha"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -173,7 +170,7 @@ export function FilteredProperties({
                   </div>
                   <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-20 h-20 bg-gray-100 rounded-xl border-2 border-white shadow-md z-30 overflow-hidden">
                     <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                      <Image className="w-8 h-8 text-gray-400" />
                     </div>
                   </div>
                 </div>

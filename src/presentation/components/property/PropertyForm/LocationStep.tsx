@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { LocationSearch } from '@/presentation/components/forms/LocationSearch/LocationSearch';
 import { useGooglePlaces } from '@/presentation/hooks/useGooglePlaces';
+import { AlertCircle, Info, MapPin } from 'lucide-react';;;
 
 interface LocationStepProps {
   formData: any;
@@ -239,9 +240,7 @@ useEffect(() => {
 
           {error && (
             <div className="mt-2.5 flex items-center gap-2 text-sm text-red-500">
-              <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
               {error}
             </div>
           )}
@@ -331,9 +330,7 @@ useEffect(() => {
               ¿Cómo quieres mostrar tu ubicación?
             </h3>
             <span className="flex items-center gap-1 text-xs text-gray-400">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              </svg>
+              <MapPin className="w-3.5 h-3.5" />
               {formData.district}, {formData.province}
             </span>
           </div>
@@ -372,9 +369,7 @@ useEffect(() => {
           </div>
 
           <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <Info className="w-3.5 h-3.5" />
             Puedes arrastrar el marcador para ajustar la ubicación exacta
           </p>
         </section>
@@ -385,9 +380,7 @@ useEffect(() => {
         className="rounded-lg p-4 flex items-start gap-3"
         style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}
       >
-        <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" style={{ color: '#00a63e' }}>
-          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-        </svg>
+        <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
         <div className="text-sm" style={{ color: '#166534' }}>
           <p className="font-semibold mb-1">¿Cómo funciona?</p>
           <ul className="space-y-0.5 text-xs opacity-80">

@@ -107,7 +107,7 @@ export function Footer() {
   return (
     <>
       <footer className="w-full mt-12 bg-[#1a1a1a] text-gray-300 font-sans">
-      <div className="w-full px-6 xl:px-16 max-w-[1920px] mx-auto py-12 border-b border-white/10">
+      <div className="w-full px-8 xl:px-16 max-w-[1920px] mx-auto py-12 border-b border-white/10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           <div>
             <h3 className="text-white font-semibold text-[15px] mb-5">Explorar propiedades</h3>
@@ -152,7 +152,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="w-full px-6 xl:px-16 max-w-[1920px] mx-auto py-8 border-b border-white/10">
+      <div className="w-full px-8 xl:px-16 max-w-[1920px] mx-auto py-8 border-b border-white/10">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
           <div>
             <p className="text-white font-semibold text-[14px] mb-4">Aceptamos</p>
@@ -201,7 +201,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="w-full px-6 xl:px-16 max-w-[1920px] mx-auto py-5">
+      <div className="w-full px-8 xl:px-16 max-w-[1920px] mx-auto py-5">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-gray-500">
           <div className="flex flex-wrap items-center gap-2">
             <span>© {new Date().getFullYear()} Tiyuy, Inc.</span>

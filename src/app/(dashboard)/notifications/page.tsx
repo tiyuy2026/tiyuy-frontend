@@ -27,8 +27,10 @@ import {
   Eye,
   X,
   ArrowUpDown,
-  ChevronDown
+  ChevronDown,
+  Loader2
 } from 'lucide-react';
+import { Footer } from '@/presentation/components/layout/Footer/Footer';
 
 type TabType = 'all' | 'unread' | 'alerts' | 'history';
 type SortType = 'newest' | 'oldest' | 'unread' | 'important';
@@ -66,7 +68,6 @@ export default function NotificationsPage() {
   const handleMarkAsRead = (id: string) => {
     setMarkingIds(prev => new Set(prev).add(id));
     markAsRead(id);
-    // Después de un tiempo, remover el id de marking (aunque la query se recargue sola)
     setTimeout(() => {
       setMarkingIds(prev => {
         const next = new Set(prev);
@@ -149,322 +150,297 @@ export default function NotificationsPage() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* Top Navigation Bar */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
-        <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-3">
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <div className="p-2 bg-slate-100 rounded-lg">
-                  <Bell className="w-4 h-4 text-slate-600" />
-                </div>
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border border-white">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
+ return (
+  <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-[#0b1120] dark:via-[#0f172a] dark:to-[#111b2e] transition-colors duration-300">
+    
+    {/* 1. TOP NAVIGATION BAR */}
+    <div className="bg-white/80 dark:bg-[#0f172a]/90 border-b border-zinc-200 dark:border-zinc-800/60 sticky top-0 z-10 backdrop-blur-md">
+      <div className="w-full px-8 xl:px-16">
+        <div className="flex items-center justify-between py-4">
+          
+          {/* Lado Izquierdo: Título e Icono */}
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="p-2 bg-muted rounded-xl">
+                <Bell className="w-5 h-5 text-foreground/80" />
               </div>
-              <h1 className="text-base font-bold text-slate-900">Centro de Notificaciones</h1>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <PushNotificationToggle />
-              
               {unreadCount > 0 && (
-                <button
-                  onClick={handleMarkAllAsRead}
-                  disabled={isMarkingAllAsRead}
-                  className="flex items-center gap-1 px-2.5 py-1.5 bg-brand-50 text-brand-700 rounded-lg hover:bg-brand-100 transition-colors text-xs font-medium disabled:opacity-50"
-                >
-                  {isMarkingAllAsRead ? (
-                    <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                  ) : (
-                    <CheckCheck className="w-3.5 h-3.5" />
-                  )}
-                  {isMarkingAllAsRead ? 'Guardando...' : 'Marcar todo'}
-                </button>
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-background">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
               )}
-              <button 
-                onClick={() => router.push('/preferences')}
-                className="flex items-center gap-1 px-2.5 py-1.5 text-slate-600 hover:text-slate-800 transition-colors rounded-lg hover:bg-slate-100 text-xs font-medium"
+            </div>
+            <h1 className="text-lg font-bold text-foreground tracking-tight">Centro de Notificaciones</h1>
+          </div>
+          
+          {/* Lado Derecho: Acciones principales fijas */}
+          <div className="flex items-center gap-3">
+            <PushNotificationToggle />
+            
+            {unreadCount > 0 && (
+              <button
+                onClick={handleMarkAllAsRead}
+                disabled={isMarkingAllAsRead}
+                className="flex items-center gap-1.5 px-3 py-2 bg-brand/10 text-brand rounded-xl hover:bg-brand/20 transition-colors text-xs font-semibold disabled:opacity-50"
               >
-                <Settings className="w-3.5 h-3.5" />
-                Configuración
+                {isMarkingAllAsRead ? (
+                  <Loader2 className="animate-spin w-3.5 h-3.5" />
+                ) : (
+                  <CheckCheck className="w-3.5 h-3.5" />
+                )}
+                {isMarkingAllAsRead ? 'Guardando...' : 'Marcar todo'}
               </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards - full width grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all hover:border-brand-200">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-red-50 rounded-lg">
-                <Bell className="w-6 h-6 text-red-500" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-900">{unreadCount}</p>
-                <p className="text-sm text-slate-500">Sin leer</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all hover:border-amber-200">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-amber-50 rounded-lg">
-                <Star className="w-6 h-6 text-amber-500" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-900">{alertsCount}</p>
-                <p className="text-sm text-slate-500">Importantes</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all hover:border-slate-300">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-slate-100 rounded-lg">
-                <History className="w-6 h-6 text-slate-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-900">{historyCount}</p>
-                <p className="text-sm text-slate-500">En historial</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Card - full width */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          {/* Tabs */}
-          <div className="flex border-b border-slate-200">
-            {[
-              { id: 'all' as TabType, label: 'Todas', icon: Bell, count: notifications.length },
-              { id: 'unread' as TabType, label: 'No leídas', icon: Eye, count: unreadCount },
-              { id: 'alerts' as TabType, label: 'Alertas', icon: AlertTriangle, count: alertsCount },
-              { id: 'history' as TabType, label: 'Historial', icon: History, count: historyCount },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 text-sm font-medium transition-all relative ${
-                    isActive 
-                      ? 'text-brand-600' 
-                      : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-brand-600' : 'text-slate-400'}`} />
-                  {tab.label}
-                  {tab.count > 0 && (
-                    <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-bold ${
-                      tab.id === 'alerts'
-                        ? 'bg-red-50 text-red-600'
-                        : tab.id === 'unread'
-                        ? 'bg-brand-50 text-brand-600'
-                        : 'bg-slate-100 text-slate-600'
-                    }`}>
-                      {tab.count}
-                    </span>
-                  )}
-                  {isActive && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-500" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Search and Filters */}
-          <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-            <div className="flex flex-col sm:flex-row gap-3">
-              {/* Search */}
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Buscar notificación..."
-                  className="w-full pl-9 pr-9 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-
-              {/* Custom Sort Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setSortOpen(!sortOpen)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm hover:border-slate-300 transition-all min-w-[180px]"
-                >
-                  <ArrowUpDown className="w-4 h-4 text-slate-400" />
-                  <span className="flex-1 text-left text-slate-700">{sortLabels[sortBy]}</span>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${sortOpen ? 'rotate-180' : ''}`} />
-                </button>
-                
-                {sortOpen && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setSortOpen(false)} />
-                    <div className="absolute right-0 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg z-20 py-1">
-                      {(Object.entries(sortLabels) as [SortType, string][]).map(([value, label]) => (
-                        <button
-                          key={value}
-                          onClick={() => {
-                            setSortBy(value);
-                            setSortOpen(false);
-                          }}
-                          className={`w-full px-4 py-2.5 text-sm text-left hover:bg-slate-50 transition-colors flex items-center gap-2 ${
-                            sortBy === value ? 'text-brand-600 font-medium bg-brand-50/50' : 'text-slate-600'
-                          }`}
-                        >
-                          {sortBy === value && <Check className="w-4 h-4 text-brand-600" />}
-                          <span className={sortBy === value ? '' : 'ml-6'}>{label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="p-6">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12 sm:py-16">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--brand-primary)]"></div>
-              </div>
-            ) : paginatedNotifications.length === 0 ? (
-              <EmptyState 
-                icon={activeTab === 'alerts' ? <AlertTriangle className="w-16 h-16" /> : activeTab === 'history' ? <History className="w-16 h-16" /> : <Bell className="w-16 h-16" />} 
-                title={
-                  searchQuery 
-                    ? 'Sin resultados para tu búsqueda'
-                    : activeTab === 'unread' 
-                      ? 'No hay notificaciones sin leer'
-                      : activeTab === 'alerts'
-                        ? 'No hay alertas importantes'
-                        : activeTab === 'history'
-                          ? 'Historial vacío'
-                          : 'No hay notificaciones'
-                }
-                description={
-                  searchQuery
-                    ? 'Intenta con otros términos de búsqueda'
-                    : 'Las notificaciones aparecerán aquí cuando tengas nuevas actualizaciones.'
-                }
-              />
-            ) : (
-              <div className="space-y-3">
-                {paginatedNotifications.map((notification) => (
-                  <NotificationCard
-                    key={notification.id}
-                    notification={notification}
-                    onMarkAsRead={handleMarkAsRead}
-                    isHistory={activeTab === 'history'}
-                  />
-                ))}
-              </div>
             )}
+            
+            <button 
+              onClick={() => router.push('/preferences')}
+              className="flex items-center gap-1.5 px-3 py-2 text-foreground/70 hover:text-foreground transition-colors rounded-xl hover:bg-muted text-xs font-semibold border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800"
+            >
+              <Settings className="w-3.5 h-3.5" />
+              Configuración
+            </button>
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-slate-600">Mostrar</span>
-                  <select
-                    value={pageSize}
-                    onChange={(e) => {
-                      setPageSize(Number(e.target.value));
-                      setPage(0);
-                    }}
-                    className="px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-                  >
-                    <option value={10}>10 por página</option>
-                    <option value={25}>25 por página</option>
-                    <option value={50}>50 por página</option>
-                  </select>
-                  <span className="text-sm text-slate-500 ml-2">
-                    {page * pageSize + 1}-{Math.min((page + 1) * pageSize, filteredNotifications.length)} de {filteredNotifications.length}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setPage(prev => Math.max(0, prev - 1))}
-                    disabled={page === 0}
-                    className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                      const startPage = Math.max(0, Math.min(page - 2, totalPages - 5));
-                      const pageNum = startPage + i;
-                      if (pageNum >= totalPages) return null;
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => setPage(pageNum)}
-                          className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
-                            page === pageNum
-                              ? 'bg-brand-600 text-white'
-                              : 'text-slate-600 hover:bg-slate-100'
-                          }`}
-                        >
-                          {pageNum + 1}
-                        </button>
-                      );
-                    })}
-                    {totalPages > 5 && (
-                      <>
-                        <span className="px-1 text-slate-400">...</span>
-                        <button
-                          onClick={() => setPage(totalPages - 1)}
-                          className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
-                            page === totalPages - 1
-                              ? 'bg-brand-600 text-white'
-                              : 'text-slate-600 hover:bg-slate-100'
-                          }`}
-                        >
-                          {totalPages}
-                        </button>
-                      </>
-                    )}
-                  </div>
-
-                  <button
-                    onClick={() => setPage(prev => Math.min(totalPages - 1, prev + 1))}
-                    disabled={page >= totalPages - 1}
-                    className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
-  );
+
+    {/* 2. CUERPO PRINCIPAL DEL DASHBOARD */}
+    <div className="w-full px-8 xl:px-16 py-6">
+      {/* Stats Cards - full width grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-white dark:bg-[#1a2332] rounded-xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-700/50 hover:shadow-md transition-all hover:border-brand/40">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-red-500/10 rounded-lg">
+              <Bell className="w-6 h-6 text-red-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-white">{unreadCount}</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Sin leer</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-[#1a2332] rounded-xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-700/50 hover:shadow-md transition-all hover:border-amber-500/40">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-amber-500/10 rounded-lg">
+              <Star className="w-6 h-6 text-amber-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-white">{alertsCount}</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Importantes</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-[#1a2332] rounded-xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-700/50 hover:shadow-md transition-all">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-zinc-100 dark:bg-zinc-700/50 rounded-lg">
+              <History className="w-6 h-6 text-zinc-600 dark:text-zinc-300" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-white">{historyCount}</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">En historial</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Card */}
+      <div className="bg-white dark:bg-[#1a2332] rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-700/50 overflow-hidden">
+        {/* Tabs */}
+        <div className="flex border-b border-zinc-200 dark:border-zinc-700/50 bg-zinc-50 dark:bg-[#1e293b] cursor-pointer">
+          {[
+            { id: 'all' as TabType, label: 'Todas', icon: Bell, count: notifications.length },
+            { id: 'unread' as TabType, label: 'No leídas', icon: Eye, count: unreadCount },
+            { id: 'alerts' as TabType, label: 'Alertas', icon: AlertTriangle, count: alertsCount },
+            { id: 'history' as TabType, label: 'Historial', icon: History, count: historyCount },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`cursor-pointer flex-1 flex items-center justify-center gap-2 py-4 px-6 text-sm font-medium transition-all relative ${
+                  isActive 
+                    ? 'text-brand bg-white dark:bg-[#1a2332]' 
+                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700/40'
+                }`}
+              >
+                <Icon className={`w-4 h-4 ${isActive ? 'text-brand' : 'text-foreground/40'}`} />
+                <span className="hidden sm:inline">{tab.label}</span>
+                {tab.count > 0 && (
+                  <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+                    tab.id === 'alerts'
+                      ? 'bg-red-500/10 text-red-500'
+                      : tab.id === 'unread'
+                      ? 'bg-brand/10 text-brand'
+                      : 'bg-muted text-foreground/70'
+                  }`}>
+                    {tab.count}
+                  </span>
+                )}
+                {isActive && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Search and Filters */}
+        <div className="p-4 border-b border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/50 dark:bg-[#1e293b]/50">
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* Search */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Buscar notificación..."
+                className="w-full pl-9 pr-9 py-2.5 bg-white dark:bg-[#0f172a] border-2 border-zinc-300 dark:border-zinc-700 rounded-xl text-sm focus:ring-2 focus:ring-brand/40 focus:border-brand text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Custom Sort Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setSortOpen(!sortOpen)}
+                className="w-full flex items-center gap-2 px-4 py-2.5 bg-background border border-zinc-200 dark:border-zinc-800/80 rounded-xl text-sm transition-all min-w-[180px]"
+              >
+                <ArrowUpDown className="w-4 h-4 text-foreground/40" />
+                <span className="flex-1 text-left text-foreground/80">{sortLabels[sortBy]}</span>
+                <ChevronDown className={`w-4 h-4 text-foreground/40 transition-transform ${sortOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {sortOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setSortOpen(false)} />
+                  <div className="absolute right-0 mt-1 w-full bg-background border border-zinc-200 dark:border-zinc-800/80 rounded-xl shadow-lg z-20 py-1">
+                    {(Object.entries(sortLabels) as [SortType, string][]).map(([value, label]) => (
+                      <button
+                        key={value}
+                        onClick={() => {
+                          setSortBy(value);
+                          setSortOpen(false);
+                        }}
+                        className={`w-full px-4 py-2.5 text-sm text-left hover:bg-muted transition-colors flex items-center gap-2 ${
+                          sortBy === value ? 'text-brand font-medium bg-brand/5 dark:bg-brand/10' : 'text-foreground/70'
+                        }`}
+                      >
+                        {sortBy === value && <Check className="w-4 h-4 text-brand" />}
+                        <span className={sortBy === value ? '' : 'ml-6'}>{label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12 sm:py-16">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand"></div>
+            </div>
+          ) : paginatedNotifications.length === 0 ? (
+            <EmptyState 
+              icon={activeTab === 'alerts' ? <AlertTriangle className="w-16 h-16 text-foreground/30" /> : activeTab === 'history' ? <History className="w-16 h-16 text-foreground/30" /> : <Bell className="w-16 h-16 text-foreground/30" />} 
+              title={searchQuery ? 'Sin resultados' : 'No hay notificaciones'}
+              description="Las notificaciones aparecerán aquí."
+            />
+          ) : (
+            <div className="space-y-3">
+              {paginatedNotifications.map((notification) => (
+                <NotificationCard
+                  key={notification.id}
+                  notification={notification}
+                  onMarkAsRead={handleMarkAsRead}
+                  isHistory={activeTab === 'history'}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-zinc-200 dark:border-zinc-800/80 bg-muted/10">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-foreground/70">Mostrar</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setPage(0);
+                  }}
+                  className="px-2 py-1.5 bg-background border border-zinc-200 dark:border-zinc-800/80 rounded-lg text-sm text-foreground"
+                >
+                  <option value={10}>10 por página</option>
+                  <option value={25}>25 por página</option>
+                  <option value={50}>50 por página</option>
+                </select>
+                <span className="text-sm text-foreground/50 ml-2">
+                  {page * pageSize + 1}-{Math.min((page + 1) * pageSize, filteredNotifications.length)} de {filteredNotifications.length}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage(prev => Math.max(0, prev - 1))}
+                  disabled={page === 0}
+                  className="p-2 rounded-lg border border-zinc-200 dark:border-zinc-800/80 text-foreground/60 hover:bg-muted disabled:opacity-40 transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                    const startPage = Math.max(0, Math.min(page - 2, totalPages - 5));
+                    const pageNum = startPage + i;
+                    if (pageNum >= totalPages) return null;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
+                          page === pageNum ? 'bg-brand text-white' : 'text-foreground/70 hover:bg-muted'
+                        }`}
+                      >
+                        {pageNum + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={() => setPage(prev => Math.min(totalPages - 1, prev + 1))}
+                  disabled={page >= totalPages - 1}
+                  className="p-2 rounded-lg border border-zinc-200 dark:border-zinc-800/80 text-foreground/60 hover:bg-muted disabled:opacity-40 transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+    < Footer />
+  </div>
+  
+);
 }
 
 function EmptyState({ icon, title, description }: { icon: React.ReactNode; title: string; description?: string }) {
@@ -473,9 +449,9 @@ function EmptyState({ icon, title, description }: { icon: React.ReactNode; title
       <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[var(--bg-tertiary)] rounded-full flex items-center justify-center mx-auto mb-4 text-[var(--text-muted)]">
         {icon}
       </div>
-      <h3 className="text-lg font-medium text-slate-700 mb-2">{title}</h3>
+      <h3 className="text-lg font-medium text-[var(--text-primary)] mb-2">{title}</h3>
       {description && (
-        <p className="text-sm text-slate-500 max-w-sm mx-auto">{description}</p>
+        <p className="text-sm text-[var(--text-secondary)] max-w-sm mx-auto">{description}</p>
       )}
     </div>
   );
@@ -532,7 +508,7 @@ function NotificationCard({ notification, onMarkAsRead, isHistory }: Notificatio
       case 'MARKETING':
         return 'bg-gradient-to-br from-cyan-500 to-cyan-600 text-white shadow-cyan-500/30';
       default:
-        return 'bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-brand-500/30';
+        return 'bg-gradient-to-br from-brand to-brand-dark text-white shadow-brand/30';
     }
   };
 
@@ -591,9 +567,9 @@ function NotificationCard({ notification, onMarkAsRead, isHistory }: Notificatio
     <div
       className={`group flex items-start gap-4 p-5 rounded-xl border transition-all duration-300 ${
         isUnread
-          ? 'bg-white border-slate-200 shadow-sm hover:shadow-md hover:border-brand-200' 
-          : 'bg-slate-50/50 border-slate-100 hover:bg-slate-50'
-      } ${isImportant && isUnread ? 'ring-1 ring-amber-200' : ''}`}
+          ? 'bg-[var(--bg-card)] border-[var(--border-color)] shadow-sm hover:shadow-md hover:border-brand/40'
+          : 'bg-[var(--bg-secondary)]/50 border-[var(--border-light)] hover:bg-[var(--bg-tertiary)]'
+      } ${isImportant && isUnread ? 'ring-1 ring-amber-500/40' : ''}`}
     >
       {/* Icono adaptable en tamaño */}
       <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center ${getIconColors(notification.type)}`}>
@@ -604,31 +580,31 @@ function NotificationCard({ notification, onMarkAsRead, isHistory }: Notificatio
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <h3 className={`font-semibold text-base ${isUnread ? 'text-slate-900' : 'text-slate-600'}`}>
+              <h3 className={`font-semibold text-base ${isUnread ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
                 {notification.title}
               </h3>
               {isUnread && (
-                <span className="px-2 py-0.5 bg-brand-50 text-brand-600 text-xs font-bold rounded-full">
+                <span className="px-2 py-0.5 bg-brand/10 text-brand text-xs font-bold rounded-full">
                   NUEVO
                 </span>
               )}
               {isImportant && (
-                <span className="px-2 py-0.5 bg-amber-50 text-amber-600 text-xs font-bold rounded-full flex items-center gap-1">
+                <span className="px-2 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-bold rounded-full flex items-center gap-1">
                   <Star className="w-3 h-3" />
                   IMPORTANTE
                 </span>
               )}
             </div>
-            <p className={`text-sm leading-relaxed ${isUnread ? 'text-slate-600' : 'text-slate-500'}`}>
+            <p className={`text-sm leading-relaxed ${isUnread ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
               {notification.message}
             </p>
             <div className="flex items-center gap-3 mt-2">
-              <span className="text-xs text-slate-400 flex items-center gap-1">
+              <span className="text-xs text-[var(--text-muted)] flex items-center gap-1">
                 <Clock className="w-3 h-3" />
                 {formatDate(notification.createdAt)}
               </span>
-              <span className="text-xs text-slate-400">•</span>
-              <span className="text-xs text-slate-400">{getTypeLabel(notification.type)}</span>
+              <span className="text-xs text-[var(--text-muted)]">•</span>
+              <span className="text-xs text-[var(--text-muted)]">{getTypeLabel(notification.type)}</span>
             </div>
           </div>
 
@@ -637,7 +613,7 @@ function NotificationCard({ notification, onMarkAsRead, isHistory }: Notificatio
             {isUnread && (
               <button
                 onClick={() => onMarkAsRead(notification.id)}
-                className="p-2 text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+                className="p-2 text-brand hover:bg-brand/10 rounded-lg transition-colors"
                 title="Marcar como leída"
               >
                 <Check className="w-5 h-5" />

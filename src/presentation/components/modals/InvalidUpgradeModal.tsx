@@ -1,5 +1,7 @@
 'use client';
 
+import { TriangleAlert, X } from 'lucide-react';
+
 interface InvalidUpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -18,17 +20,13 @@ export function InvalidUpgradeModal({ isOpen, onClose, currentPlan, selectedPlan
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="w-6 h-6" />
         </button>
 
         {/* Icono de advertencia */}
         <div className="flex justify-center mb-6">
           <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 2.502-3.148V5.857c0-1.481-.962-3.148-2.502-3.148H5.582c-1.54 0-2.502 1.667-2.502 3.148v8.995c0 1.481.962 3.148 2.502 3.148h13.856z" />
-            </svg>
+            <TriangleAlert className="w-8 h-8 text-white" />
           </div>
         </div>
 

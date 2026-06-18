@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useMyPayments, useTotalPaid } from '@/presentation/hooks/usePayments';
+import { Minus } from 'lucide-react';
 
 interface PaymentStats {
   totalPaid: number;
@@ -134,13 +135,7 @@ export function PaymentHistoryClient() {
           ) : paginatedPayments.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
               <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-10 h-10 text-gray-400"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M9 12h6" />
-                </svg>
+                <Minus className="w-10 h-10 text-gray-400" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 No se encontraron pagos

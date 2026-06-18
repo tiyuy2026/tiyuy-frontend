@@ -1,5 +1,6 @@
 'use client';
 
+import { X, Check } from 'lucide-react';
 import { ActiveSubscription } from '@/core/domain/entities/Wallet';
 
 interface ActiveSubscriptionModalProps {
@@ -19,17 +20,13 @@ export function ActiveSubscriptionModal({ isOpen, onClose, activeSubscription }:
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="w-6 h-6" />
         </button>
 
         {/* Icono de éxito */}
         <div className="flex justify-center mb-6">
           <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+            <Check className="w-8 h-8 text-white" />
           </div>
         </div>
 

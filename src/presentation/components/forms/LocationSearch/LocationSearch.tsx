@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/presentation/components/ui/Input/Input';
 import { useLocationSearch } from '@/presentation/hooks/useLocationSearch';
+import { MapPin, AlertCircle } from 'lucide-react';
 
 interface LocationSearchProps {
   onLocationSelect: (location: {
@@ -83,9 +84,7 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
         placeholder={placeholder}
         className={`pr-10 bg-white ${className}`}
         leftIcon={
-          <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-          </svg>
+          <MapPin className="w-5 h-5 text-blue-500" />
         }
         rightIcon={
           loading ? (
@@ -105,9 +104,7 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
             >
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 mt-1">
-                  <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
+                  <MapPin className="w-4 h-4 text-gray-400" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-gray-900 truncate">
@@ -127,9 +124,7 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
       {!API_KEY && (
         <div className="absolute z-50 w-full mt-1 bg-red-50 border border-red-200 rounded-lg p-3">
           <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
+            <AlertCircle className="w-4 h-4 text-red-600" />
             <span className="text-sm text-red-800">
               Google Places API key no configurada. Agrega NEXT_PUBLIC_GOOGLE_PLACES_API_KEY a tu .env.local
             </span>

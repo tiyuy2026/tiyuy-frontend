@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Minus, Plus } from 'lucide-react';
 
 interface CharacteristicsStepProps {
   formData: any;
@@ -43,9 +44,7 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
           className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
           disabled={value <= min}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-          </svg>
+          <Minus className="w-4 h-4" />
         </button>
         <div className="w-16 text-center">
           <span className="text-lg font-semibold text-gray-900">{value}</span>
@@ -56,9 +55,7 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
           className="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
           disabled={value >= max}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+          <Plus className="w-4 h-4" />
         </button>
       </div>
     </div>
