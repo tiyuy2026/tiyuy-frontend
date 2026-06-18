@@ -1244,8 +1244,8 @@ function PostComments({ channelId, postId, currentUserId, currentUserName, curre
     setReplyInputs(prev => ({ ...prev, [commentId]: '' }));
   };
 
-  // Render nested replies recursively
-  const renderNestedReplies = (nestedReplies: any[]) => {
+  // Render nested replies recursively (legacy - kept for backward compatibility)
+  const renderNestedRepliesLegacy = (nestedReplies: any[]) => {
     if (!nestedReplies || nestedReplies.length === 0) return null;
     return nestedReplies.map((nestedReply: any) => (
       <div key={nestedReply.id} className="flex gap-2">
@@ -1323,7 +1323,7 @@ function PostComments({ channelId, postId, currentUserId, currentUserName, curre
           {/* More nested replies */}
           {nestedReply.replies && nestedReply.replies.length > 0 && (
             <div className="mt-1.5 space-y-1 pl-3 border-l-2 border-gray-200">
-              {renderNestedReplies(nestedReply.replies)}
+              {renderNestedRepliesLegacy(nestedReply.replies)}
             </div>
           )}
         </div>
@@ -1384,7 +1384,7 @@ function PostComments({ channelId, postId, currentUserId, currentUserName, curre
       }
     });
 
-    return { rootComments, replyMap: replies };
+    return { rootComments: roots, replyMap: replies };
   }, [comments]);
 
   // Función recursiva optimizada para renderizar las respuestas

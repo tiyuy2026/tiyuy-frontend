@@ -1,10 +1,10 @@
+'use client';
+
 import { TriangleAlert } from 'lucide-react';
 /**
  * Admin Error State Component
  * Consistent error UI for admin module
  */
-
-'use client';
 
 interface ErrorStateProps {
   title?: string;

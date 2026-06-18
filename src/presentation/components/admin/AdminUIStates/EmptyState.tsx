@@ -1,10 +1,10 @@
+'use client';
+
 import { FileText } from 'lucide-react';
 /**
  * Admin Empty State Component
  * Consistent empty state UI for admin module
  */
-
-'use client';
 
 interface EmptyStateProps {
   title: string;

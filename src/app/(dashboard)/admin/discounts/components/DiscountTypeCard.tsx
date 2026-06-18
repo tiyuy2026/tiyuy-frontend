@@ -1,5 +1,6 @@
-import { ArrowRight, Globe, Landmark, RefreshCw, ScrollText, User, UserCheck } from 'lucide-react';
 'use client';
+
+import { ArrowRight, Globe, Landmark, RefreshCw, ScrollText, User, UserCheck } from 'lucide-react';
 
 interface DiscountOption {
   type: string;

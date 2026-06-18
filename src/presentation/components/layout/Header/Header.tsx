@@ -1011,7 +1011,7 @@ export function Header() {
                         Mis proyectos
                       </Link>
                       <Link
-                        href="/messages"
+                        href="/mensajes"
                         className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
                       >
                         <MessageSquare className="w-4 h-4" />

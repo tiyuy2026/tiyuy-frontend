@@ -362,7 +362,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[var(--bg-primary)] border-b border-[var(--border-light)]">
+      <section className="bg-[var(--bg-primary)]">
         <div className="w-full px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             <div className="flex gap-6 sm:gap-8 overflow-x-auto scrollbar-none">
@@ -387,7 +387,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-8 sm:py-16 bg-[var(--bg-primary)] border-b border-[var(--border-light)]">
+      <section className="py-2 sm:py-3 bg-[var(--bg-primary)]">
         <div className="w-full px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
@@ -417,14 +417,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-8 sm:py-16 bg-background border-b border-gray-100">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto">
           <FeaturedProperties />
         </div>
       </section>
 
       {/* DEPARTAMENTOS EN ALQUILER */}
-      <section className="py-8 sm:py-16 bg-background border-b border-gray-100">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto">
           <FilteredProperties 
             title="Departamentos para alquilar" 
@@ -435,7 +435,7 @@ export default function HomePage() {
       </section>
 
       {/* CASAS EN VENTA */}
-      <section className="py-8 sm:py-16 bg-background border-b border-gray-100">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto">
           <FilteredProperties 
             title="Casas disponibles para compra" 
@@ -446,14 +446,14 @@ export default function HomePage() {
       </section>
 
       {/* PROYECTOS INMOBILIARIOS */}
-      <section className="py-8 sm:py-16 bg-background border-b border-gray-100">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto">
           <FeaturedProjects />
         </div>
       </section>
 
       {/* OFICINAS Y LOCALES */}
-      <section className="py-8 sm:py-16 bg-background border-b border-gray-100">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto">
           <FilteredProperties 
             title="Espacios para tu negocio" 
@@ -464,7 +464,7 @@ export default function HomePage() {
       </section>
 
       {/* TERRENOS */}
-      <section className="py-8 sm:py-16 bg-background">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto">
           <FilteredProperties 
             title="Terrenos y lotes de inversión" 
@@ -477,7 +477,7 @@ export default function HomePage() {
       {/* CAMPAÑAS DE MARKETING DESTACADAS */}
       <FeaturedCampaigns />
 
-      <section className="py-8 sm:py-16 bg-background border-t border-gray-200/60">
+      <section className="py-2 sm:py-3 bg-background">
         <div className="w-full px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             <h2 className="text-2xl font-bold text-foreground mb-6">
