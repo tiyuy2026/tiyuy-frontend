@@ -151,11 +151,11 @@ export default function NotificationsPage() {
   }
 
  return (
-  <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 transition-colors duration-300">
+  <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-[#0b1120] dark:via-[#0f172a] dark:to-[#111b2e] transition-colors duration-300">
     
-    {/* 1. TOP NAVIGATION BAR (Limpio y simétrico) */}
-    <div className="bg-background border-b border-zinc-200 dark:border-zinc-800/80 sticky top-0 z-10 backdrop-blur-md bg-opacity-95">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
+    {/* 1. TOP NAVIGATION BAR */}
+    <div className="bg-white/80 dark:bg-[#0f172a]/90 border-b border-zinc-200 dark:border-zinc-800/60 sticky top-0 z-10 backdrop-blur-md">
+      <div className="w-full px-8 xl:px-16">
         <div className="flex items-center justify-between py-4">
           
           {/* Lado Izquierdo: Título e Icono */}
@@ -206,48 +206,48 @@ export default function NotificationsPage() {
     </div>
 
     {/* 2. CUERPO PRINCIPAL DEL DASHBOARD */}
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+    <div className="w-full px-8 xl:px-16 py-6">
       {/* Stats Cards - full width grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-background rounded-xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800/80 hover:shadow-md transition-all hover:border-brand/40">
+        <div className="bg-white dark:bg-[#1a2332] rounded-xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-700/50 hover:shadow-md transition-all hover:border-brand/40">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-red-500/10 rounded-lg">
               <Bell className="w-6 h-6 text-red-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{unreadCount}</p>
-              <p className="text-sm text-foreground/60">Sin leer</p>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-white">{unreadCount}</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Sin leer</p>
             </div>
           </div>
         </div>
-        <div className="bg-background rounded-xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800/80 hover:shadow-md transition-all hover:border-amber-500/40">
+        <div className="bg-white dark:bg-[#1a2332] rounded-xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-700/50 hover:shadow-md transition-all hover:border-amber-500/40">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-amber-500/10 rounded-lg">
               <Star className="w-6 h-6 text-amber-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{alertsCount}</p>
-              <p className="text-sm text-foreground/60">Importantes</p>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-white">{alertsCount}</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Importantes</p>
             </div>
           </div>
         </div>
-        <div className="bg-background rounded-xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800/80 hover:shadow-md transition-all">
+        <div className="bg-white dark:bg-[#1a2332] rounded-xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-700/50 hover:shadow-md transition-all">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-muted rounded-lg">
-              <History className="w-6 h-6 text-foreground/70" />
+            <div className="p-3 bg-zinc-100 dark:bg-zinc-700/50 rounded-lg">
+              <History className="w-6 h-6 text-zinc-600 dark:text-zinc-300" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{historyCount}</p>
-              <p className="text-sm text-foreground/60">En historial</p>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-white">{historyCount}</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">En historial</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Card - full width */}
-      <div className="bg-background rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800/80 overflow-hidden">
+      {/* Main Card */}
+      <div className="bg-white dark:bg-[#1a2332] rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-700/50 overflow-hidden">
         {/* Tabs */}
-        <div className="flex border-b border-zinc-200 dark:border-zinc-800/80 bg-muted/20">
+        <div className="flex border-b border-zinc-200 dark:border-zinc-700/50 bg-zinc-50 dark:bg-[#1e293b] cursor-pointer">
           {[
             { id: 'all' as TabType, label: 'Todas', icon: Bell, count: notifications.length },
             { id: 'unread' as TabType, label: 'No leídas', icon: Eye, count: unreadCount },
@@ -260,10 +260,10 @@ export default function NotificationsPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 text-sm font-medium transition-all relative ${
+                className={`cursor-pointer flex-1 flex items-center justify-center gap-2 py-4 px-6 text-sm font-medium transition-all relative ${
                   isActive 
-                    ? 'text-brand bg-background' 
-                    : 'text-foreground/60 hover:text-foreground hover:bg-muted/40'
+                    ? 'text-brand bg-white dark:bg-[#1a2332]' 
+                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700/40'
                 }`}
               >
                 <Icon className={`w-4 h-4 ${isActive ? 'text-brand' : 'text-foreground/40'}`} />
@@ -288,22 +288,22 @@ export default function NotificationsPage() {
         </div>
 
         {/* Search and Filters */}
-        <div className="p-4 border-b border-zinc-100 dark:border-zinc-900 bg-muted/10">
+        <div className="p-4 border-b border-zinc-100 dark:border-zinc-800/50 bg-zinc-50/50 dark:bg-[#1e293b]/50">
           <div className="flex flex-col sm:flex-row gap-3">
             {/* Search */}
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Buscar notificación..."
-                className="w-full pl-9 pr-9 py-2.5 bg-background border border-zinc-200 dark:border-zinc-800/80 rounded-xl text-sm focus:ring-2 focus:ring-brand/40 focus:border-brand text-foreground placeholder:text-foreground/40 transition-all"
+                className="w-full pl-9 pr-9 py-2.5 bg-white dark:bg-[#0f172a] border-2 border-zinc-300 dark:border-zinc-700 rounded-xl text-sm focus:ring-2 focus:ring-brand/40 focus:border-brand text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 transition-all"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
                 >
                   <X className="w-4 h-4" />
                 </button>

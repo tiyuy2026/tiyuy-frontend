@@ -283,7 +283,7 @@ export default function MyPropertiesPage() {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-9xl mx-auto py-8 px-8 xl:px-16">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
