@@ -49,8 +49,8 @@ export default function ProfileSelector() {
   };
 
   return (
-    <div className="min-h-screen py-4 sm:py-5 lg:py-12">
-      <div className="text-center mb-6 sm:mb-8 px-4">
+    <div className="min-h-screen py-4 sm:py-5 lg:py-12 px-8 xl:px-16">
+      <div className="text-center mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           Elige tu perfil
         </h1>
@@ -61,7 +61,7 @@ export default function ProfileSelector() {
 
       {/* Mensaje de error si no selecciona perfil */}
       {noSelectionError && (
-        <div className="max-w-md mx-auto mb-6 px-4">
+        <div className="max-w-md mx-auto mb-6">
           <AuthErrorBanner
             error="Por favor selecciona un tipo de perfil para continuar"
             onClose={() => setNoSelectionError(false)}
@@ -70,7 +70,7 @@ export default function ProfileSelector() {
       )}
 
       {error && (
-        <div className="max-w-md mx-auto mb-6 px-4">
+        <div className="max-w-md mx-auto mb-6">
           <AuthErrorBanner
             error={error}
             onClose={() => setError(null)}
@@ -80,7 +80,7 @@ export default function ProfileSelector() {
       )}
 
       {/* Cards de perfil */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 mb-8 sm:mb-12 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 items-stretch">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 mb-8 sm:mb-12 max-w-6xl mx-auto items-stretch">
         {profiles.map((profile) => (
           <ProfileCard
             key={profile}
@@ -92,7 +92,7 @@ export default function ProfileSelector() {
       </div>
 
       {/* Botón continuar */}
-      <div className="flex justify-center px-4 sm:px-6 lg:px-4">
+      <div className="flex justify-center">
         <Button
           variant="primary"
           size="lg"
@@ -105,7 +105,7 @@ export default function ProfileSelector() {
         </Button>
       </div>
 
-      <div className="text-center mt-6 sm:mt-8 lg:mt-12 px-4 sm:px-6 lg:px-8">
+      <div className="text-center mt-6 sm:mt-8 lg:mt-12">
         <p className="text-sm sm:text-base text-gray-600">
           ¿Ya tienes cuenta?{' '}
           <Link
