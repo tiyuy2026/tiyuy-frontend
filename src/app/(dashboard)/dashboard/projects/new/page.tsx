@@ -27,12 +27,12 @@ export default function NuevoProyectoPage() {
     <ProtectedRoute>
       <TrialGuard>
         <div className="min-h-screen bg-gray-50 py-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-8 xl:px-16">
             <TrialWarningBanner />
 
             {/* Hero (simple) */}
             <div className="mb-8">
-              <div className="px-4 py-6 sm:px-6 lg:px-8">
+              <div className="py-6">
                 <h1 className="text-3xl font-bold text-slate-900">Nuevo Proyecto</h1>
                 <p className="mt-2 text-base text-slate-600">Completa la información del proyecto en pasos sencillos. Puedes guardar borrador y completar más tarde.</p>
               </div>
@@ -105,7 +105,7 @@ export default function NuevoProyectoPage() {
             </div>
 
             {/* Form */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
+            <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
               <PropertyForm mode="create" formType="project" onStepChange={setCurrentStep} />
             </div>
           </div>

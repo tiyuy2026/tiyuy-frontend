@@ -56,24 +56,22 @@ export default function CRMDashboardPage() {
         {/* Header */}
         <div className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-8 xl:px-16 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-3">
                 <Link 
                   href="/dashboard" 
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors shrink-0"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </Link>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                    <BarChart3 className="w-7 h-7 text-blue-600" />
-                    Análisis de clientes con interacciones reales en la plataforma
-                  </h1>
-                </div>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+                  <BarChart3 className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600 shrink-0" />
+                  <span>Análisis de Clientes</span>
+                </h1>
               </div>
               <button
                 onClick={() => refetch()}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all active:scale-[0.98]"
               >
                 <RefreshCw className="w-4 h-4" />
                 Actualizar Datos
