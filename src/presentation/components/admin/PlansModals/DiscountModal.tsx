@@ -3,8 +3,8 @@
 import React from 'react';
 import { Modal } from '@/presentation/components/ui/Modal';
 import { Button } from '@/presentation/components/ui/Button';
-import { SubscriptionPlan, AgencyPlanDiscount } from '@/core/domain/entities/Admin';
-import { Search } from 'lucide-react';
+import { SubscriptionPlan } from '@/core/domain/entities/Admin';
+import { Search, X, Percent } from 'lucide-react';
 
 interface DiscountModalProps {
   isOpen: boolean;
@@ -49,111 +49,122 @@ export const DiscountModal: React.FC<DiscountModalProps> = ({
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-2xl p-8 max-w-lg w-full shadow-2xl border border-gray-100">
-        <div className="flex flex-col gap-1 mb-6">
-          <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight">Gestionar Descuentos</h3>
-          <p className="text-xs text-gray-400 font-medium">Plan: {discountPlan.displayName}</p>
-        </div>
-        
-        <div className="space-y-6">
-          <div className="p-5 bg-blue-50/50 rounded-2xl border border-blue-100">
-            <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-3">Buscar Inmobiliaria o Agente</p>
-            <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  placeholder="RUC Inmobiliaria"
-                  value={agencyRuc}
-                  onChange={(e) => { setAgencyRuc(e.target.value); setAgentDni(''); }}
-                  className="w-full px-4 py-2.5 bg-white border border-blue-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                />
-                <input
-                  type="text"
-                  placeholder="DNI Agente"
-                  value={agentDni}
-                  onChange={(e) => { setAgentDni(e.target.value); setAgencyRuc(''); }}
-                  className="w-full px-4 py-2.5 bg-white border border-blue-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                />
+      <div className="bg-white rounded-2xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
+        {/* Header verde */}
+        <div className="bg-[#00E676] px-5 py-4 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Percent className="w-5 h-5 text-green-800" />
               </div>
-              <Button 
-                variant="primary" 
-                size="sm" 
-                onClick={onSearch}
-                disabled={isSearching || (!agencyRuc && !agentDni)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex items-center justify-center gap-2"
-              >
-                <Search className="w-4 h-4" />
-                {isSearching ? 'Buscando...' : 'Verificar Identidad'}
-              </Button>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Gestionar Descuentos</h3>
+                <p className="text-xs text-green-700">Plan: {discountPlan.displayName}</p>
+              </div>
             </div>
+            <button onClick={onClose} className="p-1.5 hover:bg-green-300 rounded-lg transition-colors text-gray-600">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Form scrolleable */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Buscar Inmobiliaria o Agente */}
+          <div className="p-3 bg-blue-50 rounded-lg border border-blue-100 space-y-3">
+            <p className="text-xs font-semibold text-blue-700">Buscar Inmobiliaria o Agente</p>
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="text"
+                placeholder="RUC Inmobiliaria"
+                value={agencyRuc}
+                onChange={(e) => { setAgencyRuc(e.target.value); setAgentDni(''); }}
+                className="w-full px-3 py-2 text-sm bg-white border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                placeholder="DNI Agente"
+                value={agentDni}
+                onChange={(e) => { setAgentDni(e.target.value); setAgencyRuc(''); }}
+                className="w-full px-3 py-2 text-sm bg-white border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onSearch}
+              disabled={isSearching || (!agencyRuc && !agentDni)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium flex items-center justify-center gap-2 py-2"
+            >
+              <Search className="w-4 h-4" />
+              {isSearching ? 'Buscando...' : 'Verificar Identidad'}
+            </Button>
 
             {searchResult && (
-              <div className="mt-4 p-4 bg-white border border-green-200 rounded-xl flex items-center justify-between">
+              <div className="p-3 bg-white border border-green-200 rounded-lg flex items-center justify-between">
                 <div>
-                  <p className="text-[9px] font-black text-green-600 uppercase tracking-widest">{searchResult.type === 'AGENCY' ? 'Inmobiliaria' : 'Agente'}</p>
+                  <p className="text-[10px] font-semibold text-green-600 uppercase">{searchResult.type === 'AGENCY' ? 'Inmobiliaria' : 'Agente'}</p>
                   <p className="text-sm font-bold text-gray-800">{searchResult.name}</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-[10px] text-gray-400 font-mono">ID: {searchResult.id}</p>
-                </div>
+                <span className="text-[10px] text-gray-400 font-mono">ID: {searchResult.id}</span>
               </div>
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block pl-1">Precio Final (S/)</label>
+          {/* Precio y Descuento */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">Precio Final (S/)</label>
               <input
                 type="number"
                 value={customPrice}
                 onChange={(e) => setCustomPrice(e.target.value)}
                 placeholder="Ej: 299"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold"
+                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-bold"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block pl-1">O % de Descuento</label>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">O % de Descuento</label>
               <input
                 type="number"
                 value={discountPercentage}
                 onChange={(e) => setDiscountPercentage(e.target.value)}
                 placeholder="Ej: 20"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 font-bold"
+                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-bold"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block pl-1">Notas Administrativas</label>
+          {/* Notas */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-gray-700">Notas Administrativas</label>
             <textarea
               value={discountNotes}
               onChange={(e) => setDiscountNotes(e.target.value)}
               placeholder="Especifique el motivo del descuento..."
               rows={2}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm font-medium"
+              className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
             />
           </div>
 
-          <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex justify-between items-center">
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Precio Original:</span>
-            <span className="text-lg font-black text-gray-900">S/ {discountPlan.priceInPen}</span>
+          {/* Precio Original */}
+          <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-100">
+            <span className="text-xs font-semibold text-gray-500">Precio Original:</span>
+            <span className="text-base font-bold text-gray-900">S/ {discountPlan.priceInPen}</span>
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 mt-8 pt-6 border-t border-gray-100">
-          <Button 
-            className="w-full py-4 bg-gray-900 hover:bg-black text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-gray-100 transition-all active:scale-95 disabled:opacity-50" 
+        {/* Footer */}
+        <div className="flex gap-3 p-4 border-t border-gray-200 flex-shrink-0">
+          <Button variant="outline" className="flex-1 py-2.5 text-sm font-medium" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button
+            className="flex-1 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white rounded-lg text-sm font-medium shadow-lg shadow-teal-500/30"
             onClick={onCreateDiscount}
             disabled={!searchResult || isPending}
           >
             {isPending ? 'Aplicando...' : 'Aplicar Beneficio'}
-          </Button>
-          <Button 
-            variant="outline" 
-            className="w-full py-3 rounded-2xl font-bold text-gray-500 border border-gray-200 hover:bg-gray-50" 
-            onClick={onClose}
-          >
-            Cerrar
           </Button>
         </div>
       </div>

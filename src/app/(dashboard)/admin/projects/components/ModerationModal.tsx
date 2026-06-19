@@ -99,15 +99,15 @@ export function ModerationModal({ project, onConfirm, onCancel }: ModerationModa
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
-      {/* Header con gradiente corporativo */}
-      <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-teal-500 rounded-t-2xl">
-        <h3 className="text-xl font-bold text-white">Moderar Proyecto</h3>
+    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
+      {/* Header con verde encendido */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-green-300 bg-[#00E676] rounded-t-2xl">
+        <h3 className="text-lg font-bold text-gray-800">Moderar Proyecto</h3>
         <button
           onClick={onCancel}
-          className="text-white/80 hover:text-white transition-colors"
+          className="text-gray-600 hover:text-gray-900 transition-colors p-1 hover:bg-green-300 rounded-lg"
         >
-          <X className="w-6 h-6" />
+          <X className="w-5 h-5" />
         </button>
       </div>
 

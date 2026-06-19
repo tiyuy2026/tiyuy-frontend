@@ -33,19 +33,19 @@ export default function NotifyAgencyModal({
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl">
         {/* Header Profesional */}
-        <div className="bg-gradient-to-r from-blue-600 to-teal-500 px-6 py-4">
+        <div className="bg-[#28E10F] px-5 py-4 border-b border-green-300">
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-xl font-bold text-white">
+              <h3 className="text-lg font-bold text-gray-800">
                 Notificar Inmobiliaria
               </h3>
-              <p className="text-blue-100 text-sm mt-1">
+              <p className="text-green-700 text-sm mt-0.5">
                 Para: {selectedAgency?.name} (RUC: {selectedAgency?.ruc})
               </p>
             </div>
             <button 
               onClick={onClose}
-              className="text-white/70 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
+              className="text-gray-600 hover:text-gray-900 transition-colors p-1 hover:bg-green-300 rounded-lg"
             >
               <X className="w-5 h-5" />
             </button>

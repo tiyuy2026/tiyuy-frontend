@@ -33,153 +33,136 @@ export default function ApplyDirectDiscountModal({
 }: ApplyDirectDiscountModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl">
-        {/* Header Profesional */}
-        <div className="bg-gradient-to-r from-blue-600 to-teal-500 px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="text-xl font-bold text-white">
-                Aplicar Descuento Directo
-              </h3>
-              <p className="text-blue-100 text-sm mt-1">
-                Para: {selectedAgency?.name} (RUC: {selectedAgency?.ruc})
-              </p>
+      <div className="bg-white rounded-2xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
+        {/* Header verde */}
+        <div className="bg-[#00E676] px-5 py-4 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-green-800 font-bold text-lg">D</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Aplicar Descuento Directo</h3>
+                <p className="text-xs text-green-700">
+                  Para: {selectedAgency?.name} (RUC: {selectedAgency?.ruc})
+                </p>
+              </div>
             </div>
-            <button 
-              onClick={onClose}
-              className="text-white/70 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
-            >
+            <button onClick={onClose} className="p-1.5 hover:bg-green-300 rounded-lg transition-colors text-gray-600">
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
-        
-        {/* Content */}
-        <div className="p-4 overflow-y-auto max-h-[70vh]">
 
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-          <p className="text-sm text-yellow-800">
-            <strong>⚠️ Nota:</strong> Este descuento se aplicará directamente al plan actual de la inmobiliaria. 
-            El descuento será inmediato y afectará el próximo cobro.
-          </p>
-        </div>
+        {/* Content scrolleable */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <p className="text-xs text-yellow-800">
+              <strong>⚠️ Nota:</strong> Este descuento se aplicará directamente al plan actual de la inmobiliaria. 
+              El descuento será inmediato y afectará el próximo cobro.
+            </p>
+          </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Porcentaje de Descuento (%)</label>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-gray-700">Porcentaje de Descuento (%)</label>
             <div className="relative">
               <input
-                type="number"
-                min="0.01"
-                max="100"
-                step="0.01"
+                type="number" min="0.01" max="100" step="0.01"
                 value={directDiscount.discountPercentage}
                 onChange={(e) => setDirectDiscount({ ...directDiscount, discountPercentage: e.target.value })}
                 placeholder="Ej: 15"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 pr-12"
+                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 pr-10"
               />
-              <span className="absolute right-4 top-3.5 text-gray-400 font-bold">%</span>
+              <span className="absolute right-3 top-2.5 text-gray-400 font-bold text-sm">%</span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-[10px] text-gray-500">
               Plan actual: <span className="font-semibold">{selectedAgency?.currentPlan || 'Sin plan'}</span>
               <br />
               Ingresos últimos 30 días: <span className="font-semibold">S/ {selectedAgency?.revenue30Days?.toLocaleString() || '0'}</span>
             </p>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Motivo del Descuento</label>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-gray-700">Motivo del Descuento</label>
             <textarea
               value={directDiscount.reason}
               onChange={(e) => setDirectDiscount({ ...directDiscount, reason: e.target.value })}
               placeholder="Ej: Descuento por fidelidad, compensación por servicio, promoción especial..."
-              rows={3}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+              rows={2}
+              className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
             />
-            <p className="text-xs text-gray-500 mt-1">Este motivo quedará registrado en el historial de la inmobiliaria</p>
+            <p className="text-[10px] text-gray-500">Este motivo quedará registrado en el historial de la inmobiliaria</p>
           </div>
 
-          <div className="flex items-center">
+          <label className="flex items-center gap-2 cursor-pointer p-2 bg-gray-50 rounded-lg">
             <input
               type="checkbox"
-              id="notifyAgency"
               checked={directDiscount.notifyAgency}
               onChange={(e) => setDirectDiscount({ ...directDiscount, notifyAgency: e.target.checked })}
-              className="mr-2 w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
+              className="w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
             />
-            <label htmlFor="notifyAgency" className="text-sm text-gray-700">
-              Notificar a la inmobiliaria por email
-            </label>
-          </div>
+            <span className="text-sm text-gray-700">Notificar a la inmobiliaria por email</span>
+          </label>
 
-          <div className="border-t border-gray-200 pt-4 mt-4">
+          <div className="border-t border-gray-200 pt-3">
             <div className="flex items-start gap-3">
               <input
                 type="checkbox"
                 id="applyToAllAgents"
                 checked={directDiscount.applyToAllAgents}
                 onChange={(e) => setDirectDiscount({ ...directDiscount, applyToAllAgents: e.target.checked })}
-                className="mt-1 w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
+                className="mt-0.5 w-4 h-4 text-teal-600 rounded focus:ring-teal-500"
               />
               <div className="flex-1">
-                <label htmlFor="applyToAllAgents" className="text-sm font-medium text-gray-700 block">
+                <label htmlFor="applyToAllAgents" className="text-xs font-semibold text-gray-700 block">
                   Aplicar descuento a todos los agentes de esta inmobiliaria
                 </label>
-                <p className="text-xs text-gray-500 mt-1">
-                  El descuento se asignará automáticamente a cada agente activo de la inmobiliaria
+                <p className="text-[10px] text-gray-500 mt-0.5">
+                  El descuento se asignará automáticamente a cada agente activo
                 </p>
               </div>
             </div>
 
             {directDiscount.applyToAllAgents && (
-              <>
-                <div className="mt-4 ml-7">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Cantidad máxima de agentes
-                  </label>
+              <div className="mt-3 ml-7 space-y-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-gray-700">Cantidad máxima de agentes</label>
                   <input
-                    type="number"
-                    min="1"
+                    type="number" min="1"
                     value={directDiscount.maxAgents}
                     onChange={(e) => setDirectDiscount({ ...directDiscount, maxAgents: e.target.value })}
-                    placeholder="Ej: 15 (dejar vacío para todos los agentes)"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    placeholder="Ej: 15 (vacío = todos)"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Máximo número de agentes que pueden acceder a este descuento. Los primeros {directDiscount.maxAgents || 'N'} agentes obtendrán el {directDiscount.discountPercentage || '0'}% de descuento (solo usable 1 vez por agente).
+                  <p className="text-[10px] text-gray-500">
+                    Máximo de agentes que pueden acceder a este descuento
                   </p>
                 </div>
 
-                <div className="mt-4 ml-7">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Fecha de expiración
-                  </label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-gray-700">Fecha de expiración</label>
                   <input
                     type="datetime-local"
                     value={directDiscount.expiresAt}
                     onChange={(e) => setDirectDiscount({ ...directDiscount, expiresAt: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Después de esta fecha, el descuento no podrá ser usado por ningún agente. Ej: 3 horas, 1 día, etc.
-                  </p>
+                  <p className="text-[10px] text-gray-500">Después de esta fecha, el descuento no podrá ser usado</p>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>
-        </div>
-      </div>
 
-      <div className="bg-white border-t border-gray-200 px-4 py-3">
-        <div className="flex justify-end gap-3">
-          <Button variant="outline" onClick={onClose}>
+        {/* Footer */}
+        <div className="flex gap-3 p-4 border-t border-gray-200 flex-shrink-0">
+          <Button variant="outline" onClick={onClose} className="flex-1 py-2.5 text-sm font-medium">
             Cancelar
           </Button>
           <Button
             onClick={onApply}
             disabled={isPending || !directDiscount.discountPercentage || !directDiscount.reason}
-            className="bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white font-medium"
+            className="flex-1 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white rounded-lg text-sm font-medium shadow-lg shadow-teal-500/30"
           >
             {isPending ? 'Aplicando...' : 'Aplicar Descuento'}
           </Button>

@@ -194,6 +194,12 @@ export class AdminRepository implements IAdminRepository {
     await axiosClient.put(`${this.basePath}/users/${userId}/status?${params.toString()}`);
   }
 
+  async deleteUser(userId: number, reason?: string): Promise<void> {
+    const params = new URLSearchParams();
+    if (reason) params.append('reason', reason);
+    await axiosClient.delete(`${this.basePath}/users/${userId}?${params.toString()}`);
+  }
+
   async changeUserRole(userId: number, request: ChangeUserRoleRequest): Promise<void> {
     await axiosClient.put(`${this.basePath}/users/${userId}/role`, request);
   }

@@ -247,15 +247,15 @@ export function SystemActivityDashboard() {
     <div className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-gradient-to-br from-blue-500 to-teal-400 rounded-lg shadow-md">
+        <Link href="/admin/activities" className="flex items-center gap-2 group">
+          <div className="p-2 bg-gradient-to-br from-blue-500 to-teal-400 rounded-lg shadow-md group-hover:shadow-lg transition-all">
             <Activity className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Actividad del Sistema</h2>
+            <h2 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">Actividad del Sistema</h2>
             <p className="text-xs text-gray-500">Análisis de red Tiyuy en tiempo real</p>
           </div>
-        </div>
+        </Link>
         
         <div className="flex items-center gap-2">
           <button
@@ -268,7 +268,7 @@ export function SystemActivityDashboard() {
           </button>
           
           <Link
-            href="/admin/events"
+            href="/admin/activities"
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-blue-500 to-teal-400 rounded-lg hover:shadow-md transition-all"
           >
             Ver Actividad Completa

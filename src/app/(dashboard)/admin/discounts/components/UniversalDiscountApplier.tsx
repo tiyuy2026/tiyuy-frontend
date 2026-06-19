@@ -102,68 +102,104 @@ function GlobalDiscountModal({ isOpen, onClose }: GlobalDiscountModalProps) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-xl p-6 max-w-md w-full">
-        <h3 className="text-lg font-semibold text-gray-900 mb-1">Descuento Global</h3>
-        <p className="text-sm text-gray-500 mb-6">Codigo valido para todos los usuarios</p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="Codigo de Descuento"
-            value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
-            placeholder="Ej: BIENVENIDO20"
-            required
-          />
-          <Input
-            label="Porcentaje de Descuento (%)"
-            type="number"
-            min="1"
-            max="100"
-            value={discountPercentage}
-            onChange={(e) => setDiscountPercentage(Number(e.target.value))}
-            required
-          />
-          <Input
-            label="Limite de Usos"
-            type="number"
-            min="1"
-            value={usageLimit}
-            onChange={(e) => setUsageLimit(Number(e.target.value))}
-            required
-          />
-          <div className="flex items-center gap-2">
+      <div className="bg-white rounded-2xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
+        {/* Header verde */}
+        <div className="bg-[#00E676] px-5 py-4 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-green-800 font-bold text-lg">G</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Descuento Global</h3>
+                <p className="text-xs text-green-700">Código válido para todos los usuarios</p>
+              </div>
+            </div>
+            <button onClick={onClose} className="p-1.5 hover:bg-green-300 rounded-lg transition-colors text-gray-600">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        </div>
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-gray-700">Código de Descuento</label>
             <input
-              type="checkbox"
-              id="globalSingleUse"
-              checked={singleUse}
-              onChange={(e) => setSingleUse(e.target.checked)}
-              className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              placeholder="Ej: BIENVENIDO20"
+              required
+              className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            <label htmlFor="globalSingleUse" className="text-sm text-gray-700">Un solo uso por usuario</label>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Input
-              label="Fecha Inicio"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              required
-            />
-            <Input
-              label="Fecha Fin"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">% Descuento</label>
+              <input
+                type="number"
+                min="1" max="100"
+                value={discountPercentage}
+                onChange={(e) => setDiscountPercentage(Number(e.target.value))}
+                required
+                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-bold"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">Límite de Usos</label>
+              <input
+                type="number"
+                min="1"
+                value={usageLimit}
+                onChange={(e) => setUsageLimit(Number(e.target.value))}
+                required
+                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-bold"
+              />
+            </div>
           </div>
-          <div className="flex gap-3 pt-2">
-            <Button type="submit" disabled={createMutation.isPending} className="flex-1">
-              {createMutation.isPending ? 'Creando...' : 'Crear Descuento Global'}
-            </Button>
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-              Cancelar
-            </Button>
+          <label className="flex items-center gap-2 cursor-pointer p-2 bg-gray-50 rounded-lg">
+            <input
+              type="checkbox"
+              checked={singleUse}
+              onChange={(e) => setSingleUse(e.target.checked)}
+              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm text-gray-700">Un solo uso por usuario</span>
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">Fecha Inicio</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                required
+                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">Fecha Fin</label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
         </form>
+        <div className="flex gap-3 p-4 border-t border-gray-200 flex-shrink-0">
+          <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            disabled={createMutation.isPending}
+            className="flex-1 px-4 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white rounded-lg text-sm font-medium shadow-lg shadow-teal-500/30 disabled:opacity-50"
+          >
+            {createMutation.isPending ? 'Creando...' : 'Crear Descuento Global'}
+          </button>
+        </div>
       </div>
     </Modal>
   );
@@ -279,9 +315,25 @@ function AgentDiscountContent({ onClose }: AgentDiscountContentProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 max-w-lg w-full max-h-[85vh] overflow-y-auto">
-      <h3 className="text-lg font-semibold text-gray-900 mb-1">Descuento para Agente</h3>
-      <p className="text-sm text-gray-500 mb-6">Asigna un descuento a un agente especifico</p>
+    <div className="bg-white rounded-2xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
+      {/* Header verde */}
+      <div className="bg-[#00E676] px-5 py-4 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-green-200 rounded-xl flex items-center justify-center flex-shrink-0">
+              <span className="text-green-800 font-bold text-lg">A</span>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-800">Descuento para Agente</h3>
+              <p className="text-xs text-green-700">Asigna un descuento a un agente específico</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-1.5 hover:bg-green-300 rounded-lg transition-colors text-gray-600">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
 
       {mode === 'select' && (
         <div className="space-y-4">
@@ -393,6 +445,7 @@ function AgentDiscountContent({ onClose }: AgentDiscountContentProps) {
           isPending={createPlanDiscountMutation.isPending}
         />
       )}
+      </div>
     </div>
   );
 }
@@ -478,74 +531,91 @@ function AgencyDiscountContent({ onClose }: AgencyDiscountContentProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 max-w-lg w-full max-h-[85vh] overflow-y-auto">
-      <h3 className="text-lg font-semibold text-gray-900 mb-1">Descuento para Inmobiliaria</h3>
-      <p className="text-sm text-gray-500 mb-6">Asigna un descuento a una inmobiliaria</p>
+    <div className="bg-white rounded-2xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
+      {/* Header verde */}
+      <div className="bg-[#00E676] px-5 py-4 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-green-200 rounded-xl flex items-center justify-center flex-shrink-0">
+              <span className="text-green-800 font-bold text-lg">I</span>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-800">Descuento para Inmobiliaria</h3>
+              <p className="text-xs text-green-700">Asigna un descuento a una inmobiliaria</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-1.5 hover:bg-green-300 rounded-lg transition-colors text-gray-600">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {mode === 'select' && (
+          <div className="space-y-3">
+            <div className="relative">
+              <input
+                placeholder="Buscar inmobiliaria por nombre o RUC..."
+                value={agencySearchQuery}
+                onChange={(e) => { setAgencySearchQuery(e.target.value); setShowDropdown(true); }}
+                onFocus={() => setShowDropdown(true)}
+                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+              {showDropdown && filteredAgencies.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                  {filteredAgencies.map((agency: InmobiliariaWithStats) => (
+                    <button
+                      key={agency.id}
+                      onClick={() => { setSelectedAgency(agency); setShowDropdown(false); setAgencySearchQuery(`${agency.name} (${agency.ruc})`); }}
+                      className="w-full px-3 py-2.5 text-left hover:bg-gray-50 border-b border-gray-100 last:border-0 text-sm"
+                    >
+                      <div className="font-medium text-gray-900">{agency.name}</div>
+                      <div className="text-xs text-gray-500">RUC: {agency.ruc}</div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
-      {mode === 'select' && (
-        <div className="space-y-4">
-          <div className="relative">
-            <Input
-              placeholder="Buscar inmobiliaria por nombre o RUC..."
-              value={agencySearchQuery}
-              onChange={(e) => { setAgencySearchQuery(e.target.value); setShowDropdown(true); }}
-              onFocus={() => setShowDropdown(true)}
-            />
-            {showDropdown && filteredAgencies.length > 0 && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                {filteredAgencies.map((agency: InmobiliariaWithStats) => (
-                  <button
-                    key={agency.id}
-                    onClick={() => { setSelectedAgency(agency); setShowDropdown(false); setAgencySearchQuery(`${agency.name} (${agency.ruc})`); }}
-                    className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-0"
-                  >
-                    <div className="font-medium text-gray-900">{agency.name}</div>
-                    <div className="text-sm text-gray-500">RUC: {agency.ruc}</div>
-                  </button>
-                ))}
+            {selectedAgency && (
+              <div className="bg-violet-50 border border-violet-200 rounded-lg p-3">
+                <p className="text-xs font-medium text-violet-800">Inmobiliaria seleccionada:</p>
+                <p className="text-sm text-violet-700">{selectedAgency.name} (RUC: {selectedAgency.ruc})</p>
+              </div>
+            )}
+
+            {selectedAgency && (
+              <div className="flex flex-col gap-2">
+                <button onClick={() => setMode('create')} className="w-full py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white rounded-lg text-sm font-medium shadow-lg shadow-teal-500/30">Crear Código de Descuento</button>
+                <button onClick={() => setMode('direct')} className="w-full py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">Aplicar Descuento Directo</button>
               </div>
             )}
           </div>
+        )}
 
-          {selectedAgency && (
-            <div className="bg-violet-50 border border-violet-200 rounded-lg p-3">
-              <p className="text-sm font-medium text-violet-800">Inmobiliaria seleccionada:</p>
-              <p className="text-sm text-violet-700">{selectedAgency.name} (RUC: {selectedAgency.ruc})</p>
-            </div>
-          )}
+        {mode === 'create' && selectedAgency && (
+          <CreateAgencyDiscountModal
+            isOpen={true}
+            onClose={() => setMode('select')}
+            selectedAgency={selectedAgency}
+            newDiscount={newDiscount}
+            setNewDiscount={setNewDiscount}
+            onCreate={handleCreateDiscount}
+            isPending={createDiscountMutation.isPending}
+          />
+        )}
 
-          {selectedAgency && (
-            <div className="flex flex-col gap-2">
-              <Button onClick={() => setMode('create')} className="w-full">Crear Codigo de Descuento</Button>
-              <Button onClick={() => setMode('direct')} variant="outline" className="w-full">Aplicar Descuento Directo</Button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {mode === 'create' && selectedAgency && (
-        <CreateAgencyDiscountModal
-          isOpen={true}
-          onClose={() => setMode('select')}
-          selectedAgency={selectedAgency}
-          newDiscount={newDiscount}
-          setNewDiscount={setNewDiscount}
-          onCreate={handleCreateDiscount}
-          isPending={createDiscountMutation.isPending}
-        />
-      )}
-
-      {mode === 'direct' && selectedAgency && (
-        <ApplyDirectDiscountModal
-          isOpen={true}
-          onClose={() => setMode('select')}
-          selectedAgency={selectedAgency}
-          directDiscount={directDiscount}
-          setDirectDiscount={setDirectDiscount}
-          onApply={handleApplyDirectDiscount}
-          isPending={applyDirectMutation.isPending}
-        />
-      )}
+        {mode === 'direct' && selectedAgency && (
+          <ApplyDirectDiscountModal
+            isOpen={true}
+            onClose={() => setMode('select')}
+            selectedAgency={selectedAgency}
+            directDiscount={directDiscount}
+            setDirectDiscount={setDirectDiscount}
+            onApply={handleApplyDirectDiscount}
+            isPending={applyDirectMutation.isPending}
+          />
+        )}
+      </div>
     </div>
   );
 }
@@ -593,45 +663,75 @@ function ReusableDiscountModal({ isOpen, onClose }: ReusableDiscountModalProps) 
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-xl p-6 max-w-md w-full">
-        <h3 className="text-lg font-semibold text-gray-900 mb-1">Codigo Reutilizable</h3>
-        <p className="text-sm text-gray-500 mb-6">Codigo con multiples usos permitidos</p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="Codigo de Descuento"
-            value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
-            placeholder="Ej: REUTILIZABLE20"
-            required
-          />
-          <Input
-            label="Porcentaje de Descuento (%)"
-            type="number"
-            min="1"
-            max="100"
-            value={discountPercentage}
-            onChange={(e) => setDiscountPercentage(Number(e.target.value))}
-            required
-          />
-          <Input
-            label="Limite de Usos"
-            type="number"
-            min="1"
-            value={usageLimit}
-            onChange={(e) => setUsageLimit(Number(e.target.value))}
-            required
-          />
-          <div className="grid grid-cols-2 gap-3">
-            <Input label="Fecha Inicio" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
-            <Input label="Fecha Fin" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+      <div className="bg-white rounded-2xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
+        {/* Header verde */}
+        <div className="bg-[#00E676] px-5 py-4 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-green-800 font-bold text-lg">R</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Código Reutilizable</h3>
+                <p className="text-xs text-green-700">Código con múltiples usos permitidos</p>
+              </div>
+            </div>
+            <button onClick={onClose} className="p-1.5 hover:bg-green-300 rounded-lg transition-colors text-gray-600">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
           </div>
-          <div className="flex gap-3 pt-2">
-            <Button type="submit" disabled={createMutation.isPending} className="flex-1">
-              {createMutation.isPending ? 'Creando...' : 'Crear Codigo Reutilizable'}
-            </Button>
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
+        </div>
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-gray-700">Código de Descuento</label>
+            <input
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              placeholder="Ej: REUTILIZABLE20"
+              required
+              className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">% Descuento</label>
+              <input
+                type="number" min="1" max="100"
+                value={discountPercentage}
+                onChange={(e) => setDiscountPercentage(Number(e.target.value))}
+                required
+                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-bold"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">Límite de Usos</label>
+              <input
+                type="number" min="1"
+                value={usageLimit}
+                onChange={(e) => setUsageLimit(Number(e.target.value))}
+                required
+                className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-bold"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">Fecha Inicio</label>
+              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">Fecha Fin</label>
+              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+            </div>
           </div>
         </form>
+        <div className="flex gap-3 p-4 border-t border-gray-200 flex-shrink-0">
+          <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">Cancelar</button>
+          <button type="submit" onClick={handleSubmit} disabled={createMutation.isPending} className="flex-1 px-4 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white rounded-lg text-sm font-medium shadow-lg shadow-teal-500/30 disabled:opacity-50">
+            {createMutation.isPending ? 'Creando...' : 'Crear Código Reutilizable'}
+          </button>
+        </div>
       </div>
     </Modal>
   );
@@ -678,45 +778,63 @@ function UserDiscountModal({ isOpen, onClose }: UserDiscountModalProps) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-xl p-6 max-w-md w-full">
-        <h3 className="text-lg font-semibold text-gray-900 mb-1">Descuento para Usuario</h3>
-        <p className="text-sm text-gray-500 mb-6">Crea un codigo de descuento para un usuario especifico</p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            label="Codigo de Descuento"
-            value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
-            placeholder="Ej: USUARIO20"
-            required
-          />
-          <Input
-            label="Porcentaje de Descuento (%)"
-            type="number"
-            min="1"
-            max="100"
-            value={discountPercentage}
-            onChange={(e) => setDiscountPercentage(Number(e.target.value))}
-            required
-          />
-          <Input
-            label="Limite de Usos"
-            type="number"
-            min="1"
-            value={usageLimit}
-            onChange={(e) => setUsageLimit(Number(e.target.value))}
-            required
-          />
-          <div className="grid grid-cols-2 gap-3">
-            <Input label="Fecha Inicio" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
-            <Input label="Fecha Fin" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+      <div className="bg-white rounded-2xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
+        {/* Header verde */}
+        <div className="bg-[#00E676] px-5 py-4 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-green-800 font-bold text-lg">U</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Descuento para Usuario</h3>
+                <p className="text-xs text-green-700">Código para un usuario específico</p>
+              </div>
+            </div>
+            <button onClick={onClose} className="p-1.5 hover:bg-green-300 rounded-lg transition-colors text-gray-600">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
           </div>
-          <div className="flex gap-3 pt-2">
-            <Button type="submit" disabled={createMutation.isPending} className="flex-1">
-              {createMutation.isPending ? 'Creando...' : 'Crear Descuento para Usuario'}
-            </Button>
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">Cancelar</Button>
+        </div>
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-gray-700">Código de Descuento</label>
+            <input
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              placeholder="Ej: USUARIO20"
+              required
+              className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">% Descuento</label>
+              <input type="number" min="1" max="100" value={discountPercentage} onChange={(e) => setDiscountPercentage(Number(e.target.value))} required className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-bold" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">Límite de Usos</label>
+              <input type="number" min="1" value={usageLimit} onChange={(e) => setUsageLimit(Number(e.target.value))} required className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-bold" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">Fecha Inicio</label>
+              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">Fecha Fin</label>
+              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+            </div>
           </div>
         </form>
+        <div className="flex gap-3 p-4 border-t border-gray-200 flex-shrink-0">
+          <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">Cancelar</button>
+          <button type="submit" onClick={handleSubmit} disabled={createMutation.isPending} className="flex-1 px-4 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white rounded-lg text-sm font-medium shadow-lg shadow-teal-500/30 disabled:opacity-50">
+            {createMutation.isPending ? 'Creando...' : 'Crear Descuento para Usuario'}
+          </button>
+        </div>
       </div>
     </Modal>
   );

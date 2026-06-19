@@ -13,35 +13,35 @@ interface AgentDetailsModalProps {
 export default function AgentDetailsModal({ agent, isOpen, onClose }: AgentDetailsModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-xl p-0 max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
-        {/* Header Profesional con Gradiente */}
-        <div className="bg-gradient-to-r from-blue-600 to-teal-500 px-6 py-5">
-          <div className="flex items-center gap-4">
+      <div className="bg-white rounded-xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
+        {/* Header Profesional */}
+        <div className="bg-[#16DB16] px-4 py-3">
+          <div className="flex items-center gap-3">
             {agent.profilePhotoUrl ? (
               <img
                 src={agent.profilePhotoUrl}
                 alt={`${agent.firstName} ${agent.lastName}`}
-                className="w-20 h-20 rounded-xl object-cover border-4 border-white/30 shadow-lg"
+                className="w-14 h-14 rounded-xl object-cover border-2 border-green-300 shadow-sm"
               />
             ) : (
-              <div className="w-20 h-20 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold border-4 border-white/30 shadow-lg">
+              <div className="w-14 h-14 rounded-xl bg-green-200 flex items-center justify-center text-green-800 text-xl font-bold border-2 border-green-300 shadow-sm">
                 {`${agent.firstName?.[0] || ''}${agent.lastName?.[0] || ''}`.toUpperCase()}
               </div>
             )}
-            <div className="flex-1">
-              <h3 className="text-xl font-bold text-white">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base font-bold text-green-900 truncate">
                 {agent.firstName} {agent.lastName}
               </h3>
-              <p className="text-blue-100 text-sm mt-0.5">{agent.email}</p>
-              <div className="flex items-center gap-2 mt-2">
-                <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+              <p className="text-green-700 text-xs mt-0.5 truncate">{agent.email}</p>
+              <div className="flex items-center gap-2 mt-1.5">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                   agent.enabled 
-                    ? 'bg-green-400/30 text-green-50 border border-green-400/40' 
-                    : 'bg-red-400/30 text-red-50 border border-red-400/40'
+                    ? 'bg-green-200 text-green-800' 
+                    : 'bg-red-200 text-red-800'
                 }`}>
                   {agent.enabled ? 'Activo' : 'Inactivo'}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-400/30 text-blue-50 border border-blue-400/40">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-200 text-blue-800">
                   {agent.currentPlan || 'Free'}
                 </span>
               </div>

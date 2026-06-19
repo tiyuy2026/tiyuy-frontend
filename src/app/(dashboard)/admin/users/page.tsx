@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import {
   useUsers,
   useToggleUserStatus,
+  useDeleteUser,
   useUserById,
   useChangeUserRole,
   useVerifyUserEmail,
@@ -24,7 +25,8 @@ import { UserPropertiesModal } from '@/presentation/components/admin/UserPropert
 import { UserProjectsModal } from '@/presentation/components/admin/UserProjectsModal/UserProjectsModal';
 import { UserListItem, ChangeUserRoleRequest } from '@/core/domain/entities/Admin';
 import { toast } from '@/presentation/store/toastStore';
-import { ChevronLeft, ChevronRight, Mail, Phone, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Mail, Phone, Users, LayoutGrid, List } from 'lucide-react';
+import { UserCardView } from '@/presentation/components/admin/UserCardView/UserCardView';
 
 export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -44,14 +46,17 @@ export default function UsersPage() {
   const [isProjectsModalOpen, setIsProjectsModalOpen] = useState(false);
   const [viewingUserId, setViewingUserId] = useState<number | null>(null);
   const [detailUserId, setDetailUserId] = useState<number | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteReason, setDeleteReason] = useState('');
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
 
-  const { hasPermission } = usePermissions();
+  const { hasPermission, isSuperAdmin } = usePermissions();
 
   // Fetch datos completos del usuario cuando se abre el modal de detalle
   const { data: userDetailData, isLoading: isLoadingDetail } = useUserById(detailUserId || 0);
   const canVerifyUsers = hasPermission('USERS_VERIFY');
-  const canManageUsers = hasPermission('USERS_UPDATE');
-  const canDeleteUsers = hasPermission('USERS_DELETE');
+  const canManageUsers = hasPermission('USERS_UPDATE') || isSuperAdmin;
+  const canDeleteUsers = hasPermission('USERS_DELETE') || isSuperAdmin;
   const canChangeRoles = hasPermission('USERS_CHANGE_ROLE');
 
   const enabledParam = statusFilter === 'enabled' ? true : statusFilter === 'disabled' ? false : undefined;
@@ -64,6 +69,7 @@ export default function UsersPage() {
   );
 
   const toggleStatusMutation = useToggleUserStatus();
+  const deleteUserMutation = useDeleteUser();
   const changeRoleMutation = useChangeUserRole();
   const verifyEmailMutation = useVerifyUserEmail();
   const verifyPhoneMutation = useVerifyUserPhone();
@@ -148,6 +154,33 @@ export default function UsersPage() {
     setIsRoleModalOpen(false);
     setSelectedUser(null);
     refetch();
+  };
+
+  const handleDeleteUser = (user: UserListItem) => {
+    setSelectedUser(user);
+    setSelectedUserId(user.id);
+    setDeleteReason('');
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteUser = async () => {
+    if (!selectedUserId) return;
+
+    try {
+      await deleteUserMutation.mutateAsync({
+        userId: selectedUserId,
+        reason: deleteReason || undefined,
+      });
+      toast.success('Usuario eliminado correctamente');
+      setIsDeleteModalOpen(false);
+      setDeleteReason('');
+      setSelectedUserId(null);
+      setSelectedUser(null);
+      refetch();
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Error desconocido';
+      toast.error(`Error al eliminar usuario: ${errorMessage}`);
+    }
   };
 
   const confirmToggleStatus = async () => {
@@ -420,11 +453,12 @@ export default function UsersPage() {
   // Calculate stats
   const activeUsers = usersData?.content?.filter(u => u.enabled).length || 0;
   const pendingUsers = usersData?.content?.filter(u => !u.emailVerified || !u.phoneVerified).length || 0;
+  const totalUsers = usersData?.totalElements || 0;
 
   return (
     <div className="space-y-6 px-6 py-4">
       {/* Header - 3 tarjetas en fila */}
-      <UsersHeaderStats activeUsers={activeUsers} pendingUsers={pendingUsers} />
+      <UsersHeaderStats activeUsers={activeUsers} pendingUsers={pendingUsers} totalUsers={totalUsers} />
 
       {/* Contenedor Principal */}
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
@@ -438,6 +472,34 @@ export default function UsersPage() {
           onRoleChange={(value) => setRoleFilter(value as any)}
           onClear={handleClearFilters}
         />
+
+        {/* Toggle de vista: Tabla / Tarjetas */}
+        <div className="flex items-center justify-end px-6 py-2 border-b border-gray-100 bg-gray-50/30">
+          <div className="flex items-center bg-white rounded-lg border border-gray-200 p-0.5 shadow-sm">
+            <button
+              onClick={() => setViewMode('table')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                viewMode === 'table'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              Tabla
+            </button>
+            <button
+              onClick={() => setViewMode('cards')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                viewMode === 'cards'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              Tarjetas
+            </button>
+          </div>
+        </div>
 
         {/* Loading */}
         {isLoading && (
@@ -477,8 +539,8 @@ export default function UsersPage() {
           </div>
         )}
 
-        {/* Tabla Integrada */}
-        {!isLoading && !error && usersData?.content && usersData.content.length > 0 && (
+        {/* Vista Tabla */}
+        {!isLoading && !error && usersData?.content && usersData.content.length > 0 && viewMode === 'table' && (
           <>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-100">
@@ -541,12 +603,49 @@ export default function UsersPage() {
                       ))}
 
                       <td className="px-4 py-3 whitespace-nowrap text-right">
-                        <button
-                          onClick={() => handleViewUser(user)}
-                          className="px-3 py-1.5 text-xs font-semibold rounded-md bg-gradient-to-r from-blue-600 to-teal-500 text-white hover:from-blue-700 hover:to-teal-600 shadow-sm hover:shadow-md transition-all"
-                        >
-                          Ver Detalle
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleViewUser(user)}
+                            className="px-3 py-1.5 text-xs font-semibold rounded-md bg-gradient-to-r from-blue-600 to-teal-500 text-white hover:from-blue-700 hover:to-teal-600 shadow-sm hover:shadow-md transition-all"
+                          >
+                            Ver Detalle
+                          </button>
+                          {canManageUsers && (
+                            <button
+                              onClick={() => handleToggleStatus(user)}
+                              disabled={toggleStatusMutation.isPending && selectedUserId === user.id}
+                              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                                user.enabled
+                                  ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 border border-amber-200'
+                                  : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border border-emerald-200'
+                              } disabled:opacity-50 disabled:cursor-not-allowed`}
+                              title={user.enabled ? 'Pausar usuario (deshabilitar temporalmente)' : 'Reanudar usuario (habilitar de nuevo)'}
+                            >
+                              {toggleStatusMutation.isPending && selectedUserId === user.id ? (
+                                <>
+                                  <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                  </svg>
+                                  Procesando...
+                                </>
+                              ) : user.enabled ? (
+                                'Pausar'
+                              ) : (
+                                'Reanudar'
+                              )}
+                            </button>
+                          )}
+                          {canDeleteUsers && (
+                            <button
+                              onClick={() => handleDeleteUser(user)}
+                              className="px-3 py-1.5 text-xs font-semibold rounded-md bg-red-100 text-red-700 hover:bg-red-200 transition-all"
+                              title="Eliminar usuario"
+                            >
+                              Eliminar
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -555,6 +654,66 @@ export default function UsersPage() {
             </div>
 
             {/* Paginación Integrada */}
+            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-600">
+                  Mostrando {((currentPage - 1) * pageSize) + 1} a{' '}
+                  {Math.min(currentPage * pageSize, usersData.totalElements)} de{' '}
+                  {usersData.totalElements} resultados
+                </span>
+
+                <select
+                  value={pageSize}
+                  onChange={(e) => setPageSize(Number(e.target.value))}
+                  className="border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                >
+                  <option value={10}>10 por página</option>
+                  <option value={20}>20 por página</option>
+                  <option value={50}>50 por página</option>
+                  <option value={100}>100 por página</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage <= 1}
+                  className="px-4 py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Anterior
+                </button>
+
+                <span className="text-sm font-medium text-gray-700 px-3 py-2 bg-white rounded-lg border border-gray-200">
+                  Página {currentPage} de {Math.ceil(usersData.totalElements / pageSize)}
+                </span>
+
+                <button
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={currentPage >= Math.ceil(usersData.totalElements / pageSize)}
+                  className="px-4 py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  Siguiente
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Vista Tarjetas */}
+        {!isLoading && !error && usersData?.content && usersData.content.length > 0 && viewMode === 'cards' && (
+          <>
+            <UserCardView
+              users={usersData.content}
+              onViewDetail={handleViewUser}
+              onToggleStatus={canManageUsers ? handleToggleStatus : undefined}
+              onDelete={canDeleteUsers ? handleDeleteUser : undefined}
+              canManage={canManageUsers}
+              canDelete={canDeleteUsers}
+            />
+
+            {/* Paginación para tarjetas */}
             <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
               <div className="flex items-center gap-4">
                 <span className="text-sm text-gray-600">
@@ -656,6 +815,93 @@ export default function UsersPage() {
         isOpen={isProjectsModalOpen}
         onClose={() => setIsProjectsModalOpen(false)}
       />
+
+      {/* Toggle Status Confirmation Modal */}
+      <Modal isOpen={isToggleModalOpen} onClose={() => setIsToggleModalOpen(false)}>
+        <div className="p-4">
+          <h3 className="text-base font-semibold text-gray-900 mb-3">
+            {selectedUser?.enabled ? '¿Pausar usuario?' : '¿Reanudar usuario?'}
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            {selectedUser?.enabled
+              ? `¿Estás seguro de que deseas deshabilitar temporalmente al usuario ${selectedUser?.firstName} ${selectedUser?.lastName} (${selectedUser?.email})?`
+              : `¿Estás seguro de que deseas habilitar nuevamente al usuario ${selectedUser?.firstName} ${selectedUser?.lastName} (${selectedUser?.email})?`
+            }
+          </p>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Motivo (opcional)
+            </label>
+            <textarea
+              value={toggleReason}
+              onChange={(e) => setToggleReason(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              rows={3}
+              placeholder="Indica el motivo del cambio de estado..."
+            />
+          </div>
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={() => setIsToggleModalOpen(false)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={confirmToggleStatus}
+              disabled={toggleStatusMutation.isPending}
+              className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                selectedUser?.enabled
+                  ? 'bg-amber-600 hover:bg-amber-700'
+                  : 'bg-emerald-600 hover:bg-emerald-700'
+              }`}
+            >
+              {toggleStatusMutation.isPending ? 'Procesando...' : selectedUser?.enabled ? 'Pausar usuario' : 'Reanudar usuario'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete User Confirmation Modal */}
+      <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)}>
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            ¿Eliminar usuario?
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            ¿Estás seguro de que deseas eliminar al usuario{' '}
+            <strong>{selectedUser?.firstName} {selectedUser?.lastName}</strong> ({selectedUser?.email})?
+            Esta acción no se puede deshacer.
+          </p>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Motivo (opcional)
+            </label>
+            <textarea
+              value={deleteReason}
+              onChange={(e) => setDeleteReason(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              rows={3}
+              placeholder="Indica el motivo de la eliminación..."
+            />
+          </div>
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={confirmDeleteUser}
+              disabled={deleteUserMutation.isPending}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {deleteUserMutation.isPending ? 'Eliminando...' : 'Eliminar usuario'}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

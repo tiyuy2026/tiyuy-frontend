@@ -27,11 +27,14 @@ export function RoleChangeModal({ user, onConfirm, onCancel }: RoleChangeModalPr
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 max-w-md w-full">
-      <h3 className="text-lg font-semibold mb-4">Cambiar Rol de Usuario</h3>
+    <div className="bg-white rounded-2xl p-0 max-w-md w-full shadow-2xl overflow-hidden">
+      {/* Header con verde encendido */}
+      <div className="bg-[#00E676] px-5 py-4 border-b border-green-300">
+        <h3 className="text-lg font-bold text-gray-800">Cambiar Rol de Usuario</h3>
+      </div>
       
-      <div className="mb-4">
-        <div className="text-sm text-gray-600 mb-2">
+      <div className="p-5">
+        <div className="text-sm text-gray-600 mb-4">
           Cambiando rol para: <strong>{user.firstName} {user.lastName}</strong> ({user.email})
         </div>
         
