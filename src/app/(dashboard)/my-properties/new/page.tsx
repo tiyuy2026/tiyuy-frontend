@@ -23,7 +23,7 @@ export default function NuevaPropiedadPage() {
 
   const [currentStep, setCurrentStep] = useState(1);
 
-  const maxPublications = subscription?.plan?.maxProperties ?? 0;
+  const maxPublications = subscription?.plan?.maxPublications ?? 0;
   const remainingPublications = subscription?.remainingPublications ?? maxPublications;
   const canPublish = remainingPublications > 0;
 

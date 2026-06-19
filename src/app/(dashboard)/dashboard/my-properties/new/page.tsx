@@ -18,6 +18,14 @@ const STEPS = [
 export default function NuevaPropiedadPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
+  const [currentStep, setCurrentStep] = useState(1);
+  const { data: subscription } = useActiveSubscription();
+  const { data: myProperties } = useMyProperties();
+
+  const maxPublications = subscription?.plan?.maxPublications ?? 5;
+  const publishedCount = myProperties?.pagination?.totalElements ?? myProperties?.properties?.length ?? 0;
+  const remainingPublications = Math.max(0, maxPublications - publishedCount);
+  const canPublish = remainingPublications > 0;
 
   useEffect(() => {
     if (!isAuthenticated) router.push('/login');
