@@ -4,7 +4,7 @@ import React from 'react';
 import { Modal } from '@/presentation/components/ui/Modal';
 import { Button } from '@/presentation/components/ui/Button';
 import { PaymentTransaction } from '@/core/domain/entities/Admin';
-import { CreditCard, Calendar, User, DollarSign, Tag, Info } from 'lucide-react';
+import { CreditCard, Calendar, User, DollarSign, Tag, Info, X } from 'lucide-react';
 
 interface TransactionDetailsModalProps {
   isOpen: boolean;
@@ -23,28 +23,39 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-gray-100 overflow-hidden relative">
-        <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
-          <CreditCard className="w-32 h-32 rotate-12" />
+      <div className="bg-white rounded-2xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
+        {/* Header verde */}
+        <div className="bg-[#00E676] px-5 py-4 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                <DollarSign className="w-5 h-5 text-green-800" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Detalles de Pago</h3>
+                <p className="text-xs text-green-700">ID: #{transaction.id}</p>
+              </div>
+            </div>
+            <button onClick={onClose} className="p-1.5 hover:bg-green-300 rounded-lg transition-colors text-gray-600">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-1 mb-8">
-          <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight">Detalles de Pago</h3>
-          <p className="text-xs text-gray-400 font-mono">ID: #{transaction.id}</p>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100">
-            <div className="p-3 bg-white rounded-xl shadow-sm text-blue-600">
-              <DollarSign className="w-5 h-5" />
+        {/* Content scrolleable */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {/* Monto y Estado */}
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+            <div className="p-2.5 bg-white rounded-lg shadow-sm text-blue-600 flex-shrink-0">
+              <DollarSign className="w-4 h-4" />
             </div>
-            <div className="flex-1">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Monto Total</p>
-              <p className="text-lg font-black text-gray-900">
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-semibold text-gray-400 uppercase">Monto Total</p>
+              <p className="text-base font-bold text-gray-900">
                 {transaction.currency === 'PEN' ? 'S/' : '$'} {transaction.amount.toLocaleString()}
               </p>
             </div>
-            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-sm ${
+            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase flex-shrink-0 ${
               transaction.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
               transaction.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
               transaction.status === 'FAILED' ? 'bg-red-100 text-red-700' :
@@ -57,53 +68,53 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
             </span>
           </div>
 
-          <div className="grid grid-cols-1 gap-3">
-            <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent">
-              <User className="w-4 h-4 text-gray-400" />
-              <div>
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Usuario</p>
-                <p className="text-sm font-bold text-gray-700">Usuario ID: {transaction.userId}</p>
+          {/* Detalles */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-gray-50 transition-colors">
+              <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[9px] font-semibold text-gray-400 uppercase">Usuario</p>
+                <p className="text-sm font-medium text-gray-700">Usuario ID: {transaction.userId}</p>
               </div>
             </div>
-
-            <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent">
-              <Tag className="w-4 h-4 text-gray-400" />
-              <div>
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Suscripción</p>
-                <p className="text-sm font-bold text-gray-700">{transaction.subscriptionId ? `#${transaction.subscriptionId}` : 'N/A'}</p>
+            <div className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-gray-50 transition-colors">
+              <Tag className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[9px] font-semibold text-gray-400 uppercase">Suscripción</p>
+                <p className="text-sm font-medium text-gray-700">{transaction.subscriptionId ? `#${transaction.subscriptionId}` : 'N/A'}</p>
               </div>
             </div>
-
-            <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent">
-              <Calendar className="w-4 h-4 text-gray-400" />
-              <div>
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Fecha</p>
-                <p className="text-sm font-bold text-gray-700">{new Date(transaction.createdAt).toLocaleString('es-PE')}</p>
+            <div className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-gray-50 transition-colors">
+              <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[9px] font-semibold text-gray-400 uppercase">Fecha</p>
+                <p className="text-sm font-medium text-gray-700">{new Date(transaction.createdAt).toLocaleString('es-PE')}</p>
               </div>
             </div>
-
-            <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors border border-transparent">
-              <Info className="w-4 h-4 text-gray-400" />
-              <div>
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Descripción</p>
-                <p className="text-sm font-bold text-gray-700 truncate max-w-[250px]">{transaction.description}</p>
+            <div className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-gray-50 transition-colors">
+              <Info className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[9px] font-semibold text-gray-400 uppercase">Descripción</p>
+                <p className="text-sm font-medium text-gray-700 truncate">{transaction.description}</p>
               </div>
             </div>
           </div>
 
+          {/* ID de Referencia */}
           {transaction.paymentId && (
-            <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 flex flex-col gap-1">
-              <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">ID de Referencia Bancaria</p>
-              <p className="text-xs font-mono font-bold text-blue-800 break-all">{transaction.paymentId}</p>
+            <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+              <p className="text-[10px] font-semibold text-blue-600 uppercase">ID de Referencia Bancaria</p>
+              <p className="text-xs font-mono font-bold text-blue-800 break-all mt-0.5">{transaction.paymentId}</p>
             </div>
           )}
         </div>
-        
-        <div className="flex flex-col gap-3 mt-8 pt-6 border-t border-gray-100">
+
+        {/* Footer */}
+        <div className="flex gap-3 p-4 border-t border-gray-200 flex-shrink-0">
           {canRefund && transaction.status === 'COMPLETED' && (
-            <Button 
+            <Button
               variant="primary"
-              className="w-full py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-red-100 transition-all active:scale-95"
+              className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium shadow-lg shadow-red-500/30"
               onClick={() => {
                 const reason = prompt('Ingrese el motivo del reembolso:');
                 if (reason) {
@@ -115,8 +126,8 @@ export const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = (
               Reembolsar Operación
             </Button>
           )}
-          <Button 
-            className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-blue-100 transition-all active:scale-95" 
+          <Button
+            className={`${canRefund && transaction.status === 'COMPLETED' ? 'flex-1' : 'w-full'} py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white rounded-lg text-sm font-medium shadow-lg shadow-teal-500/30`}
             onClick={onClose}
           >
             Cerrar Ventana

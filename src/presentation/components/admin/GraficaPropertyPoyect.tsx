@@ -1,6 +1,6 @@
 /**
  * LiveAreaChart - Componente reutilizable para gráficas de área en tiempo real
- * Estilo "En Vivo" con tooltip interactivo, línea meta y gradiente
+ * Estilo "Bolsa de Valores / KPI Financiero" elegante y moderno
  */
 
 'use client';
@@ -49,7 +49,6 @@ export function LiveAreaChart({
       case '1Y': points = 12; break;
     }
     
-    // Meses abreviados en español
     const mesesAbrev = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
     
     for (let i = points; i >= 0; i--) {
@@ -67,7 +66,6 @@ export function LiveAreaChart({
           break;
         case '1M':
           date.setDate(date.getDate() - i);
-          // Para 1M, mostrar cada 5 días aproximadamente para evitar saturación
           if (i % 5 === 0 || i === 0 || i === points) {
             dateLabel = `${date.getDate()}-${mesesAbrev[date.getMonth()]}`;
           } else {
@@ -76,7 +74,6 @@ export function LiveAreaChart({
           break;
         case '3M':
           date.setDate(date.getDate() - i * 7);
-          // Para 3M, mostrar cada 2 semanas
           if (i % 2 === 0 || i === 0 || i === points) {
             dateLabel = `${date.getDate()}-${mesesAbrev[date.getMonth()]}`;
           } else {
@@ -108,31 +105,42 @@ export function LiveAreaChart({
     return Math.round(max * 0.9);
   }, [data]);
 
+  // Calcular cambio porcentual (último vs primero)
+  const percentChange = useMemo(() => {
+    if (data.length < 2) return 0;
+    const first = data[0].value;
+    const last = data[data.length - 1].value;
+    if (first === 0) return 0;
+    return ((last - first) / first) * 100;
+  }, [data]);
+
+  const isPositive = percentChange >= 0;
   const periods: TimePeriod[] = ['1D', '1W', '1M', '3M', '1Y'];
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+    <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 p-5 hover:shadow-[0_8px_30px_rgb(0,0,0,0.10)] transition-all duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5">
-            <span className="relative flex h-2.5 w-2.5">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2.5">
+          {/* Indicador EN VIVO */}
+          <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
+            <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">En Vivo</span>
+            <span className="text-[9px] font-bold text-emerald-700 uppercase tracking-widest">En Vivo</span>
           </div>
-          <h3 className="text-base font-semibold text-gray-900">{title}</h3>
+          <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
         </div>
-        <div className="flex items-center gap-0.5 bg-gray-100 rounded-lg p-0.5">
+        <div className="flex items-center gap-0.5 bg-gray-50 rounded-lg p-0.5 border border-gray-100">
           {periods.map((p) => (
             <button
               key={p}
               onClick={() => onPeriodChange(p)}
-              className={`px-2 py-0.5 text-[10px] font-medium rounded-md transition-all duration-200 ${
+              className={`px-2 py-0.5 text-[10px] font-semibold rounded-md transition-all duration-200 ${
                 period === p
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'
+                  ? 'bg-[#90EE90] text-green-900 shadow-sm'
+                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
               }`}
             >
               {p}
@@ -141,9 +149,19 @@ export function LiveAreaChart({
         </div>
       </div>
 
-      {/* Valor Actual */}
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-2xl font-bold text-gray-900">{totalValue}</span>
+      {/* Valor Actual + Cambio Porcentual */}
+      <div className="flex items-baseline gap-3 mb-4">
+        <span className="text-3xl font-bold text-gray-900 tracking-tight">{totalValue}</span>
+        <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold ${
+          isPositive 
+            ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' 
+            : 'bg-red-50 text-red-600 border border-red-200'
+        }`}>
+          <svg className={`w-3 h-3 ${isPositive ? '' : 'rotate-180'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="18 15 12 9 6 15" />
+          </svg>
+          <span>{isPositive ? '+' : ''}{percentChange.toFixed(1)}%</span>
+        </div>
       </div>
 
       {/* Gráfica */}
@@ -169,14 +187,14 @@ export function LiveAreaChart({
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 200" preserveAspectRatio="none">
           <defs>
             <linearGradient id={`gradient-${title.replace(/\s+/g, '-')}`} x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor={gradientColor} stopOpacity="0.5"/>
-              <stop offset="100%" stopColor={gradientColor} stopOpacity="0.05"/>
+              <stop offset="0%" stopColor={gradientColor} stopOpacity="0.35"/>
+              <stop offset="100%" stopColor={gradientColor} stopOpacity="0.02"/>
             </linearGradient>
           </defs>
 
-          {/* Grid lines horizontales */}
+          {/* Grid lines horizontales sutiles */}
           {[0, 1, 2, 3, 4].map(i => (
-            <line key={i} x1="0" y1={40 + i * 40} x2="400" y2={40 + i * 40} stroke="#f3f4f6" strokeWidth="1"/>
+            <line key={i} x1="0" y1={40 + i * 40} x2="400" y2={40 + i * 40} stroke="#f9fafb" strokeWidth="1"/>
           ))}
 
           {/* Línea Meta punteada naranja */}
@@ -189,6 +207,7 @@ export function LiveAreaChart({
               stroke="#f97316"
               strokeWidth="1"
               strokeDasharray="4,4"
+              opacity="0.6"
             />
           )}
 
@@ -232,7 +251,7 @@ export function LiveAreaChart({
                 key={i}
                 cx={x}
                 cy={y}
-                r="3"
+                r="2.5"
                 fill={lineColor}
                 stroke="white"
                 strokeWidth="1.5"
@@ -241,19 +260,14 @@ export function LiveAreaChart({
             );
           })}
 
-          {/* Etiquetas eje X - mostrar fechas con formato limpio */}
+          {/* Etiquetas eje X */}
           {data.length > 0 && (
             <>
-              {/* Primera fecha (inicio) */}
-              <text x="10" y="195" textAnchor="start" className="text-[9px] fill-gray-400">{data[0].date || ''}</text>
-              
-              {/* Fecha del medio */}
-              <text x="200" y="195" textAnchor="middle" className="text-[9px] fill-gray-400">
+              <text x="10" y="195" textAnchor="start" className="text-[9px] fill-gray-400 font-medium">{data[0].date || ''}</text>
+              <text x="200" y="195" textAnchor="middle" className="text-[9px] fill-gray-400 font-medium">
                 {data[Math.floor(data.length / 2)].date || ''}
               </text>
-              
-              {/* Última fecha (fin) */}
-              <text x="390" y="195" textAnchor="end" className="text-[9px] fill-gray-400">{data[data.length - 1].date || ''}</text>
+              <text x="390" y="195" textAnchor="end" className="text-[9px] fill-gray-400 font-medium">{data[data.length - 1].date || ''}</text>
             </>
           )}
         </svg>
@@ -261,13 +275,13 @@ export function LiveAreaChart({
         {/* Tooltip flotante */}
         {tooltip && (
           <div
-            className="absolute z-10 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-xl pointer-events-none"
+            className="absolute z-10 bg-gray-900 text-white px-3 py-2 rounded-xl shadow-2xl pointer-events-none border border-gray-700"
             style={{
               left: Math.min(Math.max(tooltip.x, 60), 280),
               top: Math.max(tooltip.y - 50, 10),
             }}
           >
-            <div className="text-xs text-gray-400">{tooltip.date}</div>
+            <div className="text-[10px] text-gray-400 font-medium">{tooltip.date}</div>
             <div className="text-lg font-bold text-amber-400">{tooltip.value}</div>
           </div>
         )}
@@ -275,7 +289,7 @@ export function LiveAreaChart({
         {/* Label Meta */}
         {data.length > 0 && (
           <div 
-            className="absolute right-0 bg-orange-100 text-orange-700 text-[10px] font-semibold px-2 py-0.5 rounded"
+            className="absolute right-0 bg-orange-50 text-orange-700 text-[9px] font-bold px-2 py-0.5 rounded-l-md border border-orange-200 border-r-0"
             style={{
               top: `${180 - (goal / Math.max(...data.map((d: DataPoint) => d.value), 1)) * 160 - 10}px`
             }}

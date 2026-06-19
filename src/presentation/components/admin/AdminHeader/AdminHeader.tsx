@@ -342,9 +342,9 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
           )}
         </Link>
 
-        {/* Help - Configuración */}
-        <Link href="/admin/settings" className="p-2 text-white/70 hover:text-white hover:bg-white/20 rounded-lg transition">
-          <HelpCircle className="w-5 h-5" />
+        {/* Finanzas */}
+        <Link href="/admin/finance" className="p-2 text-white/70 hover:text-white hover:bg-white/20 rounded-lg transition">
+          <DollarSign className="w-5 h-5" />
         </Link>
 
         {/* Admin Profile */}
@@ -381,8 +381,8 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
             
             {/* Profile Menu Dropdown */}
             {showProfileMenu && (
-              <div className="absolute right-0 top-full mt-2 w-72 bg-gray-900 rounded-lg shadow-xl border border-gray-700 z-50">
-                <div className="p-4 border-b border-gray-700">
+              <div className="absolute right-0 top-full mt-2 w-72 rounded-lg shadow-xl z-50" style={{ backgroundColor: '#1693a5', borderColor: '#7cb490' }}>
+                <div className="p-4 border-b" style={{ borderColor: '#7cb490' }}>
                   <div className="flex items-center gap-3">
                     <UserAvatar user={profileUser} size="md" />
                     <div>

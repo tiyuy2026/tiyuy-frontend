@@ -294,6 +294,17 @@ export const useToggleUserStatus = () => {
   });
 };
 
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, reason }: { userId: number; reason?: string }) =>
+      adminRepository.deleteUser(userId, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_QUERY_KEY, 'users'] });
+    },
+  });
+};
+
 export const useChangeUserRole = () => {
   const queryClient = useQueryClient();
   return useMutation({

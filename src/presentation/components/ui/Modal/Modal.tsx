@@ -31,10 +31,10 @@ export const Modal: React.FC<ModalProps> = ({
   if (!isOpen) return null;
 
   const sizes = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl',
+    sm: 'max-w-sm',
+    md: 'max-w-md',
+    lg: 'max-w-lg',
+    xl: 'max-w-2xl',
   };
 
   return (
@@ -56,19 +56,19 @@ export const Modal: React.FC<ModalProps> = ({
       >
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-teal-500 rounded-t-2xl">
-            <h2 className="text-2xl font-bold text-white">{title}</h2>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-green-300 bg-[#00E676] rounded-t-2xl">
+            <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
             <button
               onClick={onClose}
-              className="text-white/80 hover:text-white transition-colors"
+              className="text-gray-600 hover:text-gray-900 transition-colors p-1 hover:bg-green-300 rounded-lg"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5" />
             </button>
           </div>
         )}
 
         {/* Content */}
-        <div className="p-6">{children}</div>
+        <div className="p-4">{children}</div>
       </div>
     </div>
   );

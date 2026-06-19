@@ -29,6 +29,8 @@ import { PaginationParams, PaginatedResponse } from '@/core/domain/repositories/
 import { PropertyModerationItem, ModeratePropertyRequest } from '@/core/domain/entities/Admin';
 import { PropertiesHeaderStats } from '@/presentation/components/admin/PropertiesHeaderStats';
 import { PropertyDetailModal } from '@/presentation/components/admin/PropertyDetailModal/PropertyDetailModal';
+import { PropertyCardView, PropertyCard } from '@/presentation/components/admin/PropertyCardView';
+import { LayoutList, Grid3X3 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function PropertiesPage() {
@@ -43,6 +45,7 @@ export default function PropertiesPage() {
   const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
   const [isDisableModalOpen, setIsDisableModalOpen] = useState(false);
   const [disableReason, setDisableReason] = useState('');
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
 
   const { hasPermission } = usePermissions();
   const canModerateProperties = hasPermission('PROPERTIES_MODERATE');
@@ -373,36 +376,139 @@ export default function PropertiesPage() {
         onClear={handleClearFilters}
       />
 
-      {/* Properties Table */}
-      <AdminTable
-        data={propertiesData?.content || []}
-        columns={columns}
-        loading={isLoading}
-        error={error?.message || undefined}
-        actions={actions}
-        selection={{
-          selectedItems: selectedProperties,
-          onSelectionChange: setSelectedProperties,
-          getRowId: (property) => property.id
-        }}
-        pagination={
-          propertiesData && {
-            page: currentPage,
-            size: pageSize,
-            total: propertiesData.totalElements,
-            onPageChange: setCurrentPage,
-            onSizeChange: setPageSize
+      {/* View Mode Toggle */}
+      <div className="flex items-center justify-end gap-2">
+        <div className="bg-white rounded-lg border border-gray-200 p-1 flex gap-1 shadow-sm">
+          <button
+            onClick={() => setViewMode('table')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              viewMode === 'table'
+                ? 'bg-teal-50 text-teal-700 border border-teal-200 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <LayoutList className="w-4 h-4" />
+            Tabla
+          </button>
+          <button
+            onClick={() => setViewMode('cards')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              viewMode === 'cards'
+                ? 'bg-teal-50 text-teal-700 border border-teal-200 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <Grid3X3 className="w-4 h-4" />
+            Tarjetas
+          </button>
+        </div>
+      </div>
+
+      {/* Properties List - Table or Cards */}
+      {viewMode === 'table' ? (
+        <AdminTable
+          data={propertiesData?.content || []}
+          columns={columns}
+          loading={isLoading}
+          error={error?.message || undefined}
+          actions={actions}
+          selection={{
+            selectedItems: selectedProperties,
+            onSelectionChange: setSelectedProperties,
+            getRowId: (property) => property.id
+          }}
+          pagination={
+            propertiesData && {
+              page: currentPage,
+              size: pageSize,
+              total: propertiesData.totalElements,
+              onPageChange: setCurrentPage,
+              onSizeChange: setPageSize
+            }
           }
-        }
-        emptyState={{
-          title: 'No se encontraron propiedades',
-          description: 'Intenta ajustar tu búsqueda o filtros.',
-          action: {
-            label: 'Limpiar filtros',
-            onClick: handleClearFilters
+          emptyState={{
+            title: 'No se encontraron propiedades',
+            description: 'Intenta ajustar tu búsqueda o filtros.',
+            action: {
+              label: 'Limpiar filtros',
+              onClick: handleClearFilters
+            }
+          }}
+        />
+      ) : (
+        <PropertyCardView
+          data={propertiesData?.content || []}
+          loading={isLoading}
+          error={error?.message || undefined}
+          onViewDetails={handleViewProperty}
+          actions={[
+            ...(canModerateProperties ? [
+              {
+                label: 'Aprobar',
+                onClick: (property: PropertyModerationItem) => handleModerateProperty(property, 'APPROVE'),
+                variant: 'primary' as const
+              },
+              {
+                label: 'Rechazar',
+                onClick: (property: PropertyModerationItem) => handleModerateProperty(property, 'REJECT'),
+                variant: 'secondary' as const
+              },
+              {
+                label: 'Suspender',
+                onClick: (property: PropertyModerationItem) => handleModerateProperty(property, 'SUSPEND'),
+                variant: 'secondary' as const
+              }
+            ] : []),
+            ...(canFeatureProperties ? [
+              {
+                label: 'Destacar',
+                onClick: handleToggleFeatured,
+                variant: 'primary' as const
+              }
+            ] : []),
+            ...(canModerateProperties ? [
+              {
+                label: 'Deshabilitar',
+                onClick: (property: PropertyModerationItem) => {
+                  const reason = prompt('Motivo para deshabilitar la propiedad:');
+                  if (reason) handleDisableProperty(property, reason);
+                },
+                variant: 'danger' as const,
+                condition: (property: PropertyModerationItem) => property.status !== 'DISABLED_BY_ADMIN'
+              },
+              {
+                label: 'Habilitar',
+                onClick: handleEnableProperty,
+                variant: 'primary' as const,
+                condition: (property: PropertyModerationItem) => property.status === 'DISABLED_BY_ADMIN'
+              }
+            ] : [])
+          ]}
+          renderCard={(property: PropertyModerationItem) => (
+            <PropertyCard
+              property={property}
+              onClick={handleViewProperty}
+            />
+          )}
+          pagination={
+            propertiesData && {
+              page: currentPage,
+              size: pageSize,
+              total: propertiesData.totalElements,
+              onPageChange: setCurrentPage,
+              onSizeChange: setPageSize
+            }
           }
-        }}
-      />
+          emptyState={{
+            title: 'No se encontraron propiedades',
+            description: 'Intenta ajustar tu búsqueda o filtros.',
+            action: {
+              label: 'Limpiar filtros',
+              onClick: handleClearFilters
+            }
+          }}
+        />
+      )}
 
       {/* Property Details Modal */}
       <PropertyDetailModal

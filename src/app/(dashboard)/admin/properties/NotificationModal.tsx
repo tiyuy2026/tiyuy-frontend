@@ -40,8 +40,12 @@ export function NotificationModal({ property, onSend, onCancel }: NotificationMo
   ];
 
   return (
-    <div className="bg-white rounded-lg p-6 max-w-lg w-full border-4 border-teal-500 shadow-xl">
-      <h3 className="text-lg font-semibold mb-4 text-teal-700">Notificar Propietario</h3>
+    <div className="bg-white rounded-2xl p-0 max-w-lg w-full shadow-2xl overflow-hidden">
+      {/* Header con verde encendido */}
+      <div className="bg-[#00E645] px-5 py-4">
+        <h3 className="text-lg font-bold text-gray-800">Notificar Propietario</h3>
+      </div>
+      <div className="p-5">
 
       <div className="mb-4 bg-blue-50 p-3 rounded-lg">
         <div className="text-sm text-blue-800">
@@ -119,6 +123,7 @@ export function NotificationModal({ property, onSend, onCancel }: NotificationMo
           </Button>
         </div>
       </form>
+      </div>
     </div>
   );
 }

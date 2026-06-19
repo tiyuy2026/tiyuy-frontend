@@ -363,8 +363,42 @@ export default function AgenciesPage() {
   };
 
   const handleExport = () => {
-    // TODO: Implement export functionality
-    console.log('Export agencies data');
+    if (!developers || developers.length === 0) {
+      alert('No hay datos para exportar');
+      return;
+    }
+
+    // Crear CSV
+    const headers = ['ID', 'Nombre', 'RUC', 'Email', 'Teléfono', 'Estado', 'Plan', 'Agentes', 'Ingresos 30d', 'Descuentos', 'Última Actividad'];
+    const rows = developers.map(dev => [
+      dev.id,
+      `"${dev.name || ''}"`,
+      dev.ruc || '',
+      dev.email || '',
+      dev.phone || '',
+      dev.status || '',
+      dev.currentPlan || '',
+      dev.totalAgents || 0,
+      dev.revenue30Days || 0,
+      dev.activeDiscounts || 0,
+      dev.lastActivity ? new Date(dev.lastActivity).toLocaleDateString('es-PE') : ''
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+
+    // Descargar archivo
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `inmobiliarias_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (

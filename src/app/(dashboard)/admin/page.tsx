@@ -440,119 +440,221 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Grid de 4 Tarjetas Principales */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">Usuarios activos</p>
-                    <p className="text-3xl font-bold text-gray-900">{filteredStats.totalUsers.toLocaleString()}</p>
-                    <div className="flex items-center gap-1 mt-2">
-                      {(stats.usersGrowthPercent || 0) >= 0
-                        ? <TrendingUp className="w-4 h-4 text-green-500" />
-                        : <TrendingDown className="w-4 h-4 text-red-500" />
-                      }
-                      <span className={`text-sm font-medium ${(stats.usersGrowthPercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {(stats.usersGrowthPercent || 0) >= 0 ? '+' : ''}{(stats.usersGrowthPercent || 0).toFixed(1)}%
+            {/* KPI Cards - Estilo Bolsa de Valores / Finanzas */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+              {/* Usuarios */}
+              <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-5 shadow-2xl border border-slate-700/50 overflow-hidden group hover:shadow-teal-500/10 transition-all duration-300">
+                {/* Fondo decorativo */}
+                <div className="absolute -top-6 -right-6 w-24 h-24 bg-teal-500/10 rounded-full blur-2xl group-hover:bg-teal-500/20 transition-all duration-500"></div>
+                <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl"></div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-lg bg-teal-500/20 flex items-center justify-center border border-teal-500/30">
+                        <Users className="w-4.5 h-4.5 text-teal-400" />
+                      </div>
+                      <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Usuarios</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </span>
+                      <span className="text-[10px] font-semibold text-emerald-400 uppercase tracking-widest">LIVE</span>
                     </div>
                   </div>
-                  <svg className="w-20 h-12" viewBox="0 0 80 48">
-                    <polyline fill="none" stroke="brand" strokeWidth="2" points="0,40 20,35 40,20 60,25 80,10" />
+                  
+                  <div className="flex items-baseline gap-1.5 mb-1">
+                    <span className="text-3xl font-bold text-white tracking-tight">{filteredStats.totalUsers.toLocaleString()}</span>
+                    <span className="text-xs text-slate-500">total</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-700/50">
+                    <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold ${
+                      (stats.usersGrowthPercent || 0) >= 0 
+                        ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' 
+                        : 'bg-red-500/15 text-red-400 border border-red-500/30'
+                    }`}>
+                      {(stats.usersGrowthPercent || 0) >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                      <span>{(stats.usersGrowthPercent || 0) >= 0 ? '+' : ''}{(stats.usersGrowthPercent || 0).toFixed(1)}%</span>
+                    </div>
+                    <span className="text-[11px] text-slate-500">vs mes anterior</span>
+                  </div>
+                  
+                  {/* Mini sparkline */}
+                  <svg className="absolute bottom-3 right-3 w-16 h-8 opacity-40" viewBox="0 0 64 32">
+                    <polyline fill="none" stroke="#14b8a6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+                      points="0,28 8,24 16,18 24,22 32,12 40,16 48,8 56,10 64,4" />
                   </svg>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">Propiedades activas</p>
-                    <p className="text-3xl font-bold text-gray-900">{filteredStats.totalProperties.toLocaleString()}</p>
-                    <div className="flex items-center gap-1 mt-2">
-                      {(stats.propertiesGrowthPercent || 0) >= 0
-                        ? <TrendingUp className="w-4 h-4 text-green-500" />
-                        : <TrendingDown className="w-4 h-4 text-red-500" />
-                      }
-                      <span className={`text-sm font-medium ${(stats.propertiesGrowthPercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {(stats.propertiesGrowthPercent || 0) >= 0 ? '+' : ''}{(stats.propertiesGrowthPercent || 0).toFixed(1)}%
+              {/* Propiedades */}
+              <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-5 shadow-2xl border border-slate-700/50 overflow-hidden group hover:shadow-blue-500/10 transition-all duration-300">
+                <div className="absolute -top-6 -right-6 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all duration-500"></div>
+                <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-cyan-500/5 rounded-full blur-3xl"></div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-lg bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
+                        <Building className="w-4.5 h-4.5 text-blue-400" />
+                      </div>
+                      <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Propiedades</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </span>
+                      <span className="text-[10px] font-semibold text-emerald-400 uppercase tracking-widest">LIVE</span>
                     </div>
                   </div>
-                  <svg className="w-20 h-12" viewBox="0 0 80 48">
-                    <polyline fill="none" stroke="brand" strokeWidth="2" points="0,35 20,30 40,25 60,20 80,15" />
+                  
+                  <div className="flex items-baseline gap-1.5 mb-1">
+                    <span className="text-3xl font-bold text-white tracking-tight">{filteredStats.totalProperties.toLocaleString()}</span>
+                    <span className="text-xs text-slate-500">activas</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-700/50">
+                    <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold ${
+                      (stats.propertiesGrowthPercent || 0) >= 0 
+                        ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' 
+                        : 'bg-red-500/15 text-red-400 border border-red-500/30'
+                    }`}>
+                      {(stats.propertiesGrowthPercent || 0) >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                      <span>{(stats.propertiesGrowthPercent || 0) >= 0 ? '+' : ''}{(stats.propertiesGrowthPercent || 0).toFixed(1)}%</span>
+                    </div>
+                    <span className="text-[11px] text-slate-500">vs mes anterior</span>
+                  </div>
+                  
+                  <svg className="absolute bottom-3 right-3 w-16 h-8 opacity-40" viewBox="0 0 64 32">
+                    <polyline fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+                      points="0,20 8,16 16,22 24,14 32,18 40,10 48,12 56,6 64,8" />
                   </svg>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">Proyectos activos</p>
-                    <p className="text-3xl font-bold text-gray-900">{filteredStats.totalProjects.toLocaleString()}</p>
-                    <div className="flex items-center gap-1 mt-2">
-                      {(stats.projectsGrowthPercent || 0) >= 0
-                        ? <TrendingUp className="w-4 h-4 text-green-500" />
-                        : <TrendingDown className="w-4 h-4 text-red-500" />
-                      }
-                      <span className={`text-sm font-medium ${(stats.projectsGrowthPercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {(stats.projectsGrowthPercent || 0) >= 0 ? '+' : ''}{(stats.projectsGrowthPercent || 0).toFixed(1)}%
+              {/* Proyectos */}
+              <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-5 shadow-2xl border border-slate-700/50 overflow-hidden group hover:shadow-purple-500/10 transition-all duration-300">
+                <div className="absolute -top-6 -right-6 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all duration-500"></div>
+                <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-fuchsia-500/5 rounded-full blur-3xl"></div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-lg bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
+                        <Package className="w-4.5 h-4.5 text-purple-400" />
+                      </div>
+                      <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Proyectos</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </span>
+                      <span className="text-[10px] font-semibold text-emerald-400 uppercase tracking-widest">LIVE</span>
                     </div>
                   </div>
-                  <svg className="w-20 h-12" viewBox="0 0 80 48">
-                    <polyline fill="none" stroke="brand" strokeWidth="2" points="0,38 20,32 40,28 60,22 80,18" />
+                  
+                  <div className="flex items-baseline gap-1.5 mb-1">
+                    <span className="text-3xl font-bold text-white tracking-tight">{filteredStats.totalProjects.toLocaleString()}</span>
+                    <span className="text-xs text-slate-500">activos</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-700/50">
+                    <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold ${
+                      (stats.projectsGrowthPercent || 0) >= 0 
+                        ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' 
+                        : 'bg-red-500/15 text-red-400 border border-red-500/30'
+                    }`}>
+                      {(stats.projectsGrowthPercent || 0) >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                      <span>{(stats.projectsGrowthPercent || 0) >= 0 ? '+' : ''}{(stats.projectsGrowthPercent || 0).toFixed(1)}%</span>
+                    </div>
+                    <span className="text-[11px] text-slate-500">vs mes anterior</span>
+                  </div>
+                  
+                  <svg className="absolute bottom-3 right-3 w-16 h-8 opacity-40" viewBox="0 0 64 32">
+                    <polyline fill="none" stroke="#a855f7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+                      points="0,24 8,20 16,26 24,18 32,14 40,16 48,10 56,12 64,6" />
                   </svg>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">Ingresos del mes</p>
-                    <p className="text-3xl font-bold text-gray-900">${filteredStats.totalRevenue.toLocaleString()}</p>
-                    <div className="flex items-center gap-1 mt-2">
-                      {(stats.revenueGrowthPercent || 0) >= 0
-                        ? <TrendingUp className="w-4 h-4 text-green-500" />
-                        : <TrendingDown className="w-4 h-4 text-red-500" />
-                      }
-                      <span className={`text-sm font-medium ${(stats.revenueGrowthPercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {(stats.revenueGrowthPercent || 0) >= 0 ? '+' : ''}{(stats.revenueGrowthPercent || 0).toFixed(1)}%
+              {/* Ingresos */}
+              <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-5 shadow-2xl border border-slate-700/50 overflow-hidden group hover:shadow-amber-500/10 transition-all duration-300">
+                <div className="absolute -top-6 -right-6 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all duration-500"></div>
+                <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-orange-500/5 rounded-full blur-3xl"></div>
+                
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-lg bg-amber-500/20 flex items-center justify-center border border-amber-500/30">
+                        <DollarSign className="w-4.5 h-4.5 text-amber-400" />
+                      </div>
+                      <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Ingresos</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </span>
+                      <span className="text-[10px] font-semibold text-emerald-400 uppercase tracking-widest">LIVE</span>
                     </div>
                   </div>
-                  <svg className="w-20 h-12" viewBox="0 0 80 48">
-                    <polyline fill="none" stroke="#ef4444" strokeWidth="2" points="0,15 20,20 40,28 60,32 80,38" />
+                  
+                  <div className="flex items-baseline gap-1.5 mb-1">
+                    <span className="text-3xl font-bold text-white tracking-tight">${filteredStats.totalRevenue.toLocaleString()}</span>
+                    <span className="text-xs text-slate-500">este mes</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-700/50">
+                    <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold ${
+                      (stats.revenueGrowthPercent || 0) >= 0 
+                        ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' 
+                        : 'bg-red-500/15 text-red-400 border border-red-500/30'
+                    }`}>
+                      {(stats.revenueGrowthPercent || 0) >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                      <span>{(stats.revenueGrowthPercent || 0) >= 0 ? '+' : ''}{(stats.revenueGrowthPercent || 0).toFixed(1)}%</span>
+                    </div>
+                    <span className="text-[11px] text-slate-500">vs mes anterior</span>
+                  </div>
+                  
+                  <svg className="absolute bottom-3 right-3 w-16 h-8 opacity-40" viewBox="0 0 64 32">
+                    <polyline fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+                      points="0,8 8,12 16,6 24,10 32,14 40,18 48,22 56,26 64,30" />
                   </svg>
                 </div>
               </div>
             </div>
 
-              {/* Fila con Gráfica y Alertas */}
+              {/* Fila con Gráfica Estilo TradingView y Alertas */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Gráfica Grande de Usuarios - 2/3 del ancho */}
+              {/* Gráfica de Tendencia - Estilo TradingView / Bloomberg */}
               {userGrowthData.length > 0 && (
-                <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-                  <div className="flex items-center justify-between mb-6">
+                <div className="lg:col-span-2 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 overflow-hidden">
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                     <div className="flex items-center gap-3">
-                      <h3 className="text-lg font-semibold text-gray-900">Tendencia de registros</h3>
-                      {/* Indicador EN VIVO */}
-                      <div className="flex items-center gap-1.5">
-                        <span className="relative flex h-2.5 w-2.5">
+                      <h3 className="text-base font-semibold text-gray-900">Tendencia de registros</h3>
+                      <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
+                        <span className="relative flex h-2 w-2">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                         </span>
-                        <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">EN VIVO</span>
+                        <span className="text-[9px] font-bold text-emerald-700 uppercase tracking-widest">EN VIVO</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                    <div className="flex items-center gap-0.5 bg-gray-50 rounded-lg p-0.5 border border-gray-100">
                       {(['1D', '1W', '1M', '3M', '1Y'] as const).map((period) => (
                         <button
                           key={period}
                           onClick={() => setTimePeriod(period)}
-                          className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
+                          className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all duration-200 ${
                             timePeriod === period
-                              ? 'bg-white text-gray-900 shadow-sm'
-                              : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'
+                              ? 'bg-[#90EE90] text-green-900 shadow-sm'
+                              : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                           }`}
                         >
                           {period}
@@ -560,159 +662,170 @@ export default function AdminDashboardPage() {
                       ))}
                     </div>
                   </div>
-                  <div className="h-[400px] w-full relative">
-                    {/* Línea de tiempo continua */}
-                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 400">
-                      <defs>
-                        <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3"/>
-                          <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0"/>
-                        </linearGradient>
-                      </defs>
-                      
-                      {/* Líneas de grid horizontales con valores en eje Y */}
-                      {[0, 1, 2, 3, 4].map((i) => {
-                        const maxValue = Math.max(...userGrowthData.map(d => d.value), 1);
-                        const minValue = Math.min(...userGrowthData.map(d => d.value), 0);
-                        const range = maxValue - minValue || 1;
-                        const value = Math.round(minValue + (range * (4 - i) / 4));
-                        const y = 50 + i * 75;
-                        return (
-                          <g key={i}>
-                            <line x1="50" y1={y} x2="750" y2={y} stroke="#f3f4f6" strokeWidth="1"/>
-                            <text x="40" y={y + 4} textAnchor="end" className="text-[11px] fill-gray-400">{value}</text>
-                          </g>
-                        );
-                      })}
-                      
-                      {/* Área sombreada debajo de la línea */}
-                      <polygon
-                        fill="url(#areaGradient)"
-                        points={`50,350 ${userGrowthData.map((item, index) => {
-                          const x = 50 + (index * 700 / (userGrowthData.length - 1));
-                          const maxValue = Math.max(...userGrowthData.map(d => d.value), 1);
-                          const y = 350 - (item.value / maxValue) * 300;
-                          return `${x},${y}`;
-                        }).join(' ')} 750,350`}
-                      />
-                      
-                      {/* Línea Meta punteada naranja */}
-                      {(() => {
-                        const maxValue = Math.max(...userGrowthData.map(d => d.value), 1);
-                        const minValue = Math.min(...userGrowthData.map(d => d.value), 0);
-                        const range = maxValue - minValue || 1;
-                        const goalValue = Math.round(minValue + range * 0.9);
-                        const goalY = 350 - ((goalValue - minValue) / range) * 300;
-                        return (
-                          <g>
-                            <line
-                              x1="50"
-                              y1={goalY}
-                              x2="750"
-                              y2={goalY}
-                              stroke="#f97316"
-                              strokeWidth="1"
-                              strokeDasharray="4,4"
-                            />
-                            {/* Label Meta */}
-                            <rect x="680" y={goalY - 12} width="60" height="20" rx="4" fill="#fff7ed" />
-                            <text x="710" y={goalY - 2} textAnchor="middle" className="text-[10px] fill-orange-600 font-semibold">Meta {goalValue}</text>
-                          </g>
-                        );
-                      })()}
 
-                      {/* Línea principal de tendencia */}
-                      <polyline
-                        fill="none"
-                        stroke="#0891b2"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        points={userGrowthData.map((item, index) => {
-                          const x = 50 + (index * 700 / (userGrowthData.length - 1));
-                          const maxValue = Math.max(...userGrowthData.map(d => d.value), 1);
-                          const y = 350 - (item.value / maxValue) * 300;
-                          return `${x},${y}`;
-                        }).join(' ')}
-                      />
-                      
-                      {/* Puntos de datos con tooltips */}
-                      {userGrowthData.map((item, index) => {
-                        const x = 50 + (index * 700 / (userGrowthData.length - 1));
-                        const maxValue = Math.max(...userGrowthData.map(d => d.value), 1);
-                        const y = 350 - (item.value / maxValue) * 300;
+                  {/* Cuerpo: Métricas + Gráfica */}
+                  <div className="p-6">
+                    {/* Métricas principales estilo TradingView */}
+                    <div className="flex items-center gap-8 mb-6">
+                      <div>
+                        <div className="text-[11px] text-gray-400 font-medium uppercase tracking-wider mb-1">Actual</div>
+                        <div className="text-2xl font-bold text-gray-900">
+                          {userGrowthData[userGrowthData.length - 1]?.value || 0}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[11px] text-gray-400 font-medium uppercase tracking-wider mb-1">Cambio</div>
+                        <div className="flex items-center gap-1.5">
+                          {(() => {
+                            const last = userGrowthData[userGrowthData.length - 1]?.value || 0;
+                            const first = userGrowthData[0]?.value || 0;
+                            const change = last - first;
+                            const changePercent = first > 0 ? ((change / first) * 100) : 0;
+                            const isPositive = change >= 0;
+                            return (
+                              <>
+                                <span className={`text-lg font-bold ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
+                                  {isPositive ? '+' : ''}{change}
+                                </span>
+                                <span className={`text-xs font-semibold px-1.5 py-0.5 rounded ${
+                                  isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
+                                }`}>
+                                  {isPositive ? '+' : ''}{changePercent.toFixed(1)}%
+                                </span>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[11px] text-gray-400 font-medium uppercase tracking-wider mb-1">Máximo</div>
+                        <div className="text-lg font-bold text-gray-900">
+                          {Math.max(...userGrowthData.map(d => d.value))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[11px] text-gray-400 font-medium uppercase tracking-wider mb-1">Mínimo</div>
+                        <div className="text-lg font-bold text-gray-900">
+                          {Math.min(...userGrowthData.map(d => d.value))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[11px] text-gray-400 font-medium uppercase tracking-wider mb-1">Total</div>
+                        <div className="text-lg font-bold text-gray-900">
+                          {userGrowthData.reduce((s, d) => s + d.value, 0)}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Gráfica SVG Elegante */}
+                    <div className="relative h-[320px] w-full">
+                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 320" preserveAspectRatio="none">
+                        <defs>
+                          <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#0d9488" stopOpacity="0.25"/>
+                            <stop offset="100%" stopColor="#0d9488" stopOpacity="0.01"/>
+                          </linearGradient>
+                          <linearGradient id="areaGradientHover" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#0d9488" stopOpacity="0.35"/>
+                            <stop offset="100%" stopColor="#0d9488" stopOpacity="0.02"/>
+                          </linearGradient>
+                        </defs>
                         
-                        return (
-                          <g key={index} className="group">
-                            {/* Punto invisible para hover más grande */}
-                            <circle
-                              cx={x}
-                              cy={y}
-                              r="20"
-                              fill="transparent"
-                              className="cursor-pointer"
-                            />
-                            
-                            {/* Punto visible */}
-                            <circle
-                              cx={x}
-                              cy={y}
-                              r="4"
-                              fill="#0891b2"
-                              className="cursor-pointer group-hover:r-6 transition-all"
-                            />
-                            
-                            {/* Tooltip estilo imagen - fondo oscuro con fecha y valor */}
-                            <g className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                              {/* Fondo del tooltip */}
-                              <rect
-                                x={x - 40}
-                                y={y - 55}
-                                width="80"
-                                height="45"
-                                rx="6"
-                                fill="#1f2937"
-                              />
-                              {/* Fecha */}
-                              <text
-                                x={x}
-                                y={y - 38}
-                                textAnchor="middle"
-                                className="text-[10px] fill-gray-400"
-                              >
-                                {item.fullDate || item.date}
-                              </text>
-                              {/* Valor destacado en naranja */}
-                              <text
-                                x={x}
-                                y={y - 22}
-                                textAnchor="middle"
-                                className="text-lg fill-amber-400 font-bold"
-                              >
-                                {item.value}
-                              </text>
-                              {/* Flecha */}
-                              <polygon
-                                points={`${x-6},${y-15} ${x+6},${y-15} ${x},${y-8}`}
-                                fill="#1f2937"
-                              />
+                        {/* Grid horizontal sutil */}
+                        {[0, 1, 2, 3, 4].map((i) => {
+                          const y = 40 + i * 60;
+                          return (
+                            <g key={i}>
+                              <line x1="60" y1={y} x2="780" y2={y} stroke="#f1f5f9" strokeWidth="1"/>
                             </g>
-                            
-                            {/* Fecha en eje X - solo mostrar si tiene valor */}
-                            {item.date && (
-                              <text
-                                x={x}
-                                y={375}
-                                textAnchor="middle"
-                                className="text-[10px] fill-gray-500"
-                              >
-                                {item.date}
-                              </text>
-                            )}
-                          </g>
-                        );
-                      })}
-                    </svg>
+                          );
+                        })}
+                        
+                        {/* Área bajo la curva */}
+                        <polygon
+                          fill="url(#areaGradient)"
+                          points={`60,320 ${userGrowthData.map((item, index) => {
+                            const x = 60 + (index * 720 / (userGrowthData.length - 1 || 1));
+                            const maxVal = Math.max(...userGrowthData.map(d => d.value), 1);
+                            const y = 280 - (item.value / maxVal) * 240;
+                            return `${x},${y}`;
+                          }).join(' ')} 780,320`}
+                        />
+                        
+                        {/* Línea principal - curva suave */}
+                        <polyline
+                          fill="none"
+                          stroke="#0d9488"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          points={userGrowthData.map((item, index) => {
+                            const x = 60 + (index * 720 / (userGrowthData.length - 1 || 1));
+                            const maxVal = Math.max(...userGrowthData.map(d => d.value), 1);
+                            const y = 280 - (item.value / maxVal) * 240;
+                            return `${x},${y}`;
+                          }).join(' ')}
+                        />
+                        
+                        {/* Línea Meta punteada */}
+                        {(() => {
+                          const maxVal = Math.max(...userGrowthData.map(d => d.value), 1);
+                          const goalVal = Math.round(maxVal * 0.9);
+                          const goalY = 280 - (goalVal / maxVal) * 240;
+                          return (
+                            <g>
+                              <line x1="60" y1={goalY} x2="780" y2={goalY} stroke="#f97316" strokeWidth="1" strokeDasharray="5,4" opacity="0.6"/>
+                              <rect x="710" y={goalY - 11} width="65" height="20" rx="4" fill="#fff7ed" stroke="#fed7aa" strokeWidth="0.5"/>
+                              <text x="742" y={goalY + 3} textAnchor="middle" className="text-[10px] fill-orange-600 font-bold">Meta {goalVal}</text>
+                            </g>
+                          );
+                        })()}
+                        
+                        {/* Puntos de datos con tooltip */}
+                        {userGrowthData.map((item, index) => {
+                          const x = 60 + (index * 720 / (userGrowthData.length - 1 || 1));
+                          const maxVal = Math.max(...userGrowthData.map(d => d.value), 1);
+                          const y = 280 - (item.value / maxVal) * 240;
+                          
+                          return (
+                            <g key={index} className="group">
+                              {/* Área de hover invisible */}
+                              <rect x={x - 15} y="0" width="30" height="320" fill="transparent" className="cursor-crosshair"/>
+                              
+                              {/* Punto */}
+                              <circle cx={x} cy={y} r="3" fill="#0d9488" stroke="white" strokeWidth="2" className="group-hover:r-5 transition-all duration-200"/>
+                              
+                              {/* Tooltip */}
+                              <g className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                <rect x={x - 42} y={Math.max(y - 52, 5)} width="84" height="42" rx="6" fill="#1e293b"/>
+                                <text x={x} y={Math.max(y - 35, 8)} textAnchor="middle" className="text-[10px] fill-slate-400">{item.fullDate || item.date}</text>
+                                <text x={x} y={Math.max(y - 18, 22)} textAnchor="middle" className="text-base fill-amber-400 font-bold">{item.value}</text>
+                                <polygon points={`${x-6},${Math.max(y - 12, 28)} ${x+6},${Math.max(y - 12, 28)} ${x},${Math.max(y - 5, 32)}`} fill="#1e293b"/>
+                              </g>
+                              
+                              {/* Línea vertical de hover */}
+                              <line x1={x} y1="0" x2={x} y2="320" stroke="#0d9488" strokeWidth="0.5" opacity="0" className="group-hover:opacity-30 transition-opacity duration-200"/>
+                            </g>
+                          );
+                        })}
+                        
+                        {/* Etiquetas eje X */}
+                        {userGrowthData.filter((_, i) => {
+                          const total = userGrowthData.length;
+                          if (total <= 10) return true;
+                          const step = Math.max(1, Math.floor(total / 8));
+                          return i % step === 0 || i === total - 1;
+                        }).map((item, i, filtered) => {
+                          const originalIndex = userGrowthData.indexOf(item);
+                          const x = 60 + (originalIndex * 720 / (userGrowthData.length - 1 || 1));
+                          return (
+                            <text key={i} x={x} y="305" textAnchor="middle" className="text-[10px] fill-slate-400 font-medium">
+                              {item.date || ''}
+                            </text>
+                          );
+                        })}
+                      </svg>
+                    </div>
                   </div>
                 </div>
               )}

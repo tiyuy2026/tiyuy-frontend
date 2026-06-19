@@ -29,6 +29,8 @@ import { BulkActionsBar } from '@/presentation/components/admin/BulkActionsBar';
 import { SalesChart } from '@/presentation/components/admin/SalesChart/SalesChart';
 import { ProjectsByStatusChart } from '@/presentation/components/admin/ProjectsByStatusChart/ProjectsByStatusChart';
 import { ProjectAdminItem } from '@/core/domain/entities/Admin';
+import { ProjectCardView, ProjectCard } from '@/presentation/components/admin/ProjectCardView';
+import { LayoutList, Grid3X3 } from 'lucide-react';
 import { ModerationModal, ProjectReportsSection, ProjectCommentsSection } from './components';
 
 export default function ProjectsPage() {
@@ -44,6 +46,7 @@ export default function ProjectsPage() {
   const [isDisableModalOpen, setIsDisableModalOpen] = useState(false);
   const [disableReason, setDisableReason] = useState('');
   const [selectedProject, setSelectedProject] = useState<ProjectAdminItem | null>(null);
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
 
   const { hasPermission } = usePermissions();
   const canModerateProjects = hasPermission('PROJECTS_MODERATE');
@@ -238,43 +241,101 @@ export default function ProjectsPage() {
         onClearFilters={handleClearFilters}
       />
 
-      {/* Projects Table */}
-      <ProjectsTable
-        projects={projectsData?.content || []}
-        selectedProjects={selectedProjects}
-        onSelectProject={(project, selected) => {
-          if (selected) {
-            setSelectedProjects([...selectedProjects, project]);
-          } else {
-            setSelectedProjects(selectedProjects.filter(p => p.id !== project.id));
+      {/* View Mode Toggle */}
+      <div className="flex items-center justify-end gap-2">
+        <div className="bg-white rounded-lg border border-gray-200 p-1 flex gap-1 shadow-sm">
+          <button
+            onClick={() => setViewMode('table')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              viewMode === 'table'
+                ? 'bg-purple-50 text-purple-700 border border-purple-200 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <LayoutList className="w-4 h-4" />
+            Tabla
+          </button>
+          <button
+            onClick={() => setViewMode('cards')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              viewMode === 'cards'
+                ? 'bg-purple-50 text-purple-700 border border-purple-200 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <Grid3X3 className="w-4 h-4" />
+            Tarjetas
+          </button>
+        </div>
+      </div>
+
+      {/* Projects List - Table or Cards */}
+      {viewMode === 'table' ? (
+        <ProjectsTable
+          projects={projectsData?.content || []}
+          selectedProjects={selectedProjects}
+          onSelectProject={(project, selected) => {
+            if (selected) {
+              setSelectedProjects([...selectedProjects, project]);
+            } else {
+              setSelectedProjects(selectedProjects.filter(p => p.id !== project.id));
+            }
+          }}
+          onSelectAll={(selected) => {
+            if (selected) {
+              setSelectedProjects(projectsData?.content || []);
+            } else {
+              setSelectedProjects([]);
+            }
+          }}
+          onViewProject={(project) => {
+            setSelectedProject(project);
+            setIsViewModalOpen(true);
+          }}
+          onModerateProject={(project) => {
+            setSelectedProject(project);
+            setIsModerateModalOpen(true);
+          }}
+          onToggleFeatured={handleToggleFeatured}
+          onDeleteProject={handleDeleteProject}
+          canModerate={canModerateProjects}
+          canDelete={canDeleteProjects}
+          isLoading={isLoading}
+          currentPage={currentPage}
+          totalPages={projectsData?.totalPages || 1}
+          totalElements={projectsData?.totalElements || 0}
+          numberOfElements={projectsData?.numberOfElements || 0}
+          onPageChange={setCurrentPage}
+        />
+      ) : (
+        <ProjectCardView
+          data={projectsData?.content || []}
+          loading={isLoading}
+          renderCard={(project: ProjectAdminItem) => (
+            <ProjectCard
+              project={project}
+              onClick={handleViewProject}
+            />
+          )}
+          pagination={
+            projectsData && {
+              page: currentPage,
+              size: pageSize,
+              total: projectsData.totalElements,
+              onPageChange: setCurrentPage,
+              onSizeChange: setPageSize
+            }
           }
-        }}
-        onSelectAll={(selected) => {
-          if (selected) {
-            setSelectedProjects(projectsData?.content || []);
-          } else {
-            setSelectedProjects([]);
-          }
-        }}
-        onViewProject={(project) => {
-          setSelectedProject(project);
-          setIsViewModalOpen(true);
-        }}
-        onModerateProject={(project) => {
-          setSelectedProject(project);
-          setIsModerateModalOpen(true);
-        }}
-        onToggleFeatured={handleToggleFeatured}
-        onDeleteProject={handleDeleteProject}
-        canModerate={canModerateProjects}
-        canDelete={canDeleteProjects}
-        isLoading={isLoading}
-        currentPage={currentPage}
-        totalPages={projectsData?.totalPages || 1}
-        totalElements={projectsData?.totalElements || 0}
-        numberOfElements={projectsData?.numberOfElements || 0}
-        onPageChange={setCurrentPage}
-      />
+          emptyState={{
+            title: 'No se encontraron proyectos',
+            description: 'Intenta ajustar tu búsqueda o filtros.',
+            action: {
+              label: 'Limpiar filtros',
+              onClick: handleClearFilters
+            }
+          }}
+        />
+      )}
 
       {/* Bulk Actions Bar */}
       <BulkActionsBar

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
 
 export default function HeroSection() {
-    const containerRef = useRef<HTMLElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const [mouseRelative, setMouseRelative] = useState({ x: 0, y: 0 });
     const [mousePercent, setMousePercent] = useState({ x: 0, y: 0 });
 
@@ -33,7 +33,10 @@ export default function HeroSection() {
         <section
             ref={containerRef}
             className="group relative overflow-hidden bg-white min-h-[640px] flex items-center select-none"
-            style={{ '--mouse-x': `${mouseRelative.x}px`, '--mouse-y': `${mouseRelative.y}px` } as React.CSSProperties}
+            style={{
+                '--mouse-x': `${mouseRelative.x}px`,
+                '--mouse-y': `${mouseRelative.y}px`
+            } as React.CSSProperties}
         >
             <div
                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10"

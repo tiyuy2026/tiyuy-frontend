@@ -83,32 +83,32 @@ export function ProjectDetailModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-xl p-0 max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+      <div className="bg-white rounded-xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
         {/* Header Profesional */}
-        <div className="bg-gradient-to-r from-blue-600 to-teal-500 px-6 py-5">
-          <div className="flex items-center gap-4">
+        <div className="bg-[#0CE32C] px-4 py-3">
+          <div className="flex items-center gap-3">
             {project.coverImageUrl ? (
               <img
                 src={project.coverImageUrl}
                 alt={project.name}
-                className="w-20 h-20 rounded-xl object-cover border-4 border-white/30 shadow-lg"
+                className="w-14 h-14 rounded-xl object-cover border-2 border-green-300 shadow-sm"
               />
             ) : (
-              <div className="w-20 h-20 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold border-4 border-white/30 shadow-lg">
+              <div className="w-14 h-14 rounded-xl bg-green-200 flex items-center justify-center text-green-800 text-xl font-bold border-2 border-green-300 shadow-sm">
                 {project.name?.[0]?.toUpperCase() || 'P'}
               </div>
             )}
-            <div className="flex-1">
-              <h3 className="text-xl font-bold text-white">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base font-bold text-green-900 truncate">
                 {project.name}
               </h3>
-              <p className="text-blue-100 text-sm mt-0.5 truncate">{project.slug}</p>
-              <div className="flex items-center gap-2 mt-2">
-                <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${getStatusColor(project.status)}`}>
+              <p className="text-green-700 text-xs mt-0.5 truncate">{project.slug}</p>
+              <div className="flex items-center gap-2 mt-1.5">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${getStatusColor(project.status)}`}>
                   {getStatusLabel(project.status)}
                 </span>
                 {project.isFeatured && (
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-400/30 text-purple-50 border border-purple-400/40">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-200 text-purple-800">
                     Destacado
                   </span>
                 )}
@@ -117,7 +117,7 @@ export function ProjectDetailModal({
           </div>
         </div>
 
-        <div className="p-6 flex-1 overflow-y-auto">
+        <div className="p-4 flex-1 overflow-y-auto">
           {/* Grid de Informacion Profesional */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Informacion del Proyecto */}

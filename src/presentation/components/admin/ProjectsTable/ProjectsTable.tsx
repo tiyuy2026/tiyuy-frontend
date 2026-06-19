@@ -209,7 +209,8 @@ export function ProjectsTable({
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-      <table className="w-full">
+      <div className="overflow-x-auto overflow-y-visible max-w-full" style={{ scrollbarWidth: 'thin' }}>
+        <table className="w-full min-w-[1400px]">
         <thead className="bg-gray-50 border-b border-gray-100">
           <tr>
             <th className="px-4 py-3 w-10">
@@ -340,57 +341,67 @@ export function ProjectsTable({
                   </div>
                 </td>
                 <td className="px-4 py-4">
-                  <div className={`flex items-center gap-1 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-70'}`}>
+                  <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => onViewProject(project)}
-                      className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="Ver detalles"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition-all"
+                      title="Ver detalles del proyecto"
                     >
-                      <Eye className="w-4 h-4" />
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Ver</span>
                     </button>
                     {onEditProject && (
                       <button
                         onClick={() => onEditProject(project)}
-                        className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="Editar"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 transition-all"
+                        title="Editar proyecto"
                       >
-                        <Pencil className="w-4 h-4" />
+                        <Pencil className="w-3.5 h-3.5" />
+                        <span>Editar</span>
                       </button>
                     )}
                     {(canModerate || onModerateProject) && (
                       <button
                         onClick={() => onModerateProject?.(project)}
-                        className="p-1.5 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                        title="Moderar"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 transition-all"
+                        title="Moderar proyecto"
                       >
-                        <CheckCircle className="w-4 h-4" />
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        <span>Moderar</span>
                       </button>
                     )}
                     {onToggleFeatured && (
                       <button
                         onClick={() => onToggleFeatured(project)}
-                        className={`p-1.5 rounded-lg transition-colors ${project.isFeatured ? 'text-yellow-600 hover:bg-yellow-50' : 'text-gray-400 hover:bg-gray-50'}`}
-                        title={project.isFeatured ? 'Quitar destacado' : 'Destacar'}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+                          project.isFeatured
+                            ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200'
+                            : 'bg-gray-50 text-gray-500 hover:bg-gray-100 border-gray-200'
+                        }`}
+                        title={project.isFeatured ? 'Quitar destacado' : 'Marcar como destacado'}
                       >
-                        <Star className="w-4 h-4" />
+                        <Star className={`w-3.5 h-3.5 ${project.isFeatured ? 'fill-amber-400' : ''}`} />
+                        <span>{project.isFeatured ? 'Destacado' : 'Destacar'}</span>
                       </button>
                     )}
                     {onPauseProject && (
                       <button
                         onClick={() => onPauseProject(project)}
-                        className="p-1.5 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
-                        title="Pausar"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition-all"
+                        title="Pausar proyecto"
                       >
-                        <Pause className="w-4 h-4" />
+                        <Pause className="w-3.5 h-3.5" />
+                        <span>Pausar</span>
                       </button>
                     )}
                     {(canDelete || onDeleteProject) && (
                       <button
                         onClick={() => onDeleteProject?.(project)}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Eliminar"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition-all"
+                        title="Eliminar proyecto"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Eliminar</span>
                       </button>
                     )}
                   </div>
@@ -400,6 +411,7 @@ export function ProjectsTable({
           })}
         </tbody>
       </table>
+      </div>
 
       {/* Pagination - Siempre visible para verificar conexión backend */}
       {totalElements !== undefined && totalElements > 0 && (
