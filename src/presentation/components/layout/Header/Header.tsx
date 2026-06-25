@@ -6,7 +6,9 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { useAdminModeStore } from '@/presentation/store/adminModeStore';
 import { NotificationList } from '@/presentation/components/notifications/NotificationList/NotificationList';
-import { Bell, Building, ChevronDown, FolderGit, Home, LogOut, Menu, MessageSquare, Shield, User, X } from 'lucide-react';
+import { Bell, Building, ChevronDown, FolderGit, Home, LogOut, Menu, MessageSquare, Shield, User, X, LogIn, UserPlus, PlusCircle, Users } from 'lucide-react';
+
+
 
 export function Header() {
   const router = useRouter();
@@ -43,8 +45,11 @@ export function Header() {
   const [stripeColor, setStripeColor] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalAction, setAuthModalAction] = useState<'contactos' | 'publicar'>('contactos');
   const notificationsRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
 
   const [comprarFilters, setComprarFilters] = useState({
     estado: '',
@@ -947,14 +952,49 @@ export function Header() {
                   <Bell className="w-5 h-5" />
                 </Link>
               )}
-              {/* BOTÓN PUBLICAR */}
-              <Link
-                href="/my-properties/new"
+              {/* CONTACTOS - Siempre visible */}
+              <button
+                onClick={() => {
+                  if (isAuthenticated) {
+                    router.push('/mensajes');
+                  } else {
+                    setAuthModalAction('contactos');
+                    setShowAuthModal(true);
+                  }
+                }}
+                className="hidden sm:inline-flex items-center gap-2 text-black hover:text-gray-800 text-sm font-medium"
+              >
+                <Users className="w-4 h-4" />
+                Contactos
+              </button>
+
+
+              {/* BOTÓN PUBLICAR - Siempre visible */}
+              <button
+                onClick={() => {
+                  if (isAuthenticated) {
+                    router.push('/my-properties/new');
+                  } else {
+                    setAuthModalAction('publicar');
+                    setShowAuthModal(true);
+                  }
+                }}
                 className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm font-medium"
               >
                 <Building className="w-4 h-4" />
                 Publicar
-              </Link>
+              </button>
+
+              {/* INGRESAR - Solo si NO está autenticado */}
+              {!isAuthenticated && (
+                <Link
+                  href="/profile-selector"
+                  className="hidden sm:inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium"
+                >
+                  Ingresar
+                </Link>
+              )}
+
               {/* MENÚ USUARIO - Solo si está autenticado */}
               {isAuthenticated && (
                 <div className="relative" ref={userMenuRef}>
@@ -1040,7 +1080,7 @@ export function Header() {
                     </div>
                   </div>
                 )}
-              </div>
+                </div>
               )}
               {/* BOTÓN MENÚ MÓVIL */}
               <button
@@ -1071,25 +1111,112 @@ export function Header() {
                 Buscar inmobiliarias
               </Link>
             </div>
-            {!isAuthenticated && (
-              <div className="border-t border-gray-100 pt-4 space-y-3">
-                <Link
-                  href="/login"
-                  className="block w-full text-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm font-medium"
-                >
-                  Iniciar sesión
-                </Link>
-                <Link
-                  href="/register"
-                  className="block w-full text-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium"
-                >
-                  Registrarse
-                </Link>
+            <div className="border-t border-gray-100 pt-4 space-y-3">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  if (isAuthenticated) {
+                    router.push('/mensajes');
+                  } else {
+                    setAuthModalAction('contactos');
+                    setShowAuthModal(true);
+                  }
+                }}
+                className="flex items-center justify-center gap-2 w-full text-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium"
+              >
+                <Users className="w-4 h-4" />
+                Contactos
+              </button>
+
+
+              {!isAuthenticated && (
+                <>
+                  <Link
+                    href="/login"
+                    className="block w-full text-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm font-medium"
+                  >
+                    Iniciar sesión
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="block w-full text-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium"
+                  >
+                    Registrarse
+                  </Link>
+                </>
+              )}
+            </div>
+
+          </div>
+        </div>
+      )}
+      {/* MODAL DE AUTENTICACIÓN */}
+      {showAuthModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowAuthModal(false)}>
+          <div 
+            className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 relative animate-in zoom-in-95"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowAuthModal(false)}
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                {authModalAction === 'publicar' ? (
+                  <Building className="w-8 h-8 text-blue-500" />
+                ) : (
+                  <Users className="w-8 h-8 text-blue-500" />
+                )}
+
               </div>
-            )}
+            </div>
+
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-2">
+              {authModalAction === 'publicar' ? 'Publicar un inmueble' : 'Contactos'}
+            </h3>
+            <p className="text-sm text-gray-500 text-center mb-6">
+              {authModalAction === 'publicar' 
+                ? 'Para publicar un inmueble, primero debes iniciar sesión o crear una cuenta.'
+                : 'Para acceder a tus contactos, primero debes iniciar sesión o crear una cuenta.'}
+            </p>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  setShowAuthModal(false);
+                  router.push('/profile-selector');
+                }}
+                className="w-full flex items-center justify-center gap-2 bg-teal-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-teal-700 transition-colors"
+              >
+                <LogIn className="w-4 h-4" />
+                Iniciar sesión
+              </button>
+              <button
+                onClick={() => {
+                  setShowAuthModal(false);
+                  router.push('/profile-selector');
+                }}
+                className="w-full flex items-center justify-center gap-2 bg-white text-teal-600 font-semibold py-3 px-4 rounded-xl border-2 border-teal-600 hover:bg-teal-50 transition-colors"
+              >
+                <UserPlus className="w-4 h-4" />
+                Crear cuenta gratis
+              </button>
+              <button
+                onClick={() => setShowAuthModal(false)}
+                className="w-full text-sm text-gray-400 hover:text-gray-600 py-2 transition-colors"
+              >
+                Ahora no
+              </button>
+            </div>
           </div>
         </div>
       )}
     </>
   );
 }
+
+
