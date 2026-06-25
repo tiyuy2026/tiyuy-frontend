@@ -5,10 +5,6 @@ const nextConfig: NextConfig = {
     return [
       // Local API wrappers must run before proxying to backend
       {
-        source: '/api/auth/:path*',
-        destination: '/api/auth/:path*',
-      },
-      {
         source: '/api/google-places/:path*',
         destination: '/api/google-places/:path*',
       },

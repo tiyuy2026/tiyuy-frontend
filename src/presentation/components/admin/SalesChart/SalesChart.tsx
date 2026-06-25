@@ -233,9 +233,9 @@ export function SalesChart({ data }: SalesChartProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm h-64 flex flex-col">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-800">Resumen de ventas</h3>
+    <div className="bg-white rounded-xl p-3 sm:p-4 border border-gray-100 shadow-sm min-h-[16rem] sm:h-64 flex flex-col">
+      <div className="flex items-center justify-between mb-2 sm:mb-3 gap-2">
+        <h3 className="text-xs sm:text-sm font-semibold text-gray-800 truncate">Resumen de ventas</h3>
         <CustomDropdown
           options={periodOptions}
           value={period}
@@ -243,9 +243,9 @@ export function SalesChart({ data }: SalesChartProps) {
           placeholder="Últimos 6 meses"
         />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 min-h-0">
         {isLoading ? (
-          <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+          <div className="flex items-center justify-center h-full text-gray-400 text-xs sm:text-sm">
             Cargando datos...
           </div>
         ) : (
@@ -254,16 +254,16 @@ export function SalesChart({ data }: SalesChartProps) {
       </div>
       {/* Plan Distribution - Show most demanded plan */}
       {chartData?.planDistribution && (
-        <div className="mt-3 pt-3 border-t border-gray-100">
-          <div className="text-xs text-gray-500 mb-2">Plan más demandado:</div>
-          <div className="flex gap-2 flex-wrap">
+        <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-100">
+          <div className="text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">Plan más demandado:</div>
+          <div className="flex flex-col gap-1 sm:flex-row sm:gap-2 sm:flex-wrap">
             {Object.entries(chartData.planDistribution).map(([month, plans]) => {
               const mostDemanded = Object.entries(plans).sort((a, b) => b[1] - a[1])[0];
               if (!mostDemanded) return null;
               return (
-                <div key={month} className="flex items-center gap-1 text-xs">
-                  <span className="text-gray-600">{month}:</span>
-                  <span className="font-medium text-blue-600">{mostDemanded[0]}</span>
+                <div key={month} className="flex items-center gap-1 text-[10px] sm:text-xs">
+                  <span className="text-gray-600 font-medium">{month}:</span>
+                  <span className="font-medium text-blue-600 truncate max-w-[100px] sm:max-w-none">{mostDemanded[0]}</span>
                   <span className="text-gray-400">({mostDemanded[1]})</span>
                 </div>
               );

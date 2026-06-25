@@ -112,18 +112,18 @@ export default function AdminCampaignsListPage() {
   return (
     <div className="space-y-4 pb-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Campañas</h1>
           <p className="text-sm text-gray-500 mt-0.5">Administra y modera campanas promocionales</p>
         </div>
-        <button onClick={() => refetch()} className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition-all">
+        <button onClick={() => refetch()} className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition-all">
           <RefreshCw className="w-4 h-4" /> Actualizar
         </button>
       </div>
 
       {/* Search + Filter */}
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input

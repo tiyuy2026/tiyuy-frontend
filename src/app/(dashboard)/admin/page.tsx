@@ -344,33 +344,33 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-            
+    <div className="p-3 sm:p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 lg:space-y-8">
+             
             {/* Alertas Recientes para Admin */}
             {adminAlerts.length > 0 && (
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 mb-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">Alertas Recientes</h3>
-                  <AlertTriangle className="w-5 h-5 text-gray-400" />
+              <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 border border-gray-200 mb-4 sm:mb-8">
+                <div className="flex items-center justify-between mb-4 sm:mb-6">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Alertas Recientes</h3>
+                  <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {adminAlerts.map((alert) => (
-                    <div key={alert.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                      <div className={`w-2 h-2 rounded-full mt-1.5 ${
+                    <div key={alert.id} className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-gray-50 rounded-lg border border-gray-100">
+                      <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full mt-1.5 shrink-0 ${
                         alert.severity === 'high' ? 'bg-red-500' :
                         alert.severity === 'medium' ? 'bg-orange-500' :
                         alert.severity === 'low' ? 'bg-yellow-500' :
                         'bg-blue-500'
                       }`} />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">{alert.title}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900">{alert.title}</p>
                         <p className="text-xs text-gray-600 mt-1">{alert.message}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="text-xs text-gray-400">
+                        <div className="flex flex-wrap items-center gap-2 mt-2">
+                          <span className="text-[10px] sm:text-xs text-gray-400">
                             {new Date(alert.timestamp).toLocaleString()}
                           </span>
-                          <span className="text-xs px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full">
+                          <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 bg-gray-200 text-gray-700 rounded-full">
                             {alert.source}
                           </span>
                         </div>
@@ -378,10 +378,10 @@ export default function AdminDashboardPage() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
                   <Link 
                     href="/admin/notifications"
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium"
                   >
                     Ver todas las alertas del sistema
                   </Link>
@@ -390,52 +390,50 @@ export default function AdminDashboardPage() {
             )}
 
             {/* Filtros */}
-            <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-200 mb-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium text-gray-700">Filtrar por perfil:</span>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setSelectedProfile('todos')}
-                      className={`px-3 py-1 text-sm rounded-md transition ${
-                        selectedProfile === 'todos'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      Todos
-                    </button>
-                    <button
-                      onClick={() => setSelectedProfile('usuarios')}
-                      className={`px-3 py-1 text-sm rounded-md transition ${
-                        selectedProfile === 'usuarios'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      Usuarios
-                    </button>
-                    <button
-                      onClick={() => setSelectedProfile('agentes')}
-                      className={`px-3 py-1 text-sm rounded-md transition ${
-                        selectedProfile === 'agentes'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      Agentes
-                    </button>
-                    <button
-                      onClick={() => setSelectedProfile('desarrolladores')}
-                      className={`px-3 py-1 text-sm rounded-md transition ${
-                        selectedProfile === 'desarrolladores'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      Desarrolladores
-                    </button>
-                  </div>
+            <div className="bg-white rounded-xl shadow-lg p-3 sm:p-4 border border-gray-200 mb-4 sm:mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                <span className="text-xs sm:text-sm font-medium text-gray-700 shrink-0">Filtrar por perfil:</span>
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                  <button
+                    onClick={() => setSelectedProfile('todos')}
+                    className={`px-2.5 sm:px-3 py-1 text-xs sm:text-sm rounded-md transition whitespace-nowrap ${
+                      selectedProfile === 'todos'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    Todos
+                  </button>
+                  <button
+                    onClick={() => setSelectedProfile('usuarios')}
+                    className={`px-2.5 sm:px-3 py-1 text-xs sm:text-sm rounded-md transition whitespace-nowrap ${
+                      selectedProfile === 'usuarios'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    Usuarios
+                  </button>
+                  <button
+                    onClick={() => setSelectedProfile('agentes')}
+                    className={`px-2.5 sm:px-3 py-1 text-xs sm:text-sm rounded-md transition whitespace-nowrap ${
+                      selectedProfile === 'agentes'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    Agentes
+                  </button>
+                  <button
+                    onClick={() => setSelectedProfile('desarrolladores')}
+                    className={`px-2.5 sm:px-3 py-1 text-xs sm:text-sm rounded-md transition whitespace-nowrap ${
+                      selectedProfile === 'desarrolladores'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    Desarrolladores
+                  </button>
                 </div>
               </div>
             </div>
@@ -635,9 +633,9 @@ export default function AdminDashboardPage() {
               {userGrowthData.length > 0 && (
                 <div className="lg:col-span-2 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-gray-100 overflow-hidden">
                   {/* Header */}
-                  <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-base font-semibold text-gray-900">Tendencia de registros</h3>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 sm:justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-900">Tendencia de registros</h3>
                       <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-0.5">
                         <span className="relative flex h-2 w-2">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -664,9 +662,9 @@ export default function AdminDashboardPage() {
                   </div>
 
                   {/* Cuerpo: Métricas + Gráfica */}
-                  <div className="p-6">
+                  <div className="p-3 sm:p-4 md:p-6">
                     {/* Métricas principales estilo TradingView */}
-                    <div className="flex items-center gap-8 mb-6">
+                    <div className="flex flex-wrap items-center gap-4 sm:gap-6 md:gap-8 mb-4 sm:mb-6">
                       <div>
                         <div className="text-[11px] text-gray-400 font-medium uppercase tracking-wider mb-1">Actual</div>
                         <div className="text-2xl font-bold text-gray-900">
@@ -831,12 +829,12 @@ export default function AdminDashboardPage() {
               )}
 
               {/* Alertas Recientes - Datos Reales del Backend */}
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">Alertas recientes</h3>
-                  <span className="text-xs text-gray-500">Actualizado hace 1h</span>
+              <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-4 sm:mb-6">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Alertas recientes</h3>
+                  <span className="text-[10px] sm:text-xs text-gray-500">Actualizado hace 1h</span>
                 </div>
-                <div className="space-y-4 max-h-[400px] overflow-y-auto">
+                <div className="space-y-3 sm:space-y-4 max-h-[300px] sm:max-h-[400px] overflow-y-auto">
                   {/* Campañas Programadas - Datos reales del backend */}
                   {(campaigns?.content?.filter(c => c.status === 'SCHEDULED')?.length ?? 0) > 0 && (
                     <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors cursor-pointer border-l-4 border-blue-500">
@@ -946,33 +944,33 @@ export default function AdminDashboardPage() {
 
             {/* Estado de Propiedades */}
             {stats.propertiesByStatus && Object.keys(stats.propertiesByStatus).length > 0 && (
-              <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">Estado de Propiedades</h3>
-                  <Building className="w-5 h-5 text-gray-400" />
+              <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-4 sm:mb-6">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Estado de Propiedades</h3>
+                  <Building className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {Object.entries(stats.propertiesByStatus).map(([status, count]: [string, number]) => {
                     const percentage = ((count || 0) / (stats.totalProperties || 1)) * 100;
                     const barColor = status === 'PUBLISHED' ? 'bg-green-500' :
                                    'bg-blue-500';
                     return (
-                      <div key={status} className="flex items-center justify-between">
-                        <span className="text-gray-600 capitalize text-sm">
+                      <div key={status} className="flex items-center justify-between gap-2">
+                        <span className="text-gray-600 capitalize text-xs sm:text-sm shrink-0">
                           {status === 'PUBLISHED' ? 'Publicadas' : 
                            status === 'PENDING' ? 'Pendientes' :
                            status === 'DRAFT' ? 'Borrador' :
                            status === 'REJECTED' ? 'Rechazadas' :
                            status === 'SUSPENDED' ? 'Suspendidas' : status}
                         </span>
-                        <div className="flex items-center gap-3">
-                          <div className="w-32 h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden max-w-[200px]">
                             <div
                               className={`h-full ${barColor} rounded-full transition-all duration-500`}
                               style={{ width: `${percentage}%` }}
                             />
                           </div>
-                          <span className="text-sm font-medium text-gray-900 w-12 text-right">
+                          <span className="text-xs sm:text-sm font-medium text-gray-900 w-8 sm:w-12 text-right shrink-0">
                             {count || 0}
                           </span>
                         </div>
@@ -980,10 +978,10 @@ export default function AdminDashboardPage() {
                     );
                   })}
                 </div>
-                <div className="mt-6 pt-4 border-t border-gray-200">
+                <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">Total de Propiedades</span>
-                    <span className="text-sm font-bold text-gray-900">{stats.totalProperties}</span>
+                    <span className="text-xs sm:text-sm font-medium text-gray-900">Total de Propiedades</span>
+                    <span className="text-xs sm:text-sm font-bold text-gray-900">{stats.totalProperties}</span>
                   </div>
                 </div>
               </div>
@@ -1009,22 +1007,22 @@ export default function AdminDashboardPage() {
             <div className="space-y-6">
               {/* Alerta de Reportes Pendientes */}
               {!isSupport && stats.pendingReports > 0 && (
-                <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                        <AlertTriangle className="w-6 h-6 text-red-600" />
+                <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-0 sm:justify-between">
+                    <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
+                        <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-red-900">Acción Requerida</h3>
-                        <p className="text-red-700">
+                      <div className="min-w-0">
+                        <h3 className="text-sm sm:text-lg font-semibold text-red-900">Acción Requerida</h3>
+                        <p className="text-xs sm:text-sm text-red-700">
                           {stats.pendingReports} reportes requieren revisión inmediata
                         </p>
                       </div>
                     </div>
                     <Link
                       href="/admin/reports"
-                      className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
+                      className="inline-flex items-center justify-center px-3 sm:px-4 py-1.5 sm:py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium text-xs sm:text-sm shrink-0"
                     >
                       Revisar Ahora
                     </Link>
@@ -1034,20 +1032,20 @@ export default function AdminDashboardPage() {
 
               {/* Alerta de Propiedades Pendientes */}
               {stats.pendingProperties > 0 && (
-                <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                        <AlertTriangle className="w-6 h-6 text-yellow-600" />
+                <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-0 sm:justify-between">
+                    <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-lg flex items-center justify-center shrink-0">
+                        <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-yellow-900">Propiedades Pendientes</h3>
-                        <p className="text-yellow-700">{stats.pendingProperties} propiedades requieren moderación</p>
+                      <div className="min-w-0">
+                        <h3 className="text-sm sm:text-lg font-semibold text-yellow-900">Propiedades Pendientes</h3>
+                        <p className="text-xs sm:text-sm text-yellow-700">{stats.pendingProperties} propiedades requieren moderación</p>
                       </div>
                     </div>
                     <Link
                       href="/admin/properties/moderate"
-                      className="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition font-medium"
+                      className="inline-flex items-center justify-center px-3 sm:px-4 py-1.5 sm:py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition font-medium text-xs sm:text-sm shrink-0"
                     >
                       Moderar Propiedades
                     </Link>
@@ -1061,8 +1059,8 @@ export default function AdminDashboardPage() {
 
             {/* Footer con timestamp */}
             {dashboardStats?.generatedAt && (
-              <div className="text-center pt-8 border-t border-gray-200">
-                <p className="text-sm text-gray-500">
+              <div className="text-center pt-4 sm:pt-6 lg:pt-8 border-t border-gray-200">
+                <p className="text-xs sm:text-sm text-gray-500">
                   Última actualización: {new Date(dashboardStats.generatedAt).toLocaleString()}
                 </p>
               </div>

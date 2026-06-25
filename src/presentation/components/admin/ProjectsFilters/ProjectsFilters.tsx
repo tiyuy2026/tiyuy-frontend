@@ -166,27 +166,27 @@ export function ProjectsFilters({
 
   return (
     <>
-      <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+      <div className="bg-white rounded-xl p-3 sm:p-4 border border-gray-100 shadow-sm">
         {/* Filtros en una sola línea con etiquetas */}
-        <div className="flex items-center gap-4 flex-wrap pb-2">
+        <div className="flex items-stretch sm:items-center gap-2 sm:gap-4 flex-wrap pb-2">
         {/* Search Input */}
-        <div className="flex-1 min-w-[150px] max-w-[200px]">
-          <label className="block text-xs font-medium text-gray-500 mb-1.5 truncate" title="Buscar">Buscar</label>
+        <div className="flex-1 min-w-[120px] sm:min-w-[150px] max-w-full sm:max-w-[200px]">
+          <label className="block text-[10px] sm:text-xs font-medium text-gray-500 mb-1 truncate" title="Buscar">Buscar</label>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" />
             <input
               type="text"
               placeholder="Buscar..."
               value={searchQuery || ''}
-              className="w-full h-[38px] pl-10 pr-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              className="w-full h-[34px] sm:h-[38px] pl-8 sm:pl-10 pr-2.5 sm:pr-3 bg-gray-50 border border-gray-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
               onChange={(e) => onSearchChange?.(e.target.value)}
             />
           </div>
         </div>
 
         {/* Estado Dropdown */}
-        <div className="w-[120px]">
-          <label className="block text-xs font-medium text-gray-500 mb-1.5">Estado</label>
+        <div className="w-[calc(50%-0.5rem)] sm:w-[120px]">
+          <label className="block text-[10px] sm:text-xs font-medium text-gray-500 mb-1">Estado</label>
           <CustomDropdown
             options={statusOptions}
             value={statusFilter || 'all'}
@@ -195,8 +195,8 @@ export function ProjectsFilters({
         </div>
 
         {/* Ciclo de Vida Dropdown */}
-        <div className="w-[120px]">
-          <label className="block text-xs font-medium text-gray-500 mb-1.5">Ciclo</label>
+        <div className="w-[calc(50%-0.5rem)] sm:w-[120px]">
+          <label className="block text-[10px] sm:text-xs font-medium text-gray-500 mb-1">Ciclo</label>
           <CustomDropdown
             options={lifecycleOptions}
             value=""
@@ -205,8 +205,8 @@ export function ProjectsFilters({
         </div>
 
         {/* Tipo Dropdown */}
-        <div className="w-[120px]">
-          <label className="block text-xs font-medium text-gray-500 mb-1.5">Tipo</label>
+        <div className="w-[calc(50%-0.5rem)] sm:w-[120px]">
+          <label className="block text-[10px] sm:text-xs font-medium text-gray-500 mb-1">Tipo</label>
           <CustomDropdown
             options={typeOptions}
             value=""
@@ -215,8 +215,8 @@ export function ProjectsFilters({
         </div>
 
         {/* Ubicacion Dropdown */}
-        <div className="w-[120px]">
-          <label className="block text-xs font-medium text-gray-500 mb-1.5">Ubicación</label>
+        <div className="w-[calc(50%-0.5rem)] sm:w-[120px]">
+          <label className="block text-[10px] sm:text-xs font-medium text-gray-500 mb-1">Ubicación</label>
           <CustomDropdown
             options={locationOptions}
             value=""
@@ -225,10 +225,10 @@ export function ProjectsFilters({
         </div>
 
         {/* Price Range Slider */}
-        <div className="w-[180px] flex-shrink-0">
-          <label className="block text-xs font-medium text-gray-500 mb-1.5">Precio</label>
-          <div className="flex items-center gap-2 h-[38px]">
-            <span className="text-xs text-gray-500 whitespace-nowrap">{formatPrice(priceRange[1])}+</span>
+        <div className="w-full sm:w-[180px] flex-shrink-0">
+          <label className="block text-[10px] sm:text-xs font-medium text-gray-500 mb-1">Precio</label>
+          <div className="flex items-center gap-2 h-[34px] sm:h-[38px]">
+            <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">{formatPrice(priceRange[1])}+</span>
             <input
               type="range"
               min="0"
@@ -236,14 +236,14 @@ export function ProjectsFilters({
               step="50000"
               value={priceRange[1]}
               onChange={(e) => handlePriceChange(Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              className="flex-1 h-1.5 sm:h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
           </div>
         </div>
 
         {/* Unidades Dropdown */}
-        <div className="w-[150px] flex-shrink-0">
-          <label className="block text-xs font-medium text-gray-500 mb-1.5">Unidades</label>
+        <div className="w-full sm:w-[150px] flex-shrink-0">
+          <label className="block text-[10px] sm:text-xs font-medium text-gray-500 mb-1">Unidades</label>
           <CustomDropdown
             options={unitsOptions}
             value=""

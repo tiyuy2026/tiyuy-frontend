@@ -36,7 +36,7 @@ export function ProjectsHeaderStats({ stats, isLoading }: ProjectsHeaderStatsPro
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4">
         {[...Array(6)].map((_, i) => (
           <div key={i} className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm animate-pulse">
             <div className="flex items-start justify-between">
@@ -54,7 +54,7 @@ export function ProjectsHeaderStats({ stats, isLoading }: ProjectsHeaderStatsPro
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4">
       <ProjectsStatsCard
         icon={FolderOpen}
         label="Total Proyectos"

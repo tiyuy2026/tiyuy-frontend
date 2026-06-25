@@ -16,7 +16,8 @@ import { authStorage } from '@/infrastructure/storage/auth-storage';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminHeader } from '@/presentation/components/admin/AdminHeader/AdminHeader';
-import { Activity, Bell, Building, Building2, DollarSign, Layers, LayoutDashboard, LogOut, Megaphone, MessageSquare, Package, ShieldAlert, ShieldCheck, Tag, TriangleAlert, UserCircle, Users } from 'lucide-react';
+import { Activity, Bell, Building, Building2, DollarSign, FileText, Layers, LayoutDashboard, LogOut, Megaphone, MessageSquare, Package, ShieldAlert, ShieldCheck, Tag, TriangleAlert, UserCircle, Users } from 'lucide-react';
+
 
 interface GitHubShellProps {
   children: ReactNode;
@@ -91,12 +92,20 @@ const NAV_SECTIONS: NavSectionWithPermission[] = [
     ],
   },
   {
+    title: 'SERVICIO AL CLIENTE',
+    items: [
+      { label: 'Reclamos', href: '/admin/reclamos', icon: FileText },
+    ],
+  },
+
+  {
     title: 'SISTEMA',
     items: [
       { label: 'Administradores', href: '/admin/admins', icon: Users, requiredPermission: 'ADMINS_VIEW' },
       { label: 'Actividad', href: '/admin/activities', icon: Activity, requiredPermission: 'AUDIT_LOGS_VIEW' },
     ],
   },
+
   {
     title: 'CUENTA',
     items: [

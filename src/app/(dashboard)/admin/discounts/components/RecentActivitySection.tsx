@@ -80,7 +80,7 @@ export default function RecentActivitySection() {
         </div>
 
         {/* Date filters */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <label className="text-xs text-gray-400 font-medium">Desde:</label>
             <input
@@ -183,7 +183,7 @@ export default function RecentActivitySection() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+        <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-gray-100 gap-3">
           <span className="text-xs text-gray-400">
             Pagina {page + 1} de {totalPages}
           </span>
@@ -196,7 +196,7 @@ export default function RecentActivitySection() {
             >
               Anterior
             </Button>
-            <div className="flex items-center gap-1">
+            <div className="hidden sm:flex items-center gap-1">
               {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                 const startPage = Math.max(0, Math.min(page - 2, totalPages - 5));
                 const pageNum = startPage + i;

@@ -534,18 +534,18 @@ export default function GroupsAndChannelsPage() {
   const violationsPercentage = totalItems > 0 ? ((itemsWithViolations / totalItems) * 100).toFixed(1) : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="px-3 sm:px-4 py-3 sm:py-4 space-y-3 sm:space-y-6 max-w-[1600px] mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Grupos y Canales</h1>
-          <p className="text-gray-600 mt-1">Administra grupos de la red social y canales por ciudad</p>
+          <h1 className="text-lg sm:text-2xl font-bold text-gray-900">Gestión de Grupos y Canales</h1>
+          <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">Administra grupos de la red social y canales por ciudad</p>
         </div>
         <button
           onClick={() => setIsCreateGroupModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-lg hover:from-blue-600 hover:to-teal-500 transition-all font-medium shadow-lg hover:shadow-xl"
+          className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-lg hover:from-blue-600 hover:to-teal-500 transition-all font-medium shadow-lg hover:shadow-xl text-xs sm:text-sm w-full sm:w-auto justify-center"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           Crear Grupo
         </button>
       </div>
@@ -592,7 +592,7 @@ export default function GroupsAndChannelsPage() {
 
       {/* Main content card with list */}
       <Card>
-        <CardContent className="p-6">
+        <CardContent className="p-3 sm:p-6">
 
           {/* Results counter for suspended view */}
           {viewType === 'suspended' && filteredData && (

@@ -73,7 +73,7 @@ export const DiscountModal: React.FC<DiscountModalProps> = ({
           {/* Buscar Inmobiliaria o Agente */}
           <div className="p-3 bg-blue-50 rounded-lg border border-blue-100 space-y-3">
             <p className="text-xs font-semibold text-blue-700">Buscar Inmobiliaria o Agente</p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <input
                 type="text"
                 placeholder="RUC Inmobiliaria"
@@ -112,7 +112,7 @@ export const DiscountModal: React.FC<DiscountModalProps> = ({
           </div>
 
           {/* Precio y Descuento */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-700">Precio Final (S/)</label>
               <input

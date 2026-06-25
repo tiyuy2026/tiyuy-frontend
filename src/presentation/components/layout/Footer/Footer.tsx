@@ -36,7 +36,8 @@ const FOOTER_COLUMNS = [
       { label: 'Nuestra política antidiscriminación', href: '/#antidiscriminacion' },
       { label: 'Apoyo a personas con discapacidad', href: '/#discapacidad' },
       { label: 'Opciones de cancelación', href: '/#cancelacion' },
-      { label: 'Libro de Reclamaciones', href: '/#reclamaciones' },
+      { label: 'Libro de Reclamaciones', href: '/libro-de-reclamaciones' },
+
       { label: 'Centro de Soporte', href: '/soporte' },
     ],
   },

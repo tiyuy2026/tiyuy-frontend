@@ -83,32 +83,32 @@ export function ProjectDetailModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
+      <div className="bg-white rounded-xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col mx-2 sm:mx-0">
         {/* Header Profesional */}
-        <div className="bg-[#0CE32C] px-4 py-3">
-          <div className="flex items-center gap-3">
+        <div className="bg-[#0CE32C] px-3 sm:px-4 py-2.5 sm:py-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {project.coverImageUrl ? (
               <img
                 src={project.coverImageUrl}
                 alt={project.name}
-                className="w-14 h-14 rounded-xl object-cover border-2 border-green-300 shadow-sm"
+                className="w-10 h-10 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl object-cover border-2 border-green-300 shadow-sm"
               />
             ) : (
-              <div className="w-14 h-14 rounded-xl bg-green-200 flex items-center justify-center text-green-800 text-xl font-bold border-2 border-green-300 shadow-sm">
+              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-green-200 flex items-center justify-center text-green-800 text-base sm:text-xl font-bold border-2 border-green-300 shadow-sm">
                 {project.name?.[0]?.toUpperCase() || 'P'}
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <h3 className="text-base font-bold text-green-900 truncate">
+              <h3 className="text-sm sm:text-base font-bold text-green-900 truncate">
                 {project.name}
               </h3>
-              <p className="text-green-700 text-xs mt-0.5 truncate">{project.slug}</p>
-              <div className="flex items-center gap-2 mt-1.5">
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${getStatusColor(project.status)}`}>
+              <p className="text-green-700 text-[10px] sm:text-xs mt-0.5 truncate">{project.slug}</p>
+              <div className="flex items-center gap-1.5 sm:gap-2 mt-1">
+                <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold ${getStatusColor(project.status)}`}>
                   {getStatusLabel(project.status)}
                 </span>
                 {project.isFeatured && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-200 text-purple-800">
+                  <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-purple-200 text-purple-800">
                     Destacado
                   </span>
                 )}
@@ -117,9 +117,9 @@ export function ProjectDetailModal({
           </div>
         </div>
 
-        <div className="p-4 flex-1 overflow-y-auto">
+        <div className="p-3 sm:p-4 flex-1 overflow-y-auto">
           {/* Grid de Informacion Profesional */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* Informacion del Proyecto */}
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
               <div className="flex items-center gap-2 mb-3">

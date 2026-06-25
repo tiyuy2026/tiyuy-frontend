@@ -1,4 +1,4 @@
-import axiosClient from '../api/axios-client';
+import { publicApiClient, axiosClient } from '../api/axios-client';
 import { AUTH_ENDPOINTS, ENDPOINTS } from '../api/endpoints';
 import { IAuthRepository } from '@/core/domain/repositories';
 import { User, AuthResponse, RegisterData } from '@/core/domain/entities';
@@ -6,7 +6,9 @@ import { User, AuthResponse, RegisterData } from '@/core/domain/entities';
 export class AuthRepository implements IAuthRepository {
   async login(email: string, password: string): Promise<AuthResponse> {
     try {
-      const response = await axiosClient.post<AuthResponse>(AUTH_ENDPOINTS.LOGIN, {
+      // Usamos publicApiClient para login porque axiosClient tiene un interceptor
+      // que bloquea la petición si hay un token expirado en localStorage
+      const response = await publicApiClient.post<AuthResponse>(AUTH_ENDPOINTS.LOGIN, {
         email,
         password,
       });

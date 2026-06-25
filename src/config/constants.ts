@@ -139,3 +139,30 @@ export const SUBSCRIPTION_PLAN_DESCRIPTIONS = {
   ENTERPRISE_TRIAL: '12 propiedades por 3 meses',
   ENTERPRISE: 'Hasta 4 proyectos por 45 días - Renovable'
 } as const;
+
+// Libro de Reclamaciones
+export const COMPLAINT_TYPES = {
+  RECLAMO: 'Reclamo',
+  QUEJA: 'Queja',
+} as const;
+
+export const COMPLAINT_BIEN_TYPES = {
+  PRODUCTO: 'Producto',
+  SERVICIO: 'Servicio',
+} as const;
+
+export const COMPLAINT_STATUS = {
+  PENDIENTE: 'Pendiente',
+  EN_REVISION: 'En Revisión',
+  RESPONDIDO: 'Respondido',
+  CERRADO: 'Cerrado',
+} as const;
+
+export const COMPLAINT_STATUS_COLORS = {
+  PENDIENTE: 'bg-yellow-100 text-yellow-800',
+  EN_REVISION: 'bg-blue-100 text-blue-800',
+  RESPONDIDO: 'bg-green-100 text-green-800',
+  CERRADO: 'bg-gray-100 text-gray-800',
+} as const;
+
+

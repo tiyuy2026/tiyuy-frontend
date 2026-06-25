@@ -36,20 +36,20 @@ export function PropertiesFilters({
   onClear,
 }: PropertiesFiltersProps) {
   return (
-    <div className="p-4 border-b border-gray-100">
-      <div className="flex flex-col lg:flex-row gap-3 items-center">
+    <div className="p-3 sm:p-4 border-b border-gray-100">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center">
         {/* Buscador elegante */}
         <div className="flex-1 w-full">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
+              <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
             </div>
             <input
               type="text"
               placeholder="Buscar por título, propietario o ubicación..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-400 focus:outline-none focus:placeholder-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out"
+              className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-400 focus:outline-none focus:placeholder-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm transition duration-150 ease-in-out"
             />
           </div>
         </div>
@@ -61,14 +61,14 @@ export function PropertiesFilters({
             onChange={onStatusChange}
             options={statusOptions}
             placeholder="Todos los Estados"
-            minWidth="180px"
+            minWidth="160px"
           />
         </div>
 
         {(searchQuery || statusFilter !== 'all') && (
           <button
             onClick={onClear}
-            className="px-3 py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center gap-1 text-sm"
+            className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center gap-1 text-xs sm:text-sm justify-center"
           >
             <X className="w-3 h-3" />
             Limpiar

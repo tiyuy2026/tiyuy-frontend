@@ -23,7 +23,7 @@ export function ItemList({
   onViolation,
 }: ItemListProps) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2 sm:space-y-3">
       {items.map((item) => (
         <ListItem
           key={item.id}

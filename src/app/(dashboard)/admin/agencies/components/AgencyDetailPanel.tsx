@@ -62,24 +62,24 @@ export default function AgencyDetailPanel({
   return (
     <div className={`${isFullscreen ? 'w-full' : 'w-full max-w-5xl'} bg-white min-h-screen`}>
 
-      <div className="px-8 py-6 space-y-6 max-w-[1400px] mx-auto">
+      <div className="px-3 sm:px-8 py-3 sm:py-6 space-y-3 sm:space-y-6 max-w-[1400px] mx-auto">
         {/* Logo y RUC - más presencia */}
-        <div className="flex items-center gap-5 pb-2 border-b border-gray-100">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-cyan-100">
+        <div className="flex items-center gap-3 sm:gap-5 pb-2 border-b border-gray-100">
+          <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white text-base sm:text-2xl font-bold shadow-lg shadow-cyan-100 flex-shrink-0">
             {agency.name?.[0] || 'I'}
           </div>
-          <div>
-            <p className="text-xs text-slate-400 uppercase tracking-wide">RUC</p>
-            <p className="text-2xl font-bold text-slate-900 tracking-tight">{agency.ruc || '-'}</p>
+          <div className="min-w-0">
+            <p className="text-[9px] sm:text-xs text-slate-400 uppercase tracking-wide">RUC</p>
+            <p className="text-base sm:text-2xl font-bold text-slate-900 tracking-tight truncate">{agency.ruc || '-'}</p>
             <div className="flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-slate-400" />
-              <span className="text-xs text-slate-400">{agency.city || '-'}</span>
+              <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400 flex-shrink-0" />
+              <span className="text-[10px] sm:text-xs text-slate-400 truncate">{agency.city || '-'}</span>
             </div>
           </div>
         </div>
 
         {/* Tarjetas elegantes: Información de contacto y Estado */}
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
           {/* Tarjeta de Información de Contacto */}
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
             <h4 className="text-sm font-semibold text-slate-900 mb-4">Información de contacto</h4>

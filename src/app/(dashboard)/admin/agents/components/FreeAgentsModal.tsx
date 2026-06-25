@@ -49,25 +49,28 @@ export default function FreeAgentsModal({
       title="Agentes Free - Potencial Perdido"
       size="lg"
     >
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {/* Date Filter */}
-        <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-          <span className="text-sm font-medium text-gray-700">Filtrar por fecha:</span>
-          <input
-            type="date"
-            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
-            onChange={(e) => setFreeAgentsDateRange((prev: any) => ({ ...prev, start: e.target.value ? new Date(e.target.value) : undefined }))}
-          />
-          <span className="text-gray-500">-</span>
-          <input
-            type="date"
-            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
-            onChange={(e) => setFreeAgentsDateRange((prev: any) => ({ ...prev, end: e.target.value ? new Date(e.target.value) : undefined }))}
-          />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 p-2.5 sm:p-3 bg-gray-50 rounded-lg">
+          <span className="text-xs sm:text-sm font-medium text-gray-700">Filtrar por fecha:</span>
+          <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
+            <input
+              type="date"
+              className="flex-1 sm:w-auto px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm border border-gray-300 rounded-lg"
+              onChange={(e) => setFreeAgentsDateRange((prev: any) => ({ ...prev, start: e.target.value ? new Date(e.target.value) : undefined }))}
+            />
+            <span className="text-gray-500 text-xs sm:text-sm">-</span>
+            <input
+              type="date"
+              className="flex-1 sm:w-auto px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm border border-gray-300 rounded-lg"
+              onChange={(e) => setFreeAgentsDateRange((prev: any) => ({ ...prev, end: e.target.value ? new Date(e.target.value) : undefined }))}
+            />
+          </div>
           <Button
             variant="outline"
             size="sm"
             onClick={() => { setFreeAgentsDateRange({}); setFreeAgentsPage(1); }}
+            className="text-xs sm:text-sm w-full sm:w-auto"
           >
             Limpiar
           </Button>
@@ -97,20 +100,21 @@ export default function FreeAgentsModal({
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 border-t">
-            <span className="text-sm text-gray-500">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0 pt-3 sm:pt-4 border-t">
+            <span className="text-[10px] sm:text-sm text-gray-500">
               Mostrando {Math.min((freeAgentsPage - 1) * 5 + 1, filteredCount)} - {Math.min(freeAgentsPage * 5, filteredCount)} de {filteredCount}
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setFreeAgentsPage((prev: number) => Math.max(1, prev - 1))}
                 disabled={freeAgentsPage === 1}
+                className="text-[10px] sm:text-sm px-2 sm:px-3"
               >
                 Anterior
               </Button>
-              <span className="text-sm text-gray-600">
+              <span className="text-[10px] sm:text-sm text-gray-600">
                 Página {freeAgentsPage} de {totalPages}
               </span>
               <Button
@@ -118,6 +122,7 @@ export default function FreeAgentsModal({
                 size="sm"
                 onClick={() => setFreeAgentsPage((prev: number) => Math.min(totalPages, prev + 1))}
                 disabled={freeAgentsPage === totalPages}
+                className="text-[10px] sm:text-sm px-2 sm:px-3"
               >
                 Siguiente
               </Button>

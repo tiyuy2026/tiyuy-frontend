@@ -9,7 +9,7 @@ interface SuspendedFilterProps {
 
 export function SuspendedFilter({ suspendedFilter, setSuspendedFilter }: SuspendedFilterProps) {
   return (
-    <div className="flex gap-2 p-1 bg-red-50 rounded-lg w-fit mb-4">
+    <div className="flex flex-wrap gap-2 p-1 bg-red-50 rounded-lg w-fit mb-4">
       <button
         onClick={() => setSuspendedFilter('all')}
         className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${

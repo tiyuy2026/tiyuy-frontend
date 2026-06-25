@@ -13,35 +13,35 @@ interface AgentDetailsModalProps {
 export default function AgentDetailsModal({ agent, isOpen, onClose }: AgentDetailsModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-white rounded-xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
+      <div className="bg-white rounded-xl p-0 max-w-lg w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col mx-2 sm:mx-0">
         {/* Header Profesional */}
-        <div className="bg-[#16DB16] px-4 py-3">
-          <div className="flex items-center gap-3">
+        <div className="bg-[#16DB16] px-3 sm:px-4 py-2.5 sm:py-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {agent.profilePhotoUrl ? (
               <img
                 src={agent.profilePhotoUrl}
                 alt={`${agent.firstName} ${agent.lastName}`}
-                className="w-14 h-14 rounded-xl object-cover border-2 border-green-300 shadow-sm"
+                className="w-10 h-10 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl object-cover border-2 border-green-300 shadow-sm"
               />
             ) : (
-              <div className="w-14 h-14 rounded-xl bg-green-200 flex items-center justify-center text-green-800 text-xl font-bold border-2 border-green-300 shadow-sm">
+              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-green-200 flex items-center justify-center text-green-800 text-base sm:text-xl font-bold border-2 border-green-300 shadow-sm">
                 {`${agent.firstName?.[0] || ''}${agent.lastName?.[0] || ''}`.toUpperCase()}
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <h3 className="text-base font-bold text-green-900 truncate">
+              <h3 className="text-sm sm:text-base font-bold text-green-900 truncate">
                 {agent.firstName} {agent.lastName}
               </h3>
-              <p className="text-green-700 text-xs mt-0.5 truncate">{agent.email}</p>
-              <div className="flex items-center gap-2 mt-1.5">
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+              <p className="text-green-700 text-[10px] sm:text-xs mt-0.5 truncate">{agent.email}</p>
+              <div className="flex items-center gap-1.5 sm:gap-2 mt-1">
+                <span className={`px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold ${
                   agent.enabled 
                     ? 'bg-green-200 text-green-800' 
                     : 'bg-red-200 text-red-800'
                 }`}>
                   {agent.enabled ? 'Activo' : 'Inactivo'}
                 </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-200 text-blue-800">
+                <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-blue-200 text-blue-800">
                   {agent.currentPlan || 'Free'}
                 </span>
               </div>
@@ -49,9 +49,9 @@ export default function AgentDetailsModal({ agent, isOpen, onClose }: AgentDetai
           </div>
         </div>
 
-        <div className="p-6 flex-1 overflow-y-auto">
+        <div className="p-3 sm:p-6 flex-1 overflow-y-auto">
           {/* Grid de Informacion Profesional */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {/* Informacion Personal */}
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
               <div className="flex items-center gap-2 mb-3">
@@ -193,10 +193,10 @@ export default function AgentDetailsModal({ agent, isOpen, onClose }: AgentDetai
         </div>
 
         {/* Footer con Botones */}
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
-          <Button variant="secondary" onClick={onClose}>Cerrar</Button>
-          <Link href="/admin/agents/discounts">
-            <Button className="bg-green-600 hover:bg-green-700">
+        <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 bg-gray-50 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
+          <Button variant="secondary" onClick={onClose} className="text-xs sm:text-sm w-full sm:w-auto">Cerrar</Button>
+          <Link href="/admin/agents/discounts" className="w-full sm:w-auto">
+            <Button className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm w-full sm:w-auto">
               Gestionar Descuentos
             </Button>
           </Link>

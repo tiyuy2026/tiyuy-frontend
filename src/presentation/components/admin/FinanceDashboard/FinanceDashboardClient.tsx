@@ -60,24 +60,24 @@ function StatCard({ title, value, growth, icon, iconBg, iconColor }: StatCardPro
   const isPositive = growth !== undefined && growth >= 0;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 group">
-      <div className="flex items-start justify-between mb-2">
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${iconBg} ${iconColor}`}>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 sm:p-4 group">
+      <div className="flex items-start justify-between mb-1 sm:mb-2">
+        <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center ${iconBg} ${iconColor}`}>
           {icon}
         </div>
         {growth !== undefined && (
-          <span className={`text-xs font-medium flex items-center gap-0.5 ${
+          <span className={`text-[10px] sm:text-xs font-medium flex items-center gap-0.5 ${
             isPositive ? 'text-emerald-500' : 'text-red-500'
           }`}>
             {isPositive
-              ? <ArrowUpRight className="w-3 h-3" />
-              : <ArrowDownRight className="w-3 h-3" />}
+              ? <ArrowUpRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+              : <ArrowDownRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" />}
             {formatGrowth(growth)}
           </span>
         )}
       </div>
-      <p className="text-2xl font-bold text-gray-900 mt-2 mb-0.5 tracking-tight">{value}</p>
-      <p className="text-xs text-gray-500 font-medium">{title}</p>
+      <p className="text-base sm:text-2xl font-bold text-gray-900 mt-1 sm:mt-2 mb-0.5 tracking-tight">{value}</p>
+      <p className="text-[10px] sm:text-xs text-gray-500 font-medium truncate">{title}</p>
     </div>
   );
 }
@@ -439,10 +439,10 @@ export function FinanceDashboardClient() {
   ];
 
   return (
-    <div className="space-y-4 pb-6">
+    <div className="space-y-4 pb-6 w-full max-w-full overflow-x-hidden">
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Finanzas</h1>
           <p className="text-sm text-gray-500 mt-0.5">
@@ -450,7 +450,7 @@ export function FinanceDashboardClient() {
           </p>
         </div>
         {/* Tabs de rango — filtran transacciones y resetean paginación */}
-        <div className="flex items-center gap-0.5">
+        <div className="flex flex-wrap items-center gap-1">
           {dateRanges.map((range) => (
             <button
               key={range.key}

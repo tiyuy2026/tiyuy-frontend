@@ -289,12 +289,12 @@ export default function PlansPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Planes y Monetización</h2>
           <p className="text-gray-500 text-sm">Gestión de suscripciones, pagos y análisis de ingresos en tiempo real</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-shrink-0">
           <button
             onClick={handleRefreshData}
             className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-all flex items-center gap-2 text-sm font-semibold shadow-sm active:scale-95"
@@ -401,7 +401,7 @@ export default function PlansPage() {
 
       {/* Plans Section */}
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h3 className="text-lg font-bold text-gray-900">Planes de Suscripción</h3>
             <p className="text-sm text-gray-500">Gestiona los planes de suscripción disponibles</p>

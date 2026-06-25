@@ -56,18 +56,18 @@ export default function AgenciesKpiRow({
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4 mb-4 sm:mb-6">
       {kpis.map((kpi, index) => {
         const Icon = kpi.icon;
         return (
-          <div key={index} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-start gap-4">
-              <div className={`w-12 h-12 rounded-xl ${kpi.bgColor} flex items-center justify-center flex-shrink-0`}>
-                <Icon className={`w-6 h-6 ${kpi.iconColor}`} />
+          <div key={index} className="bg-white rounded-xl sm:rounded-2xl p-2 sm:p-4 shadow-sm border border-gray-100">
+            <div className="flex items-start gap-2 sm:gap-4">
+              <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl ${kpi.bgColor} flex items-center justify-center flex-shrink-0`}>
+                <Icon className={`w-4 h-4 sm:w-6 sm:h-6 ${kpi.iconColor}`} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-3xl font-bold text-gray-900 leading-tight">{kpi.value}</p>
-                <p className="text-sm text-gray-500 mt-0.5">{kpi.label}</p>
+                <p className="text-base sm:text-3xl font-bold text-gray-900 leading-tight truncate">{kpi.value}</p>
+                <p className="text-[9px] sm:text-sm text-gray-500 mt-0 sm:mt-0.5 truncate">{kpi.label}</p>
               </div>
             </div>
           </div>

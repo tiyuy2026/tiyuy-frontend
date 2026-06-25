@@ -114,28 +114,28 @@ export function ProjectCardView<T>({
 
       {/* Paginación */}
       {pagination && pagination.total > pagination.size && (
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3 flex items-center justify-between">
-          <div className="text-sm text-gray-500">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-3 sm:px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+          <div className="text-xs sm:text-sm text-gray-500">
             Mostrando <span className="font-medium text-gray-700">{startItem}-{endItem}</span> de{' '}
             <span className="font-medium text-gray-700">{pagination.total}</span> proyectos
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               onClick={() => pagination.onPageChange(pagination.page - 1)}
               disabled={pagination.page <= 1}
-              className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-1 sm:p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <ChevronLeft className="w-4 h-4 text-gray-600" />
+              <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600" />
             </button>
-            <span className="text-sm text-gray-700 px-2">
+            <span className="text-xs sm:text-sm text-gray-700 px-1 sm:px-2">
               {pagination.page} / {totalPages}
             </span>
             <button
               onClick={() => pagination.onPageChange(pagination.page + 1)}
               disabled={pagination.page >= totalPages}
-              className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-1 sm:p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <ChevronRight className="w-4 h-4 text-gray-600" />
+              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600" />
             </button>
           </div>
         </div>

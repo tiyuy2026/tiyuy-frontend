@@ -84,29 +84,31 @@ interface KPICardProps {
 
 function KPICard({ title, value, icon, iconBg, iconColor, badge, badgePositive = true, sparkline, sparkColor }: KPICardProps) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center justify-between gap-3">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-3">
       {/* Ícono */}
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${iconBg} ${iconColor}`}>
+      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 ${iconBg} ${iconColor}`}>
         {icon}
       </div>
 
       {/* Texto */}
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-gray-500 truncate">{title}</p>
-        <p className="text-2xl font-extrabold text-gray-900 leading-tight tracking-tight">{value}</p>
+        <p className="text-[10px] sm:text-xs font-medium text-gray-500 truncate">{title}</p>
+        <p className="text-lg sm:text-2xl font-extrabold text-gray-900 leading-tight tracking-tight">{value}</p>
         {badge && (
           <div className={`flex items-center gap-1 mt-0.5`}>
-            <TrendingUp className={`w-3 h-3 ${badgePositive ? 'text-emerald-500' : 'text-rose-500 rotate-180'}`} />
-            <span className={`text-[11px] font-semibold ${badgePositive ? 'text-emerald-600' : 'text-rose-600'}`}>
+            <TrendingUp className={`w-2.5 h-2.5 sm:w-3 sm:h-3 ${badgePositive ? 'text-emerald-500' : 'text-rose-500 rotate-180'}`} />
+            <span className={`text-[10px] sm:text-[11px] font-semibold ${badgePositive ? 'text-emerald-600' : 'text-rose-600'}`}>
               {badge}
             </span>
           </div>
         )}
       </div>
 
-      {/* Sparkline */}
+      {/* Sparkline - hidden on mobile */}
       {sparkline && sparkColor && (
-        <MiniSparkline data={sparkline} color={sparkColor} />
+        <div className="hidden sm:block">
+          <MiniSparkline data={sparkline} color={sparkColor} />
+        </div>
       )}
     </div>
   );
@@ -400,23 +402,30 @@ export default function AdminCampaignsDashboard() {
   }
 
   return (
-    <div className="space-y-5 pb-8">
+    <div className="space-y-5 pb-8 w-full max-w-full overflow-x-hidden">
 
       {/* ── Header ── */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Panel de Campañas</h1>
           <p className="text-sm text-gray-500 mt-0.5">Resumen general de actividades y rendimiento de campañas</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Date range picker - dinámico */}
           <button className="flex items-center gap-2 px-3.5 py-2 bg-white rounded-xl border border-gray-200 shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
             <Calendar className="w-4 h-4 text-gray-400" />
-            <span>
+            <span className="hidden sm:inline">
               {(() => {
                 const now = new Date();
                 const start = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
                 return `${start.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })} – ${now.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' })}`;
+              })()}
+            </span>
+            <span className="sm:hidden">
+              {(() => {
+                const now = new Date();
+                const start = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+                return `${start.toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })} – ${now.toLocaleDateString('es-PE', { day: '2-digit', month: 'short' })}`;
               })()}
             </span>
             <ChevronDown className="w-4 h-4 text-gray-400" />
@@ -428,7 +437,7 @@ export default function AdminCampaignsDashboard() {
               className="flex items-center gap-2 px-3.5 py-2 bg-white rounded-xl border border-gray-200 shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
             >
               <SlidersHorizontal className="w-4 h-4 text-gray-400" />
-              <span>{statusFilter}</span>
+              <span className="hidden sm:inline">{statusFilter}</span>
               <ChevronDown className="w-4 h-4 text-gray-400" />
             </button>
             {showStatusMenu && (
@@ -455,13 +464,13 @@ export default function AdminCampaignsDashboard() {
           onClick={() => router.push('/admin/campaigns/list')}
             className="flex items-center gap-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
           >
-            <Zap className="w-4 h-4" /> Ver Campañas
+            <Zap className="w-4 h-4" /> <span className="hidden sm:inline">Ver Campañas</span><span className="sm:hidden">Ver</span>
           </button>
         </div>
       </div>
 
       {/* ── Row 1: 4 KPI Cards ── */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <KPICard
           title="Campañas Activas"
           value={String(activeCampaigns)}
@@ -505,7 +514,7 @@ export default function AdminCampaignsDashboard() {
       </div>
 
       {/* ── Row 2: LineChart (2/4) + Pie (1/4) + Actividad (1/4) ── */}
-      <div className="grid grid-cols-[1fr_260px_260px] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px_260px] gap-4">
 
         {/* ── Rendimiento de Campañas (LineChart) ── */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
@@ -575,7 +584,7 @@ export default function AdminCampaignsDashboard() {
           </div>
 
           {/* Métricas debajo del chart — 5 chips exacto como imagen 2 */}
-          <div className="grid grid-cols-5 gap-2 mt-4 pt-4 border-t border-gray-50">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-4 pt-4 border-t border-gray-50">
             {[
               { label: 'Impresiones', value: formatCompact(totalImpressions), color: 'text-purple-600', growth: stats?.impressionsGrowth ?? 0 },
               { label: 'Clics',       value: formatCompact(totalClicks),      color: 'text-blue-600',   growth: stats?.clicksGrowth ?? 0 },

@@ -22,7 +22,83 @@ export default function AgenciesTable({ agencies, onSelectAgency, onNotifyAgency
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-      <div className="overflow-x-auto">
+      {/* Mobile View - Cards */}
+      <div className="block sm:hidden divide-y divide-gray-100">
+        {agencies.length === 0 ? (
+          <div className="text-center py-8 text-gray-500 text-sm">
+            No se encontraron inmobiliarias
+          </div>
+        ) : (
+          agencies.map((agency) => (
+            <div
+              key={agency.id}
+              onClick={() => onSelectAgency(agency)}
+              className={`p-3 hover:bg-gray-50 cursor-pointer transition ${
+                selectedAgencyId === agency.id ? 'bg-blue-50' : ''
+              } ${
+                recentlyUpdatedAgencyId === agency.id ? 'bg-emerald-50 animate-pulse' : ''
+              }`}
+            >
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-teal-400 flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+                    {agency.name?.[0] || 'I'}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-gray-900 text-sm truncate">{agency.name}</p>
+                    <p className="text-[10px] text-gray-500">RUC: {agency.ruc || '-'}</p>
+                  </div>
+                </div>
+                <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-medium flex-shrink-0 ${getStatusBadgeClass(agency.status, agency.enabled)}`}>
+                  {agency.enabled === false ? 'INACTIVO' : agency.status}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-1 text-[10px] text-gray-600 mb-2">
+                <div>
+                  <span className="text-gray-400">Gerente: </span>
+                  {agency.managerName || '-'}
+                </div>
+                <div>
+                  <span className="text-gray-400">Ciudad: </span>
+                  {agency.city || '-'}
+                </div>
+                <div>
+                  <span className="text-gray-400">Proyectos: </span>
+                  {agency.totalProjects || 0}
+                </div>
+                <div>
+                  <span className="text-gray-400">Agentes: </span>
+                  {agency.totalAgents || 0}
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="text-[10px] text-gray-400 truncate max-w-[60%]">
+                  {agency.email || '-'}
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onSelectAgency(agency); }}
+                    className="p-1 text-blue-600 hover:bg-blue-50 rounded transition"
+                    title="Ver detalle"
+                  >
+                    <Eye className="w-3 h-3" />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onNotifyAgency?.(agency); }}
+                    className="p-1 text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 rounded transition"
+                    title="Notificar"
+                  >
+                    <MessageSquare className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop View - Table */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
@@ -133,7 +209,7 @@ export default function AgenciesTable({ agencies, onSelectAgency, onNotifyAgency
           </tbody>
         </table>
         {agencies.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-500 hidden sm:block">
             No se encontraron inmobiliarias
           </div>
         )}

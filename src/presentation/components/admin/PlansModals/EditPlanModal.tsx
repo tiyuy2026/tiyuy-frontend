@@ -89,7 +89,7 @@ export const EditPlanModal: React.FC<EditPlanModalProps> = ({
             </div>
           </div>
           
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-700 text-center block">Duración (días)</label>
               <input

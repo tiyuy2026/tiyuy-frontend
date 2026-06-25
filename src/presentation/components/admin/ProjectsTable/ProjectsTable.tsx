@@ -415,31 +415,33 @@ export function ProjectsTable({
 
       {/* Pagination - Siempre visible para verificar conexión backend */}
       {totalElements !== undefined && totalElements > 0 && (
-        <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-          <div className="text-sm text-gray-500">
+        <div className="px-3 sm:px-4 py-3 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 bg-gray-50/50">
+          <div className="text-xs sm:text-sm text-gray-500">
             Mostrando <span className="font-medium text-gray-700">{projects.length}</span> de <span className="font-medium text-gray-700">{totalElements}</span> proyectos
             {totalPages && totalPages > 1 && (
-              <span className="ml-2">(Página {currentPage || 1} de {totalPages})</span>
+              <span className="ml-1 sm:ml-2">(Pág. {currentPage || 1} de {totalPages})</span>
             )}
           </div>
           {totalPages && totalPages > 1 && onPageChange && currentPage && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage <= 1}
-                className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-white"
+                className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-white"
               >
-                Anterior
+                <span className="hidden sm:inline">Anterior</span>
+                <span className="sm:hidden">{'<'}</span>
               </button>
-              <span className="text-sm text-gray-700 px-2">
+              <span className="text-xs sm:text-sm text-gray-700 px-1 sm:px-2">
                 {currentPage} / {totalPages}
               </span>
               <button
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={currentPage >= totalPages}
-                className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-white"
+                className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors bg-white"
               >
-                Siguiente
+                <span className="hidden sm:inline">Siguiente</span>
+                <span className="sm:hidden">{'>'}</span>
               </button>
             </div>
           )}

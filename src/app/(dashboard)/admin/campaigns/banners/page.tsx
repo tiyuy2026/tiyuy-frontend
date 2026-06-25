@@ -88,12 +88,12 @@ export default function MarketingBannersPage() {
     return (
       <>
         <div className="space-y-4 pb-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Banners Publicitarios</h1>
               <p className="text-sm text-gray-500 mt-0.5">Administra banners promocionales</p>
             </div>
-            <button onClick={() => setIsCreateModalOpen(true)} className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-sm font-medium rounded-xl hover:shadow-md transition-all">
+            <button onClick={() => setIsCreateModalOpen(true)} className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-sm font-medium rounded-xl hover:shadow-md transition-all">
               <Plus className="w-4 h-4" /> Crear Banner
             </button>
           </div>
@@ -116,12 +116,12 @@ export default function MarketingBannersPage() {
   return (
     <div className="space-y-4 pb-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Banners Publicitarios</h1>
           <p className="text-sm text-gray-500 mt-0.5">Administra banners promocionales</p>
         </div>
-        <button onClick={() => setIsCreateModalOpen(true)} className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-sm font-medium rounded-xl hover:shadow-md transition-all">
+        <button onClick={() => setIsCreateModalOpen(true)} className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-sm font-medium rounded-xl hover:shadow-md transition-all">
           <Plus className="w-4 h-4" /> Crear Banner
         </button>
       </div>

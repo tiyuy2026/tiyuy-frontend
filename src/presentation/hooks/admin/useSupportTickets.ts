@@ -28,7 +28,21 @@ export function useSupportTickets(params?: {
     queryKey: ['support-tickets', 'list', params],
     queryFn: () => adminRepository.getSupportTickets(params),
     staleTime: 30000,
-    placeholderData: (previousData) => previousData,
+  });
+}
+
+/**
+ * Hook separado para la gráfica de actividad de tickets.
+ * Usa un queryKey diferente para evitar conflictos con useSupportTickets.
+ */
+export function useSupportTicketsForChart(params?: {
+  page?: number;
+  size?: number;
+}) {
+  return useQuery({
+    queryKey: ['support-tickets', 'chart', params],
+    queryFn: () => adminRepository.getSupportTickets(params),
+    staleTime: 60000,
   });
 }
 

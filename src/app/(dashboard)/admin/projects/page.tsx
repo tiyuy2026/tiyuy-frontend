@@ -218,7 +218,7 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className="p-4 space-y-4 max-w-[1600px] mx-auto">
+    <div className="px-3 sm:px-4 py-3 sm:py-4 space-y-4 sm:space-y-6 max-w-[1600px] mx-auto">
       {/* Header Stats */}
       <ProjectsHeaderStats stats={projectStats} isLoading={statsLoading} />
 
@@ -243,27 +243,28 @@ export default function ProjectsPage() {
 
       {/* View Mode Toggle */}
       <div className="flex items-center justify-end gap-2">
-        <div className="bg-white rounded-lg border border-gray-200 p-1 flex gap-1 shadow-sm">
+        <div className="bg-white rounded-lg border border-gray-200 p-0.5 sm:p-1 flex gap-0.5 sm:gap-1 shadow-sm">
           <button
             onClick={() => setViewMode('table')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-[10px] sm:text-sm font-medium transition-all ${
               viewMode === 'table'
                 ? 'bg-purple-50 text-purple-700 border border-purple-200 shadow-sm'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
-            <LayoutList className="w-4 h-4" />
-            Tabla
+            <LayoutList className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Tabla</span>
+            <span className="sm:hidden">Lista</span>
           </button>
           <button
             onClick={() => setViewMode('cards')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-[10px] sm:text-sm font-medium transition-all ${
               viewMode === 'cards'
                 ? 'bg-purple-50 text-purple-700 border border-purple-200 shadow-sm'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
-            <Grid3X3 className="w-4 h-4" />
+            <Grid3X3 className="w-3 h-3 sm:w-4 sm:h-4" />
             Tarjetas
           </button>
         </div>
@@ -416,32 +417,33 @@ export default function ProjectsPage() {
       {/* Disable Project Modal */}
       {selectedProject && (
         <Modal isOpen={isDisableModalOpen} onClose={() => setIsDisableModalOpen(false)}>
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold mb-2 text-gray-900">Deshabilitar Proyecto</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Esta acción deshabilitará el proyecto <strong>{selectedProject.name}</strong>.
+          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-2 sm:mx-0">
+            <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-900">Deshabilitar Proyecto</h3>
+            <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
+              Esta acción deshabilitará el proyecto <strong className="break-words">{selectedProject.name}</strong>.
             </p>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="mb-3 sm:mb-4">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">
                 Motivo (requerido)
               </label>
               <textarea
                 value={disableReason}
                 onChange={(e) => setDisableReason(e.target.value)}
                 placeholder="Ej: Violación de términos, información incorrecta..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 rows={3}
               />
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Button
                 variant="danger"
                 onClick={() => handleDisableProject(selectedProject, disableReason)}
                 disabled={!disableReason.trim() || disableProjectMutation.isPending}
+                className="text-xs sm:text-sm w-full sm:w-auto"
               >
                 {disableProjectMutation.isPending ? 'Deshabilitando...' : 'Deshabilitar'}
               </Button>
-              <Button variant="outline" onClick={() => { setDisableReason(''); setIsDisableModalOpen(false); }}>
+              <Button variant="outline" onClick={() => { setDisableReason(''); setIsDisableModalOpen(false); }} className="text-xs sm:text-sm w-full sm:w-auto">
                 Cancelar
               </Button>
             </div>

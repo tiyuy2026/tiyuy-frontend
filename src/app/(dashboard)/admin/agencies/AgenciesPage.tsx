@@ -19,6 +19,7 @@ import {
 } from '@/presentation/hooks/admin/useDevelopers';
 import { useAssignDiscountToAgent } from '@/presentation/hooks/useAdmin';
 import { Spinner } from '@/presentation/components/ui/Spinner';
+import PaginationNav from '@/presentation/components/shared/PaginationNav';
 import { InmobiliariaWithStats, InmobiliariaAgent, InmobiliariaDiscount } from '@/core/domain/entities/Admin';
 import AgenciesHeader from './components/AgenciesHeader';
 import AgenciesKpiRow from './components/AgenciesKpiRow';
@@ -71,7 +72,7 @@ export default function AgenciesPage() {
     search: searchQuery,
     status: statusFilter,
     page: currentPage - 1,
-    size: 20,
+    size: 10,
   });
 
   const { data: developerAgents } = useDeveloperAgents(selectedDeveloper?.id || 0);
@@ -100,9 +101,40 @@ export default function AgenciesPage() {
   const assignDiscountToAgentMutation = useAssignDiscountToAgent();
 
   const developers = developersData?.content || [];
+  const totalPages = developersData?.totalPages || 0;
+  const totalElements = developersData?.totalElements || 0;
+
+  const getPageNumbers = (): (number | 'ellipsis')[] => {
+    const pages: (number | 'ellipsis')[] = [];
+    const maxVisible = 5;
+    
+    if (totalPages <= maxVisible) {
+      for (let i = 0; i < totalPages; i++) pages.push(i);
+    } else {
+      pages.push(0);
+      let start = Math.max(1, currentPage - 1);
+      let end = Math.min(totalPages - 2, currentPage + 1);
+      
+      if (currentPage <= 2) {
+        start = 1;
+        end = Math.min(totalPages - 2, 3);
+      } else if (currentPage >= totalPages - 3) {
+        start = Math.max(1, totalPages - 4);
+        end = totalPages - 2;
+      }
+      
+      if (start > 1) pages.push('ellipsis');
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (end < totalPages - 2) pages.push('ellipsis');
+      pages.push(totalPages - 1);
+    }
+    
+    return pages;
+  };
 
   
   // Debug: Ver qué campos vienen del API
+
   console.log('[DEBUG] Developers data:', developers.map(d => ({ id: d.id, name: d.name, lastActivity: d.lastActivity, lastLoginAt: (d as any).lastLoginAt, updatedAt: (d as any).updatedAt })));
 
   // Calculate KPIs
@@ -402,7 +434,7 @@ export default function AgenciesPage() {
   };
 
   return (
-    <div className="space-y-6 relative min-h-[calc(100vh-140px)]">
+    <div className="px-3 sm:px-4 py-3 sm:py-4 space-y-3 sm:space-y-6 relative min-h-[calc(100vh-140px)] max-w-[1600px] mx-auto">
       {/* Header - Always visible */}
       <AgenciesHeader onExport={handleExport} />
 
@@ -410,19 +442,19 @@ export default function AgenciesPage() {
       {selectedDeveloper ? (
         <div className="absolute inset-0 z-40 bg-gray-50 overflow-auto">
           {/* Detail Header with Back Button */}
-          <div className="sticky top-0 z-50 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm">
-            <div className="flex items-center gap-4">
+          <div className="sticky top-0 z-50 bg-white border-b border-gray-200 px-3 sm:px-6 py-2 sm:py-4 flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
               <button
                 onClick={handleBackToList}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                className="px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium whitespace-nowrap"
               >
-                Volver a la lista
+                ← Volver
               </button>
-              <div className="h-6 w-px bg-gray-300" />
-              <h2 className="text-xl font-semibold text-gray-900">
+              <div className="h-4 sm:h-6 w-px bg-gray-300 flex-shrink-0" />
+              <h2 className="text-sm sm:text-xl font-semibold text-gray-900 truncate">
                 {selectedDeveloper.name}
               </h2>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+              <span className={`px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-sm font-medium flex-shrink-0 ${
                 selectedDeveloper.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800' :
                 selectedDeveloper.status === 'SUSPENDED' ? 'bg-yellow-100 text-yellow-800' :
                 selectedDeveloper.status === 'INACTIVE' ? 'bg-rose-100 text-rose-800' :
@@ -437,7 +469,7 @@ export default function AgenciesPage() {
           </div>
 
           {/* Fullscreen Detail Content */}
-          <div className="p-6 max-w-7xl mx-auto">
+          <div className="p-3 sm:p-6 max-w-7xl mx-auto">
             <AgencyDetailPanel
               agency={selectedDeveloper}
               agents={developerAgents || []}
@@ -501,6 +533,18 @@ export default function AgenciesPage() {
               />
             )}
           </div>
+
+          {/* Paginación - 10 resultados por página */}
+          {totalPages > 1 && (
+            <PaginationNav
+              currentPage={currentPage - 1}
+              totalPages={totalPages}
+              totalElements={totalElements}
+              pageSize={10}
+              onPageChange={(page) => setCurrentPage(page + 1)}
+              getPageNumbers={getPageNumbers}
+            />
+          )}
         </>
       )}
 

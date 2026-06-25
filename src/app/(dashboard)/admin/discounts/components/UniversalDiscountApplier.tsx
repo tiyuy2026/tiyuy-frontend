@@ -132,7 +132,7 @@ function GlobalDiscountModal({ isOpen, onClose }: GlobalDiscountModalProps) {
               className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-700">% Descuento</label>
               <input
@@ -165,7 +165,7 @@ function GlobalDiscountModal({ isOpen, onClose }: GlobalDiscountModalProps) {
             />
             <span className="text-sm text-gray-700">Un solo uso por usuario</span>
           </label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-700">Fecha Inicio</label>
               <input
@@ -693,7 +693,7 @@ function ReusableDiscountModal({ isOpen, onClose }: ReusableDiscountModalProps) 
               className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-700">% Descuento</label>
               <input
@@ -715,7 +715,7 @@ function ReusableDiscountModal({ isOpen, onClose }: ReusableDiscountModalProps) 
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-700">Fecha Inicio</label>
               <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
@@ -808,7 +808,7 @@ function UserDiscountModal({ isOpen, onClose }: UserDiscountModalProps) {
               className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-700">% Descuento</label>
               <input type="number" min="1" max="100" value={discountPercentage} onChange={(e) => setDiscountPercentage(Number(e.target.value))} required className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-bold" />
@@ -818,7 +818,7 @@ function UserDiscountModal({ isOpen, onClose }: UserDiscountModalProps) {
               <input type="number" min="1" value={usageLimit} onChange={(e) => setUsageLimit(Number(e.target.value))} required className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-bold" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-700">Fecha Inicio</label>
               <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />

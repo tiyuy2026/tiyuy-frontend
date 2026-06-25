@@ -13,24 +13,24 @@ interface KpiCardProps {
 
 function KpiCard({ label, value, gradient, icon, subtitle }: KpiCardProps) {
   return (
-    <div className="relative bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-all duration-300 group overflow-hidden">
+    <div className="relative bg-white rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-300 group overflow-hidden">
       {/* Gradient accent top */}
       <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${gradient} opacity-60`} />
       
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-sm`}>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-sm flex-shrink-0`}>
             {icon}
           </div>
-          <div>
-            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">{label}</p>
-            <p className="text-2xl font-bold text-gray-900 mt-0.5">{value}</p>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-xs font-medium text-gray-400 uppercase tracking-wider truncate">{label}</p>
+            <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-0.5">{value}</p>
           </div>
         </div>
       </div>
       
       {subtitle && (
-        <p className="text-xs text-gray-400 mt-3 ml-[52px]">{subtitle}</p>
+        <p className="text-[10px] sm:text-xs text-gray-400 mt-2 sm:mt-3 ml-0 sm:ml-[52px]">{subtitle}</p>
       )}
     </div>
   );

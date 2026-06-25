@@ -10,6 +10,7 @@ import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { useAuthStore } from '@/presentation/store/authStore';
 import {
   useSupportTickets,
+  useSupportTicketsForChart,
   useSupportTicketStats,
   useUpdateSupportTicketStatus,
   useNotifyTicketUser,
@@ -306,6 +307,14 @@ export default function CommunicationsPage() {
   const [backendPage, setBackendPage] = useState(0);
   const [frontendPage, setFrontendPage] = useState(0);
 
+  // Query for chart data (unfiltered - always fetches all tickets for the chart)
+  // Usa hook separado con queryKey diferente para evitar conflictos con la lista
+  const { data: chartTicketsData } = useSupportTicketsForChart({
+    page: 0,
+    size: 100,
+  });
+
+  // Query for filtered list
   const { data: ticketsData, isLoading: isLoadingTickets, refetch: refetchTickets } = useSupportTickets({
     status: statusFilter || undefined,
     category: categoryFilter || undefined,
@@ -316,6 +325,7 @@ export default function CommunicationsPage() {
   });
 
   const allTickets = ticketsData?.content || [];
+  const chartTickets = chartTicketsData?.content || [];
   const totalFrontendPages = Math.ceil(allTickets.length / FRONTEND_PAGE_SIZE);
   const displayedTickets = allTickets.slice(frontendPage * FRONTEND_PAGE_SIZE, (frontendPage + 1) * FRONTEND_PAGE_SIZE);
 
@@ -407,9 +417,9 @@ export default function CommunicationsPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-full overflow-x-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Centro de Soporte</h1>
           <p className="text-gray-500 mt-1 text-sm">Monitorea y gestiona las incidencias del sistema en tiempo real</p>
@@ -423,7 +433,7 @@ export default function CommunicationsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         {statCards.map((stat) => (
           <Card key={stat.label} className="p-4">
             <div className="flex items-center gap-3">
@@ -460,7 +470,7 @@ export default function CommunicationsPage() {
                 </span>
               </div>
             </div>
-            <RealtimeTicketChart tickets={allTickets} />
+            <RealtimeTicketChart tickets={chartTickets} />
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 text-xs">
               <div className="flex items-center gap-4">
                 <span className="text-gray-500">

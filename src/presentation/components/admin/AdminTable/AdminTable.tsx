@@ -269,40 +269,39 @@ export function AdminTable<T extends Record<string, any>>({
 
       {/* Pagination */}
       {pagination && (
-        <div className="bg-white px-6 py-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">
-              Mostrando {((pagination.page - 1) * pagination.size) + 1} a{' '}
-              {Math.min(pagination.page * pagination.size, pagination.total)} de{' '}
-              {pagination.total} resultados
+        <div className="bg-white px-3 sm:px-6 py-3 sm:py-4 rounded-xl border border-gray-100 shadow-sm flex flex-col sm:flex-row gap-3 sm:gap-0 sm:items-center sm:justify-between">
+          <div className="flex flex-col xs:flex-row xs:items-center gap-2 xs:gap-4">
+            <span className="text-xs sm:text-sm text-gray-600">
+              {((pagination.page - 1) * pagination.size) + 1}-{Math.min(pagination.page * pagination.size, pagination.total)} de{' '}
+              {pagination.total}
             </span>
 
             <select
               value={pagination.size}
               onChange={(e) => pagination.onSizeChange(Number(e.target.value))}
-              className="border border-gray-200 rounded-lg px-4 py-2 text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              className="border border-gray-200 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
             >
-              <option value={10}>10 por página</option>
-              <option value={20}>20 por página</option>
-              <option value={50}>50 por página</option>
-              <option value={100}>100 por página</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
             </select>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center sm:justify-end gap-2 sm:gap-3">
             <Button
               variant="outline"
               size="sm"
               onClick={() => pagination.onPageChange(pagination.page - 1)}
               disabled={pagination.page <= 1}
-              className="px-4 py-2 rounded-lg border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all"
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all text-xs sm:text-sm"
             >
-              <ChevronLeft className="w-4 h-4 mr-1" />
-              Anterior
+              <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+              <span className="hidden sm:inline">Anterior</span>
             </Button>
 
-            <span className="text-sm font-medium text-gray-700 px-3 py-2 bg-gray-50 rounded-lg">
-              Página {pagination.page} de {Math.ceil(pagination.total / pagination.size)}
+            <span className="text-xs sm:text-sm font-medium text-gray-700 px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-50 rounded-lg whitespace-nowrap">
+              {pagination.page} / {Math.ceil(pagination.total / pagination.size)}
             </span>
 
             <Button
@@ -310,10 +309,10 @@ export function AdminTable<T extends Record<string, any>>({
               size="sm"
               onClick={() => pagination.onPageChange(pagination.page + 1)}
               disabled={pagination.page >= Math.ceil(pagination.total / pagination.size)}
-              className="px-4 py-2 rounded-lg border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all"
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all text-xs sm:text-sm"
             >
-              Siguiente
-              <ChevronRight className="w-4 h-4 ml-1" />
+              <span className="hidden sm:inline">Siguiente</span>
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 sm:ml-1" />
             </Button>
           </div>
         </div>

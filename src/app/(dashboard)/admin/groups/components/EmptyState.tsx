@@ -15,12 +15,12 @@ export function EmptyState({ viewType }: EmptyStateProps) {
   };
 
   return (
-    <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
-      <AlertCircle className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-      <p className="text-lg font-medium text-gray-600 mb-1">
+    <div className="text-center py-6 sm:py-12 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
+      <AlertCircle className="w-8 h-8 sm:w-12 sm:h-12 mx-auto text-gray-400 mb-2 sm:mb-4" />
+      <p className="text-sm sm:text-lg font-medium text-gray-600 mb-1">
         No se encontraron {getItemType()}
       </p>
-      <p className="text-sm text-gray-500">
+      <p className="text-[10px] sm:text-sm text-gray-500">
         Intenta ajustar los filtros o realizar una nueva búsqueda
       </p>
     </div>

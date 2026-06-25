@@ -9,7 +9,7 @@ interface ViewTabsProps {
 
 export function ViewTabs({ viewType, setViewType }: ViewTabsProps) {
   return (
-    <div className="flex gap-2 p-1 bg-gray-100 rounded-lg w-fit">
+    <div className="flex flex-wrap gap-2 p-1 bg-gray-100 rounded-lg w-fit">
       <button
         onClick={() => setViewType('groups')}
         className={`px-4 py-2 rounded-md font-medium transition ${
