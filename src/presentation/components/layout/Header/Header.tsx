@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { useAdminModeStore } from '@/presentation/store/adminModeStore';
 import { NotificationList } from '@/presentation/components/notifications/NotificationList/NotificationList';
-import { Bell, Briefcase, Building, ChevronDown, FolderGit, Home, LogOut, Menu, MessageCircle, MessageSquare, Shield, ShieldCheck, Headset, User, X } from 'lucide-react';
+import { Bell, Building, ChevronDown, FolderGit, Home, LogOut, Menu, MessageSquare, Shield, User, X } from 'lucide-react';
 
 export function Header() {
   const router = useRouter();
@@ -25,7 +25,6 @@ export function Header() {
         closeMenus();
         setShowNotifications(false);
         setShowUserMenu(false);
-        setShowContactsLogin(false);
       } else {
         setVisible(true);
       }
@@ -43,11 +42,9 @@ export function Header() {
   const [pinnedMenu, setPinnedMenu] = useState<'comprar' | 'alquilar' | null>(null);
   const [stripeColor, setStripeColor] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showContactsLogin, setShowContactsLogin] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const notificationsRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const contactsRef = useRef<HTMLDivElement>(null);
 
   const [comprarFilters, setComprarFilters] = useState({
     estado: '',
@@ -82,9 +79,6 @@ export function Header() {
       }
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
         setShowUserMenu(false);
-      }
-      if (contactsRef.current && !contactsRef.current.contains(e.target as Node)) {
-        setShowContactsLogin(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -953,29 +947,6 @@ export function Header() {
                   <Bell className="w-5 h-5" />
                 </Link>
               )}
-              {/* BOTÓN CONTACTOS - Solo si no está autenticado */}
-              {!isAuthenticated && (
-                <div className="relative" ref={contactsRef}>
-                  <button
-                    onClick={() => setShowContactsLogin(!showContactsLogin)}
-                    className="flex items-center gap-2 text-black hover:text-gray-800"
-                  >
-                    <MessageCircle className="w-5 h-5" />
-                    <span className="hidden sm:inline text-sm">Contactos</span>
-                  </button>
-                  {showContactsLogin && (
-                    <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-gray-200 shadow-xl rounded-xl p-4 z-50">
-                      <p className="text-sm text-gray-600 mb-3">Inicia sesión para ver tus contactos</p>
-                      <Link
-                        href="/login"
-                        className="block w-full text-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm"
-                      >
-                        Iniciar sesión
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              )}
               {/* BOTÓN PUBLICAR */}
               <Link
                 href="/my-properties/new"
@@ -984,9 +955,9 @@ export function Header() {
                 <Building className="w-4 h-4" />
                 Publicar
               </Link>
-              {/* MENÚ USUARIO */}
-              <div className="relative" ref={userMenuRef}>
-                {isAuthenticated ? (
+              {/* MENÚ USUARIO - Solo si está autenticado */}
+              {isAuthenticated && (
+                <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     className="flex items-center gap-2 text-black hover:text-gray-800"
@@ -996,16 +967,7 @@ export function Header() {
                     </div>
                     <ChevronDown className="w-4 h-4 hidden sm:block" />
                   </button>
-                ) : (
-                  <Link
-                    href="/login"
-                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
-                  >
-                    <User className="w-4 h-4" />
-                    <span className="hidden sm:inline">Ingresar</span>
-                  </Link>
-                )}
-                {showUserMenu && isAuthenticated && (
+                  {showUserMenu && (
                   <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-gray-200 shadow-xl rounded-xl p-2 z-50">
                     <div className="px-3 py-2 border-b border-gray-100">
                       <p className="text-sm font-medium text-gray-900">{user?.firstName} {user?.lastName}</p>
@@ -1079,6 +1041,7 @@ export function Header() {
                   </div>
                 )}
               </div>
+              )}
               {/* BOTÓN MENÚ MÓVIL */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -1109,12 +1072,18 @@ export function Header() {
               </Link>
             </div>
             {!isAuthenticated && (
-              <div className="border-t border-gray-100 pt-4">
+              <div className="border-t border-gray-100 pt-4 space-y-3">
                 <Link
                   href="/login"
                   className="block w-full text-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm font-medium"
                 >
                   Iniciar sesión
+                </Link>
+                <Link
+                  href="/register"
+                  className="block w-full text-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium"
+                >
+                  Registrarse
                 </Link>
               </div>
             )}

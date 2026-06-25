@@ -1,5 +1,6 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useProfileStore } from '@/presentation/store/profileStore';
 import { RegisterUsuarioForm } from './RegisterUsuarioForm';
 import { RegisterAgenteForm } from './RegisterAgenteForm';
@@ -8,6 +9,17 @@ import { RegisterAdminForm } from './RegisterAdminForm';
 
 export const RegisterForm: React.FC = () => {
   const { selectedProfile } = useProfileStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!selectedProfile) {
+      router.replace('/profile-selector');
+    }
+  }, [selectedProfile, router]);
+
+  if (!selectedProfile) {
+    return null;
+  }
 
   const renderForm = () => {
     switch (selectedProfile) {
@@ -20,22 +32,7 @@ export const RegisterForm: React.FC = () => {
       case 'ADMIN':
         return <RegisterAdminForm />;
       default:
-        return (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Selecciona un perfil para continuar
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Primero elige como quieres usar TIYUY
-            </p>
-            <a
-              href="/profile-selector"
-              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Elegir Perfil
-            </a>
-          </div>
-        );
+        return null;
     }
   };
 

@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { Plus } from 'lucide-react';
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { useProjects } from '@/presentation/hooks/useProjects';
@@ -157,20 +158,21 @@ export default function MyProjectsPage() {
 
       <TrialGuard>
         <div className="min-h-screen bg-gray-50 py-8">
-          <div className="max-w-9xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-9xl mx-auto px-8 xl:px-16">
             {/* Trial warning banner */}
             <TrialWarningBanner />
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Mis Proyectos</h1>
                 <p className="text-gray-600 mt-2">Administra tus proyectos inmobiliarios y desarrollos</p>
               </div>
               <Link
                 href="/dashboard/projects/new"
-                className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:from-purple-700 hover:to-purple-800 transition-all active:scale-[0.98]"
               >
+                <Plus className="w-5 h-5" />
                 Nuevo Proyecto
               </Link>
             </div>
@@ -249,26 +251,28 @@ export default function MyProjectsPage() {
               </div>
             </div>
 
-            <div className="flex space-x-8 px-4">
-              {[
-                { key: 'ALL', label: 'Todos', count: projects.length },
-                { key: 'DRAFT', label: 'Borradores', count: projects.filter((p: any) => p.status === 'DRAFT').length },
-                { key: 'PUBLISHED', label: 'Publicados', count: projects.filter((p: any) => p.status === 'PUBLISHED').length },
-                { key: 'PAUSED', label: 'Pausados', count: projects.filter((p: any) => p.status === 'PAUSED').length },
-                { key: 'COMPLETED', label: 'Completados', count: projects.filter((p: any) => p.status === 'COMPLETED').length },
-              ].map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key as any)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === tab.key
-                      ? 'border-purple-600 text-purple-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  {tab.label} ({tab.count})
-                </button>
-              ))}
+            <div className="overflow-x-auto scrollbar-none">
+              <div className="flex space-x-6 sm:space-x-8 px-4 min-w-max">
+                {[
+                  { key: 'ALL', label: 'Todos', count: projects.length },
+                  { key: 'DRAFT', label: 'Borradores', count: projects.filter((p: any) => p.status === 'DRAFT').length },
+                  { key: 'PUBLISHED', label: 'Publicados', count: projects.filter((p: any) => p.status === 'PUBLISHED').length },
+                  { key: 'PAUSED', label: 'Pausados', count: projects.filter((p: any) => p.status === 'PAUSED').length },
+                  { key: 'COMPLETED', label: 'Completados', count: projects.filter((p: any) => p.status === 'COMPLETED').length },
+                ].map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key as any)}
+                    className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                      activeTab === tab.key
+                        ? 'border-purple-600 text-purple-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    {tab.label} ({tab.count})
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
