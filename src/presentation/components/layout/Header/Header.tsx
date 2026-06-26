@@ -473,12 +473,13 @@ export function Header() {
                               <h3 className="font-bold text-black text-lg mb-5">Servicios</h3>
                               <ul className="space-y-3">
                                 <li>
-                                  <Link
-                                    href="/#guia-comprar"
-                                    className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer"
-                                  >
-                                    Guía para comprar un inmueble
-                                  </Link>
+                      <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
+                      >
+                        Mi perfil
+                      </Link>
+
                                 </li>
                                 <li>
                                   <Link
@@ -1028,13 +1029,16 @@ export function Header() {
                         <Building className="w-4 h-4" />
                         Mis propiedades
                       </Link>
-                      <Link
-                        href="/my-projects"
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
-                      >
-                        <FolderGit className="w-4 h-4" />
-                        Mis proyectos
-                      </Link>
+                      {user?.role && !['USER', 'AGENT'].includes(user.role) && (
+                        <Link
+                          href="/my-projects"
+                          className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
+                        >
+                          <FolderGit className="w-4 h-4" />
+                          Mis proyectos
+                        </Link>
+                      )}
+
                       <Link
                         href="/mensajes"
                         className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
@@ -1050,12 +1054,13 @@ export function Header() {
                         Notificaciones
                       </Link>
                       <Link
-                        href="/profile"
+                        href="/dashboard"
                         className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
                       >
                         <User className="w-4 h-4" />
                         Mi perfil
                       </Link>
+
                       {adminRoleType && (
                         <Link
                           href="/admin"
