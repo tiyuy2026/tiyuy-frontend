@@ -77,7 +77,7 @@ export function FavoriteButton({ propertyId, size = 'md', variant = 'icon' }: Fa
       {isPending ? (
         <Loader className="animate-spin w-4 h-4 text-gray-400" />
       ) : (
-        <Heart className="" />
+        <Heart className={isFavorite ? 'text-rose-500' : 'text-gray-600'} fill={isFavorite ? '#f43f5e' : 'none'} />
       )}
     </button>
   );

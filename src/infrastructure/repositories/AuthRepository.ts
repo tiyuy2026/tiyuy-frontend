@@ -14,9 +14,24 @@ export class AuthRepository implements IAuthRepository {
       });
       return response.data;
     } catch (error: any) {
-      // Manejar errores específicos de login
       const status = error.response?.status;
       const data = error.response?.data;
+
+      if (error.code === 'ERR_NETWORK') {
+        throw new Error('No se puede conectar con el servidor. Verifica tu conexión a internet o intenta más tarde.');
+      }
+
+      if (error.code === 'ECONNREFUSED') {
+        throw new Error('El servidor no está disponible en este momento. Por favor, intenta más tarde.');
+      }
+
+      if (error.code === 'ECONNABORTED') {
+        throw new Error('El servidor no responde. Tiempo de espera agotado. Intenta nuevamente.');
+      }
+
+      if (error.code === 'ERR_BAD_RESPONSE' || error.message?.includes('5xx')) {
+        throw new Error('Error interno del servidor. Estamos trabajando para solucionarlo.');
+      }
       
       if (status === 401) {
         if (data?.message?.toLowerCase().includes('contraseña') || data?.message?.toLowerCase().includes('password')) {
@@ -34,6 +49,10 @@ export class AuthRepository implements IAuthRepository {
       
       if (status === 429) {
         throw new Error('Demasiados intentos. Espera un momento y vuelve a intentar.');
+      }
+      
+      if (!status) {
+        throw new Error('Error de conexión. El servidor no está disponible, intenta más tarde.');
       }
       
       throw new Error(data?.message || 'Error al iniciar sesión. Inténtalo nuevamente.');

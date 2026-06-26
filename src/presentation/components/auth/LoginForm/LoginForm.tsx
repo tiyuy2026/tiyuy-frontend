@@ -53,11 +53,24 @@ export const LoginForm: React.FC = () => {
     e.preventDefault();
     clearError();
 
+    
+
     const newErrors = validateForm();
     setValidationErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
-    await login(formData.email, formData.password);
+    const result = await login(formData.email, formData.password);
+    
+
+    if (!result || !result.success) {
+      // login failed; the hook already set the error in the store so AuthErrorBanner will show it
+      return;
+    }
+
+    // On success, navigate from the component so logs remain visible if needed.
+    const target = result.targetRoute || '/';
+    // small delay allows the console to show logs before navigation clears it during debug
+    setTimeout(() => router.replace(target), 80);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,6 +89,7 @@ export const LoginForm: React.FC = () => {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signInWithGoogleComplete();
+      
 
       if (result.verificationError) {
         return;
@@ -113,8 +127,10 @@ export const LoginForm: React.FC = () => {
         const isAdminUser = result.authResponse.adminRoleType !== undefined || adminRoles.includes(result.authResponse.role);
         const targetRoute = isAdminUser ? '/admin' : '/';
 
-        router.replace(targetRoute);
-        setTimeout(() => window.location.assign(targetRoute), 100);
+        // delay navigation slightly so console logs and UI updates are visible
+        setTimeout(() => router.replace(targetRoute), 80);
+        // fallback full reload after a bit more time
+        setTimeout(() => window.location.assign(targetRoute), 300);
       } else if (result.loginError && result.userData) {
         setInfoDialog({
           isOpen: true,
@@ -130,7 +146,9 @@ export const LoginForm: React.FC = () => {
           googleData: result.userData,
         });
       }
-    } catch {}
+    } catch (err: any) {
+      // silent catch: error is handled via hook state
+    }
   };
 
   const handleRegisterFromDialog = () => {

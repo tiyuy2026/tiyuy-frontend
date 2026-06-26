@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/presentation/store/authStore';
 import {
-  Flame, Home, Users, Building,
+  Flame, Home, Heart, Users, Building,
   Megaphone, Diamond, User, ChevronDown, LogOut, PanelLeftClose, PanelLeft
 } from 'lucide-react';
 
@@ -28,6 +28,7 @@ export function useDashboardSidebar() {
 interface NavItemProps {
   href: string;
   icon: React.ReactNode;
+  iconActive?: React.ReactNode;
   label: string;
   show?: boolean;
   collapsed: boolean;
@@ -36,8 +37,9 @@ interface NavItemProps {
   setSidebarOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const NavItem = ({ href, icon, label, show = true, collapsed, isMobile, isActive, setSidebarOpen }: NavItemProps) => {
+const NavItem = ({ href, icon, iconActive, label, show = true, collapsed, isMobile, isActive, setSidebarOpen }: NavItemProps) => {
   if (!show) return null;
+  const active = isActive(href);
   return (
     <Link
       href={href}
@@ -45,17 +47,17 @@ const NavItem = ({ href, icon, label, show = true, collapsed, isMobile, isActive
         if (isMobile) setSidebarOpen(false);
       }}
       className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all whitespace-nowrap ${
-        isActive(href)
+        active
           ? 'bg-teal-50 text-teal-700 font-medium'
           : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
       }`}
       title={collapsed ? label : undefined}
     >
-      <span className="flex-shrink-0">{icon}</span>
+      <span className="flex-shrink-0">{active && iconActive ? iconActive : icon}</span>
       <span className={`transition-all duration-200 overflow-hidden ${collapsed ? 'opacity-0 w-0' : 'opacity-100'}`}>
         {label}
       </span>
-      {isActive(href) && !collapsed && (
+      {active && !collapsed && (
         <span className="ml-auto w-2 h-2 bg-teal-500 rounded-full flex-shrink-0"></span>
       )}
       {collapsed && (
@@ -190,6 +192,17 @@ export default function DashboardLayout({
                 href="/my-properties"
                 icon={<Home className="w-5 h-5 flex-shrink-0" />}
                 label="Mis Propiedades"
+                collapsed={collapsed}
+                isMobile={isMobile}
+                isActive={isActive}
+                setSidebarOpen={setSidebarOpen}
+              />
+
+              <NavItem
+                href="/dashboard/favorites"
+                icon={<Heart className="w-5 h-5 flex-shrink-0" />}
+                iconActive={<Heart className="w-5 h-5 flex-shrink-0 text-rose-500" fill="#f43f5e" />}
+                label="Favoritos"
                 collapsed={collapsed}
                 isMobile={isMobile}
                 isActive={isActive}

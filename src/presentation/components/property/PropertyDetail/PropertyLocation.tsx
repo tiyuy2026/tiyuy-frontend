@@ -1,7 +1,6 @@
 import { MapPin } from 'lucide-react';
 import { PropertyLocation as Location } from '@/core/domain/entities/Property';
 import { EnhancedMap } from './EnhancedMap';
-import { PropertyComments } from './PropertyComments';
 
 interface PropertyLocationProps {
   location: Location;
@@ -69,11 +68,6 @@ export function PropertyLocation({ location, propertyId }: PropertyLocationProps
           </div>
         )}
 
-      </div>
-
-      {/* Comentarios de la zona — al final, bien separados */}
-      <div className="border-t border-gray-100">
-        <PropertyComments propertyId={propertyId} location={location} />
       </div>
 
     </div>
