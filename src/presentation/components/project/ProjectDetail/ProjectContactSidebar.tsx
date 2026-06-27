@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ProjectFull, ProjectUnit } from '@/core/domain/entities/Project';
 import { StarRating } from '../../property/PropertyDetail/StarRating';
 import { useCRMInteraction } from '@/presentation/hooks/useCRMInteraction';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { Input } from '@/presentation/components/ui';
 import { ShareButton } from '../../shared/ShareButton/ShareButton';
-import { Star, AlertCircle, Calendar, MessageCircle } from 'lucide-react';
+import { Star, AlertCircle, Calendar, MessageCircle, Heart, LogIn, UserPlus, AlertTriangle } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { axiosClient } from '@/infrastructure/api/axios-client';
 import { toast } from '@/presentation/store/toastStore';
 import { useRouter } from 'next/navigation';
@@ -26,6 +27,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
   const [rating, setRating] = useState<{ averageRating: number; totalRatings: number } | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Cargar rating
   useEffect(() => {
@@ -59,7 +61,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
 
   const handleToggleFavorite = async () => {
     if (!isAuthenticated) {
-      router.push('/login');
+      setShowLoginModal(true);
       return;
     }
     setFavLoading(true);
@@ -75,6 +77,19 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
     }
   };
 
+  type ContactMethod = 'EMAIL' | 'PHONE' | 'WHATSAPP';
+
+  const contactMethods: { value: ContactMethod; label: string; icon: string }[] = [
+    { value: 'EMAIL', label: 'Email', icon: 'material-symbols:mail-outline' },
+    { value: 'PHONE', label: 'Teléfono', icon: 'material-symbols:phone-in-talk-outline' },
+    { value: 'WHATSAPP', label: 'WhatsApp', icon: 'ic:baseline-whatsapp' },
+  ];
+
+  const [methodDropdownOpen, setMethodDropdownOpen] = useState(false);
+  const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
+  const methodDropdownRef = useRef<HTMLDivElement>(null);
+  const unitDropdownRef = useRef<HTMLDivElement>(null);
+
   const [formData, setFormData] = useState({
     contactName: user?.firstName && user?.lastName
       ? `${user.firstName} ${user.lastName}`
@@ -82,10 +97,24 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
     contactEmail: user?.email || '',
     contactPhone: '',
     message: '¡Hola! Me interesa este proyecto. ¿Está disponible?',
-    preferredContactMethod: 'EMAIL' as const,
+    preferredContactMethod: 'EMAIL' as ContactMethod,
     selectedUnitId: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Cerrar dropdowns al hacer clic fuera
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (methodDropdownRef.current && !methodDropdownRef.current.contains(event.target as Node)) {
+        setMethodDropdownOpen(false);
+      }
+      if (unitDropdownRef.current && !unitDropdownRef.current.contains(event.target as Node)) {
+        setUnitDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -182,6 +211,12 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
           </p>
         </div>
 
+        <style>{`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
         <form onSubmit={handleSubmit} className="px-4 py-3 space-y-2.5" noValidate>
           <Input
             id="contactName"
@@ -216,50 +251,142 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
             placeholder="+51 999 999 999"
           />
 
-          {/* Método preferido */}
-          <div>
-            <label htmlFor="preferredContactMethod" className="block text-xs font-medium text-gray-700 mb-1">
+          {/* Método preferido - Dropdown personalizado */}
+          <div ref={methodDropdownRef}>
+            <label className="block text-xs font-medium text-gray-700 mb-1.5">
               Prefieres que te contacten por
             </label>
-            <select
-              id="preferredContactMethod"
-              name="preferredContactMethod"
-              value={formData.preferredContactMethod}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm text-gray-700 bg-gray-50"
+            <button
+              type="button"
+              onClick={() => setMethodDropdownOpen(!methodDropdownOpen)}
+              className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg border border-gray-300 bg-white shadow-sm hover:border-gray-400 transition-all duration-200 text-gray-700 text-sm"
             >
-              <option value="EMAIL">Email</option>
-              <option value="PHONE">Teléfono</option>
-              <option value="WHATSAPP">WhatsApp</option>
-            </select>
+              <span className="flex items-center gap-2">
+                {(() => {
+                  const selected = contactMethods.find(m => m.value === formData.preferredContactMethod);
+                  return selected ? (
+                    <>
+                      <Icon icon={selected.icon} className="w-4 h-4 text-brand" />
+                      <span>{selected.label}</span>
+                    </>
+                  ) : null;
+                })()}
+              </span>
+              <Icon
+                icon="material-symbols:keyboard-arrow-down"
+                className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${methodDropdownOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+
+            {methodDropdownOpen && (
+              <div className="relative z-50">
+                <div
+                  className="absolute top-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
+                  style={{ animation: 'fadeIn 0.15s ease-out' }}
+                >
+                  {contactMethods.map((method) => (
+                    <button
+                      key={method.value}
+                      type="button"
+                      onClick={() => {
+                        setFormData({ ...formData, preferredContactMethod: method.value });
+                        setMethodDropdownOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
+                        formData.preferredContactMethod === method.value
+                          ? 'bg-brand/5 text-brand font-semibold'
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Icon
+                        icon={method.icon}
+                        className={`w-4 h-4 ${formData.preferredContactMethod === method.value ? 'text-brand' : 'text-gray-400'}`}
+                      />
+                      <span>{method.label}</span>
+                      {formData.preferredContactMethod === method.value && (
+                        <Icon icon="material-symbols:check" className="w-4 h-4 text-brand ml-auto" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Unidad de interés */}
+          {/* Unidad de interés - Dropdown personalizado */}
           {units.length > 0 && (
-            <div>
-              <label htmlFor="selectedUnitId" className="block text-xs font-medium text-gray-700 mb-1">
+            <div ref={unitDropdownRef}>
+              <label className="block text-xs font-medium text-gray-700 mb-1.5">
                 Unidad de interés (opcional)
               </label>
-              <select
-                id="selectedUnitId"
-                name="selectedUnitId"
-                value={formData.selectedUnitId}
-                onChange={handleChange}
-                className="w-full px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm text-gray-700 bg-gray-50"
-              >
-                <option value="">Selecciona una unidad</option>
-                {units.filter(u => u.status === 'AVAILABLE').map((unit) => (
-                  <option key={unit.id} value={unit.unitNumber}>
-                    {unit.unitNumber} - {unit.bedrooms} dorm - {currency} {unit.price?.toLocaleString('en-US')}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setUnitDropdownOpen(!unitDropdownOpen)}
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg border border-gray-300 bg-white shadow-sm hover:border-gray-400 transition-all duration-200 text-sm"
+                >
+                  <span className={`${formData.selectedUnitId ? 'text-gray-700' : 'text-gray-400'}`}>
+                    {formData.selectedUnitId || 'Selecciona una unidad'}
+                  </span>
+                  <Icon
+                    icon="material-symbols:keyboard-arrow-down"
+                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${unitDropdownOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+
+                {unitDropdownOpen && (
+                  <div className="relative z-50">
+                    <div
+                      className="absolute top-1 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+                      style={{ animation: 'fadeIn 0.15s ease-out' }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData({ ...formData, selectedUnitId: '' });
+                          setUnitDropdownOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
+                          !formData.selectedUnitId
+                            ? 'bg-brand/5 text-brand font-semibold'
+                            : 'text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        <span>Selecciona una unidad</span>
+                        {!formData.selectedUnitId && (
+                          <Icon icon="material-symbols:check" className="w-4 h-4 text-brand ml-auto" />
+                        )}
+                      </button>
+                      {units.filter(u => u.status === 'AVAILABLE').map((unit) => (
+                        <button
+                          key={unit.id}
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, selectedUnitId: unit.unitNumber });
+                            setUnitDropdownOpen(false);
+                          }}
+                          className={`w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm transition-colors duration-150 ${
+                            formData.selectedUnitId === unit.unitNumber
+                              ? 'bg-brand/5 text-brand font-semibold'
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          <span>{unit.unitNumber} - {unit.bedrooms} dorm - {currency} {unit.price?.toLocaleString('en-US')}</span>
+                          {formData.selectedUnitId === unit.unitNumber && (
+                            <Icon icon="material-symbols:check" className="w-4 h-4 text-brand ml-auto" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
           {/* Mensaje */}
           <div>
-            <label htmlFor="message" className="block text-xs font-medium text-gray-700 mb-1">
+            <label htmlFor="message" className="block text-xs font-medium text-gray-700 mb-1.5">
               Mensaje
             </label>
             <textarea
@@ -268,7 +395,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
               value={formData.message}
               onChange={handleChange}
               rows={3}
-              className={`w-full px-3 py-2 rounded-xl border transition-all duration-200 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 ${
+              className={`w-full px-3 py-2.5 rounded-lg border transition-all duration-200 focus:outline-none text-sm text-gray-700 placeholder:text-gray-400 ${
                 errors.message
                   ? 'border-red-500 focus:ring-2 focus:ring-red-500 bg-red-50'
                   : 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50'
@@ -277,7 +404,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
             />
             {errors.message && (
               <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
+                <AlertCircle className="w-3.5 h-3.5" />
                 {errors.message}
               </p>
             )}
@@ -397,6 +524,42 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
           )}
         </div>
       </div>
+
+      {/* Modal de inicio de sesión para favoritos */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setShowLoginModal(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-gradient-to-r from-rose-500 to-pink-500 px-6 py-6 text-center">
+              <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
+                <Heart className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white">Guardar en Favoritos</h3>
+              <p className="text-rose-100 text-sm mt-1">Inicia sesión para guardar este proyecto</p>
+            </div>
+            <div className="px-6 py-5 space-y-3">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-700">
+                    Debes iniciar sesión o crear una cuenta para agregar proyectos a tus favoritos.
+                  </p>
+                </div>
+              </div>
+              <button onClick={() => router.push('/login')} className="w-full py-2.5 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl font-medium hover:from-rose-600 hover:to-pink-600 transition-all shadow-lg shadow-rose-200 flex items-center justify-center gap-2">
+                <LogIn className="w-4 h-4" /> Iniciar Sesión
+              </button>
+              <button onClick={() => router.push('/register')} className="w-full py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all flex items-center justify-center gap-2">
+                <UserPlus className="w-4 h-4" /> Crear una Cuenta
+              </button>
+            </div>
+            <div className="px-6 py-3 bg-gray-50 border-t border-gray-100 flex justify-center">
+              <button onClick={() => setShowLoginModal(false)} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                Ahora no, gracias
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -59,8 +59,17 @@ export const useUnifiedNotifications = (type?: 'all' | 'general' | 'events') => 
       if (!isAuthenticated || !user) return { content: [] };
       
       try {
-        const { data } = await apiClient.get<PageResponse<GeneralNotification>>('/notifications/in-app');
-        return data || { content: [] };
+        const { data } = await apiClient.get<any>('/notifications/in-app');
+        // Mapear la respuesta del backend (isRead -> read, id numérico -> string)
+        const content: GeneralNotification[] = (data?.content || []).map((n: any) => ({
+          id: String(n.id),
+          title: n.title || '',
+          message: n.message || '',
+          type: n.type || 'ADMIN_NOTIFICATION',
+          read: n.isRead === true || n.read === true,
+          createdAt: n.createdAt || new Date().toISOString(),
+        }));
+        return { ...data, content };
       } catch (error) {
         console.error('Error fetching general notifications:', error);
         return { content: [] };
@@ -108,26 +117,101 @@ export const useUnifiedNotifications = (type?: 'all' | 'general' | 'events') => 
     ? eventNotificationsQuery.isPending
     : generalNotificationsQuery.isPending || eventNotificationsQuery.isPending;
 
-  // Mutación para marcar como leído - SIN optimistic update, espera respuesta real del backend
+  // Mutación para marcar como leído - CON optimistic update
   const markAsReadMutation = useMutation({
     mutationFn: async (notificationId: string) => {
       const { data } = await apiClient.post(`/notifications/${notificationId}/read`);
       return data;
     },
-    onSuccess: () => {
-      // Solo cuando el backend confirma, recargamos los datos reales
+    onMutate: async (notificationId: string) => {
+      // Cancelar queries en curso para evitar race conditions
+      await queryClient.cancelQueries({ queryKey: ['notifications', 'general'] });
+      await queryClient.cancelQueries({ queryKey: ['notifications', 'events'] });
+
+      // Snapshot del estado anterior
+      const previousGeneral = queryClient.getQueryData(['notifications', 'general']);
+      const previousEvents = queryClient.getQueryData(['notifications', 'events']);
+
+      // Optimistic update: marcar como leída inmediatamente
+      queryClient.setQueryData(['notifications', 'general'], (old: any) => {
+        if (!old?.content) return old;
+        return {
+          ...old,
+          content: old.content.map((n: any) =>
+            n.id === notificationId ? { ...n, read: true } : n
+          ),
+        };
+      });
+
+      queryClient.setQueryData(['notifications', 'events'], (old: any) => {
+        if (!old?.content) return old;
+        return {
+          ...old,
+          content: old.content.map((n: any) =>
+            n.id === notificationId ? { ...n, read: true } : n
+          ),
+        };
+      });
+
+      return { previousGeneral, previousEvents };
+    },
+    onError: (err, notificationId, context) => {
+      // Revertir al estado anterior si falla
+      if (context?.previousGeneral) {
+        queryClient.setQueryData(['notifications', 'general'], context.previousGeneral);
+      }
+      if (context?.previousEvents) {
+        queryClient.setQueryData(['notifications', 'events'], context.previousEvents);
+      }
+    },
+    onSettled: () => {
+      // Recargar datos reales del backend para asegurar consistencia
       queryClient.invalidateQueries({ queryKey: ['notifications', 'general'] });
       queryClient.invalidateQueries({ queryKey: ['notifications', 'events'] });
     },
   });
 
-  // Mutación para marcar todas como leídas - SIN optimistic update
+  // Mutación para marcar todas como leídas - CON optimistic update
   const markAllAsReadMutation = useMutation({
     mutationFn: async () => {
       const { data } = await apiClient.post('/notifications/read-all');
       return data;
     },
-    onSuccess: () => {
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['notifications', 'general'] });
+      await queryClient.cancelQueries({ queryKey: ['notifications', 'events'] });
+
+      const previousGeneral = queryClient.getQueryData(['notifications', 'general']);
+      const previousEvents = queryClient.getQueryData(['notifications', 'events']);
+
+      // Optimistic update: marcar todas como leídas
+      queryClient.setQueryData(['notifications', 'general'], (old: any) => {
+        if (!old?.content) return old;
+        return {
+          ...old,
+          content: old.content.map((n: any) => ({ ...n, read: true })),
+        };
+      });
+
+      queryClient.setQueryData(['notifications', 'events'], (old: any) => {
+        if (!old?.content) return old;
+        return {
+          ...old,
+          content: old.content.map((n: any) => ({ ...n, read: true })),
+        };
+      });
+
+      return { previousGeneral, previousEvents };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousGeneral) {
+        queryClient.setQueryData(['notifications', 'general'], context.previousGeneral);
+      }
+      if (context?.previousEvents) {
+        queryClient.setQueryData(['notifications', 'events'], context.previousEvents);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications', 'general'] });
       queryClient.invalidateQueries({ queryKey: ['notifications', 'events'] });
     },

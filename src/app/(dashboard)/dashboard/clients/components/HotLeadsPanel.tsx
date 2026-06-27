@@ -10,16 +10,16 @@ export function HotLeadsPanel() {
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-orange-100 rounded-lg">
-            <Flame className="w-5 h-5 text-orange-600" />
+      <div className="bg-white rounded-xl border border-gray-200 p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="p-1.5 bg-orange-50 rounded-lg">
+            <Flame className="w-4 h-4 text-orange-600" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-800">Oportunidades Calientes</h3>
+          <h3 className="text-sm font-semibold text-gray-800">Oportunidades Calientes</h3>
         </div>
-        <div className="animate-pulse space-y-3">
+        <div className="animate-pulse space-y-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-16 bg-gray-100 rounded-lg" />
+            <div key={i} className="h-14 bg-gray-100 rounded-lg" />
           ))}
         </div>
       </div>
@@ -28,14 +28,14 @@ export function HotLeadsPanel() {
 
   if (!hotLeads?.length) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-orange-100 rounded-lg">
-            <Flame className="w-5 h-5 text-orange-600" />
+      <div className="bg-white rounded-xl border border-gray-200 p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="p-1.5 bg-orange-50 rounded-lg">
+            <Flame className="w-4 h-4 text-orange-600" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-800">Oportunidades Calientes</h3>
+          <h3 className="text-sm font-semibold text-gray-800">Oportunidades Calientes</h3>
         </div>
-        <p className="text-gray-500 text-center py-4">No hay leads calientes detectados</p>
+        <p className="text-gray-500 text-center py-3 text-sm">No hay leads calientes detectados</p>
       </div>
     );
   }
@@ -49,79 +49,79 @@ export function HotLeadsPanel() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="bg-white rounded-xl border border-gray-200 p-5">
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-orange-100 rounded-lg">
-            <Flame className="w-5 h-5 text-orange-600" />
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 bg-orange-50 rounded-lg">
+            <Flame className="w-4 h-4 text-orange-600" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-800">Oportunidades Calientes</h3>
-            <p className="text-sm text-gray-500">{hotLeads.length} leads detectados</p>
+            <h3 className="text-sm font-semibold text-gray-800">Oportunidades Calientes</h3>
+            <p className="text-xs text-gray-400">{hotLeads.length} leads detectados</p>
           </div>
         </div>
       </div>
 
-      <div className="space-y-3 max-h-[400px] overflow-y-auto">
+      <div className="space-y-2 max-h-[350px] overflow-y-auto">
         {hotLeads.slice(0, 10).map((lead) => (
           <div
             key={`${lead.clientId}-${lead.propertyId}`}
-            className="p-4 border border-gray-100 rounded-lg hover:border-orange-200 hover:bg-orange-50/30 transition-colors"
+            className="p-3 border border-gray-100 rounded-lg hover:border-orange-200 hover:bg-orange-50/30 transition-colors"
           >
             <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                   <UserAvatar 
                     user={{ firstName: lead.clientName, lastName: '' }} 
                     size="xs" 
                   />
-                  <span className="font-semibold text-gray-900">{lead.clientName}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full border ${getPriorityColor(lead.priority)}`}>
+                  <span className="text-sm font-medium text-gray-900">{lead.clientName}</span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${getPriorityColor(lead.priority)}`}>
                     {lead.priority}
                   </span>
-                  <span className="text-xs text-gray-500">Score: {lead.score}</span>
+                  <span className="text-[10px] text-gray-400">Score: {lead.score}</span>
                 </div>
                 
-                <p className="text-sm text-gray-600 mb-2">{lead.propertyTitle}</p>
+                <p className="text-xs text-gray-600 mb-1.5 truncate">{lead.propertyTitle}</p>
                 
-                <div className="flex items-center gap-3 text-xs text-gray-500">
+                <div className="flex items-center gap-2 text-[10px] text-gray-500">
                   {lead.clientPhone && (
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-0.5">
                       <Phone className="w-3 h-3" />
                       {lead.clientPhone}
                     </span>
                   )}
                   {lead.clientEmail && (
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-0.5">
                       <Mail className="w-3 h-3" />
                       {lead.clientEmail}
                     </span>
                   )}
                 </div>
 
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-1 mt-1.5">
                   {lead.viewCount > 0 && (
-                    <span className="flex items-center gap-1 text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
+                    <span className="flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">
                       <Eye className="w-3 h-3" />
                       {lead.viewCount} vistas
                     </span>
                   )}
                   {lead.downloadedDocuments && (
-                    <span className="flex items-center gap-1 text-xs px-2 py-1 bg-blue-100 rounded-full text-blue-600">
+                    <span className="flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 bg-blue-100 rounded text-blue-600">
                       <Download className="w-3 h-3" />
-                      Descargó docs
+                      Docs
                     </span>
                   )}
                   {lead.contactRequested && (
-                    <span className="flex items-center gap-1 text-xs px-2 py-1 bg-green-100 rounded-full text-green-600">
+                    <span className="flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 bg-green-100 rounded text-green-600">
                       <Phone className="w-3 h-3" />
-                      Solicitó contacto
+                      Contacto
                     </span>
                   )}
                   {lead.savedToFavorites && (
-                    <span className="flex items-center gap-1 text-xs px-2 py-1 bg-pink-100 rounded-full text-pink-600">
+                    <span className="flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 bg-pink-100 rounded text-pink-600">
                       <Heart className="w-3 h-3" />
-                      Guardó favorito
+                      Favorito
                     </span>
                   )}
                 </div>
@@ -129,7 +129,7 @@ export function HotLeadsPanel() {
 
               <Link
                 href={`/dashboard/clients/${lead.clientId}`}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                className="text-xs text-blue-600 hover:text-blue-800 font-medium shrink-0 ml-2"
               >
                 Ver →
               </Link>

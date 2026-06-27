@@ -7,8 +7,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { toast } from '@/presentation/store/toastStore';
 import { axiosClient } from '@/infrastructure/api/axios-client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Globe, Lock, User, Camera, CheckCircle } from 'lucide-react';
+import { Globe, Lock, User, Camera, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
+
+// Formatos de imagen permitidos
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 // Hooks para API - Mismos que usa el perfil de usuario
 function useCurrentUser() {
@@ -145,25 +150,50 @@ export default function AdminProfilePage() {
   }, [user?.email]);
 
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
+  const [showFormatError, setShowFormatError] = useState(false);
+  const [formatErrorFile, setFormatErrorFile] = useState<{ name: string; type: string } | null>(null);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewPhoto(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      
-      uploadPhoto.mutate(file, {
-        onSuccess: () => {
-          setPreviewPhoto(null);
-        },
-        onError: () => {
-          setPreviewPhoto(null);
-        }
-      });
+    if (!file) return;
+
+    // Validar tipo de archivo antes de enviar
+    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+    const isValidType = ALLOWED_IMAGE_TYPES.includes(file.type);
+    const isValidExtension = ALLOWED_EXTENSIONS.includes(fileExtension);
+
+    console.log('Validando archivo:', { name: file.name, type: file.type, extension: fileExtension, isValidType, isValidExtension });
+
+    if (!isValidType || !isValidExtension) {
+      console.log('Archivo rechazado - formato no permitido');
+      setFormatErrorFile({ name: file.name, type: file.type || 'desconocido' });
+      setShowFormatError(true);
+      // Resetear el input
+      e.target.value = '';
+      return;
     }
+
+    // Validar tamaño
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('El archivo excede el tamaño máximo de 5MB');
+      e.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewPhoto(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+    
+    uploadPhoto.mutate(file, {
+      onSuccess: () => {
+        setPreviewPhoto(null);
+      },
+      onError: () => {
+        setPreviewPhoto(null);
+      }
+    });
   };
 
   const themeClasses = theme === 'dark' ? 'dark bg-gray-900 text-white' : 'bg-gray-50 text-gray-900';
@@ -251,36 +281,34 @@ export default function AdminProfilePage() {
           )}
           
           <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-            <div className="px-8 py-4">
-              <div className="flex items-center justify-between">
+            <div className="px-4 sm:px-8 py-3 sm:py-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Mi Perfil</h1>
-                  <p className="text-gray-500 text-sm mt-1">Gestiona tu cuenta y preferencias</p>
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Mi Perfil</h1>
+                  <p className="text-gray-500 text-xs sm:text-sm mt-0.5">Gestiona tu cuenta y preferencias</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleSavePreferences}
-                    disabled={updatePreferences.isPending}
-                    className="px-6 py-2 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 transition-colors disabled:opacity-50"
-                  >
-                    { updatePreferences.isPending ? 'Guardando...' : 'Guardar Cambios' }
-                  </button>
-                </div>
+                <button
+                  onClick={handleSavePreferences}
+                  disabled={updatePreferences.isPending}
+                  className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-2 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 transition-colors disabled:opacity-50 text-sm"
+                >
+                  { updatePreferences.isPending ? 'Guardando...' : 'Guardar Cambios' }
+                </button>
               </div>
             </div>
           </header>
 
-          <div className="p-8 max-w-6xl mx-auto space-y-8">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-4 sm:space-y-6 lg:space-y-8">
             {/* Profile Photo and Identity */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><User className="w-5 h-5" /> Identidad</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Profile Photo */}
-                <div className="flex items-start gap-6">
-                  <div className="relative">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+                  <div className="relative shrink-0">
                     {previewPhoto ? (
-                      <div className="w-24 h-24 rounded-full overflow-hidden shadow-lg">
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden shadow-lg">
                         <img src={previewPhoto} alt="Preview" className="w-full h-full object-cover" />
                       </div>
                     ) : (
@@ -294,13 +322,13 @@ export default function AdminProfilePage() {
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploadPhoto.isPending}
-                      className="absolute -bottom-1 -right-1 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-teal-600 hover:bg-teal-50 transition-colors border border-gray-200 disabled:opacity-50"
+                      className="absolute -bottom-1 -right-1 w-7 h-7 sm:w-8 sm:h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-teal-600 hover:bg-teal-50 transition-colors border border-gray-200 disabled:opacity-50"
                     >
-                      <Camera className="w-4 h-4" />
+                      <Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
-                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload}/>
+                    <input ref={fileInputRef} type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" className="hidden" onChange={handlePhotoUpload}/>
                   </div>
-                  <div>
+                  <div className="text-center sm:text-left">
                     <h3 className="font-semibold text-gray-900">Foto de Perfil</h3>
                     <p className="text-sm text-gray-500 mb-3">JPG, PNG. Maximo 2MB.</p>
                     <button
@@ -326,8 +354,8 @@ export default function AdminProfilePage() {
                     <div className="bg-gray-50 px-4 py-3 rounded-xl border border-gray-200">
                       <label className="block text-xs text-gray-500 mb-1">Numero de Documento</label>
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-medium rounded">DNI</span>
-                        <span className="font-semibold text-gray-900">{user?.dni || 'No disponible'}</span>
+                        <span className="shrink-0 px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-medium rounded">DNI</span>
+                        <span className="font-semibold text-gray-900 truncate">{user?.dni || 'No disponible'}</span>
                       </div>
                       <p className="text-xs text-gray-400 mt-2">Tu DNI esta vinculado a tu cuenta</p>
                     </div>
@@ -409,13 +437,13 @@ export default function AdminProfilePage() {
                   
                   <div>
                     <label className="text-sm text-gray-600 mb-1 block">Email</label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <input 
                         type="email" 
                         value={email} 
                         onChange={(e) => setEmail(e.target.value)}
                         readOnly={!isEditingEmail}
-                        className={`flex-1 px-4 py-3 rounded-xl border outline-none transition-all ${
+                        className={`w-full sm:flex-1 px-4 py-3 rounded-xl border outline-none transition-all ${
                           isEditingEmail 
                             ? 'border-teal-500 ring-2 ring-teal-200 bg-white' 
                             : 'border-gray-200 bg-gray-50 text-gray-600'
@@ -425,14 +453,14 @@ export default function AdminProfilePage() {
                         <button
                           onClick={handleUpdateEmail}
                           disabled={updateEmail.isPending}
-                          className="px-4 py-2 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 disabled:opacity-50 transition-colors"
+                          className="w-full sm:w-auto px-4 py-3 sm:py-2 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 disabled:opacity-50 transition-colors"
                         >
                           {updateEmail.isPending ? '...' : 'Guardar'}
                         </button>
                       ) : (
                         <button
                           onClick={() => setIsEditingEmail(true)}
-                          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                          className="w-full sm:w-auto px-4 py-3 sm:py-2 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
                         >
                           Cambiar
                         </button>
@@ -497,6 +525,72 @@ export default function AdminProfilePage() {
           </div>
         </main>
       </div>
+
+      {/* Modal de error de formato de archivo */}
+      {showFormatError && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden animate-in zoom-in-95">
+            {/* Header con icono */}
+            <div className="bg-red-50 px-6 py-5 flex items-center gap-3 border-b border-red-100">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900">Formato no permitido</h3>
+                <p className="text-sm text-gray-500">Solo imágenes JPG, PNG y WEBP</p>
+              </div>
+            </div>
+
+            {/* Cuerpo */}
+            <div className="px-6 py-5 space-y-3">
+              {formatErrorFile && (
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Archivo</span>
+                    <span className="text-xs text-red-500 font-medium flex items-center gap-1">
+                      <XCircle className="w-3 h-3" />
+                      Rechazado
+                    </span>
+                  </div>
+                  <p className="text-sm font-medium text-gray-900 truncate">{formatErrorFile!.name}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Tipo detectado: <span className="font-mono text-gray-500">{formatErrorFile!.type}</span>
+                  </p>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Formatos aceptados</p>
+                <div className="flex flex-wrap gap-2">
+                  {['JPG', 'JPEG', 'PNG', 'WEBP'].map((fmt) => (
+                    <span key={fmt} className="px-3 py-1 bg-teal-50 text-teal-700 text-xs font-medium rounded-full border border-teal-200">
+                      .{fmt.toLowerCase()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-gray-400 bg-amber-50 rounded-lg p-3 border border-amber-200">
+                <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                <span>Selecciona una imagen en formato JPG, PNG o WEBP para continuar.</span>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+              <button
+                onClick={() => {
+                  setShowFormatError(false);
+                  setFormatErrorFile(null);
+                }}
+                className="px-6 py-2.5 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 transition-colors shadow-sm"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </ProtectedRoute>
   );
 }

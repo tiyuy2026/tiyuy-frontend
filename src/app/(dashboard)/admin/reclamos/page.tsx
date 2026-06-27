@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { axiosClient } from '@/infrastructure/api/axios-client';
-import { Search, Filter, Eye, X, Loader2, AlertCircle, CheckCircle, Clock, MessageSquare, ChevronLeft, ChevronRight, FileSpreadsheet, FileText } from 'lucide-react';
+import { Search, Filter, Eye, X, Loader2, AlertCircle, CheckCircle, Clock, MessageSquare, ChevronDown, ChevronLeft, ChevronRight, FileSpreadsheet, FileText } from 'lucide-react';
+
+
 
 
 interface Complaint {
@@ -48,6 +50,8 @@ export default function AdminReclamosPage() {
   const [updating, setUpdating] = useState(false);
   const [fechaDesde, setFechaDesde] = useState('');
   const [fechaHasta, setFechaHasta] = useState('');
+  const [showEstadoDropdown, setShowEstadoDropdown] = useState(false);
+
 
   const fetchComplaints = useCallback(async () => {
 
@@ -106,13 +110,13 @@ export default function AdminReclamosPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
+      {/* Header centrado */}
+      <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-900">Libro de Reclamaciones</h1>
         <p className="text-sm text-gray-500 mt-1">Gestión de reclamos y quejas según formato Indecopi</p>
       </div>
 
-      {/* Filters */}
+      {/* Filters - buscador + filtro responsive */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -121,25 +125,58 @@ export default function AdminReclamosPage() {
             placeholder="Buscar por código, DNI, correo o nombre..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-        <select
-          value={estadoFilter}
-          onChange={(e) => { setEstadoFilter(e.target.value); setPage(0); }}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        >
-          <option value="">Todos los estados</option>
-          <option value="PENDIENTE">Pendiente</option>
-          <option value="EN_REVISION">En Revisión</option>
-          <option value="RESPONDIDO">Respondido</option>
-          <option value="CERRADO">Cerrado</option>
-        </select>
+        <div className="relative w-full sm:min-w-[180px] sm:w-auto">
+          <button
+            onClick={() => setShowEstadoDropdown(!showEstadoDropdown)}
+            className="w-full flex items-center justify-between gap-2 px-4 py-2.5 border border-gray-300 rounded-lg text-sm bg-white text-gray-700 hover:border-gray-400 transition-colors"
+          >
+            <span>{estadoFilter ? STATUS_MAP[estadoFilter]?.label || estadoFilter : 'Todos los estados'}</span>
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showEstadoDropdown ? 'rotate-180' : ''}`} />
+          </button>
+          {showEstadoDropdown && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setShowEstadoDropdown(false)} />
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1">
+                <button
+                  onClick={() => { setEstadoFilter(''); setPage(0); setShowEstadoDropdown(false); }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${!estadoFilter ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-700'}`}
+                >
+                  Todos los estados
+                </button>
+                {Object.entries(STATUS_MAP).map(([key, config]) => {
+                  const Icon = config.icon;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => { setEstadoFilter(key); setPage(0); setShowEstadoDropdown(false); }}
+                      className={`w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${estadoFilter === key ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-700'}`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      {config.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+
+
       </div>
+
+
+
 
       {/* Reportes */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">📊 Descargar Reportes</h3>
+        <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <FileText className="w-4 h-4 text-gray-500" />
+          Descargar Reportes
+        </h3>
+
         <div className="flex flex-col sm:flex-row gap-3 items-end">
           <div className="flex flex-col sm:flex-row gap-2">
             <div>
@@ -163,11 +200,25 @@ export default function AdminReclamosPage() {
           </div>
           <div className="flex gap-2">
             <button
-              onClick={() => {
-                const params = new URLSearchParams();
-                if (fechaDesde) params.set('fechaDesde', fechaDesde);
-                if (fechaHasta) params.set('fechaHasta', fechaHasta);
-                window.open(`/api/v1/admin/complaints/reporte/excel?${params.toString()}`, '_blank');
+              onClick={async () => {
+                try {
+                  const params = new URLSearchParams();
+                  if (fechaDesde) params.set('fechaDesde', fechaDesde);
+                  if (fechaHasta) params.set('fechaHasta', fechaHasta);
+                  const response = await axiosClient.get(`/v1/admin/complaints/reporte/excel?${params.toString()}`, {
+                    responseType: 'blob',
+                  });
+                  const url = window.URL.createObjectURL(new Blob([response.data]));
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.setAttribute('download', 'libro-reclamaciones.xlsx');
+                  document.body.appendChild(link);
+                  link.click();
+                  link.remove();
+                  window.URL.revokeObjectURL(url);
+                } catch (err) {
+                  console.error('Error descargando Excel:', err);
+                }
               }}
               className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition"
             >
@@ -175,17 +226,32 @@ export default function AdminReclamosPage() {
               Excel
             </button>
             <button
-              onClick={() => {
-                const params = new URLSearchParams();
-                if (fechaDesde) params.set('fechaDesde', fechaDesde);
-                if (fechaHasta) params.set('fechaHasta', fechaHasta);
-                window.open(`/api/v1/admin/complaints/reporte/pdf?${params.toString()}`, '_blank');
+              onClick={async () => {
+                try {
+                  const params = new URLSearchParams();
+                  if (fechaDesde) params.set('fechaDesde', fechaDesde);
+                  if (fechaHasta) params.set('fechaHasta', fechaHasta);
+                  const response = await axiosClient.get(`/v1/admin/complaints/reporte/pdf?${params.toString()}`, {
+                    responseType: 'blob',
+                  });
+                  const url = window.URL.createObjectURL(new Blob([response.data]));
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.setAttribute('download', 'libro-reclamaciones.pdf');
+                  document.body.appendChild(link);
+                  link.click();
+                  link.remove();
+                  window.URL.revokeObjectURL(url);
+                } catch (err) {
+                  console.error('Error descargando PDF:', err);
+                }
               }}
               className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition"
             >
               <FileText className="w-4 h-4" />
               PDF
             </button>
+
           </div>
         </div>
       </div>
@@ -281,44 +347,44 @@ export default function AdminReclamosPage() {
         )}
       </div>
 
-      {/* Detail Modal */}
+      {/* Detail Modal - Responsive */}
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-12 overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-2 sm:p-4 pt-12 sm:pt-12 overflow-y-auto">
           <div className="fixed inset-0 bg-black/50" onClick={() => { setSelected(null); setResponderMode(false); setRespuesta(''); }} />
           <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">Reclamo {selected.codigoReclamo}</h2>
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex items-center justify-between z-10">
+              <div className="min-w-0 flex-1 mr-2">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">Reclamo {selected.codigoReclamo}</h2>
                 <StatusBadge estado={selected.estado} />
               </div>
               <button
                 onClick={() => { setSelected(null); setResponderMode(false); setRespuesta(''); }}
-                className="p-1 hover:bg-gray-100 rounded-lg"
+                className="p-1 hover:bg-gray-100 rounded-lg shrink-0"
               >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-4 sm:p-6 space-y-6">
               {/* Datos del Consumidor */}
               <div>
                 <h3 className="text-sm font-semibold text-gray-900 mb-3">Datos del Consumidor</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div><span className="text-gray-500">Nombre:</span> <span className="text-gray-900">{selected.nombre}</span></div>
-                  <div><span className="text-gray-500">DNI/CE:</span> <span className="text-gray-900">{selected.dniCe}</span></div>
-                  <div><span className="text-gray-500">Domicilio:</span> <span className="text-gray-900">{selected.domicilio}</span></div>
-                  <div><span className="text-gray-500">Teléfono:</span> <span className="text-gray-900">{selected.telefono || '-'}</span></div>
-                  <div className="col-span-2"><span className="text-gray-500">Correo:</span> <span className="text-gray-900">{selected.correo}</span></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
+                  <div className="break-words"><span className="text-gray-500">Nombre:</span> <span className="text-gray-900">{selected.nombre}</span></div>
+                  <div className="break-words"><span className="text-gray-500">DNI/CE:</span> <span className="text-gray-900">{selected.dniCe}</span></div>
+                  <div className="break-words"><span className="text-gray-500">Domicilio:</span> <span className="text-gray-900">{selected.domicilio}</span></div>
+                  <div className="break-words"><span className="text-gray-500">Teléfono:</span> <span className="text-gray-900">{selected.telefono || '-'}</span></div>
+                  <div className="col-span-1 sm:col-span-2 break-words"><span className="text-gray-500">Correo:</span> <span className="text-gray-900">{selected.correo}</span></div>
                 </div>
               </div>
 
               {/* Datos del Bien */}
               <div>
                 <h3 className="text-sm font-semibold text-gray-900 mb-3">Bien Contratado</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div><span className="text-gray-500">Tipo:</span> <span className="text-gray-900">{selected.tipoBien === 'PRODUCTO' ? 'Producto' : 'Servicio'}</span></div>
-                  <div><span className="text-gray-500">Monto:</span> <span className="text-gray-900">{selected.montoReclamado ? `S/ ${selected.montoReclamado.toFixed(2)}` : '-'}</span></div>
-                  <div className="col-span-2"><span className="text-gray-500">Descripción:</span> <span className="text-gray-900">{selected.descripcionBien}</span></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
+                  <div className="break-words"><span className="text-gray-500">Tipo:</span> <span className="text-gray-900">{selected.tipoBien === 'PRODUCTO' ? 'Producto' : 'Servicio'}</span></div>
+                  <div className="break-words"><span className="text-gray-500">Monto:</span> <span className="text-gray-900">{selected.montoReclamado ? `S/ ${selected.montoReclamado.toFixed(2)}` : '-'}</span></div>
+                  <div className="col-span-1 sm:col-span-2 break-words"><span className="text-gray-500">Descripción:</span> <span className="text-gray-900">{selected.descripcionBien}</span></div>
                 </div>
               </div>
 
@@ -328,11 +394,11 @@ export default function AdminReclamosPage() {
                 <div className="space-y-3 text-sm">
                   <div>
                     <span className="text-gray-500 block mb-1">Descripción:</span>
-                    <p className="text-gray-900 bg-gray-50 rounded-lg p-3">{selected.detalleReclamacion}</p>
+                    <p className="text-gray-900 bg-gray-50 rounded-lg p-3 text-sm leading-relaxed">{selected.detalleReclamacion}</p>
                   </div>
                   <div>
                     <span className="text-gray-500 block mb-1">Pedido del Consumidor:</span>
-                    <p className="text-gray-900 bg-gray-50 rounded-lg p-3">{selected.pedidoConsumidor}</p>
+                    <p className="text-gray-900 bg-gray-50 rounded-lg p-3 text-sm leading-relaxed">{selected.pedidoConsumidor}</p>
                   </div>
                 </div>
               </div>
@@ -364,29 +430,29 @@ export default function AdminReclamosPage() {
                       rows={4}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <div className="flex gap-2 justify-end">
+                    <div className="flex flex-col sm:flex-row gap-2 justify-end">
                       <button
                         onClick={() => { setResponderMode(false); setRespuesta(''); }}
-                        className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
+                        className="w-full sm:w-auto px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
                       >
                         Cancelar
                       </button>
                       <button
                         onClick={() => handleUpdateStatus('RESPONDIDO')}
                         disabled={updating || !respuesta.trim()}
-                        className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                        className="w-full sm:w-auto px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
                       >
                         {updating ? 'Guardando...' : 'Responder y cerrar'}
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex gap-2 justify-end">
+                  <div className="flex flex-col sm:flex-row gap-2 justify-end">
                     {selected.estado === 'PENDIENTE' && (
                       <button
                         onClick={() => handleUpdateStatus('EN_REVISION')}
                         disabled={updating}
-                        className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        className="w-full sm:w-auto px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                       >
                         Marcar en Revisión
                       </button>
@@ -394,7 +460,7 @@ export default function AdminReclamosPage() {
                     {selected.estado === 'EN_REVISION' && (
                       <button
                         onClick={() => setResponderMode(true)}
-                        className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 inline-flex items-center gap-1"
+                        className="w-full sm:w-auto px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 inline-flex items-center gap-1 justify-center"
                       >
                         <MessageSquare className="w-4 h-4" /> Responder
                       </button>
@@ -403,7 +469,7 @@ export default function AdminReclamosPage() {
                       <button
                         onClick={() => handleUpdateStatus('CERRADO')}
                         disabled={updating}
-                        className="px-4 py-2 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                        className="w-full sm:w-auto px-4 py-2 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700"
                       >
                         Cerrar
                       </button>
@@ -415,6 +481,7 @@ export default function AdminReclamosPage() {
           </div>
         </div>
       )}
+
     </div>
   );
 }

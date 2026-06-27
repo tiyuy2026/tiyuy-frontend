@@ -139,7 +139,47 @@ export function useClientCRM(userId?: number) {
     staleTime: 30000,
   });
 
-  const isLoading = contactsLoading || sentContactsLoading || leadsLoading || sentLeadsLoading || propertiesLoading;
+  // 6. Obtener grupos del usuario (datos reales del backend)
+  const { 
+    data: groupsData, 
+    isLoading: groupsLoading,
+    error: groupsError 
+  } = useQuery({
+    queryKey: ['contacts', 'extended', 'groups'],
+    queryFn: async () => {
+      try {
+        const response = await axiosClient.get('/contacts/extended/groups?page=0&size=50');
+        return response.data?.content || response.data || [];
+      } catch {
+        return [];
+      }
+    },
+    enabled: !!userId,
+    retry: 1,
+    staleTime: 60000,
+  });
+
+  // 7. Obtener chats del usuario (datos reales del backend)
+  const { 
+    data: chatsData, 
+    isLoading: chatsLoading,
+    error: chatsError 
+  } = useQuery({
+    queryKey: ['contacts', 'extended', 'chats'],
+    queryFn: async () => {
+      try {
+        const response = await axiosClient.get('/contacts/extended/chats');
+        return response.data || [];
+      } catch {
+        return [];
+      }
+    },
+    enabled: !!userId,
+    retry: 1,
+    staleTime: 60000,
+  });
+
+  const isLoading = contactsLoading || sentContactsLoading || leadsLoading || sentLeadsLoading || propertiesLoading || groupsLoading || chatsLoading;
 
   // Log de errores para depuración
   if (contactsError) console.warn('[useClientCRM] Error en contacts:', contactsError);

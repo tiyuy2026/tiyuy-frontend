@@ -110,8 +110,14 @@ axiosClient.interceptors.response.use(
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined') {
         clearTokens();
-        // Evitar redirigir múltiples veces si hay varias peticiones fallando en paralelo
-        if (!window.location.pathname.startsWith('/login')) {
+        // Solo redirigir si no es una petición que ya maneja el 401 internamente
+        // (como check de favoritos que captura el 401 y retorna false)
+        const url = error.config?.url || '';
+        const isHandledLocally = 
+          url.includes('/favorites/check') || 
+          url.includes('/favorites/check-multiple');
+        
+        if (!isHandledLocally && !window.location.pathname.startsWith('/login')) {
           window.location.href = '/login';
         }
       }

@@ -109,6 +109,11 @@ export class AnalyticsRepository implements IAnalyticsRepository {
     return response.data;
   }
 
+  async getDailyActivityFlow(): Promise<Array<{ date: string; total: number; contacts: number; favorites: number; views: number; publications: number }>> {
+    const response = await axiosClient.get('/activity/admin/daily-flow');
+    return response.data;
+  }
+
   async exportActivitiesToPDF(type?: string, dateRange?: string): Promise<Blob> {
     const params = new URLSearchParams();
     if (type) params.append('type', type);

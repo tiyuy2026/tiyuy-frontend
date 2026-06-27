@@ -19,7 +19,11 @@ import {
   BarChart3,
   Activity,
   Target,
-  MessageSquare
+  MessageSquare,
+  TrendingUp,
+  UserCheck,
+  Clock,
+  Zap
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -42,8 +46,8 @@ export default function CRMDashboardPage() {
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 font-medium">Analizando datos del CRM...</p>
-            <p className="text-sm text-gray-400 mt-2">Agregando interacciones de mensajes, grupos, canales y eventos</p>
+            <p className="text-gray-600 font-medium">Cargando panel de clientes...</p>
+            <p className="text-sm text-gray-400 mt-2">Sincronizando contactos, leads y propiedades</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -54,107 +58,90 @@ export default function CRMDashboardPage() {
     <ProtectedRoute requiredRoles={['AGENT', 'DEVELOPER', 'ADMIN']}>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-8 xl:px-16 py-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="flex items-center gap-3">
+        <div className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
                 <Link 
                   href="/dashboard" 
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors shrink-0"
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <ArrowLeft className="w-5 h-5" />
+                  <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </Link>
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-                  <BarChart3 className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600 shrink-0" />
-                  <span>Análisis de Clientes</span>
-                </h1>
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">Clientes</h1>
+                  <p className="text-sm text-gray-500">Panel de análisis y seguimiento de clientes</p>
+                </div>
               </div>
               <button
                 onClick={() => refetch()}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all active:scale-[0.98]"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
               >
                 <RefreshCw className="w-4 h-4" />
-                Actualizar Datos
+                Actualizar
               </button>
             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-8 xl:px-16 py-6">
-          {/* KPI Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white rounded-xl shadow-lg p-5 border-l-4 border-blue-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500 font-medium">Total Clientes</p>
-                  <p className="text-3xl font-bold text-gray-900">{metrics.totalClients}</p>
-                </div>
-                <div className="p-3 bg-blue-100 rounded-full">
-                  <Users className="w-6 h-6 text-blue-600" />
+        <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+          {/* KPI Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-gray-500">Total Clientes</span>
+                <div className="p-2 bg-blue-50 rounded-lg">
+                  <Users className="w-4 h-4 text-blue-600" />
                 </div>
               </div>
-              <div className="mt-2 text-xs text-gray-400">
-                {metrics.newClientsThisWeek > 0 && (
-                  <span className="text-green-600 font-medium">+{metrics.newClientsThisWeek} esta semana</span>
-                )}
-              </div>
+              <p className="text-2xl font-bold text-gray-900">{metrics.totalClients}</p>
+              {metrics.newClientsThisWeek > 0 && (
+                <p className="text-xs text-green-600 mt-1">+{metrics.newClientsThisWeek} esta semana</p>
+              )}
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-5 border-l-4 border-green-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500 font-medium">Clientes Activos</p>
-                  <p className="text-3xl font-bold text-gray-900">{metrics.activeClients}</p>
-                </div>
-                <div className="p-3 bg-green-100 rounded-full">
-                  <Activity className="w-6 h-6 text-green-600" />
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-gray-500">Activos</span>
+                <div className="p-2 bg-green-50 rounded-lg">
+                  <Activity className="w-4 h-4 text-green-600" />
                 </div>
               </div>
-              <div className="mt-2 text-xs text-gray-500">
+              <p className="text-2xl font-bold text-gray-900">{metrics.activeClients}</p>
+              <p className="text-xs text-gray-400 mt-1">
                 {Math.round((metrics.activeClients / Math.max(metrics.totalClients, 1)) * 100)}% del total
-              </div>
+              </p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-5 border-l-4 border-purple-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500 font-medium">Alto Interés</p>
-                  <p className="text-3xl font-bold text-gray-900">{metrics.highInterestClients}</p>
-                </div>
-                <div className="p-3 bg-purple-100 rounded-full">
-                  <Target className="w-6 h-6 text-purple-600" />
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-gray-500">Alto Interés</span>
+                <div className="p-2 bg-purple-50 rounded-lg">
+                  <Target className="w-4 h-4 text-purple-600" />
                 </div>
               </div>
-              <div className="mt-2 text-xs text-gray-500">
-                Prioridad de seguimiento
-              </div>
+              <p className="text-2xl font-bold text-gray-900">{metrics.highInterestClients}</p>
+              <p className="text-xs text-gray-400 mt-1">Prioridad de seguimiento</p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-5 border-l-4 border-teal-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500 font-medium">Interacciones</p>
-                  <p className="text-3xl font-bold text-gray-900">{metrics.messagesExchanged}</p>
-                </div>
-                <div className="p-3 bg-teal-100 rounded-full">
-                  <MessageSquare className="w-6 h-6 text-teal-600" />
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-gray-500">Interacciones</span>
+                <div className="p-2 bg-teal-50 rounded-lg">
+                  <MessageSquare className="w-4 h-4 text-teal-600" />
                 </div>
               </div>
-              <div className="mt-2 text-xs text-gray-500">
-                Mensajes + Grupos + Canales
-              </div>
+              <p className="text-2xl font-bold text-gray-900">{metrics.messagesExchanged}</p>
+              <p className="text-xs text-gray-400 mt-1">Mensajes + Contactos</p>
             </div>
           </div>
 
-          {/* Main Dashboard Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            {/* Charts Section - Takes 2 columns */}
+          {/* Charts + Heatmap */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
               <CRMMetricsCharts metrics={metrics} />
             </div>
-
-            {/* Heatmap Section - Takes 1 column */}
-            <div className="lg:col-span-1">
+            <div>
               <ClientActivityHeatmap 
                 heatmapData={heatmapData}
                 clients={clients}
@@ -167,10 +154,9 @@ export default function CRMDashboardPage() {
             </div>
           </div>
 
-          {/* Bottom Section: Client List + Insights */}
+          {/* Client List + Insights */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Client List - Takes 1 column */}
-            <div className="lg:col-span-1 h-[600px]">
+            <div className="lg:col-span-1">
               <ClientList 
                 clients={clients}
                 filterClients={filterClients}
@@ -178,8 +164,6 @@ export default function CRMDashboardPage() {
                 onClientSelect={setSelectedClient}
               />
             </div>
-
-            {/* Insights Panel - Takes 2 columns */}
             <div className="lg:col-span-2">
               <ClientInsightsPanel 
                 metrics={metrics}
@@ -190,11 +174,11 @@ export default function CRMDashboardPage() {
           </div>
 
           {/* CRM Avanzado */}
-          <div className="mt-8">
-            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Target className="w-6 h-6 text-blue-600" />
-              CRM Avanzado
-            </h2>
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="w-5 h-5 text-blue-600" />
+              <h2 className="text-lg font-semibold text-gray-900">CRM Avanzado</h2>
+            </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <HotLeadsPanel />
               <ConversionPipeline />
@@ -204,130 +188,120 @@ export default function CRMDashboardPage() {
 
           {/* Selected Client Detail */}
           {selectedClient && (
-            <div className="mt-6 bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-800">
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h3 className="text-base font-semibold text-gray-900">
                   Detalle: {selectedClient.name}
                 </h3>
                 <button 
                   onClick={() => setSelectedClient(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  ✕
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                {/* Message Activity */}
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4" />
-                    Mensajes
-                  </h4>
-                  <div className="space-y-1 text-sm">
-                    <p className="text-blue-700">
-                      <span className="font-semibold">{selectedClient.messageActivity.totalMessages}</span> total
-                    </p>
-                    <p className="text-blue-600">
-                      <span className="font-semibold">{selectedClient.messageActivity.sentMessages}</span> enviados
-                    </p>
-                    <p className="text-blue-600">
-                      <span className="font-semibold">{selectedClient.messageActivity.receivedMessages}</span> recibidos
-                    </p>
-                    <p className={`text-xs mt-2 font-medium ${
-                      selectedClient.messageActivity.interestLevel === 'HIGH' ? 'text-green-600' :
-                      selectedClient.messageActivity.interestLevel === 'MEDIUM' ? 'text-yellow-600' :
-                      'text-gray-500'
-                    }`}>
-                      Nivel: {selectedClient.messageActivity.interestLevel}
-                    </p>
+              <div className="p-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2 text-sm">
+                      <MessageSquare className="w-4 h-4" />
+                      Mensajes
+                    </h4>
+                    <div className="space-y-1">
+                      <p className="text-blue-700 text-sm">
+                        <span className="font-semibold">{selectedClient.messageActivity.totalMessages}</span> total
+                      </p>
+                      <p className="text-blue-600 text-sm">
+                        <span className="font-semibold">{selectedClient.messageActivity.sentMessages}</span> enviados
+                      </p>
+                      <p className="text-blue-600 text-sm">
+                        <span className="font-semibold">{selectedClient.messageActivity.receivedMessages}</span> recibidos
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-teal-50 rounded-lg">
+                    <h4 className="font-medium text-teal-900 mb-2 flex items-center gap-2 text-sm">
+                      <Users className="w-4 h-4" />
+                      Grupos
+                    </h4>
+                    <div className="space-y-1">
+                      <p className="text-teal-700 text-sm">
+                        <span className="font-semibold">{selectedClient.groupActivity.groupsJoined}</span> grupos
+                      </p>
+                      <p className="text-teal-600 text-sm">
+                        <span className="font-semibold">{selectedClient.groupActivity.postsCreated}</span> posts
+                      </p>
+                      <p className="text-teal-600 text-sm">
+                        <span className="font-semibold">{selectedClient.groupActivity.commentsMade}</span> comentarios
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-purple-50 rounded-lg">
+                    <h4 className="font-medium text-purple-900 mb-2 flex items-center gap-2 text-sm">
+                      <Activity className="w-4 h-4" />
+                      Canales
+                    </h4>
+                    <div className="space-y-1">
+                      <p className="text-purple-700 text-sm">
+                        <span className="font-semibold">{selectedClient.channelActivity.channelsSubscribed}</span> suscripciones
+                      </p>
+                      <p className="text-purple-600 text-sm">
+                        <span className="font-semibold">{selectedClient.channelActivity.eventsAttended}</span> eventos
+                      </p>
+                      <p className="text-purple-600 text-sm">
+                        <span className="font-semibold">{selectedClient.channelActivity.eventResponses}</span> respuestas
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-orange-50 rounded-lg">
+                    <h4 className="font-medium text-orange-900 mb-2 flex items-center gap-2 text-sm">
+                      <Target className="w-4 h-4" />
+                      Propiedades
+                    </h4>
+                    <div className="space-y-1">
+                      <p className="text-orange-700 text-sm">
+                        <span className="font-semibold">{selectedClient.propertyActivity.propertiesViewed}</span> vistas
+                      </p>
+                      <p className="text-orange-600 text-sm">
+                        <span className="font-semibold">{selectedClient.propertyActivity.inquiriesMade}</span> consultas
+                      </p>
+                      <p className="text-orange-600 text-sm">
+                        <span className="font-semibold">{selectedClient.propertyActivity.favoritesAdded}</span> favoritos
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Group Activity */}
-                <div className="p-4 bg-teal-50 rounded-lg">
-                  <h4 className="font-medium text-teal-900 mb-2 flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    Grupos
-                  </h4>
-                  <div className="space-y-1 text-sm">
-                    <p className="text-teal-700">
-                      <span className="font-semibold">{selectedClient.groupActivity.groupsJoined}</span> grupos
-                    </p>
-                    <p className="text-teal-600">
-                      <span className="font-semibold">{selectedClient.groupActivity.postsCreated}</span> posts
-                    </p>
-                    <p className="text-teal-600">
-                      <span className="font-semibold">{selectedClient.groupActivity.commentsMade}</span> comentarios
-                    </p>
+                <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
+                  <div className="flex items-center gap-6">
+                    <div>
+                      <span className="text-xs text-gray-500">Score</span>
+                      <p className="text-lg font-bold text-blue-600">{selectedClient.interactionScore}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-gray-500">Engagement</span>
+                      <p className="text-lg font-bold text-teal-600">{selectedClient.engagementRate}%</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-gray-500">Última Actividad</span>
+                      <p className="text-sm font-medium text-gray-700">
+                        {selectedClient.daysSinceLastActivity === 0 ? 'Hoy' :
+                         selectedClient.daysSinceLastActivity === 1 ? 'Ayer' :
+                         `Hace ${selectedClient.daysSinceLastActivity} días`}
+                      </p>
+                    </div>
                   </div>
-                </div>
-
-                {/* Channel Activity */}
-                <div className="p-4 bg-purple-50 rounded-lg">
-                  <h4 className="font-medium text-purple-900 mb-2 flex items-center gap-2">
-                    <Activity className="w-4 h-4" />
-                    Canales
-                  </h4>
-                  <div className="space-y-1 text-sm">
-                    <p className="text-purple-700">
-                      <span className="font-semibold">{selectedClient.channelActivity.channelsSubscribed}</span> suscripciones
-                    </p>
-                    <p className="text-purple-600">
-                      <span className="font-semibold">{selectedClient.channelActivity.eventsAttended}</span> eventos
-                    </p>
-                    <p className="text-purple-600">
-                      <span className="font-semibold">{selectedClient.channelActivity.eventResponses}</span> respuestas
-                    </p>
-                  </div>
-                </div>
-
-                {/* Property Activity */}
-                <div className="p-4 bg-orange-50 rounded-lg">
-                  <h4 className="font-medium text-orange-900 mb-2 flex items-center gap-2">
-                    <Target className="w-4 h-4" />
-                    Propiedades
-                  </h4>
-                  <div className="space-y-1 text-sm">
-                    <p className="text-orange-700">
-                      <span className="font-semibold">{selectedClient.propertyActivity.propertiesViewed}</span> vistas
-                    </p>
-                    <p className="text-orange-600">
-                      <span className="font-semibold">{selectedClient.propertyActivity.inquiriesMade}</span> consultas
-                    </p>
-                    <p className="text-orange-600">
-                      <span className="font-semibold">{selectedClient.propertyActivity.favoritesAdded}</span> favoritos
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Score and Engagement */}
-              <div className="mt-4 pt-4 border-t flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                  <div>
-                    <span className="text-sm text-gray-500">Score de Interacción</span>
-                    <p className="text-2xl font-bold text-blue-600">{selectedClient.interactionScore}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-500">Tasa de Engagement</span>
-                    <p className="text-2xl font-bold text-teal-600">{selectedClient.engagementRate}%</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-gray-500">Última Actividad</span>
-                    <p className="text-lg font-medium text-gray-700">
-                      {selectedClient.daysSinceLastActivity === 0 ? 'Hoy' :
-                       selectedClient.daysSinceLastActivity === 1 ? 'Ayer' :
-                       `Hace ${selectedClient.daysSinceLastActivity} días`}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
                   <Link
                     href={`/dashboard/clients/${selectedClient.id}`}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
                   >
-                    Ver Detalle Completo
+                    Ver Detalle
                   </Link>
                 </div>
               </div>

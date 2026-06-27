@@ -114,6 +114,15 @@ export function useActivityStats(dateRange?: string) {
   });
 }
 
+export function useDailyActivityFlow() {
+  return useQuery({
+    queryKey: ['activity', 'daily-flow'],
+    queryFn: () => analyticsRepo.getDailyActivityFlow(),
+    staleTime: 60000, // 1 minuto antes de refetch
+    refetchInterval: 60000, // Refetch cada minuto
+  });
+}
+
 export function useExportActivitiesToPDF() {
   return useMutation({
     mutationFn: ({ type, dateRange }: { type?: string; dateRange?: string }) => 

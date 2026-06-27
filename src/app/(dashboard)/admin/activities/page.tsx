@@ -6,8 +6,8 @@
 
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { useUserActivities, useActivityStats } from '@/presentation/hooks/useAnalytics';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useUserActivities, useActivityStats, useDailyActivityFlow } from '@/presentation/hooks/useAnalytics';
 import { Spinner } from '@/presentation/components/ui/Spinner';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -58,147 +58,307 @@ const CATEGORIES = [
 
 const PAGE_SIZE = 20;
 
-// ─── Componente de gráfica en tiempo real estilo trading ───
-function RealtimeActivityChart({ activities }: { activities: UserActivity[] }) {
+// ─── Componente de gráfica profesional tipo TradingView ───
+function RealtimeActivityChart({ dailyFlow }: { dailyFlow: Array<{ date: string; total: number }> }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [hoveredPoint, setHoveredPoint] = useState<{ x: number; y: number; label: string; value: number } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [hoveredPoint, setHoveredPoint] = useState<{ x: number; y: number; label: string; value: number; index: number } | null>(null);
+  const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
+  const [dimensions, setDimensions] = useState({ w: 0, h: 0 });
 
-  // Agrupar actividades por hora para la gráfica
-  const chartData = (() => {
-    const grouped: Record<string, number> = {};
-    const now = new Date();
-    for (let i = 5; i >= 0; i--) {
-      const h = new Date(now.getTime() - i * 3600000);
-      const key = h.getHours() + ':00';
-      grouped[key] = 0;
-    }
-    (activities || []).forEach((a) => {
-      const d = new Date(a.date);
-      const h = d.getHours();
-      const key = h + ':00';
-      if (grouped[key] !== undefined) grouped[key]++;
+  // Calcular datos de la gráfica
+  const chartData = useMemo(() => {
+    if (!dailyFlow || dailyFlow.length === 0) return [];
+    return dailyFlow.map(d => {
+      const date = new Date(d.date + 'T00:00:00');
+      const label = date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+      return { label, value: d.total };
     });
-    return Object.entries(grouped).map(([label, value]) => ({ label, value }));
-  })();
+  }, [dailyFlow]);
 
-  // Efecto para dibujar la gráfica en el canvas
+  // Calcular estadísticas
+  const stats = useMemo(() => {
+    if (chartData.length === 0) return { total: 0, avg: 0, max: 0, min: 0, trend: 0, trendPct: 0 };
+    const values = chartData.map(d => d.value);
+    const total = values.reduce((a, b) => a + b, 0);
+    const avg = Math.round(total / values.length);
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+    const trend = values.length >= 2 ? values[values.length - 1] - values[0] : 0;
+    const trendPct = values[0] > 0 ? Math.round((trend / values[0]) * 100) : 0;
+    return { total, avg, max, min, trend, trendPct };
+  }, [chartData]);
+
+  // Resize observer
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        setDimensions({ w: Math.floor(width), h: Math.floor(height) });
+      }
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  // Dibujar gráfica
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || dimensions.w === 0) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+    canvas.width = dimensions.w * dpr;
+    canvas.height = dimensions.h * dpr;
     ctx.scale(dpr, dpr);
 
-    const w = rect.width;
-    const h = rect.height;
-    const padding = { top: 20, right: 20, bottom: 30, left: 40 };
+    const w = dimensions.w;
+    const h = dimensions.h;
+    const padding = { top: 24, right: 16, bottom: 28, left: 44 };
     const chartW = w - padding.left - padding.right;
     const chartH = h - padding.top - padding.bottom;
 
-    // Limpiar
     ctx.clearRect(0, 0, w, h);
 
     if (chartData.length === 0) {
-      ctx.fillStyle = '#9CA3AF';
-      ctx.font = '14px sans-serif';
+      ctx.fillStyle = '#64748B';
+      ctx.font = '13px Inter, system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('Sin datos', w / 2, h / 2);
+      ctx.fillText('Sin datos disponibles', w / 2, h / 2);
       return;
     }
 
-    const maxVal = Math.max(...chartData.map(d => d.value), 1);
     const values = chartData.map(d => d.value);
     const labels = chartData.map(d => d.label);
+    const maxVal = Math.max(...values, 1);
+    const minVal = Math.min(...values, 0);
+    const range = maxVal - minVal || 1;
+    const paddedMax = maxVal + range * 0.1;
+    const paddedMin = Math.max(0, minVal - range * 0.1);
+    const paddedRange = paddedMax - paddedMin || 1;
 
-    // Grid lines
-    ctx.strokeStyle = '#F3F4F6';
+    // ── Fondo con gradiente sutil ──
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+    bgGrad.addColorStop(0, '#F8FAFC');
+    bgGrad.addColorStop(1, '#F1F5F9');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    // ── Grid horizontal (4 líneas) ──
+    ctx.strokeStyle = '#E2E8F0';
     ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
     for (let i = 0; i <= 4; i++) {
       const y = padding.top + (chartH / 4) * i;
       ctx.beginPath();
       ctx.moveTo(padding.left, y);
       ctx.lineTo(w - padding.right, y);
       ctx.stroke();
-
-      ctx.fillStyle = '#9CA3AF';
-      ctx.font = '10px sans-serif';
+      // Labels del eje Y
+      const val = Math.round(paddedMax - (paddedRange / 4) * i);
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '10px Inter, system-ui, sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(Math.round(maxVal - (maxVal / 4) * i).toString(), padding.left - 8, y + 4);
+      ctx.fillText(val.toString(), padding.left - 8, y + 3);
     }
+    ctx.setLineDash([]);
 
-    // Dibujar línea
     const stepX = chartW / (values.length - 1 || 1);
-    ctx.beginPath();
-    ctx.strokeStyle = '#1693a5';
-    ctx.lineWidth = 2.5;
-    ctx.lineJoin = 'round';
-    ctx.lineCap = 'round';
 
+    // ── Área bajo la curva (gradiente más elegante) ──
+    ctx.beginPath();
     values.forEach((v, i) => {
       const x = padding.left + i * stepX;
-      const y = padding.top + chartH - (v / maxVal) * chartH;
+      const y = padding.top + chartH - ((v - paddedMin) / paddedRange) * chartH;
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     });
-    ctx.stroke();
-
-    // Área bajo la línea (gradiente)
-    const gradient = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartH);
-    gradient.addColorStop(0, 'rgba(22, 147, 165, 0.2)');
-    gradient.addColorStop(1, 'rgba(22, 147, 165, 0.01)');
     ctx.lineTo(padding.left + (values.length - 1) * stepX, padding.top + chartH);
     ctx.lineTo(padding.left, padding.top + chartH);
     ctx.closePath();
-    ctx.fillStyle = gradient;
+    const areaGrad = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartH);
+    areaGrad.addColorStop(0, 'rgba(22, 147, 165, 0.25)');
+    areaGrad.addColorStop(0.5, 'rgba(22, 147, 165, 0.08)');
+    areaGrad.addColorStop(1, 'rgba(22, 147, 165, 0.01)');
+    ctx.fillStyle = areaGrad;
     ctx.fill();
 
-    // Puntos
+    // ── Línea principal (más gruesa y con glow) ──
+    // Glow
+    ctx.save();
+    ctx.shadowColor = 'rgba(22, 147, 165, 0.3)';
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
     values.forEach((v, i) => {
       const x = padding.left + i * stepX;
-      const y = padding.top + chartH - (v / maxVal) * chartH;
+      const y = padding.top + chartH - ((v - paddedMin) / paddedRange) * chartH;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = '#1693a5';
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    ctx.restore();
+
+    // ── Puntos en los datos ──
+    values.forEach((v, i) => {
+      const x = padding.left + i * stepX;
+      const y = padding.top + chartH - ((v - paddedMin) / paddedRange) * chartH;
+      // Círculo exterior blanco
       ctx.beginPath();
-      ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+      ctx.arc(x, y, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fill();
+      ctx.strokeStyle = '#1693a5';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      // Círculo interior
+      ctx.beginPath();
+      ctx.arc(x, y, 2, 0, Math.PI * 2);
       ctx.fillStyle = '#1693a5';
       ctx.fill();
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
     });
 
-    // Labels del eje X
-    ctx.fillStyle = '#9CA3AF';
-    ctx.font = '10px sans-serif';
+    // ── Labels del eje X ──
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '10px Inter, system-ui, sans-serif';
     ctx.textAlign = 'center';
     labels.forEach((label, i) => {
       const x = padding.left + i * stepX;
       ctx.fillText(label, x, h - padding.bottom + 16);
     });
-  }, [chartData]);
+
+    // ── Tooltip en hover ──
+    if (hoveredPoint) {
+      const { index } = hoveredPoint;
+      const x = padding.left + index * stepX;
+      const y = padding.top + chartH - ((values[index] - paddedMin) / paddedRange) * chartH;
+
+      // Línea vertical
+      ctx.strokeStyle = 'rgba(22, 147, 165, 0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(x, padding.top);
+      ctx.lineTo(x, padding.top + chartH);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Círculo destacado
+      ctx.beginPath();
+      ctx.arc(x, y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(22, 147, 165, 0.15)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#1693a5';
+      ctx.fill();
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+    }
+
+  }, [chartData, dimensions, hoveredPoint]);
+
+  // Manejar movimiento del mouse
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas || chartData.length === 0) return;
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    setMousePos({ x: mouseX, y: mouseY });
+
+    const padding = { top: 24, right: 16, bottom: 28, left: 44 };
+    const chartW = dimensions.w - padding.left - padding.right;
+    const stepX = chartW / (chartData.length - 1 || 1);
+    const index = Math.round((mouseX - padding.left) / stepX);
+    if (index >= 0 && index < chartData.length) {
+      const x = padding.left + index * stepX;
+      const values = chartData.map(d => d.value);
+      const maxVal = Math.max(...values, 1);
+      const minVal = Math.min(...values, 0);
+      const range = maxVal - minVal || 1;
+      const paddedMax = maxVal + range * 0.1;
+      const paddedMin = Math.max(0, minVal - range * 0.1);
+      const paddedRange = paddedMax - paddedMin || 1;
+      const y = padding.top + dimensions.h - padding.top - padding.bottom - ((values[index] - paddedMin) / paddedRange) * (dimensions.h - padding.top - padding.bottom);
+      setHoveredPoint({ x, y, label: chartData[index].label, value: chartData[index].value, index });
+    } else {
+      setHoveredPoint(null);
+    }
+  }, [chartData, dimensions]);
+
+  const handleMouseLeave = useCallback(() => {
+    setHoveredPoint(null);
+    setMousePos(null);
+  }, []);
 
   return (
-    <div className="relative">
-      <canvas
-        ref={canvasRef}
-        className="w-full h-48 cursor-crosshair"
-        style={{ maxHeight: '200px' }}
-      />
-      {hoveredPoint && (
-        <div
-          className="absolute bg-white border border-gray-200 rounded-lg shadow-lg px-3 py-2 text-xs pointer-events-none z-10"
-          style={{
-            left: Math.min(hoveredPoint.x + 10, 300),
-            top: Math.max(hoveredPoint.y - 40, 0),
-          }}
-        >
-          <p className="font-semibold text-gray-900">{hoveredPoint.label}</p>
-          <p className="text-[#1693a5]">{hoveredPoint.value} actividades</p>
+    <div className="space-y-4">
+      {/* ── KPI Cards ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl border border-slate-200 p-3.5">
+          <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Total</p>
+          <p className="text-xl font-bold text-slate-900 mt-0.5">{stats.total.toLocaleString()}</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">últimos 7 días</p>
         </div>
-      )}
+        <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl border border-slate-200 p-3.5">
+          <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Promedio</p>
+          <p className="text-xl font-bold text-slate-900 mt-0.5">{stats.avg.toLocaleString()}</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">actividades/día</p>
+        </div>
+        <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl border border-slate-200 p-3.5">
+          <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Máximo</p>
+          <p className="text-xl font-bold text-slate-900 mt-0.5">{stats.max.toLocaleString()}</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">pico del período</p>
+        </div>
+        <div className="bg-gradient-to-br from-slate-50 to-white rounded-xl border border-slate-200 p-3.5">
+          <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Tendencia</p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <p className={`text-xl font-bold ${stats.trend >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+              {stats.trend >= 0 ? '+' : ''}{stats.trendPct}%
+            </p>
+            <svg className={`w-4 h-4 ${stats.trend >= 0 ? 'text-emerald-500' : 'text-red-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              {stats.trend >= 0 ? (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181" />
+              )}
+            </svg>
+          </div>
+          <p className="text-[10px] text-slate-400 mt-0.5">vs inicio del período</p>
+        </div>
+      </div>
+
+      {/* ── Gráfica ── */}
+      <div ref={containerRef} className="relative w-full" style={{ height: '220px' }}>
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full cursor-crosshair rounded-lg"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+        />
+        {/* Tooltip flotante */}
+        {hoveredPoint && mousePos && (
+          <div
+            className="absolute pointer-events-none z-20 bg-white/95 backdrop-blur-sm border border-slate-200 rounded-xl shadow-xl px-4 py-3 min-w-[140px]"
+            style={{
+              left: Math.min(mousePos.x + 16, dimensions.w - 160),
+              top: Math.max(mousePos.y - 70, 8),
+            }}
+          >
+            <p className="text-xs font-medium text-slate-500">{hoveredPoint.label}</p>
+            <p className="text-lg font-bold text-slate-900 mt-0.5">{hoveredPoint.value.toLocaleString()}</p>
+            <p className="text-[10px] text-slate-400">actividades</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -295,6 +455,7 @@ export default function ActivitiesPage() {
     PAGE_SIZE
   );
   const { data: stats } = useActivityStats();
+  const { data: dailyFlow } = useDailyActivityFlow();
 
   const activities = data?.content || [];
   const totalElements = data?.totalElements || 0;
@@ -302,6 +463,7 @@ export default function ActivitiesPage() {
 
   const handleCategoryClick = (type: string) => {
     setSelectedType(type);
+    setActiveType(type); // Aplica el filtro inmediatamente
     setPage(0);
   };
 
@@ -406,7 +568,7 @@ export default function ActivitiesPage() {
             </span>
           </div>
         </div>
-        <RealtimeActivityChart activities={activities} />
+        <RealtimeActivityChart dailyFlow={dailyFlow || []} />
       </div>
 
       {/* Filtro por categoría y fecha */}

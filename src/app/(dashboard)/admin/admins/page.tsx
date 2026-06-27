@@ -351,15 +351,15 @@ export default function AdminUsersPage() {
   return (
     <div className="max-w-none space-y-6">
       {/* ── Header ── */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Administradores</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Administradores</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">
             Gestiona los administradores del sistema y sus permisos
           </p>
         </div>
         {isSuperAdmin && (
-          <div className="relative">
+          <div className="relative self-end sm:self-auto">
             <Button
               variant="primary"
               onClick={() => setShowCreateDropdown(!showCreateDropdown)}
@@ -408,40 +408,40 @@ export default function AdminUsersPage() {
 
       {/* ── Hero Card ── */}
       <Card className="rounded-2xl shadow-sm border border-slate-200 bg-white overflow-hidden">
-        <div className="p-8">
-          <div className="grid grid-cols-[120px_1fr_1fr] gap-8 items-start">
+        <div className="p-4 sm:p-6 lg:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6 lg:gap-8">
             {/* Columna 1: Avatar */}
-            <div className="flex justify-center">
-              <div className={`w-24 h-24 rounded-full ${heroConfig.iconBg} flex items-center justify-center`}>
-                <svg className={`w-12 h-12 ${heroConfig.iconColor}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="flex justify-center sm:justify-start">
+              <div className={`w-16 h-16 sm:w-20 sm:h-24 lg:w-24 lg:h-24 rounded-full ${heroConfig.iconBg} flex items-center justify-center`}>
+                <svg className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 ${heroConfig.iconColor}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
               </div>
             </div>
 
             {/* Columna 2: Info personal */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold text-gray-900">
+            <div className="flex-1 space-y-2 sm:space-y-3 text-center sm:text-left">
+              <div className="flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-3">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">
                   {previewRole ? 'Nuevo Usuario' : 'Super Administrador'}
                 </h2>
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${heroConfig.badge}`}>
+                <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${heroConfig.badge}`}>
                   {heroConfig.label}
                 </span>
               </div>
               <p className="text-sm text-gray-500">
                 {previewRole ? 'admin@ejemplo.com' : 'admin@tiyuy.com'}
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
                 <span className="w-2 h-2 rounded-full bg-green-500" />
                 <span className="text-sm text-green-700 font-medium">Activo</span>
               </div>
             </div>
 
             {/* Columna 3: Descripción de acceso */}
-            <div className="border-l border-slate-200 pl-8">
-              <h3 className="text-lg font-semibold text-gray-900">{heroConfig.title}</h3>
-              <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+            <div className="sm:border-l border-slate-200 sm:pl-4 lg:pl-8 sm:max-w-[200px] lg:max-w-[280px]">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">{heroConfig.title}</h3>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2 leading-relaxed">
                 {heroConfig.description}
               </p>
             </div>
@@ -450,17 +450,17 @@ export default function AdminUsersPage() {
       </Card>
 
       {/* ── Main Content: Listado + Sidebar ── */}
-      <div className="grid grid-cols-[1fr_320px] gap-6">
+      <div className="flex flex-col lg:grid lg:grid-cols-[1fr_320px] gap-6">
         {/* Left: Listado */}
         <div className="space-y-6">
           {/* Barra de acciones */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-700">
                 {filteredAdmins.length} administradores
               </span>
             </div>
-            <div className="relative">
+            <div className="relative w-full sm:w-auto">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
@@ -469,7 +469,7 @@ export default function AdminUsersPage() {
                 placeholder="Buscar administrador..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-72 h-11 pl-10 pr-4 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full sm:w-72 h-11 pl-10 pr-4 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               />
             </div>
           </div>
@@ -489,25 +489,25 @@ export default function AdminUsersPage() {
                 const cfg = ROLE_CONFIG[admin.roleType as keyof typeof ROLE_CONFIG] || ROLE_CONFIG.ADMIN;
                 return (
                   <Card key={admin.id} className="rounded-2xl shadow-sm border border-slate-200 bg-white p-5 hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                       {/* Avatar */}
-                      <div className={`w-12 h-12 rounded-full ${cfg.iconBg} flex items-center justify-center flex-shrink-0`}>
-                        <span className={`text-sm font-bold ${cfg.iconColor}`}>
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full ${cfg.iconBg} flex items-center justify-center flex-shrink-0`}>
+                        <span className={`text-xs sm:text-sm font-bold ${cfg.iconColor}`}>
                           {admin.firstName?.[0]}{admin.lastName?.[0]}
                         </span>
                       </div>
                       {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-gray-900 truncate">
+                      <div className="flex-1 min-w-0 w-full sm:w-auto">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                          <span className="font-semibold text-gray-900 truncate text-sm sm:text-base">
                             {admin.firstName} {admin.lastName}
                           </span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cfg.badge}`}>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cfg.badge} w-fit`}>
                             {cfg.label}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500 truncate">{admin.email}</p>
-                        <div className="flex items-center gap-3 mt-1">
+                        <p className="text-xs sm:text-sm text-gray-500 truncate">{admin.email}</p>
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1">
                           <div className="flex items-center gap-1">
                             <span className={`w-1.5 h-1.5 rounded-full ${admin.active ? 'bg-green-500' : 'bg-red-500'}`} />
                             <span className="text-xs text-gray-500">{admin.active ? 'Activo' : 'Inactivo'}</span>
@@ -528,10 +528,10 @@ export default function AdminUsersPage() {
                         )}
                       </div>
                       {/* Actions */}
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 w-full sm:w-auto justify-end sm:justify-start">
                         <button
                           onClick={() => handleEdit(admin)}
-                          className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium"
+                          className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium"
                         >
                           Editar
                         </button>
@@ -539,13 +539,13 @@ export default function AdminUsersPage() {
                           <>
                             <button
                               onClick={() => handleDelete(admin.id)}
-                              className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+                              className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
                             >
                               Eliminar
                             </button>
                             <button
                               onClick={() => handleToggleStatus(admin.id, !admin.active)}
-                              className={`px-3 py-1.5 text-sm rounded-lg transition-colors font-medium ${
+                              className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-lg transition-colors font-medium ${
                                 admin.active
                                   ? 'text-orange-600 hover:bg-orange-50'
                                   : 'text-green-600 hover:bg-green-50'
@@ -578,23 +578,23 @@ export default function AdminUsersPage() {
                 const cfg = ROLE_CONFIG.SUPPORT;
                 return (
                   <Card key={admin.id} className="rounded-2xl shadow-sm border border-slate-200 bg-white p-5 hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-full ${cfg.iconBg} flex items-center justify-center flex-shrink-0`}>
-                        <span className={`text-sm font-bold ${cfg.iconColor}`}>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full ${cfg.iconBg} flex items-center justify-center flex-shrink-0`}>
+                        <span className={`text-xs sm:text-sm font-bold ${cfg.iconColor}`}>
                           {admin.firstName?.[0]}{admin.lastName?.[0]}
                         </span>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-gray-900 truncate">
+                      <div className="flex-1 min-w-0 w-full sm:w-auto">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                          <span className="font-semibold text-gray-900 truncate text-sm sm:text-base">
                             {admin.firstName} {admin.lastName}
                           </span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cfg.badge}`}>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cfg.badge} w-fit`}>
                             {cfg.label}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500 truncate">{admin.email}</p>
-                        <div className="flex items-center gap-3 mt-1">
+                        <p className="text-xs sm:text-sm text-gray-500 truncate">{admin.email}</p>
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1">
                           <div className="flex items-center gap-1">
                             <span className={`w-1.5 h-1.5 rounded-full ${admin.active ? 'bg-green-500' : 'bg-red-500'}`} />
                             <span className="text-xs text-gray-500">{admin.active ? 'Activo' : 'Inactivo'}</span>
@@ -604,10 +604,10 @@ export default function AdminUsersPage() {
                           </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 w-full sm:w-auto justify-end sm:justify-start">
                         <button
                           onClick={() => handleEdit(admin)}
-                          className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium"
+                          className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium"
                         >
                           Editar
                         </button>
@@ -615,13 +615,13 @@ export default function AdminUsersPage() {
                           <>
                             <button
                               onClick={() => handleDelete(admin.id)}
-                              className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+                              className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
                             >
                               Eliminar
                             </button>
                             <button
                               onClick={() => handleToggleStatus(admin.id, !admin.active)}
-                              className={`px-3 py-1.5 text-sm rounded-lg transition-colors font-medium ${
+                              className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-lg transition-colors font-medium ${
                                 admin.active
                                   ? 'text-orange-600 hover:bg-orange-50'
                                   : 'text-green-600 hover:bg-green-50'

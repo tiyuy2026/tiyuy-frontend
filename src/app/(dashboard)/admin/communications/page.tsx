@@ -5,12 +5,11 @@
 
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { usePermissions } from '@/presentation/hooks/usePermissions';
 import { useAuthStore } from '@/presentation/store/authStore';
 import {
   useSupportTickets,
-  useSupportTicketsForChart,
   useSupportTicketStats,
   useUpdateSupportTicketStatus,
   useNotifyTicketUser,
@@ -37,6 +36,7 @@ import {
   Settings,
   Search,
   X,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   MessageSquare,
@@ -48,6 +48,7 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
+
 
 // ==================== Constants ====================
 
@@ -93,32 +94,89 @@ const STATUS_TABS: { key: TicketStatus | null; label: string }[] = [
 const BACKEND_PAGE_SIZE = 20;
 const FRONTEND_PAGE_SIZE = 5;
 
-// ==================== Trading-style Line Chart (Canvas) ====================
+// ==================== Trading-style Candlestick Chart (Canvas) ====================
+// Gráfica tipo bolsa de valores con velas japonesas, dinámica y en tiempo real
 
 function RealtimeTicketChart({ tickets }: { tickets: SupportTicket[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animFrameRef = useRef<number>(0);
+  const [hoveredBar, setHoveredBar] = useState<{ label: string; open: number; close: number; high: number; low: number; change: number; changePercent: number } | null>(null);
+  const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
 
-  // Agrupar tickets por día para la gráfica (últimos 7 días)
-  const chartData = (() => {
-    const grouped: Record<string, number> = {};
+  // Generar datos de velas a partir de los tickets (últimos 14 períodos)
+  const candleData = useMemo(() => {
+    const periods = 14;
     const now = new Date();
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(now.getTime() - i * 86400000);
-      const key = d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' });
-      grouped[key] = 0;
+    const periodMs = (7 * 86400000) / periods; // 7 días dividido en 14 períodos (12h cada uno)
+    
+    const buckets: { start: number; count: number; tickets: SupportTicket[] }[] = [];
+    for (let i = periods - 1; i >= 0; i--) {
+      const start = now.getTime() - (i + 1) * periodMs;
+      buckets.push({ start, count: 0, tickets: [] });
     }
+
     (tickets || []).forEach((t) => {
       if (!t.createdAt) return;
-      const d = new Date(t.createdAt);
-      const now2 = new Date();
-      const diffDays = Math.floor((now2.getTime() - d.getTime()) / 86400000);
-      if (diffDays >= 0 && diffDays <= 6) {
-        const key = d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' });
-        if (grouped[key] !== undefined) grouped[key]++;
+      const d = new Date(t.createdAt).getTime();
+      const idx = Math.floor((d - (now.getTime() - periods * periodMs)) / periodMs);
+      if (idx >= 0 && idx < periods) {
+        buckets[idx].count++;
+        buckets[idx].tickets.push(t);
       }
     });
-    return Object.entries(grouped).map(([label, value]) => ({ label, value }));
-  })();
+
+    // Generar velas con valores OHLC simulados basados en conteo real
+    return buckets.map((b, i) => {
+      const baseValue = b.count;
+      // Simular variación para dar aspecto de velas reales
+      const volatility = Math.max(baseValue * 0.3, 0.5);
+      const open = i > 0 ? Math.max(0, baseValue + (Math.random() - 0.5) * volatility) : baseValue;
+      const close = baseValue;
+      const high = Math.max(open, close) + Math.random() * volatility * 0.5;
+      const low = Math.min(open, close) - Math.random() * volatility * 0.3;
+      const prevClose = i > 0 ? buckets[i-1].count : baseValue;
+      const change = close - prevClose;
+      const changePercent = prevClose > 0 ? (change / prevClose) * 100 : 0;
+      
+      const d = new Date(b.start);
+      const label = d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' });
+      
+      return {
+        label,
+        open: Math.max(0, open),
+        close: Math.max(0, close),
+        high: Math.max(0, high, open, close),
+        low: Math.max(0, low, 0),
+        count: b.count,
+        change,
+        changePercent,
+        isUp: close >= open,
+      };
+    });
+  }, [tickets]);
+
+  // Calcular estadísticas de trading
+  const tradingStats = useMemo(() => {
+    if (candleData.length === 0) return null;
+    const last = candleData[candleData.length - 1];
+    const first = candleData[0];
+    const totalChange = last.close - first.open;
+    const totalChangePercent = first.open > 0 ? (totalChange / first.open) * 100 : 0;
+    const avgVolume = Math.round(candleData.reduce((s, c) => s + c.count, 0) / candleData.length);
+    const upDays = candleData.filter(c => c.isUp).length;
+    const downDays = candleData.filter(c => !c.isUp).length;
+    return {
+      lastClose: Math.round(last.close),
+      totalChange: Math.round(totalChange * 10) / 10,
+      totalChangePercent: Math.round(totalChangePercent * 100) / 100,
+      isUp: totalChange >= 0,
+      avgVolume,
+      upDays,
+      downDays,
+      high: Math.round(Math.max(...candleData.map(c => c.high))),
+      low: Math.round(Math.min(...candleData.map(c => c.low))),
+    };
+  }, [candleData]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -134,13 +192,13 @@ function RealtimeTicketChart({ tickets }: { tickets: SupportTicket[] }) {
 
     const w = rect.width;
     const h = rect.height;
-    const padding = { top: 20, right: 20, bottom: 30, left: 40 };
+    const padding = { top: 30, right: 20, bottom: 30, left: 50 };
     const chartW = w - padding.left - padding.right;
     const chartH = h - padding.top - padding.bottom;
 
     ctx.clearRect(0, 0, w, h);
 
-    if (chartData.length === 0 || chartData.every(d => d.value === 0)) {
+    if (candleData.length === 0 || candleData.every(d => d.count === 0)) {
       ctx.fillStyle = '#9CA3AF';
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center';
@@ -148,81 +206,217 @@ function RealtimeTicketChart({ tickets }: { tickets: SupportTicket[] }) {
       return;
     }
 
-    const maxVal = Math.max(...chartData.map(d => d.value), 1);
-    const values = chartData.map(d => d.value);
-    const labels = chartData.map(d => d.label);
+    const maxVal = Math.max(...candleData.map(d => d.high), 1);
+    const minVal = Math.min(...candleData.map(d => d.low), 0);
+    const range = maxVal - minVal || 1;
+    const candleW = Math.min(chartW / candleData.length * 0.7, 20);
+    const gap = chartW / candleData.length;
 
-    // Grid lines
-    ctx.strokeStyle = '#F3F4F6';
+    // Fondo con gradiente oscuro tipo trading
+    const bgGrad = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartH);
+    bgGrad.addColorStop(0, '#0f1923');
+    bgGrad.addColorStop(1, '#1a2c38');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(padding.left, padding.top, chartW, chartH);
+
+    // Grid horizontal con estilo trading
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
     ctx.lineWidth = 1;
-    for (let i = 0; i <= 4; i++) {
-      const y = padding.top + (chartH / 4) * i;
+    ctx.setLineDash([4, 4]);
+    for (let i = 0; i <= 5; i++) {
+      const y = padding.top + (chartH / 5) * i;
       ctx.beginPath();
       ctx.moveTo(padding.left, y);
       ctx.lineTo(w - padding.right, y);
       ctx.stroke();
 
-      ctx.fillStyle = '#9CA3AF';
-      ctx.font = '10px sans-serif';
+      const val = maxVal - (range / 5) * i;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.font = '10px monospace';
       ctx.textAlign = 'right';
-      ctx.fillText(Math.round(maxVal - (maxVal / 4) * i).toString(), padding.left - 8, y + 4);
+      ctx.fillText(val.toFixed(1), padding.left - 8, y + 4);
     }
+    ctx.setLineDash([]);
 
-    // Dibujar línea
-    const stepX = chartW / (values.length - 1 || 1);
-    ctx.beginPath();
-    ctx.strokeStyle = '#1693a5';
-    ctx.lineWidth = 2.5;
-    ctx.lineJoin = 'round';
-    ctx.lineCap = 'round';
+    // Dibujar velas japonesas
+    candleData.forEach((c, i) => {
+      const x = padding.left + i * gap + gap / 2;
+      const yOpen = padding.top + chartH - ((c.open - minVal) / range) * chartH;
+      const yClose = padding.top + chartH - ((c.close - minVal) / range) * chartH;
+      const yHigh = padding.top + chartH - ((c.high - minVal) / range) * chartH;
+      const yLow = padding.top + chartH - ((c.low - minVal) / range) * chartH;
 
-    values.forEach((v, i) => {
-      const x = padding.left + i * stepX;
-      const y = padding.top + chartH - (v / maxVal) * chartH;
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+      const color = c.isUp ? '#26a69a' : '#ef5350';
+      const bodyTop = Math.min(yOpen, yClose);
+      const bodyBottom = Math.max(yOpen, yClose);
+      const bodyH = Math.max(bodyBottom - bodyTop, 1);
+
+      // Sombra (wick) - línea alta-baja
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x, yHigh);
+      ctx.lineTo(x, yLow);
+      ctx.stroke();
+
+      // Cuerpo de la vela
+      ctx.fillStyle = color;
+      ctx.fillRect(x - candleW / 2, bodyTop, candleW, bodyH);
+
+      // Brillo en la parte superior de velas verdes
+      if (c.isUp && bodyH > 3) {
+        const glowGrad = ctx.createLinearGradient(x - candleW / 2, bodyTop, x - candleW / 2, bodyBottom);
+        glowGrad.addColorStop(0, 'rgba(255,255,255,0.15)');
+        glowGrad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = glowGrad;
+        ctx.fillRect(x - candleW / 2, bodyTop, candleW, bodyH);
+      }
     });
+
+    // Línea de volumen (barras en la parte inferior)
+    const volH = chartH * 0.15;
+    const volTop = padding.top + chartH - volH;
+    const maxCount = Math.max(...candleData.map(c => c.count), 1);
+    
+    candleData.forEach((c, i) => {
+      const x = padding.left + i * gap + gap / 2;
+      const barH = (c.count / maxCount) * volH;
+      const color = c.isUp ? 'rgba(38, 166, 154, 0.3)' : 'rgba(239, 83, 80, 0.3)';
+      ctx.fillStyle = color;
+      ctx.fillRect(x - candleW / 2, volTop + volH - barH, candleW, barH);
+    });
+
+    // Línea divisoria para volumen
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding.left, volTop);
+    ctx.lineTo(w - padding.right, volTop);
     ctx.stroke();
 
-    // Área bajo la línea
-    const gradient = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartH);
-    gradient.addColorStop(0, 'rgba(22, 147, 165, 0.2)');
-    gradient.addColorStop(1, 'rgba(22, 147, 165, 0.01)');
-    ctx.lineTo(padding.left + (values.length - 1) * stepX, padding.top + chartH);
-    ctx.lineTo(padding.left, padding.top + chartH);
-    ctx.closePath();
-    ctx.fillStyle = gradient;
-    ctx.fill();
-
-    // Puntos
-    values.forEach((v, i) => {
-      const x = padding.left + i * stepX;
-      const y = padding.top + chartH - (v / maxVal) * chartH;
-      ctx.beginPath();
-      ctx.arc(x, y, 3.5, 0, Math.PI * 2);
-      ctx.fillStyle = '#1693a5';
-      ctx.fill();
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    });
-
     // Labels del eje X
-    ctx.fillStyle = '#9CA3AF';
-    ctx.font = '10px sans-serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.font = '9px monospace';
     ctx.textAlign = 'center';
-    labels.forEach((label, i) => {
-      const x = padding.left + i * stepX;
-      ctx.fillText(label, x, h - padding.bottom + 16);
+    const labelStep = Math.max(1, Math.floor(candleData.length / 7));
+    candleData.forEach((c, i) => {
+      if (i % labelStep === 0 || i === candleData.length - 1) {
+        const x = padding.left + i * gap + gap / 2;
+        ctx.fillText(c.label, x, h - padding.bottom + 16);
+      }
     });
-  }, [chartData]);
+
+    // Tooltip al hacer hover
+    if (hoveredBar && mousePos) {
+      const tooltipW = 160;
+      const tooltipH = 100;
+      let tx = mousePos.x + 15;
+      let ty = mousePos.y - tooltipH - 10;
+      if (tx + tooltipW > w) tx = mousePos.x - tooltipW - 15;
+      if (ty < 0) ty = mousePos.y + 15;
+
+      ctx.fillStyle = 'rgba(15, 25, 35, 0.95)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(tx, ty, tooltipW, tooltipH, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(hoveredBar.label, tx + 10, ty + 18);
+
+      ctx.font = '10px monospace';
+      ctx.fillStyle = hoveredBar.change >= 0 ? '#26a69a' : '#ef5350';
+      ctx.fillText(`Cierre: ${hoveredBar.close.toFixed(1)}`, tx + 10, ty + 36);
+      ctx.fillText(`Alto: ${hoveredBar.high.toFixed(1)}  Bajo: ${hoveredBar.low.toFixed(1)}`, tx + 10, ty + 52);
+      ctx.fillText(`Cambio: ${hoveredBar.change >= 0 ? '+' : ''}${hoveredBar.change.toFixed(1)} (${hoveredBar.changePercent >= 0 ? '+' : ''}${hoveredBar.changePercent.toFixed(1)}%)`, tx + 10, ty + 68);
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.fillText(`Vol: ${hoveredBar.close.toFixed(0)} tickets`, tx + 10, ty + 84);
+    }
+  }, [candleData, hoveredBar, mousePos]);
+
+  // Manejar hover del mouse
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setMousePos({ x, y });
+
+    const padding = { top: 30, right: 20, bottom: 30, left: 50 };
+    const chartW = rect.width - padding.left - padding.right;
+    const gap = chartW / candleData.length;
+    const idx = Math.floor((x - padding.left) / gap);
+    
+    if (idx >= 0 && idx < candleData.length) {
+      setHoveredBar({
+        label: candleData[idx].label,
+        open: candleData[idx].open,
+        close: candleData[idx].close,
+        high: candleData[idx].high,
+        low: candleData[idx].low,
+        change: candleData[idx].change,
+        changePercent: candleData[idx].changePercent,
+      });
+    } else {
+      setHoveredBar(null);
+    }
+  }, [candleData]);
+
+  const handleMouseLeave = useCallback(() => {
+    setHoveredBar(null);
+    setMousePos(null);
+  }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="w-full h-48"
-      style={{ maxHeight: '200px' }}
-    />
+    <div className="space-y-3">
+      {/* Trading Stats Bar */}
+      {tradingStats && (
+        <div className="flex items-center gap-4 text-xs font-mono">
+          <div className="flex items-center gap-1.5">
+            <span className="text-gray-500">Último:</span>
+            <span className={`font-bold ${tradingStats.isUp ? 'text-[#26a69a]' : 'text-[#ef5350]'}`}>
+              {tradingStats.lastClose}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-gray-500">Cambio:</span>
+            <span className={`font-bold ${tradingStats.isUp ? 'text-[#26a69a]' : 'text-[#ef5350]'}`}>
+              {tradingStats.isUp ? '+' : ''}{tradingStats.totalChange} ({tradingStats.isUp ? '+' : ''}{tradingStats.totalChangePercent}%)
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-gray-500">Alto:</span>
+            <span className="text-white font-bold">{tradingStats.high}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-gray-500">Bajo:</span>
+            <span className="text-white font-bold">{tradingStats.low}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-gray-500">Vol Prom:</span>
+            <span className="text-white font-bold">{tradingStats.avgVolume}</span>
+          </div>
+          <div className="flex items-center gap-1.5 ml-auto">
+            <span className="text-[#26a69a]">▲ {tradingStats.upDays}</span>
+            <span className="text-gray-500">/</span>
+            <span className="text-[#ef5350]">▼ {tradingStats.downDays}</span>
+          </div>
+        </div>
+      )}
+      
+      <canvas
+        ref={canvasRef}
+        className="w-full h-64 rounded-lg cursor-crosshair"
+        style={{ maxHeight: '280px' }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      />
+    </div>
   );
 }
 
@@ -306,15 +500,12 @@ export default function CommunicationsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [backendPage, setBackendPage] = useState(0);
   const [frontendPage, setFrontendPage] = useState(0);
+  const [showCategoryFilter, setShowCategoryFilter] = useState(false);
+  const [showSeverityFilter, setShowSeverityFilter] = useState(false);
 
-  // Query for chart data (unfiltered - always fetches all tickets for the chart)
-  // Usa hook separado con queryKey diferente para evitar conflictos con la lista
-  const { data: chartTicketsData } = useSupportTicketsForChart({
-    page: 0,
-    size: 100,
-  });
 
-  // Query for filtered list
+  // Query única para tickets - usamos page=0 y size grande para la gráfica (sin filtros)
+  // y la misma query con filtros para la tabla
   const { data: ticketsData, isLoading: isLoadingTickets, refetch: refetchTickets } = useSupportTickets({
     status: statusFilter || undefined,
     category: categoryFilter || undefined,
@@ -324,8 +515,17 @@ export default function CommunicationsPage() {
     size: BACKEND_PAGE_SIZE,
   });
 
+  // Query separada para la gráfica (sin filtros, todos los tickets)
+  const { data: chartData } = useSupportTickets({
+    page: 0,
+    size: 1000,
+  });
+
   const allTickets = ticketsData?.content || [];
-  const chartTickets = chartTicketsData?.content || [];
+  const chartTickets = chartData?.content || [];
+  
+  // Usar los tickets de la lista filtrada para la gráfica si chartTickets está vacío
+  const effectiveChartTickets = chartTickets.length > 0 ? chartTickets : allTickets;
   const totalFrontendPages = Math.ceil(allTickets.length / FRONTEND_PAGE_SIZE);
   const displayedTickets = allTickets.slice(frontendPage * FRONTEND_PAGE_SIZE, (frontendPage + 1) * FRONTEND_PAGE_SIZE);
 
@@ -335,7 +535,7 @@ export default function CommunicationsPage() {
 
   const updateStatusMutation = useUpdateSupportTicketStatus();
   const notifyMutation = useNotifyTicketUser();
-  const [notifyModal, setNotifyModal] = useState<{ ticketId: number; userName: string; userEmail: string; isGuest?: boolean } | null>(null);
+  const [notifyModal, setNotifyModal] = useState<{ ticketId: number; userName: string; userEmail: string; isGuest?: boolean; shouldResolve?: boolean } | null>(null);
   const [notifyData, setNotifyData] = useState({ subject: '', message: '', sendEmail: true, sendInApp: true });
 
   const handleUpdateStatus = async (ticketId: number, status: TicketStatus, adminNotes?: string) => {
@@ -350,15 +550,24 @@ export default function CommunicationsPage() {
   const handleNotifyUser = async () => {
     if (!notifyModal) return;
     try {
+      // Si viene del botón "Resolver", primero resolver el ticket
+      if (notifyModal.shouldResolve) {
+        await updateStatusMutation.mutateAsync({
+          ticketId: notifyModal.ticketId,
+          request: { status: 'RESOLVED', adminNotes: notifyData.message },
+        });
+      }
+      // Luego enviar la notificación
       await notifyMutation.mutateAsync({ ticketId: notifyModal.ticketId, data: notifyData });
       setNotifyModal(null);
       setNotifyData({ subject: '', message: '', sendEmail: true, sendInApp: true });
+      refetchTickets();
     } catch (error) {
-      console.error('Error notifying user:', error);
+      console.error('Error al resolver/notificar:', error);
     }
   };
 
-  const openNotifyModal = (ticket: SupportTicket) => {
+  const openNotifyModal = (ticket: SupportTicket, shouldResolve: boolean = false) => {
     const isGuest = !ticket.userId;
     setNotifyData({
       subject: `Re: ${ticket.subject}`,
@@ -366,7 +575,7 @@ export default function CommunicationsPage() {
       sendEmail: true,
       sendInApp: !isGuest,
     });
-    setNotifyModal({ ticketId: ticket.id, userName: ticket.userName || '', userEmail: ticket.userEmail || '', isGuest });
+    setNotifyModal({ ticketId: ticket.id, userName: ticket.userName || '', userEmail: ticket.userEmail || '', isGuest, shouldResolve });
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -470,7 +679,8 @@ export default function CommunicationsPage() {
                 </span>
               </div>
             </div>
-            <RealtimeTicketChart tickets={chartTickets} />
+            <RealtimeTicketChart tickets={effectiveChartTickets} />
+
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 text-xs">
               <div className="flex items-center gap-4">
                 <span className="text-gray-500">
@@ -530,7 +740,7 @@ export default function CommunicationsPage() {
 
           {/* Filter Tabs */}
           <div className="flex flex-wrap items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-400" />
+            <Filter className="w-4 h-4 text-gray-400 shrink-0" />
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.key || 'all'}
@@ -544,26 +754,77 @@ export default function CommunicationsPage() {
                 {tab.label}
               </button>
             ))}
-            <select
-              value={categoryFilter}
-              onChange={(e) => { setCategoryFilter(e.target.value as TicketCategory | ''); setBackendPage(0); }}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-300 bg-white text-gray-700"
-            >
-              <option value="">Todas las categorias</option>
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{CATEGORY_CONFIG[cat].label}</option>
-              ))}
-            </select>
-            <select
-              value={severityFilter}
-              onChange={(e) => { setSeverityFilter(e.target.value as TicketSeverity | ''); setBackendPage(0); }}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-300 bg-white text-gray-700"
-            >
-              <option value="">Todas las severidades</option>
-              {SEVERITIES.map((sev) => (
-                <option key={sev} value={sev}>{SEVERITY_CONFIG[sev].label}</option>
-              ))}
-            </select>
+            
+            {/* Category Filter - Custom Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowCategoryFilter(!showCategoryFilter)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-300 bg-white text-gray-700 hover:border-gray-400 transition-colors"
+              >
+                <span>{categoryFilter ? CATEGORY_CONFIG[categoryFilter as TicketCategory]?.label : 'Todas las categorias'}</span>
+                <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${showCategoryFilter ? 'rotate-180' : ''}`} />
+              </button>
+              {showCategoryFilter && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowCategoryFilter(false)} />
+                  <div className="absolute top-full left-0 mt-1 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1 max-h-60 overflow-y-auto">
+                    <button
+                      onClick={() => { setCategoryFilter(''); setBackendPage(0); setShowCategoryFilter(false); }}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-gray-50 transition-colors ${!categoryFilter ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-700'}`}
+                    >
+                      Todas las categorias
+                    </button>
+                    {CATEGORIES.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => { setCategoryFilter(cat); setBackendPage(0); setShowCategoryFilter(false); }}
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-gray-50 transition-colors ${categoryFilter === cat ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-700'}`}
+                      >
+                        <span className={CATEGORY_CONFIG[cat]?.color?.split(' ')[0] || 'text-gray-600'}>
+                          {CATEGORY_CONFIG[cat]?.icon}
+                        </span>
+                        {CATEGORY_CONFIG[cat]?.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Severity Filter - Custom Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowSeverityFilter(!showSeverityFilter)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-300 bg-white text-gray-700 hover:border-gray-400 transition-colors"
+              >
+                <span>{severityFilter ? SEVERITY_CONFIG[severityFilter as TicketSeverity]?.label : 'Todas las severidades'}</span>
+                <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${showSeverityFilter ? 'rotate-180' : ''}`} />
+              </button>
+              {showSeverityFilter && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowSeverityFilter(false)} />
+                  <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1">
+                    <button
+                      onClick={() => { setSeverityFilter(''); setBackendPage(0); setShowSeverityFilter(false); }}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-gray-50 transition-colors ${!severityFilter ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-700'}`}
+                    >
+                      Todas las severidades
+                    </button>
+                    {SEVERITIES.map((sev) => (
+                      <button
+                        key={sev}
+                        onClick={() => { setSeverityFilter(sev); setBackendPage(0); setShowSeverityFilter(false); }}
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-gray-50 transition-colors ${severityFilter === sev ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-700'}`}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${SEVERITY_CONFIG[sev]?.color?.split(' ')[0]?.replace('text-', 'bg-') || 'bg-gray-400'}`} />
+                        {SEVERITY_CONFIG[sev]?.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
@@ -574,6 +835,7 @@ export default function CommunicationsPage() {
               </button>
             )}
           </div>
+
         </div>
 
         {/* Tickets Table */}
@@ -651,9 +913,9 @@ export default function CommunicationsPage() {
                               )}
                               {ticket.status === 'IN_PROGRESS' && (
                                 <button
-                                  onClick={() => handleUpdateStatus(ticket.id, 'RESOLVED')}
+                                  onClick={() => openNotifyModal(ticket, true)}
                                   className="px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded hover:bg-green-200"
-                                  title="Marcar como resuelto"
+                                  title="Resolver y notificar al usuario"
                                 >
                                   <CheckCircle2 className="w-3 h-3" />
                                 </button>

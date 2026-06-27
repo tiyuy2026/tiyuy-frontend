@@ -49,6 +49,7 @@ import {
   Copy,
   RotateCw,
   MoreHorizontal,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Filter,
@@ -56,6 +57,7 @@ import {
   Loader,
   Shield
 } from 'lucide-react';
+
 
 type TabType = 'send' | 'alerts' | 'history';
 
@@ -127,6 +129,8 @@ export default function NotificationsPage() {
 
   // Action menu state
   const [openActionMenu, setOpenActionMenu] = useState<number | null>(null);
+  const [showHistoryFilter, setShowHistoryFilter] = useState(false);
+
   
   // Detail modal state
   const [detailItem, setDetailItem] = useState<{ type: 'notification' | 'alert'; data: any } | null>(null);
@@ -339,17 +343,17 @@ export default function NotificationsPage() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-8">
+      {/* Tabs - Responsive */}
+      <div className="flex flex-col sm:flex-row gap-2 mb-8">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2.5 px-5 py-3 rounded-xl text-sm font-medium transition-all duration-200 min-h-[56px] ${
+              className={`flex items-center justify-center gap-2.5 px-5 py-3 rounded-xl text-sm font-medium transition-all duration-200 min-h-[48px] sm:min-h-[56px] w-full sm:w-auto ${
                 activeTab === tab.id
-                  ? 'bg-white text-gray-900 shadow-lg shadow-gray-200/50 border border-gray-200 scale-[1.02]'
+                  ? 'bg-white text-gray-900 shadow-lg shadow-gray-200/50 border border-gray-200 sm:scale-[1.02]'
                   : 'bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-700 border border-transparent'
               }`}
             >
@@ -360,10 +364,11 @@ export default function NotificationsPage() {
         })}
       </div>
 
+
       {/* Send Notification Section */}
       {activeTab === 'send' && (
         <div className="space-y-6">
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Enviar Notificación</h2>
 
             <div className="space-y-4">
@@ -374,7 +379,7 @@ export default function NotificationsPage() {
                   type="text"
                   value={newNotification.subject}
                   onChange={(e) => setNewNotification(prev => ({ ...prev, subject: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all text-sm"
                   placeholder="Ingresa el asunto del email"
                 />
               </div>
@@ -386,7 +391,7 @@ export default function NotificationsPage() {
                   value={newNotification.message}
                   onChange={(e) => setNewNotification(prev => ({ ...prev, message: e.target.value }))}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all text-sm"
                   placeholder="Ingresa el mensaje de la notificación"
                 />
               </div>
@@ -407,9 +412,9 @@ export default function NotificationsPage() {
                         roles: e.target.checked ? [] : prev.roles,
                         userIds: e.target.checked ? [] : prev.userIds
                       }))}
-                      className="mr-3 h-4 w-4"
+                      className="mr-3 h-4 w-4 shrink-0"
                     />
-                    <span className="font-medium text-gray-900">Enviar a todos los usuarios</span>
+                    <span className="font-medium text-gray-900 text-sm">Enviar a todos los usuarios</span>
                   </label>
                 </div>
 
@@ -422,7 +427,7 @@ export default function NotificationsPage() {
                         <button
                           key={role}
                           onClick={() => toggleRoleSelection(role)}
-                          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                          className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors ${
                             newNotification.roles.includes(role)
                               ? 'bg-gradient-to-r from-teal-600 to-teal-700 text-white shadow-lg shadow-teal-500/30'
                               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -444,7 +449,7 @@ export default function NotificationsPage() {
                         type="text"
                         value={userSearch.searchQuery}
                         onChange={(e) => userSearch.setSearchQuery(e.target.value)}
-                        placeholder="Buscar por nombre, email o DNI (mín. 2 caracteres)..."
+                        placeholder="Buscar por nombre, email o DNI..."
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-all"
                       />
                     </div>
@@ -453,19 +458,19 @@ export default function NotificationsPage() {
                     )}
                     {!userSearch.hasSearched && (
                       <p className="text-xs text-gray-500 mb-2">
-                        Escribe al menos 2 caracteres para buscar usuarios. Se buscará en toda la base de datos.
+                        Escribe al menos 2 caracteres para buscar usuarios.
                       </p>
                     )}
                     <div className="max-h-48 overflow-y-auto border rounded-lg p-2">
                       {userSearch.users.map((user: any) => (
-                        <label key={user.id} className="flex items-center p-2 hover:bg-gray-50 cursor-pointer">
+                        <label key={user.id} className="flex items-start p-2 hover:bg-gray-50 cursor-pointer gap-2">
                           <input
                             type="checkbox"
                             checked={newNotification.userIds.includes(user.id)}
                             onChange={() => toggleUserSelection(user.id)}
-                            className="mr-3"
+                            className="mt-0.5 shrink-0"
                           />
-                          <span className="text-sm text-gray-700">
+                          <span className="text-xs sm:text-sm text-gray-700 break-words min-w-0">
                             {user.firstName} {user.lastName} ({user.email}) - {user.role}
                           </span>
                         </label>
@@ -481,12 +486,12 @@ export default function NotificationsPage() {
                 {!newNotification.sendToAll && (
                   <div className="mb-4">
                     <p className="text-sm font-medium text-gray-700 mb-2">Por Inmobiliaria (RUC):</p>
-                    <div className="flex gap-2 mb-2">
+                    <div className="flex flex-col sm:flex-row gap-2 mb-2">
                       <input
                         type="text"
                         id="agencyRuc"
                         placeholder="Ingresa RUC de inmobiliaria"
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full sm:flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             e.preventDefault();
@@ -506,7 +511,7 @@ export default function NotificationsPage() {
                             input.value = '';
                           }
                         }}
-                        className="px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-lg shadow-teal-500/30"
+                        className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-lg hover:from-teal-700 hover:to-teal-800 transition-all shadow-lg shadow-teal-500/30 text-sm"
                       >
                         Agregar
                       </button>
@@ -516,7 +521,7 @@ export default function NotificationsPage() {
                         {newNotification.agencyIds.map((ruc) => (
                           <span
                             key={ruc}
-                            className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-teal-100 text-teal-800"
+                            className="inline-flex items-center px-3 py-1 rounded-full text-xs sm:text-sm bg-teal-100 text-teal-800"
                           >
                             RUC: {ruc}
                             <button
@@ -541,7 +546,7 @@ export default function NotificationsPage() {
                         type="text"
                         value={agentSearch.searchQuery}
                         onChange={(e) => agentSearch.setSearchQuery(e.target.value)}
-                        placeholder="Buscar agente por nombre, email o DNI (mín. 2 caracteres)..."
+                        placeholder="Buscar agente por nombre, email o DNI..."
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm transition-all"
                       />
                     </div>
@@ -550,21 +555,21 @@ export default function NotificationsPage() {
                     )}
                     {!agentSearch.hasSearched && (
                       <p className="text-xs text-gray-500 mb-2">
-                        Escribe al menos 2 caracteres para buscar agentes. Se buscará en toda la base de datos.
+                        Escribe al menos 2 caracteres para buscar agentes.
                       </p>
                     )}
                     <div className="max-h-48 overflow-y-auto border rounded-lg p-2">
                       {agentSearch.users
                         .filter((agent: any) => agent.role === 'AGENT')
                         .map((agent: any) => (
-                          <label key={agent.id} className="flex items-center p-2 hover:bg-gray-50 cursor-pointer">
+                          <label key={agent.id} className="flex items-start p-2 hover:bg-gray-50 cursor-pointer gap-2">
                             <input
                               type="checkbox"
                               checked={newNotification.userIds.includes(agent.id)}
                               onChange={() => toggleUserSelection(agent.id)}
-                              className="mr-3"
+                              className="mt-0.5 shrink-0"
                             />
-                            <span className="text-sm text-gray-700">
+                            <span className="text-xs sm:text-sm text-gray-700 break-words min-w-0">
                               {agent.firstName} {agent.lastName} ({agent.email})
                             </span>
                           </label>
@@ -581,13 +586,13 @@ export default function NotificationsPage() {
               {/* Channels */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Canales</label>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <label className="flex items-center cursor-pointer">
                     <input
                       type="checkbox"
                       checked={newNotification.sendEmail}
                       onChange={(e) => setNewNotification(prev => ({ ...prev, sendEmail: e.target.checked }))}
-                      className="mr-2"
+                      className="mr-2 shrink-0"
                     />
                     <span className="text-sm text-gray-700">Email (Brevo)</span>
                   </label>
@@ -596,7 +601,7 @@ export default function NotificationsPage() {
                       type="checkbox"
                       checked={newNotification.sendInApp}
                       onChange={(e) => setNewNotification(prev => ({ ...prev, sendInApp: e.target.checked }))}
-                      className="mr-2"
+                      className="mr-2 shrink-0"
                     />
                     <span className="text-sm text-gray-700">Notificación en App</span>
                   </label>
@@ -605,7 +610,7 @@ export default function NotificationsPage() {
 
               {/* Summary */}
               <div className="p-3 bg-teal-50 rounded-lg border border-teal-100">
-                <p className="text-sm text-teal-800">
+                <p className="text-xs sm:text-sm text-teal-800 break-words">
                   <strong>Resumen:</strong>
                   {newNotification.sendToAll
                     ? ' Enviar a todos los usuarios'
@@ -626,7 +631,7 @@ export default function NotificationsPage() {
                 <button
                   onClick={handleSendNotification}
                   disabled={!newNotification.subject || !newNotification.message || sendNotification.isPending}
-                  className="px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-lg hover:from-teal-700 hover:to-teal-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-teal-500/30"
+                  className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-lg hover:from-teal-700 hover:to-teal-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-teal-500/30 text-sm"
                 >
                   {sendNotification.isPending ? 'Enviando...' : 'Enviar Notificación'}
                 </button>
@@ -636,24 +641,25 @@ export default function NotificationsPage() {
         </div>
       )}
 
+
       {/* Alerts Section */}
       {activeTab === 'alerts' && (
         <div className="space-y-6">
           {/* Create Alert Card */}
           <Card className="overflow-hidden border-red-200">
-            <div className="bg-gradient-to-r from-red-50 to-red-100/50 p-6 border-b border-red-100">
+            <div className="bg-gradient-to-r from-red-50 to-red-100/50 p-4 sm:p-6 border-b border-red-100">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-500 rounded-lg">
-                  <AlertTriangle className="w-6 h-6 text-white" />
+                <div className="p-2 bg-red-500 rounded-lg shrink-0">
+                  <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold text-red-900">Crear Alerta</h2>
-                  <p className="text-sm text-red-700">Envía alertas urgentes por múltiples canales (in-app, email, push)</p>
+                <div className="min-w-0">
+                  <h2 className="text-lg sm:text-xl font-bold text-red-900">Crear Alerta</h2>
+                  <p className="text-xs sm:text-sm text-red-700">Envía alertas urgentes por múltiples canales (in-app, email, push)</p>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-4 sm:p-6 space-y-6">
               {/* Alert Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Tipo de Alerta</label>
@@ -667,7 +673,7 @@ export default function NotificationsPage() {
                     <button
                       key={type.id}
                       onClick={() => setNewAlert(prev => ({ ...prev, alertType: type.id as any }))}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                      className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-all ${
                         newAlert.alertType === type.id
                           ? type.color === 'red' ? 'bg-red-100 text-red-700 border-2 border-red-300' :
                             type.color === 'blue' ? 'bg-blue-100 text-blue-700 border-2 border-blue-300' :
@@ -676,7 +682,7 @@ export default function NotificationsPage() {
                           : 'bg-gray-50 text-gray-600 border-2 border-transparent hover:bg-gray-100'
                       }`}
                     >
-                      <type.Icon className="w-5 h-5" />
+                      <type.Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                       {type.label}
                     </button>
                   ))}
@@ -692,7 +698,7 @@ export default function NotificationsPage() {
                     value={newAlert.subject}
                     onChange={(e) => setNewAlert(prev => ({ ...prev, subject: e.target.value }))}
                     placeholder="Ej: Mantenimiento programado del sistema"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
                   />
                 </div>
                 <div>
@@ -702,14 +708,14 @@ export default function NotificationsPage() {
                     onChange={(e) => setNewAlert(prev => ({ ...prev, message: e.target.value }))}
                     placeholder="Describe la alerta o emergencia..."
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
                   />
                 </div>
               </div>
 
               {/* Scheduling */}
-              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="flex items-center gap-3 mb-3">
+              <div className="p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-start sm:items-center gap-3 mb-3">
                   <input
                     type="checkbox"
                     id="scheduleAlert"
@@ -722,16 +728,16 @@ export default function NotificationsPage() {
                         setNewAlert(prev => ({ ...prev, scheduledFor: undefined, status: 'SENDING' }));
                       }
                     }}
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mt-0.5 sm:mt-0"
                   />
                   <label htmlFor="scheduleAlert" className="text-sm font-medium text-gray-700 cursor-pointer flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-500" />
+                    <Calendar className="w-4 h-4 text-gray-500 shrink-0" />
                     Programar envío para más tarde
                   </label>
                 </div>
 
                 {newAlert.scheduledFor && (
-                  <div className="ml-7">
+                  <div className="ml-0 sm:ml-7">
                     <label className="block text-xs text-gray-500 mb-1">Fecha y hora de envío</label>
                     <input
                       type="datetime-local"
@@ -742,7 +748,7 @@ export default function NotificationsPage() {
                         setNewAlert(prev => ({ ...prev, scheduledFor: utcISO }));
                       }}
                       min={new Date().toISOString().slice(0, 16)}
-                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       La alerta se enviará automáticamente en la fecha seleccionada
@@ -754,15 +760,15 @@ export default function NotificationsPage() {
               {/* Channels */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Canales de Envío</label>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={newAlert.sendInApp}
                       onChange={(e) => setNewAlert(prev => ({ ...prev, sendInApp: e.target.checked }))}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 shrink-0"
                     />
-                    <Smartphone className="w-4 h-4 text-teal-500" />
+                    <Smartphone className="w-4 h-4 text-teal-500 shrink-0" />
                     <span className="text-sm text-gray-700">In-App</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -770,9 +776,9 @@ export default function NotificationsPage() {
                       type="checkbox"
                       checked={newAlert.sendEmail}
                       onChange={(e) => setNewAlert(prev => ({ ...prev, sendEmail: e.target.checked }))}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 shrink-0"
                     />
-                    <Mail className="w-4 h-4 text-blue-500" />
+                    <Mail className="w-4 h-4 text-blue-500 shrink-0" />
                     <span className="text-sm text-gray-700">Email</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -780,9 +786,9 @@ export default function NotificationsPage() {
                       type="checkbox"
                       checked={newAlert.sendPush}
                       onChange={(e) => setNewAlert(prev => ({ ...prev, sendPush: e.target.checked }))}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 shrink-0"
                     />
-                    <BellRing className="w-4 h-4 text-cyan-500" />
+                    <BellRing className="w-4 h-4 text-cyan-500 shrink-0" />
                     <span className="text-sm text-gray-700">Push</span>
                   </label>
                 </div>
@@ -819,7 +825,7 @@ export default function NotificationsPage() {
                     });
                   }}
                   disabled={createAdminAlert.isPending}
-                  className="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                  className="w-full sm:w-auto px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 text-sm"
                 >
                   {createAdminAlert.isPending ? (
                     <>
@@ -849,6 +855,7 @@ export default function NotificationsPage() {
         </div>
       )}
 
+
       {/* History Section - Independent */}
       {activeTab === 'history' && (
         <div className="space-y-6">
@@ -860,35 +867,61 @@ export default function NotificationsPage() {
                   <h2 className="text-xl font-bold text-gray-900">Historial de Envíos</h2>
                   <p className="text-sm text-gray-500 mt-1">Notificaciones y alertas enviadas</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
                   {/* Search */}
-                  <div className="relative">
+                  <div className="relative flex-1 sm:flex-none">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="text"
                       value={historySearchQuery}
                       onChange={(e) => setHistorySearchQuery(e.target.value)}
-                      placeholder="Buscar por asunto, mensaje o destinatarios..."
-                      className="w-64 pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all"
+                      placeholder="Buscar..."
+                      className="w-full sm:w-64 pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all"
                     />
                   </div>
-                  {/* Filter */}
-                  <div className="flex items-center gap-2">
-                    <Filter className="w-4 h-4 text-gray-400" />
-                    <select
-                      value={historyTypeFilter}
-                      onChange={(e) => {
-                        setHistoryTypeFilter(e.target.value);
-                        setHistoryPage(0);
-                      }}
-                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all"
+                  {/* Filter - Custom Dropdown */}
+                  <div className="relative w-full sm:w-auto">
+                    <button
+                      onClick={() => setShowHistoryFilter(!showHistoryFilter)}
+                      className="w-full flex items-center justify-between gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-700 hover:border-gray-400 transition-colors"
                     >
-                      <option value="">Todas</option>
-                      <option value="NOTIFICATION">Notificaciones</option>
-                      <option value="ALERT">Alertas</option>
-                    </select>
+                      <div className="flex items-center gap-2">
+                        <Filter className="w-4 h-4 text-gray-400 shrink-0" />
+                        <span>{historyTypeFilter === 'NOTIFICATION' ? 'Notificaciones' : historyTypeFilter === 'ALERT' ? 'Alertas' : 'Todas'}</span>
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showHistoryFilter ? 'rotate-180' : ''}`} />
+                    </button>
+                    {showHistoryFilter && (
+                      <>
+                        <div className="fixed inset-0 z-10" onClick={() => setShowHistoryFilter(false)} />
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1">
+                          <button
+                            onClick={() => { setHistoryTypeFilter(''); setHistoryPage(0); setShowHistoryFilter(false); }}
+                            className={`w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${!historyTypeFilter ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-700'}`}
+                          >
+                            Todas
+                          </button>
+                          <button
+                            onClick={() => { setHistoryTypeFilter('NOTIFICATION'); setHistoryPage(0); setShowHistoryFilter(false); }}
+                            className={`w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${historyTypeFilter === 'NOTIFICATION' ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-700'}`}
+                          >
+                            <Bell className="w-3.5 h-3.5" />
+                            Notificaciones
+                          </button>
+                          <button
+                            onClick={() => { setHistoryTypeFilter('ALERT'); setHistoryPage(0); setShowHistoryFilter(false); }}
+                            className={`w-full flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${historyTypeFilter === 'ALERT' ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-700'}`}
+                          >
+                            <AlertTriangle className="w-3.5 h-3.5" />
+                            Alertas
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
+
+
               </div>
             </div>
 
@@ -913,29 +946,29 @@ export default function NotificationsPage() {
                   return (
                     <div
                       key={`notif-${notification.id}`}
-                      className="p-5 hover:bg-gray-50 hover:shadow-sm transition-all duration-200 cursor-pointer group"
+                      className="p-4 sm:p-5 hover:bg-gray-50 hover:shadow-sm transition-all duration-200 cursor-pointer group"
                     >
-                      <div className="flex items-start gap-4">
-                        {/* Icon */}
-                        <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center bg-teal-100 text-teal-600">
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        {/* Icon - hidden on very small screens, show on sm+ */}
+                        <div className="hidden sm:flex flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl items-center justify-center bg-teal-100 text-teal-600">
                           <Bell className="w-5 h-5" />
                         </div>
 
                         {/* Content */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">
+                          <div className="flex items-start justify-between gap-2 sm:gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">
                                   NOTIFICACIÓN
                                 </span>
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${status.color}`}>
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${status.color}`}>
                                   <span className={`w-1.5 h-1.5 rounded-full ${status.dot} mr-1.5`}></span>
                                   {status.label}
                                 </span>
                               </div>
-                              <h3 className="text-base font-semibold text-gray-900">{notification.title}</h3>
-                              <p className="text-sm text-gray-600 mt-1 line-clamp-2">{notification.message}</p>
+                              <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">{notification.title}</h3>
+                              <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">{notification.message}</p>
                             </div>
 
                             {/* Action Menu */}
@@ -945,14 +978,14 @@ export default function NotificationsPage() {
                                   e.stopPropagation();
                                   setOpenActionMenu(openActionMenu === notification.id ? null : notification.id);
                                 }}
-                                className="p-2 rounded-lg hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"
                               >
-                                <MoreHorizontal className="w-5 h-5 text-gray-400" />
+                                <MoreHorizontal className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                               </button>
                               {openActionMenu === notification.id && (
                                 <>
                                   <div className="fixed inset-0 z-10" onClick={() => setOpenActionMenu(null)} />
-                                  <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-20 py-1">
+                                  <div className="absolute right-0 top-full mt-1 w-44 sm:w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-20 py-1">
                                     <button
                                       onClick={() => {
                                         setDetailItem({ type: 'notification', data: notification });
@@ -981,18 +1014,18 @@ export default function NotificationsPage() {
                           </div>
 
                           {/* Metadata */}
-                          <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                          <div className="mt-2 sm:mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm text-gray-500">
                             <span className="flex items-center gap-1.5">
-                              <Calendar className="w-4 h-4" />
+                              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                               {format(new Date(notification.createdAt), 'dd MMM yyyy, HH:mm')}
                             </span>
                             <span className="flex items-center gap-1.5">
-                              <Users className="w-4 h-4" />
+                              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                               {notification.recipientCount || 1} {notification.recipientCount === 1 ? 'destinatario' : 'destinatarios'}
                             </span>
                             <span className="flex items-center gap-1.5">
                               {channels.map((ch, i) => (
-                                <span key={i} className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                <span key={i} className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-xs font-medium ${
                                   ch.active ? 'bg-gray-100 text-gray-600' : 'bg-gray-50 text-gray-400'
                                 }`}>
                                   {ch.label}
@@ -1013,11 +1046,11 @@ export default function NotificationsPage() {
                   return (
                     <div
                       key={`alert-${alert.id}`}
-                      className="p-5 hover:bg-gray-50 hover:shadow-sm transition-all duration-200 cursor-pointer group"
+                      className="p-4 sm:p-5 hover:bg-gray-50 hover:shadow-sm transition-all duration-200 cursor-pointer group"
                     >
-                      <div className="flex items-start gap-4">
-                        {/* Icon */}
-                        <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        {/* Icon - hidden on very small screens */}
+                        <div className={`hidden sm:flex flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl items-center justify-center ${
                           alert.alertType === 'EMERGENCY' ? 'bg-red-100 text-red-600' :
                           alert.alertType === 'SYSTEM' ? 'bg-blue-100 text-blue-600' :
                           alert.alertType === 'ANNOUNCEMENT' ? 'bg-teal-100 text-teal-600' :
@@ -1029,19 +1062,19 @@ export default function NotificationsPage() {
 
                         {/* Content */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                          <div className="flex items-start justify-between gap-2 sm:gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
                                   ALERTA: {getAlertTypeLabel(alert.alertType)}
                                 </span>
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${status.color}`}>
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${status.color}`}>
                                   <span className={`w-1.5 h-1.5 rounded-full ${status.dot} mr-1.5`}></span>
                                   {status.label}
                                 </span>
                               </div>
-                              <h3 className="text-base font-semibold text-gray-900">{alert.subject}</h3>
-                              <p className="text-sm text-gray-600 mt-1 line-clamp-2">{alert.message}</p>
+                              <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">{alert.subject}</h3>
+                              <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">{alert.message}</p>
                             </div>
 
                             {/* Action Menu */}
@@ -1051,14 +1084,14 @@ export default function NotificationsPage() {
                                   e.stopPropagation();
                                   setOpenActionMenu(openActionMenu === alert.id ? null : alert.id);
                                 }}
-                                className="p-2 rounded-lg hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"
                               >
-                                <MoreHorizontal className="w-5 h-5 text-gray-400" />
+                                <MoreHorizontal className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                               </button>
                               {openActionMenu === alert.id && (
                                 <>
                                   <div className="fixed inset-0 z-10" onClick={() => setOpenActionMenu(null)} />
-                                  <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-20 py-1">
+                                  <div className="absolute right-0 top-full mt-1 w-44 sm:w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-20 py-1">
                                     <button
                                       onClick={() => {
                                         setDetailItem({ type: 'alert', data: alert });
@@ -1087,18 +1120,18 @@ export default function NotificationsPage() {
                           </div>
 
                           {/* Metadata */}
-                          <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                          <div className="mt-2 sm:mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm text-gray-500">
                             <span className="flex items-center gap-1.5">
-                              <Calendar className="w-4 h-4" />
+                              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                               {format(new Date(alert.createdAt), 'dd MMM yyyy, HH:mm')}
                             </span>
                             <span className="flex items-center gap-1.5">
-                              <Users className="w-4 h-4" />
+                              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                               {alert.targetUserCount || 0} destinatarios
                             </span>
                             <span className="flex items-center gap-1.5">
                               {channels.map((ch, i) => (
-                                <span key={i} className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                <span key={i} className={`inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-xs font-medium ${
                                   ch.active ? 'bg-gray-100 text-gray-600' : 'bg-gray-50 text-gray-400'
                                 }`}>
                                   {ch.label}
@@ -1112,6 +1145,7 @@ export default function NotificationsPage() {
                   );
                 })}
               </div>
+
             )}
 
             {/* History Pagination */}
@@ -1263,8 +1297,9 @@ export default function NotificationsPage() {
                 <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-4 border border-gray-100">{detailItem.data.message}</p>
               </div>
 
-              {/* Details Grid */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* Details Grid - Responsive */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
                 <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
                   <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Fecha de Envío</label>
                   <p className="text-sm font-medium text-gray-900 flex items-center gap-1.5">

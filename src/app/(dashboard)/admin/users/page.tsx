@@ -456,7 +456,7 @@ export default function UsersPage() {
   const totalUsers = usersData?.totalElements || 0;
 
   return (
-    <div className="space-y-6 px-6 py-4">
+    <div className="space-y-4 sm:space-y-6 px-3 sm:px-6 py-3 sm:py-4">
       {/* Header - 3 tarjetas en fila */}
       <UsersHeaderStats activeUsers={activeUsers} pendingUsers={pendingUsers} totalUsers={totalUsers} />
 
@@ -474,7 +474,7 @@ export default function UsersPage() {
         />
 
         {/* Toggle de vista: Tabla / Tarjetas */}
-        <div className="flex items-center justify-end px-6 py-2 border-b border-gray-100 bg-gray-50/30">
+        <div className="flex items-center justify-end px-3 sm:px-6 py-2 border-b border-gray-100 bg-gray-50/30">
           <div className="flex items-center bg-white rounded-lg border border-gray-200 p-0.5 shadow-sm">
             <button
               onClick={() => setViewMode('table')}
@@ -654,47 +654,45 @@ export default function UsersPage() {
             </div>
 
             {/* Paginación Integrada */}
-            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">
-                  Mostrando {((currentPage - 1) * pageSize) + 1} a{' '}
-                  {Math.min(currentPage * pageSize, usersData.totalElements)} de{' '}
-                  {usersData.totalElements} resultados
+            <div className="px-3 sm:px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gray-50/50">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                <span className="text-xs sm:text-sm text-gray-600">
+                  {((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, usersData.totalElements)} de {usersData.totalElements}
                 </span>
 
                 <select
                   value={pageSize}
                   onChange={(e) => setPageSize(Number(e.target.value))}
-                  className="border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  className="w-full sm:w-auto border border-gray-200 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 >
-                  <option value={10}>10 por página</option>
-                  <option value={20}>20 por página</option>
-                  <option value={50}>50 por página</option>
-                  <option value={100}>100 por página</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
                 </select>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end">
                 <button
                   onClick={() => setCurrentPage(currentPage - 1)}
                   disabled={currentPage <= 1}
-                  className="px-4 py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
                 >
-                  <ChevronLeft className="w-4 h-4" />
-                  Anterior
+                  <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Anterior</span>
                 </button>
 
-                <span className="text-sm font-medium text-gray-700 px-3 py-2 bg-white rounded-lg border border-gray-200">
-                  Página {currentPage} de {Math.ceil(usersData.totalElements / pageSize)}
+                <span className="text-xs sm:text-sm font-medium text-gray-700 px-2 sm:px-3 py-1.5 sm:py-2 bg-white rounded-lg border border-gray-200">
+                  {currentPage}/{Math.ceil(usersData.totalElements / pageSize)}
                 </span>
 
                 <button
                   onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={currentPage >= Math.ceil(usersData.totalElements / pageSize)}
-                  className="px-4 py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
                 >
-                  Siguiente
-                  <ChevronRight className="w-4 h-4" />
+                  <span className="hidden sm:inline">Siguiente</span>
+                  <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               </div>
             </div>
@@ -714,47 +712,45 @@ export default function UsersPage() {
             />
 
             {/* Paginación para tarjetas */}
-            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">
-                  Mostrando {((currentPage - 1) * pageSize) + 1} a{' '}
-                  {Math.min(currentPage * pageSize, usersData.totalElements)} de{' '}
-                  {usersData.totalElements} resultados
+            <div className="px-3 sm:px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gray-50/50">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                <span className="text-xs sm:text-sm text-gray-600">
+                  {((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, usersData.totalElements)} de {usersData.totalElements}
                 </span>
 
                 <select
                   value={pageSize}
                   onChange={(e) => setPageSize(Number(e.target.value))}
-                  className="border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  className="w-full sm:w-auto border border-gray-200 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 >
-                  <option value={10}>10 por página</option>
-                  <option value={20}>20 por página</option>
-                  <option value={50}>50 por página</option>
-                  <option value={100}>100 por página</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
                 </select>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end">
                 <button
                   onClick={() => setCurrentPage(currentPage - 1)}
                   disabled={currentPage <= 1}
-                  className="px-4 py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
                 >
-                  <ChevronLeft className="w-4 h-4" />
-                  Anterior
+                  <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Anterior</span>
                 </button>
 
-                <span className="text-sm font-medium text-gray-700 px-3 py-2 bg-white rounded-lg border border-gray-200">
-                  Página {currentPage} de {Math.ceil(usersData.totalElements / pageSize)}
+                <span className="text-xs sm:text-sm font-medium text-gray-700 px-2 sm:px-3 py-1.5 sm:py-2 bg-white rounded-lg border border-gray-200">
+                  {currentPage}/{Math.ceil(usersData.totalElements / pageSize)}
                 </span>
 
                 <button
                   onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={currentPage >= Math.ceil(usersData.totalElements / pageSize)}
-                  className="px-4 py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
                 >
-                  Siguiente
-                  <ChevronRight className="w-4 h-4" />
+                  <span className="hidden sm:inline">Siguiente</span>
+                  <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               </div>
             </div>
