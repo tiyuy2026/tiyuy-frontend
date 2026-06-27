@@ -1,3 +1,4 @@
+ 'use client';
 import { useState } from 'react';
 import { signInWithPopup, signOut as firebaseSignOut, User as FirebaseUser } from 'firebase/auth';
 import { auth, googleProvider } from '@/config/firebase';
@@ -44,12 +45,7 @@ export const useGoogleAuth = () => {
         const firstName = nameParts[0] || '';
         const lastName = nameParts.slice(1).join(' ') || '';
 
-        console.log('Google Auth exitoso:', { 
-          email: user.email, 
-          firstName, 
-          lastName,
-          uid: user.uid 
-        });
+        
 
         return {
           email: user.email || '',
@@ -62,7 +58,7 @@ export const useGoogleAuth = () => {
 
       return null;
     } catch (error: any) {
-      console.error('Error en Google Sign-In:', error);
+      
       
       // Manejar errores específicos
       if (error.code === 'auth/popup-closed-by-user') {

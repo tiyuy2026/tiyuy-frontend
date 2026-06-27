@@ -5,6 +5,7 @@ import { Property } from '@/core/domain/entities/Property';
 import { PropertyGallery } from '../PropertyGallery/PropertyGallery';
 import { PropertyQuickInfo } from './PropertyQuickInfo';
 import { PropertyLocation } from './PropertyLocation';
+import { PropertyComments } from './PropertyComments';
 import { ContactForm } from '../../shared/ContactForm/ContactForm';
 import { WhatsAppButton } from './WhatsAppButton';
 import { FavoriteButton } from '../../shared/FavoriteButton/FavoriteButton';
@@ -217,10 +218,28 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
             {/* 4. MAPA — después de la descripción */}
             <PropertyLocation location={property.location} propertyId={property.id} />
 
-            {/* 5. SIMILARES */}
+            {/* 5. CONTACTA AL ANUNCIANTE — solo móvil */}
+            <div className="lg:hidden space-y-4">
+              <div className="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden">
+                <div className="px-6 pt-6 pb-4 border-b border-gray-50">
+                  <h3 className="text-lg font-bold text-gray-900">Contacta al anunciante</h3>
+                </div>
+                <div className="px-6 py-4">
+                  <ContactForm propertyId={property.id} ownerId={property.owner.id} />
+                </div>
+                <div className="px-6 pb-6 pt-2">
+                  <WhatsAppButton property={property} className="w-full" />
+                </div>
+              </div>
+            </div>
+
+            {/* 6. COMENTARIOS DE LA ZONA */}
+            <PropertyComments propertyId={property.id} location={property.location} />
+
+            {/* 7. SIMILARES */}
             <SimilarProperties currentProperty={property} />
 
-            {/* 6. RECOMENDACIONES */}
+            {/* 8. RECOMENDACIONES */}
             <PersonalizedRecommendations 
               title="Más recomendaciones para ti" 
               properties={[]}
@@ -238,8 +257,8 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
           <div className="lg:col-span-3">
             <div className="sticky top-4 space-y-4">
 
-              {/* Contactar */}
-              <div className="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden">
+              {/* Contactar — oculto en móvil (se muestra en columna principal) */}
+              <div className="hidden lg:block bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden">
                 <div className="px-6 pt-6 pb-4 border-b border-gray-50">
                   <h3 className="text-lg font-bold text-gray-900">Contacta al anunciante</h3>
                 </div>

@@ -1,3 +1,4 @@
+ 'use client';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../store/authStore';
 import { AuthRepository } from '@/infrastructure/repositories';
@@ -49,15 +50,17 @@ export const useAuth = () => {
       authStorage.setToken(response.token);
       authStorage.setUser(userData);
       setAuth(response.token, userData, adminData);
-      
-      // Redirigir según el rol - si tiene adminRoleType o el role es ADMIN/SUPPORT/SUPER_ADMIN, es admin del sistema
+
+      // Determine target route but DO NOT navigate here; let the caller handle navigation.
       const adminRoles = ['ADMIN', 'SUPER_ADMIN', 'SUPPORT'];
       const isAdminUser = response.adminRoleType !== undefined || adminRoles.includes(response.role);
       const targetRoute = isAdminUser ? '/admin' : '/';
-      router.replace(targetRoute);
+
+      return { success: true, targetRoute } as const;
     } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesion');
-      // No relanzamos el error para evitar que burbujee y cause crash
+      const message = err?.message || 'Error al iniciar sesion';
+      setError(message);
+      return { success: false, message } as const;
     } finally {
       setLoading(false);
     }
