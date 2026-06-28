@@ -1,11 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { usePropertyMatches } from '@/presentation/hooks/useAgentCRM';
-import { Home, MapPin, DollarSign, Percent, Eye, Heart, TrendingUp } from 'lucide-react';
+import { Home, MapPin, DollarSign, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+
+const ITEMS_PER_PAGE = 5;
 
 export function PropertyMatchesPanel() {
   const { data: matches, isLoading } = usePropertyMatches();
+  const [page, setPage] = useState(0);
 
   if (isLoading) {
     return (
@@ -39,6 +43,9 @@ export function PropertyMatchesPanel() {
     );
   }
 
+  const totalPages = Math.ceil(matches.length / ITEMS_PER_PAGE);
+  const paginatedMatches = matches.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5">
       <div className="flex items-center justify-between mb-4">
@@ -54,9 +61,9 @@ export function PropertyMatchesPanel() {
       </div>
 
       <div className="space-y-2 max-h-[350px] overflow-y-auto">
-        {matches.slice(0, 10).map((match) => (
+        {paginatedMatches.map((match, index) => (
           <div
-            key={match.propertyId}
+            key={`${match.clientId}-${match.propertyId}-${index}`}
             className="p-3 border border-gray-100 rounded-lg hover:border-teal-200 hover:bg-teal-50/30 transition-colors"
           >
             <div className="flex items-start justify-between">
@@ -119,6 +126,30 @@ export function PropertyMatchesPanel() {
           </div>
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+          <button
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            disabled={page === 0}
+            className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="w-3 h-3" />
+            Anterior
+          </button>
+          <span className="text-xs text-gray-400">
+            {page + 1} / {totalPages}
+          </span>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+            disabled={page >= totalPages - 1}
+            className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            Siguiente
+            <ChevronRight className="w-3 h-3" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -88,48 +88,6 @@ export function ClientInsightsPanel({ metrics, topClients, atRiskClients }: Clie
         ))}
       </div>
 
-      {/* Top Clientes */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-1.5">
-            <Zap className="w-4 h-4 text-yellow-500" />
-            Más Comprometidos
-          </h3>
-          <span className="text-xs text-gray-400">Top 5</span>
-        </div>
-        <div className="space-y-2">
-          {topClients.length === 0 ? (
-            <p className="text-gray-500 text-center py-3 text-sm">No hay datos suficientes</p>
-          ) : (
-            topClients.map((client, index) => (
-              <div key={client.id} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 
-                    flex items-center justify-center text-white font-semibold text-xs">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{client.name}</p>
-                    <p className="text-xs text-gray-500">
-                      {client.messageActivity.totalMessages} mensajes · {client.totalInteractions} interacciones
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-1">
-                    <BarChart3 className="w-3.5 h-3.5 text-blue-500" />
-                    <span className="font-bold text-blue-600 text-sm">{client.interactionScore}</span>
-                  </div>
-                  <p className="text-xs text-gray-400">
-                    {client.daysSinceLastActivity <= 7 ? 'Activo reciente' : `Hace ${client.daysSinceLastActivity} días`}
-                  </p>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
       {/* Clientes en Riesgo */}
       {atRiskClients.length > 0 && (
         <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border border-orange-200 p-5">
@@ -171,52 +129,6 @@ export function ClientInsightsPanel({ metrics, topClients, atRiskClients }: Clie
         </div>
       )}
 
-      {/* Recomendaciones */}
-      <div className="bg-gradient-to-br from-blue-50 to-teal-50 rounded-xl border border-blue-100 p-5">
-        <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-1.5">
-          <Activity className="w-4 h-4 text-blue-500" />
-          Recomendaciones
-        </h3>
-        <div className="space-y-2">
-          {metrics.highInterestClients > 0 && (
-            <div className="flex items-start gap-2.5 p-2.5 bg-white rounded-lg">
-              <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-green-600 text-[10px]">✓</span>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-900">{metrics.highInterestClients} clientes con alto interés</p>
-                <p className="text-xs text-gray-500">Prioriza el seguimiento con estos clientes.</p>
-              </div>
-            </div>
-          )}
-          
-          {atRiskClients.length > 0 && (
-            <div className="flex items-start gap-2.5 p-2.5 bg-white rounded-lg">
-              <div className="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-orange-600 text-[10px]">!</span>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-900">Reactiva clientes inactivos</p>
-                <p className="text-xs text-gray-500">
-                  {atRiskClients.length} clientes valiosos no han interactuado recientemente.
-                </p>
-              </div>
-            </div>
-          )}
-          
-          {metrics.messagesExchanged > 0 && (
-            <div className="flex items-start gap-2.5 p-2.5 bg-white rounded-lg">
-              <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <MessageSquare className="w-3 h-3 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-900">{metrics.messagesExchanged} mensajes intercambiados</p>
-                <p className="text-xs text-gray-500">Responde rápido para mantener el engagement.</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 }

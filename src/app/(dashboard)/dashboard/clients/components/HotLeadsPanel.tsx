@@ -1,12 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import { useHotLeads } from '@/presentation/hooks/useAgentCRM';
-import { Flame, Phone, Mail, Eye, Download, Heart } from 'lucide-react';
+import { Flame, Phone, Mail, Eye, Download, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 
+const ITEMS_PER_PAGE = 5;
+
 export function HotLeadsPanel() {
   const { data: hotLeads, isLoading } = useHotLeads(30, 3);
+  const [page, setPage] = useState(0);
 
   if (isLoading) {
     return (
@@ -40,6 +44,9 @@ export function HotLeadsPanel() {
     );
   }
 
+  const totalPages = Math.ceil(hotLeads.length / ITEMS_PER_PAGE);
+  const paginatedLeads = hotLeads.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'HIGH': return 'bg-red-100 text-red-700 border-red-200';
@@ -63,9 +70,9 @@ export function HotLeadsPanel() {
       </div>
 
       <div className="space-y-2 max-h-[350px] overflow-y-auto">
-        {hotLeads.slice(0, 10).map((lead) => (
+        {paginatedLeads.map((lead, index) => (
           <div
-            key={`${lead.clientId}-${lead.propertyId}`}
+            key={`${lead.clientId}-${lead.propertyId}-${index}`}
             className="p-3 border border-gray-100 rounded-lg hover:border-orange-200 hover:bg-orange-50/30 transition-colors"
           >
             <div className="flex items-start justify-between">
@@ -137,6 +144,30 @@ export function HotLeadsPanel() {
           </div>
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+          <button
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            disabled={page === 0}
+            className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="w-3 h-3" />
+            Anterior
+          </button>
+          <span className="text-xs text-gray-400">
+            {page + 1} / {totalPages}
+          </span>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+            disabled={page >= totalPages - 1}
+            className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            Siguiente
+            <ChevronRight className="w-3 h-3" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

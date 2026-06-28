@@ -96,7 +96,7 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
       : '',
     contactEmail: user?.email || '',
     contactPhone: '',
-    message: '¡Hola! Me interesa este proyecto. ¿Está disponible?',
+    message: 'Hola! Me interesa este proyecto. Esta disponible?',
     preferredContactMethod: 'EMAIL' as ContactMethod,
     selectedUnitId: '',
   });
@@ -124,7 +124,14 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
     } else if (!/\S+@\S+\.\S+/.test(formData.contactEmail)) {
       newErrors.contactEmail = 'Email inválido';
     }
-    if (!formData.contactPhone.trim()) newErrors.contactPhone = 'El teléfono es obligatorio';
+    if (!formData.contactPhone.trim()) {
+      newErrors.contactPhone = 'El teléfono es obligatorio';
+    } else {
+      const digitsOnly = formData.contactPhone.replace(/\D/g, '');
+      if (digitsOnly.length !== 9) {
+        newErrors.contactPhone = 'El teléfono debe tener exactamente 9 dígitos';
+      }
+    }
     if (!formData.message.trim()) newErrors.message = 'El mensaje es obligatorio';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -134,7 +141,16 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    
+    // Para el telefono: solo permitir numeros y maximo 9 digitos
+    if (name === 'contactPhone') {
+      const digitsOnly = value.replace(/\D/g, '');
+      const limited = digitsOnly.slice(0, 9);
+      setFormData({ ...formData, contactPhone: limited });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+    
     if (errors[name]) {
       setErrors(prev => {
         const n = { ...prev };
@@ -150,13 +166,15 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
 
     try {
       await trackContactForm.mutateAsync({
-        propertyId: project.id,
+        projectId: project.id,
         contactName: formData.contactName,
         contactEmail: formData.contactEmail,
         contactPhone: formData.contactPhone,
-        message: `${formData.message}${formData.selectedUnitId ? ` | Unidad de interés: ${formData.selectedUnitId}` : ''}`,
+        message: `${formData.message}${formData.selectedUnitId ? ` | Unidad de interes: ${formData.selectedUnitId}` : ''}`,
         preferredContactMethod: formData.preferredContactMethod,
       });
+
+      toast.success('Enviado exitosamente');
 
       setFormData({
         contactName: isAuthenticated && user?.firstName && user?.lastName
@@ -164,13 +182,14 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
           : '',
         contactEmail: isAuthenticated && user?.email ? user.email : '',
         contactPhone: '',
-        message: '¡Hola! Me interesa este proyecto. ¿Está disponible?',
+        message: 'Hola! Me interesa este proyecto. Esta disponible?',
         preferredContactMethod: 'EMAIL' as const,
         selectedUnitId: '',
       });
       setErrors({});
     } catch (error) {
       console.error('Error enviando formulario:', error);
+      toast.error('Error al enviar el mensaje. Intentalo de nuevo.');
     }
   };
 

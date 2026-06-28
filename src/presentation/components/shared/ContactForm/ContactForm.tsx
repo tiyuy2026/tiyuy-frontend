@@ -6,6 +6,7 @@ import { useCRMInteraction } from '@/presentation/hooks/useCRMInteraction';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { Input } from '@/presentation/components/ui';
 import { AlertCircle } from 'lucide-react';
+import { toast } from '@/presentation/store/toastStore';
 
 interface ContactFormProps {
   propertyId: number;
@@ -24,7 +25,7 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
       : '',
     contactEmail: user?.email || '',
     contactPhone: '',
-    message: '¡Hola! Me interesa esta propiedad. ¿Está disponible?',
+    message: 'Hola! Me interesa esta propiedad. Esta disponible?',
     preferredContactMethod: 'EMAIL',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -58,7 +59,14 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
     } else if (!/\S+@\S+\.\S+/.test(formData.contactEmail)) {
       newErrors.contactEmail = 'Email inválido';
     }
-    if (!formData.contactPhone.trim()) newErrors.contactPhone = 'El teléfono es obligatorio';
+    if (!formData.contactPhone.trim()) {
+      newErrors.contactPhone = 'El teléfono es obligatorio';
+    } else {
+      const digitsOnly = formData.contactPhone.replace(/\D/g, '');
+      if (digitsOnly.length !== 9) {
+        newErrors.contactPhone = 'El teléfono debe tener exactamente 9 dígitos';
+      }
+    }
     if (!formData.message.trim()) newErrors.message = 'El mensaje es obligatorio';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -68,7 +76,16 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    
+    // Para el telefono: solo permitir numeros y maximo 9 digitos
+    if (name === 'contactPhone') {
+      const digitsOnly = value.replace(/\D/g, '');
+      const limited = digitsOnly.slice(0, 9);
+      setFormData({ ...formData, contactPhone: limited });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+    
     if (errors[name]) {
       setErrors(prev => {
         const n = { ...prev };
@@ -92,18 +109,21 @@ export function ContactForm({ propertyId, ownerId }: ContactFormProps) {
         preferredContactMethod: formData.preferredContactMethod,
       });
 
+      toast.success('Enviado exitosamente');
+
       setFormData({
         contactName: isAuthenticated && user?.firstName && user?.lastName
           ? `${user.firstName} ${user.lastName}`
           : '',
         contactEmail: isAuthenticated && user?.email ? user.email : '',
         contactPhone: '',
-        message: '¡Hola! Me interesa esta propiedad. ¿Está disponible?',
+        message: 'Hola! Me interesa esta propiedad. Esta disponible?',
         preferredContactMethod: 'EMAIL' as ContactMethod,
       });
       setErrors({});
     } catch (error) {
       console.error('Error enviando formulario:', error);
+      toast.error('Error al enviar el mensaje. Intentalo de nuevo.');
     }
   };
 

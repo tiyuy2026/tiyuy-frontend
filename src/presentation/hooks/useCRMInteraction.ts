@@ -5,9 +5,10 @@ import { useMutation } from '@tanstack/react-query';
 import { axiosClient, publicApiClient } from '@/infrastructure/api/axios-client';
 import { toast } from '@/presentation/store/toastStore';
 
-// DTOs para CRM (IGUALES)
+// DTOs para CRM
 interface CreateLeadRequest {
-  propertyId: number;
+  propertyId?: number;
+  projectId?: number;
   message?: string;
   contactPhone?: string;
   contactEmail?: string;
@@ -36,12 +37,15 @@ export function useCRMInteraction() {
   // Crear lead cuando usuario muestra interés (WhatsApp o formulario)
   const createLead = useMutation({
     mutationFn: async (data: CreateLeadRequest) => {
-      const response = await axiosClient.post('/interactions/leads', {
-        propertyId: data.propertyId,
+      const payload: any = {
         message: data.message || 'Interés en propiedad vía WhatsApp/Formulario',
         contactPhone: data.contactPhone,
         contactEmail: data.contactEmail,
-      });
+      };
+      if (data.propertyId) payload.propertyId = data.propertyId;
+      if (data.projectId) payload.projectId = data.projectId;
+      
+      const response = await axiosClient.post('/interactions/leads', payload);
       return response.data;
     },
     onSuccess: () => {
@@ -71,11 +75,12 @@ export function useCRMInteraction() {
   // Trackear click en WhatsApp con redirección
   const trackWhatsAppClick = useMutation({
     mutationFn: async (data: WhatsAppClickRequest) => {
-      const leadResponse = await axiosClient.post('/interactions/leads', {
-        propertyId: data.propertyId,
+      const payload: any = {
         message: `Contacto vía WhatsApp: ${data.message?.substring(0, 100) || 'Solicitud de información'}`,
-        source: 'whatsapp_button',
-      });
+      };
+      if (data.propertyId) payload.propertyId = data.propertyId;
+      
+      const leadResponse = await axiosClient.post('/interactions/leads', payload);
 
       return {
         leadId: leadResponse.data?.leadId,
@@ -102,7 +107,8 @@ export function useCRMInteraction() {
   // Trackear envío de formulario de contacto (PÚBLICO - sin login)
   const trackContactForm = useMutation({
     mutationFn: async (data: {
-      propertyId: number;
+      propertyId?: number;
+      projectId?: number;
       contactName: string;
       contactEmail: string;
       contactPhone: string;
@@ -110,13 +116,15 @@ export function useCRMInteraction() {
       preferredContactMethod: string;
     }) => {
       // Usar publicApiClient para permitir leads anónimos
-      const leadResponse = await publicApiClient.post('/interactions/leads', {
-        propertyId: data.propertyId,
+      const payload: any = {
         message: `${data.message} | Contactar por: ${data.preferredContactMethod}`,
         contactPhone: data.contactPhone,
         contactEmail: data.contactEmail,
-        source: 'contact_form',
-      });
+      };
+      if (data.propertyId) payload.propertyId = data.propertyId;
+      if (data.projectId) payload.projectId = data.projectId;
+      
+      const leadResponse = await publicApiClient.post('/interactions/leads', payload);
 
       return leadResponse.data;
     },
