@@ -57,70 +57,77 @@ function isClientActive(client: Partial<CRMClient>): boolean {
 export function useClientCRM(userId?: number) {
   const queryClient = useQueryClient();
 
+  // Helper para queries con configuración optimizada
+  const queryConfig = {
+    enabled: !!userId,
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutos de caché
+    gcTime: 10 * 60 * 1000,   // 10 minutos en memoria
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  };
+
   // ========== QUERIES REALES AL BACKEND ==========
   
-  // 1. Obtener contactos recibidos (personas que han contactado al usuario)
+  // Helper para hacer fetch con timeout
+  const fetchWithTimeout = (url: string, timeoutMs = 4000, defaultValue: any = []) => ({
+    queryFn: async () => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const response = await axiosClient.get(url, { signal: controller.signal });
+        return response.data?.content || response.data || defaultValue;
+      } catch {
+        return defaultValue;
+      } finally {
+        clearTimeout(timeout);
+      }
+    },
+    retry: 0,
+  });
+
+  // 1. Obtener contactos recibidos
   const { 
     data: contactsData, 
     isLoading: contactsLoading,
     error: contactsError 
   } = useQuery({
     queryKey: ['contacts', 'received', 0, 100],
-    queryFn: async () => {
-      const response = await axiosClient.get('/contacts/received?page=0&size=100');
-      return response.data?.content || response.data || [];
-    },
-    enabled: !!userId,
-    retry: 2,
-    staleTime: 30000,
+    ...fetchWithTimeout('/contacts/received?page=0&size=100'),
+    ...queryConfig,
   });
 
-  // 2. Obtener contactos enviados (personas a las que el usuario ha contactado)
+  // 2. Obtener contactos enviados
   const { 
     data: sentContactsData, 
     isLoading: sentContactsLoading,
     error: sentContactsError 
   } = useQuery({
     queryKey: ['contacts', 'sent', 0, 100],
-    queryFn: async () => {
-      const response = await axiosClient.get('/contacts/sent?page=0&size=100');
-      return response.data?.content || response.data || [];
-    },
-    enabled: !!userId,
-    retry: 2,
-    staleTime: 30000,
+    ...fetchWithTimeout('/contacts/sent?page=0&size=100'),
+    ...queryConfig,
   });
 
-  // 3. Obtener leads recibidos (personas interesadas en mis propiedades)
+  // 3. Obtener leads recibidos
   const { 
     data: leadsData, 
     isLoading: leadsLoading,
     error: leadsError 
   } = useQuery({
     queryKey: ['leads', 'received', 0, 100],
-    queryFn: async () => {
-      const response = await axiosClient.get('/interactions/leads/received?page=0&size=100');
-      return response.data?.content || response.data || [];
-    },
-    enabled: !!userId,
-    retry: 2,
-    staleTime: 30000,
+    ...fetchWithTimeout('/interactions/leads/received?page=0&size=100'),
+    ...queryConfig,
   });
 
-  // 4. Obtener leads enviados (propiedades en las que el usuario mostró interés)
+  // 4. Obtener leads enviados
   const { 
     data: sentLeadsData, 
     isLoading: sentLeadsLoading,
     error: sentLeadsError 
   } = useQuery({
     queryKey: ['leads', 'sent', 0, 100],
-    queryFn: async () => {
-      const response = await axiosClient.get('/interactions/leads/sent?page=0&size=100');
-      return response.data?.content || response.data || [];
-    },
-    enabled: !!userId,
-    retry: 2,
-    staleTime: 30000,
+    ...fetchWithTimeout('/interactions/leads/sent?page=0&size=100'),
+    ...queryConfig,
   });
 
   // 5. Obtener propiedades del usuario
@@ -130,53 +137,28 @@ export function useClientCRM(userId?: number) {
     error: propertiesError 
   } = useQuery({
     queryKey: ['my-properties', 0, 100],
-    queryFn: async () => {
-      const response = await axiosClient.get('/properties/my-properties?page=0&size=100');
-      return response.data?.content || response.data || [];
-    },
-    enabled: !!userId,
-    retry: 2,
-    staleTime: 30000,
+    ...fetchWithTimeout('/properties/my-properties?page=0&size=100'),
+    ...queryConfig,
   });
 
-  // 6. Obtener grupos del usuario (datos reales del backend)
+  // 6. Obtener grupos
   const { 
     data: groupsData, 
     isLoading: groupsLoading,
-    error: groupsError 
   } = useQuery({
     queryKey: ['contacts', 'extended', 'groups'],
-    queryFn: async () => {
-      try {
-        const response = await axiosClient.get('/contacts/extended/groups?page=0&size=50');
-        return response.data?.content || response.data || [];
-      } catch {
-        return [];
-      }
-    },
-    enabled: !!userId,
-    retry: 1,
-    staleTime: 60000,
+    ...fetchWithTimeout('/contacts/extended/groups?page=0&size=50', 3000),
+    ...queryConfig,
   });
 
-  // 7. Obtener chats del usuario (datos reales del backend)
+  // 7. Obtener chats
   const { 
     data: chatsData, 
     isLoading: chatsLoading,
-    error: chatsError 
   } = useQuery({
     queryKey: ['contacts', 'extended', 'chats'],
-    queryFn: async () => {
-      try {
-        const response = await axiosClient.get('/contacts/extended/chats');
-        return response.data || [];
-      } catch {
-        return [];
-      }
-    },
-    enabled: !!userId,
-    retry: 1,
-    staleTime: 60000,
+    ...fetchWithTimeout('/contacts/extended/chats', 3000),
+    ...queryConfig,
   });
 
   const isLoading = contactsLoading || sentContactsLoading || leadsLoading || sentLeadsLoading || propertiesLoading || groupsLoading || chatsLoading;

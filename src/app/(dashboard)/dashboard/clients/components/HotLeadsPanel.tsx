@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useHotLeads } from '@/presentation/hooks/useAgentCRM';
-import { Flame, Phone, Mail, Eye, Download, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
-import Link from 'next/link';
+import { HotLeadDTO, useHotLeads } from '@/presentation/hooks/useAgentCRM';
+import { Flame, Phone, Mail, Eye, Download, Heart, ChevronLeft, ChevronRight, X, Building2, TrendingUp, Calendar, Clock } from 'lucide-react';
 import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
 
 const ITEMS_PER_PAGE = 5;
@@ -11,6 +10,7 @@ const ITEMS_PER_PAGE = 5;
 export function HotLeadsPanel() {
   const { data: hotLeads, isLoading } = useHotLeads(30, 3);
   const [page, setPage] = useState(0);
+  const [selectedLead, setSelectedLead] = useState<HotLeadDTO | null>(null);
 
   if (isLoading) {
     return (
@@ -73,7 +73,8 @@ export function HotLeadsPanel() {
         {paginatedLeads.map((lead, index) => (
           <div
             key={`${lead.clientId}-${lead.propertyId}-${index}`}
-            className="p-3 border border-gray-100 rounded-lg hover:border-orange-200 hover:bg-orange-50/30 transition-colors"
+            onClick={() => setSelectedLead(lead)}
+            className="block p-3 border border-gray-100 rounded-lg hover:border-orange-200 hover:bg-orange-50/30 transition-all cursor-pointer"
           >
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
@@ -133,13 +134,6 @@ export function HotLeadsPanel() {
                   )}
                 </div>
               </div>
-
-              <Link
-                href={`/dashboard/clients/${lead.clientId}`}
-                className="text-xs text-blue-600 hover:text-blue-800 font-medium shrink-0 ml-2"
-              >
-                Ver →
-              </Link>
             </div>
           </div>
         ))}
@@ -166,6 +160,135 @@ export function HotLeadsPanel() {
             Siguiente
             <ChevronRight className="w-3 h-3" />
           </button>
+        </div>
+      )}
+
+      {/* Modal de detalle del lead */}
+      {selectedLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedLead(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-auto overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Modal header */}
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-orange-50 to-white">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl">
+                  <Flame className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Detalle del Lead</h3>
+                  <p className="text-xs text-gray-400">Información completa de la oportunidad</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedLead(null)}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal body */}
+            <div className="p-6 space-y-5">
+              {/* Cliente info */}
+              <div className="flex items-start gap-4">
+                <UserAvatar 
+                  user={{ firstName: selectedLead.clientName, lastName: '' }} 
+                  size="md" 
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="text-lg font-bold text-gray-900">{selectedLead.clientName}</h4>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${getPriorityColor(selectedLead.priority)}`}>
+                      {selectedLead.priority}
+                    </span>
+                  </div>
+                  {selectedLead.clientEmail && (
+                    <p className="text-sm text-gray-500 flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5" />
+                      {selectedLead.clientEmail}
+                    </p>
+                  )}
+                  {selectedLead.clientPhone && (
+                    <p className="text-sm text-gray-500 flex items-center gap-1.5 mt-0.5">
+                      <Phone className="w-3.5 h-3.5" />
+                      {selectedLead.clientPhone}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Score y propiedad */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                  <div className="flex items-center gap-2 text-amber-600 mb-2">
+                    <TrendingUp className="w-4 h-4" />
+                    <span className="text-xs font-semibold uppercase tracking-wider">Score</span>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900">{selectedLead.score}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Puntuación de interés</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                  <div className="flex items-center gap-2 text-blue-600 mb-2">
+                    <Eye className="w-4 h-4" />
+                    <span className="text-xs font-semibold uppercase tracking-wider">Vistas</span>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900">{selectedLead.viewCount}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Veces que vio la propiedad</p>
+                </div>
+              </div>
+
+              {/* Propiedad */}
+              <div>
+                <div className="flex items-center gap-2 text-gray-700 mb-2">
+                  <Building2 className="w-4 h-4 text-orange-500" />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Propiedad de interés</span>
+                </div>
+                <div className="p-3 bg-orange-50 rounded-xl border border-orange-100">
+                  <p className="font-medium text-gray-900 text-sm">{selectedLead.propertyTitle}</p>
+                  {selectedLead.lastViewAt && (
+                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      Última vista: {new Date(selectedLead.lastViewAt).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Comportamiento */}
+              <div>
+                <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 block">Comportamiento</span>
+                <div className="flex flex-wrap gap-2">
+                  {selectedLead.contactRequested && (
+                    <span className="flex items-center gap-1 text-[11px] px-3 py-1.5 bg-green-100 text-green-700 rounded-lg font-medium">
+                      <Phone className="w-3 h-3" />
+                      Solicitó contacto
+                    </span>
+                  )}
+                  {selectedLead.downloadedDocuments && (
+                    <span className="flex items-center gap-1 text-[11px] px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg font-medium">
+                      <Download className="w-3 h-3" />
+                      Descargó documentos
+                    </span>
+                  )}
+                  {selectedLead.savedToFavorites && (
+                    <span className="flex items-center gap-1 text-[11px] px-3 py-1.5 bg-pink-100 text-pink-700 rounded-lg font-medium">
+                      <Heart className="w-3 h-3" />
+                      Guardó en favoritos
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal footer */}
+            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+              <button
+                onClick={() => setSelectedLead(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

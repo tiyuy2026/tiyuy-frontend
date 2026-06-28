@@ -137,9 +137,12 @@ export function ClientList({ clients, filterClients, selectedClientId, onClientS
           </div>
         ) : (
           <div className="divide-y divide-gray-50">
-            {filteredClients.map(client => {
+              {filteredClients.map(client => {
               const activityStatus = getActivityStatus(client.daysSinceLastActivity);
               const isSelected = selectedClientId === client.id;
+              const displayName = client.name && client.name !== 'Sin nombre' && client.name.length > 2 
+                ? client.name 
+                : (client.email || client.phone || `Cliente #${client.id}`);
 
               return (
                 <div
@@ -151,13 +154,13 @@ export function ClientList({ clients, filterClients, selectedClientId, onClientS
                 >
                   <div className="flex items-start gap-2.5">
                     <UserAvatar 
-                      user={{ firstName: client.name, lastName: '' }} 
+                      user={{ firstName: displayName, lastName: '' }} 
                       size="sm" 
                     />
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-medium text-gray-900 truncate">{client.name}</h3>
+                        <h3 className="text-sm font-medium text-gray-900 truncate">{displayName}</h3>
                         <div className="flex items-center gap-1">
                           <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
                           <span className="text-xs font-semibold text-blue-600">{client.interactionScore}</span>

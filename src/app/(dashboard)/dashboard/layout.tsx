@@ -141,38 +141,16 @@ export default function DashboardLayout({
                 : 'w-64'
             }`}
           >
-            <div className="p-4 border-b border-gray-200 flex items-center gap-2">
-              {collapsed ? (
-                <button
-                  onClick={() => setCollapsed(false)}
-                  className="flex items-center gap-2 min-w-0 flex-1"
-                  title="Expandir menú"
-                >
-                  <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
-                    T
-                  </div>
-                </button>
-              ) : (
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-2 min-w-0 flex-1"
-                  title="Ir al inicio"
-                >
-                  <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
-                    T
-                  </div>
-                  <div className="transition-all duration-200 overflow-hidden">
-                    <h1 className="font-bold text-gray-900 text-lg leading-tight whitespace-nowrap">TIYUY</h1>
-                    <p className="text-xs text-gray-500 leading-tight whitespace-nowrap">Real Estate CRM</p>
-                  </div>
-                </Link>
-              )}
+            <div className="px-3 pt-2 pb-1">
               <button
                 onClick={() => setCollapsed(!collapsed)}
-                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-600 hover:text-gray-900 transition-all duration-300 w-full"
                 title={collapsed ? 'Expandir menú' : 'Colapsar menú'}
               >
-                {collapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+                {collapsed ? <PanelLeft className="w-5 h-5 flex-shrink-0" /> : <PanelLeftClose className="w-5 h-5 flex-shrink-0" />}
+                <span className={`text-sm font-medium transition-all duration-200 overflow-hidden ${collapsed ? 'opacity-0 w-0' : 'opacity-100'}`}>
+                  Menú
+                </span>
               </button>
             </div>
 

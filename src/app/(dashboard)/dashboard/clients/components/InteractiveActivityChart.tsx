@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  AreaChart,
-  Area,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   Tooltip,
@@ -11,119 +11,52 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { CRMMetrics } from '@/core/domain/entities/CRM';
-import { TrendingUp, TrendingDown, Minus, Activity } from 'lucide-react';
 
 interface InteractiveActivityChartProps {
   metrics: CRMMetrics;
 }
 
-interface ChartDataPoint {
-  name: string;
-  value: number;
-  trend: 'up' | 'down' | 'stable';
-  detail: string;
-}
-
-const TREND_CONFIG = {
-  up: {
-    gradient: ['#10b981', '#10b98100'],
-    line: '#059669',
-    label: 'Al alza',
-    bg: 'bg-emerald-50',
-    text: 'text-emerald-600',
-    dot: '#10b981',
-  },
-  down: {
-    gradient: ['#ef4444', '#ef444400'],
-    line: '#dc2626',
-    label: 'A la baja',
-    bg: 'bg-red-50',
-    text: 'text-red-600',
-    dot: '#ef4444',
-  },
-  stable: {
-    gradient: ['#6b7280', '#6b728000'],
-    line: '#6b7280',
-    label: 'Estable',
-    bg: 'bg-gray-50',
-    text: 'text-gray-600',
-    dot: '#6b7280',
-  },
-};
-
-function calculateTrend(current: number, previous: number): 'up' | 'down' | 'stable' {
-  if (previous === 0) return 'stable';
-  const ratio = current / previous;
-  if (ratio > 1.1) return 'up';
-  if (ratio < 0.9) return 'down';
-  return 'stable';
-}
+const CATEGORIES = [
+  { key: 'Mensajes', color: '#0ea5e9' },
+  { key: 'Activos', color: '#10b981' },
+  { key: 'Alto Interés', color: '#8b5cf6' },
+  { key: 'Interés Medio', color: '#f59e0b' },
+  { key: 'Bajo Interés', color: '#6b7280' },
+  { key: 'En Riesgo', color: '#ef4444' },
+];
 
 export function InteractiveActivityChart({ metrics }: InteractiveActivityChartProps) {
-  const chartData: ChartDataPoint[] = useMemo(() => [
-    {
-      name: 'Mensajes',
-      value: metrics.messagesExchanged,
-      trend: calculateTrend(metrics.messagesExchanged, Math.max(metrics.messagesExchanged - metrics.interactionsThisWeek, 1)),
-      detail: `${metrics.messagesExchanged} intercambiados`
-    },
-    {
-      name: 'Activos',
-      value: metrics.activeClients,
-      trend: calculateTrend(metrics.activeClients, metrics.totalClients - metrics.activeClients),
-      detail: `${((metrics.activeClients / Math.max(metrics.totalClients, 1)) * 100).toFixed(0)}% del total`
-    },
-    {
-      name: 'Alto Interés',
-      value: metrics.highInterestClients,
-      trend: calculateTrend(metrics.highInterestClients, metrics.mediumInterestClients),
-      detail: `${metrics.highInterestClients} leads calificados`
-    },
-    {
-      name: 'Interés Medio',
-      value: metrics.mediumInterestClients,
-      trend: calculateTrend(metrics.mediumInterestClients, metrics.lowInterestClients),
-      detail: 'Requieren seguimiento'
-    },
-    {
-      name: 'Bajo Interés',
-      value: metrics.lowInterestClients,
-      trend: 'down',
-      detail: 'Menor prioridad'
-    },
-    {
-      name: 'En Riesgo',
-      value: metrics.clientsAtRisk.length,
-      trend: 'down',
-      detail: `${metrics.clientsAtRisk.length} clientes por recuperar`
-    },
+  const [hoveredKey, setHoveredKey] = useState<string | null>(null);
+
+  // Un solo array con cada punto como objeto separado para tener línea conectada
+  const chartData = useMemo(() => [
+    { name: 'Mensajes', value: metrics.messagesExchanged, fill: '#0ea5e9' },
+    { name: 'Activos', value: metrics.activeClients, fill: '#10b981' },
+    { name: 'Alto Interés', value: metrics.highInterestClients, fill: '#8b5cf6' },
+    { name: 'Interés Medio', value: metrics.mediumInterestClients, fill: '#f59e0b' },
+    { name: 'Bajo Interés', value: metrics.lowInterestClients, fill: '#6b7280' },
+    { name: 'En Riesgo', value: metrics.clientsAtRisk.length, fill: '#ef4444' },
   ], [metrics]);
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (!active || !payload || !payload.length) return null;
-    
-    const data = payload[0].payload as ChartDataPoint;
-    const trend = TREND_CONFIG[data.trend];
-    
+  const maxVal = Math.max(1, ...chartData.map(d => d.value));
+
+  // Calcular puntos para SVG overlay (puntos exactos en coordenadas)
+  const points = chartData.map((d, i) => ({
+    ...d,
+    cx: 10 + i * (100 / (chartData.length - 1)) * 0.9, // posición X relativa
+    cy: d.value,
+  }));
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (!active || !payload?.length) return null;
+    const d = payload[0].payload;
     return (
-      <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-100 p-4 min-w-[200px]">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-semibold text-gray-900">{data.name}</span>
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${trend.bg} ${trend.text}`}>
-            {data.trend === 'up' ? <TrendingUp className="w-3 h-3" /> :
-             data.trend === 'down' ? <TrendingDown className="w-3 h-3" /> :
-             <Minus className="w-3 h-3" />}
-            {trend.label}
-          </span>
+      <div className="bg-white rounded-xl shadow-2xl border border-gray-100 px-4 py-3 min-w-[160px]">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.fill }} />
+          <span className="text-sm font-bold text-gray-900">{d.name}</span>
         </div>
-        <div className="flex items-baseline gap-1.5 mb-1">
-          <span className="text-2xl font-extrabold text-gray-900">{data.value}</span>
-          <span className="text-[11px] text-gray-400 font-medium">unidades</span>
-        </div>
-        <div className="flex items-center gap-1.5 text-[11px] text-gray-500">
-          <Activity className="w-3 h-3" />
-          <span>{data.detail}</span>
-        </div>
+        <p className="text-2xl font-black text-gray-900">{d.value}</p>
       </div>
     );
   };
@@ -131,106 +64,106 @@ export function InteractiveActivityChart({ metrics }: InteractiveActivityChartPr
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-50">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-sm font-bold text-gray-900">Estadísticas de Clientes</h2>
-            <p className="text-[11px] text-gray-400 mt-0.5">Pasa el mouse sobre las barras para ver más detalles</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="text-[11px] text-gray-500">Al alza</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-gray-400" />
-              <span className="text-[11px] text-gray-500">Estable</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-red-500" />
-              <span className="text-[11px] text-gray-500">A la baja</span>
-            </div>
-          </div>
-        </div>
+      <div className="px-6 py-5 border-b border-gray-50">
+        <h2 className="text-base font-bold text-gray-900">Analytics Predictivo</h2>
+        <p className="text-xs text-gray-400 mt-1">Pasa el mouse sobre los puntos para ver detalles</p>
       </div>
 
       {/* Chart */}
-      <div className="px-6 py-5">
-        <div className="h-[180px]">
+      <div className="px-6 py-4">
+        <div className="h-[160px]">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={chartData}
-              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-            >
+            <LineChart data={chartData} margin={{ top: 20, right: 10, left: -20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={false} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} dx={-5} />
+              <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#e2e8f0', strokeWidth: 1, strokeDasharray: '4 4' }} />
+              
+              {/* Línea única conectando todos los puntos - estilo financiero */}
               <defs>
-                {chartData.map((entry, index) => (
-                  <linearGradient key={entry.name} id={`gradient-${index}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={TREND_CONFIG[entry.trend].gradient[0]} stopOpacity={0.3} />
-                    <stop offset="100%" stopColor={TREND_CONFIG[entry.trend].gradient[1]} stopOpacity={0} />
-                  </linearGradient>
-                ))}
+                <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#0ea5e9" />
+                  <stop offset="20%" stopColor="#10b981" />
+                  <stop offset="40%" stopColor="#8b5cf6" />
+                  <stop offset="60%" stopColor="#f59e0b" />
+                  <stop offset="80%" stopColor="#6b7280" />
+                  <stop offset="100%" stopColor="#ef4444" />
+                </linearGradient>
+                <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity={0.12} />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+                </linearGradient>
               </defs>
-              
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                stroke="#f3f4f6" 
-                vertical={false}
-              />
-              
-              <XAxis 
-                dataKey="name" 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 11, fill: '#9ca3af', fontWeight: 500 }}
-                dy={8}
-              />
-              
-              <YAxis 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 11, fill: '#9ca3af' }}
-                dx={-5}
-              />
-              
-              <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#e5e7eb', strokeWidth: 1, strokeDasharray: '4 4' }} />
-              
-              <Area
+
+              {/* Área bajo la línea */}
+              <Line
                 type="monotone"
                 dataKey="value"
-                stroke="#6366f1"
-                strokeWidth={2.5}
-                fill="url(#gradient-0)"
+                stroke="url(#lineGrad)"
+                strokeWidth={3}
                 dot={false}
-                activeDot={{
-                  r: 5,
-                  strokeWidth: 2,
-                  stroke: '#6366f1',
-                  fill: '#fff',
-                }}
+                activeDot={false}
               />
-            </AreaChart>
+
+              {/* Puntos individuales por categoría */}
+              {chartData.map((d, i) => {
+                const isHovered = hoveredKey === d.name;
+                return (
+                  <Line
+                    key={d.name}
+                    type="monotone"
+                    dataKey="value"
+                    stroke="transparent"
+                    fill="transparent"
+                    dot={false}
+                    activeDot={false}
+                    data={[d]}
+                    onMouseEnter={() => setHoveredKey(d.name)}
+                    onMouseLeave={() => setHoveredKey(null)}
+                  />
+                );
+              })}
+            </LineChart>
           </ResponsiveContainer>
         </div>
+      </div>
 
-        {/* Footer metrics */}
-        <div className="mt-4 pt-4 border-t border-gray-50">
-          <div className="grid grid-cols-4 gap-4">
-            <div className="text-center">
-              <p className="text-lg font-bold text-gray-900">{metrics.totalClients}</p>
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-medium">Total</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-emerald-600">{metrics.activeClients}</p>
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-medium">Activos</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-amber-600">{metrics.highInterestClients + metrics.mediumInterestClients}</p>
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-medium">Calificados</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-gray-600">{metrics.clientsAtRisk.length}</p>
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-medium">En Riesgo</p>
-            </div>
+      {/* Footer - línea horizontal con dots tipo timeline */}
+      <div className="px-6 py-5 border-t border-gray-50">
+        <div className="relative">
+          {/* Línea base horizontal */}
+          <div className="absolute top-[7px] left-0 right-0 h-px bg-gray-200" />
+          
+          <div className="relative flex justify-between">
+            {chartData.map((d) => {
+              const isHovered = hoveredKey === d.name;
+              return (
+                <div
+                  key={d.name}
+                  className="flex flex-col items-center cursor-pointer transition-all duration-200"
+                  onMouseEnter={() => setHoveredKey(d.name)}
+                  onMouseLeave={() => setHoveredKey(null)}
+                  style={{ transform: isHovered ? 'translateY(-2px)' : 'none' }}
+                >
+                  <div
+                    className={`w-[15px] h-[15px] rounded-full border-[3px] border-white shadow-sm transition-all duration-200 ${
+                      isHovered ? 'scale-125 shadow-md' : ''
+                    }`}
+                    style={{ backgroundColor: d.fill }}
+                  />
+                  <span className={`text-[10px] mt-2 font-semibold whitespace-nowrap transition-colors duration-200 ${
+                    isHovered ? 'text-gray-900' : 'text-gray-400'
+                  }`}>
+                    {d.name}
+                  </span>
+                  <span className={`text-xs font-black transition-all duration-200 ${
+                    isHovered ? 'opacity-100 translate-y-0' : 'opacity-60'
+                  }`} style={{ color: d.fill }}>
+                    {d.value}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
