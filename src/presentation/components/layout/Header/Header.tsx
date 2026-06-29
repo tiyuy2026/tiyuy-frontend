@@ -851,12 +851,20 @@ export function Header() {
                               <h3 className="font-bold text-black text-lg mb-5">Otros servicios</h3>
                               <ul className="space-y-3">
                                 <li>
-                                  <Link
-                                    href="/my-properties/new"
-                                    className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer"
+                                  <button
+                                    onClick={() => {
+                                      setShowServiciosMenu(false);
+                                      if (isAuthenticated) {
+                                        router.push('/my-properties/new');
+                                      } else {
+                                        setAuthModalAction('publicar');
+                                        setShowAuthModal(true);
+                                      }
+                                    }}
+                                    className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left"
                                   >
                                     Publica un inmueble
-                                  </Link>
+                                  </button>
                                 </li>
                               </ul>
                             </div>
@@ -866,7 +874,7 @@ export function Header() {
                               <ul className="space-y-3">
                                 <li>
                                   <Link
-                                    href="/#guia-comprar"
+                                    href="/rental-guide"
                                     className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer"
                                   >
                                     Guía para comprar un inmueble
@@ -874,7 +882,7 @@ export function Header() {
                                 </li>
                                 <li>
                                   <Link
-                                    href="/#guia-vender"
+                                    href="/rental-guide"
                                     className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer"
                                   >
                                     Guía para vender un inmueble
@@ -882,7 +890,7 @@ export function Header() {
                                 </li>
                                 <li>
                                   <Link
-                                    href="/#rental-guide"
+                                    href="/rental-guide"
                                     className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer"
                                   >
                                     Guía para alquilar un inmueble
@@ -904,7 +912,7 @@ export function Header() {
                               <ul className="space-y-3">
                                 <li>
                                   <Link
-                                    href="/#reporte-indice"
+                                    href="/price-per-m2"
                                     className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer"
                                   >
                                     Reporte Índice por m2
@@ -918,7 +926,7 @@ export function Header() {
                               <ul className="space-y-3">
                                 <li>
                                   <Link
-                                    href="/#mercado-inmobiliario"
+                                    href="/market-radar"
                                     className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer"
                                   >
                                     Mercado Inmobiliario

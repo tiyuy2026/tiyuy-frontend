@@ -183,6 +183,8 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
                     propertyId={property.id}
                     size="md"
                     showValue
+                    averageRating={rating?.averageRating || 0}
+                    totalRatings={rating?.totalRatings || 0}
                     onRatingSaved={() => {
                       fetch(`/api/properties/${property.id}/rating`).then(res => {
                         if (res.ok) res.json().then(data => setRating(data));
@@ -342,6 +344,8 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
                     propertyId={property.id}
                     size="md"
                     showValue
+                    averageRating={rating?.averageRating || 0}
+                    totalRatings={rating?.totalRatings || 0}
                     onRatingSaved={() => {
                       // Recargar rating después de calificar
                       fetch(`/api/properties/${property.id}/rating`).then(res => {
@@ -353,6 +357,9 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
                     <p className="text-xs text-gray-400">
                       Promedio: {rating.averageRating.toFixed(1)} ({rating.totalRatings} {rating.totalRatings === 1 ? 'voto' : 'votos'})
                     </p>
+                  )}
+                  {(!rating || rating.totalRatings === 0) && (
+                    <p className="text-xs text-gray-400">Sé el primero en calificar</p>
                   )}
                 </div>
               </div>

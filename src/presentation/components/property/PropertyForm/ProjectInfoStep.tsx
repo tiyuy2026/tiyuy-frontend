@@ -218,6 +218,134 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
         )}
       </div>
 
+      {/* ─── DATOS DE LOTIZACION (solo si el tipo es LOTIZATION) ─── */}
+      {formData.projectType === 'LOTIZATION' && (
+        <div className="space-y-4 border-l-4 border-teal-400 pl-4 bg-teal-50/30 rounded-r-xl p-4">
+          <h4 className="font-bold text-gray-900 text-sm">Datos de Lotizacion</h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">RUC (privado)</label>
+              <input type="text" value={formData.ruc || ''} onChange={e => onChange('ruc', e.target.value)}
+                placeholder="20600000001" maxLength={11}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Razon social</label>
+              <input type="text" value={formData.socialReason || ''} onChange={e => onChange('socialReason', e.target.value)}
+                placeholder="Nombre de la empresa"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Inicial desde (S/)</label>
+              <input type="number" value={formData.initialFee || ''} onChange={e => onChange('initialFee', e.target.value ? Number(e.target.value) : '')}
+                placeholder="Ej: 5000" min="0"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Cuota mensual (S/)</label>
+              <input type="number" value={formData.monthlyPayment || ''} onChange={e => onChange('monthlyPayment', e.target.value ? Number(e.target.value) : '')}
+                placeholder="Ej: 800" min="0"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Informacion de financiamiento</label>
+            <input type="text" value={formData.financingInfo || ''} onChange={e => onChange('financingInfo', e.target.value)}
+              placeholder="Ej: Financiamiento directo sin intereses a 24 meses"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Total de manzanas</label>
+              <input type="number" value={formData.totalBlocks || ''} onChange={e => onChange('totalBlocks', e.target.value ? Number(e.target.value) : '')}
+                placeholder="Ej: 8" min="0"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Sitio web</label>
+              <input type="url" value={formData.websiteUrl || ''} onChange={e => onChange('websiteUrl', e.target.value)}
+                placeholder="https://"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Red social</label>
+            <input type="url" value={formData.socialMediaUrl || ''} onChange={e => onChange('socialMediaUrl', e.target.value)}
+              placeholder="https://facebook.com/tuproyecto"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+          </div>
+
+          {/* Habilitacion urbana */}
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <h5 className="font-semibold text-gray-800 text-sm mb-3">Habilitacion urbana y documentos</h5>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" checked={formData.hasUrbanization || false} 
+                  onChange={e => onChange('hasUrbanization', e.target.checked)} className="rounded text-teal-600" />
+                <span>Habilitacion urbana</span>
+              </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" checked={formData.hasPropertyTitle || false}
+                  onChange={e => onChange('hasPropertyTitle', e.target.checked)} className="rounded text-teal-600" />
+                <span>Titulo de propiedad</span>
+              </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" checked={formData.hasWater || false}
+                  onChange={e => onChange('hasWater', e.target.checked)} className="rounded text-teal-600" />
+                <span>Agua</span>
+              </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" checked={formData.hasElectricity || false}
+                  onChange={e => onChange('hasElectricity', e.target.checked)} className="rounded text-teal-600" />
+                <span>Electricidad</span>
+              </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" checked={formData.hasSewerage || false}
+                  onChange={e => onChange('hasSewerage', e.target.checked)} className="rounded text-teal-600" />
+                <span>Desague</span>
+              </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" checked={formData.hasPavedRoads || false}
+                  onChange={e => onChange('hasPavedRoads', e.target.checked)} className="rounded text-teal-600" />
+                <span>Pistas</span>
+              </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" checked={formData.hasStreetLighting || false}
+                  onChange={e => onChange('hasStreetLighting', e.target.checked)} className="rounded text-teal-600" />
+                <span>Alumbrado publico</span>
+              </label>
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" checked={formData.hasGasNetwork || false}
+                  onChange={e => onChange('hasGasNetwork', e.target.checked)} className="rounded text-teal-600" />
+                <span>Gas natural</span>
+              </label>
+            </div>
+
+            {formData.hasUrbanization && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 pt-3 border-t border-gray-100">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Nombre de urbanizacion</label>
+                  <input type="text" value={formData.urbanizationName || ''} onChange={e => onChange('urbanizationName', e.target.value)}
+                    placeholder="Ej: Los Olivos de Monterrico"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Numero de partida registral</label>
+                  <input type="text" value={formData.registryNumber || ''} onChange={e => onChange('registryNumber', e.target.value)}
+                    placeholder="Ej: P03234567"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Amenidades */}
       <div>
         <div className={`p-4 rounded-xl border transition-colors ${

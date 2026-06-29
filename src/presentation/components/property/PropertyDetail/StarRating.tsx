@@ -8,7 +8,9 @@ import { useAuthStore } from '@/presentation/store/authStore';
 import { useRouter } from 'next/navigation';
 
 interface StarRatingProps {
-  initialRating?: number;
+  initialRating?: number;      // Promedio general de la propiedad/proyecto
+  averageRating?: number;      // Promedio general (se sobrepone a initialRating si no ha calificado)
+  totalRatings?: number;       // Total de calificaciones
   onRate?: (rating: number) => void;
   readonly?: boolean;
   size?: 'sm' | 'md' | 'lg';
@@ -20,6 +22,8 @@ interface StarRatingProps {
 
 export function StarRating({ 
   initialRating = 0, 
+  averageRating,
+  totalRatings,
   onRate, 
   readonly = false, 
   size = 'md',
@@ -30,12 +34,21 @@ export function StarRating({
 }: StarRatingProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
-  const [rating, setRating] = useState(initialRating);
+  // Mostrar promedio general si existe, sino el initialRating
+  const [rating, setRating] = useState(averageRating || initialRating);
   const [hoverRating, setHoverRating] = useState(0);
   const [saving, setSaving] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [pendingRating, setPendingRating] = useState<number | null>(null);
+  const [totalCount, setTotalCount] = useState(totalRatings || 0);
+
+  // Sincronizar el promedio cuando cambie desde afuera (solo si el usuario no ha calificado)
+  useEffect(() => {
+    if (averageRating !== undefined && userRating === null && hoverRating === 0) {
+      setRating(averageRating);
+    }
+  }, [averageRating, userRating, hoverRating]);
 
   // Cargar la calificación del usuario si existe
   useEffect(() => {
@@ -57,6 +70,11 @@ export function StarRating({
           if (data.rating) {
             setUserRating(data.rating);
             setRating(data.rating);
+          } else {
+            // Usuario no ha calificado, mostrar promedio
+            if (averageRating !== undefined) {
+              setRating(averageRating);
+            }
           }
         }
       } catch {

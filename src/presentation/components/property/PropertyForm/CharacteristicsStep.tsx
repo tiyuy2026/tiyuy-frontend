@@ -278,91 +278,125 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
                 Características del terreno
               </h2>
               <p className="text-sm text-gray-400 mb-4">
-                Especifica las medidas y uso del suelo
+                Especifica las medidas, servicios y zonificacion del lote
               </p>
 
               <div className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <NumberInput
-                    label="Total de Unidades *"
-                    value={formData.totalUnits}
-                    onChange={(value) => handleChangeWithLog('totalUnits', value)}
-                    placeholder="0"
-                    suffix="unidades"
-                  />
-                  <NumberInput
-                    label="Área Desde *"
-                    value={formData.areaFrom}
-                    onChange={(value) => handleChangeWithLog('areaFrom', value)}
-                    placeholder="0"
-                    suffix="m²"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <NumberInput
-                    label="Área Hasta *"
-                    value={formData.areaTo}
-                    onChange={(value) => handleChangeWithLog('areaTo', value)}
-                    placeholder="0"
-                    suffix="m²"
-                  />
-                  <div>
+                {/* ── MEDIDAS ── */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Medidas del lote</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <NumberInput
+                        label="Área total (m2) *"
+                        value={formData.totalArea}
+                        onChange={(value) => handleChangeWithLog('totalArea', value)}
+                        placeholder="0"
+                        suffix="m²"
+                      />
+                      {validationErrors?.totalArea && <p className="mt-1 text-sm text-red-600">{validationErrors.totalArea}</p>}
+                    </div>
                     <NumberInput
-                      label="Área total"
-                      value={formData.totalArea}
-                      onChange={(value) => handleChangeWithLog('totalArea', value)}
+                      label="Área construida (opcional)"
+                      value={formData.builtArea}
+                      onChange={(value) => handleChangeWithLog('builtArea', value)}
                       placeholder="0"
                       suffix="m²"
+                      optional={true}
                     />
-                    {validationErrors?.totalArea && <p className="mt-1 text-sm text-red-600">{validationErrors.totalArea}</p>}
+                    <NumberInput
+                      label="Frente"
+                      value={formData.frontage}
+                      onChange={(value) => handleChangeWithLog('frontage', value)}
+                      placeholder="0"
+                      suffix="ml"
+                    />
+                    <NumberInput
+                      label="Fondo"
+                      value={formData.depth}
+                      onChange={(value) => handleChangeWithLog('depth', value)}
+                      placeholder="0"
+                      suffix="ml"
+                    />
+                    <NumberInput
+                      label="Perimetro"
+                      value={formData.perimeter}
+                      onChange={(value) => handleChangeWithLog('perimeter', value)}
+                      placeholder="0"
+                      suffix="ml"
+                    />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <NumberInput
-                    label="Frente"
-                    value={formData.frontage}
-                    onChange={(value) => handleChangeWithLog('frontage', value)}
-                    placeholder="0"
-                    suffix="ml"
-                  />
-                  <NumberInput
-                    label="Fondo"
-                    value={formData.depth}
-                    onChange={(value) => handleChangeWithLog('depth', value)}
-                    placeholder="0"
-                    suffix="ml"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <NumberInput
-                    label="Perímetro"
-                    value={formData.perimeter}
-                    onChange={(value) => handleChangeWithLog('perimeter', value)}
-                    placeholder="0"
-                    suffix="ml"
-                  />
-                  <NumberInput
-                    label="Número de Pisos"
-                    value={formData.floors}
-                    onChange={(value) => handleChangeWithLog('floors', value)}
-                    placeholder="0"
-                    suffix="pisos"
+                {/* ── TOPOGRAFIA ── */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Topografia</h3>
+                  <OptionSelector
+                    label="Tipo de terreno"
+                    value={formData.topography || 'FLAT'}
+                    onChange={(value) => onChange('topography', value)}
+                    options={[
+                      { label: 'Plano', value: 'FLAT' },
+                      { label: 'Ligera pendiente', value: 'SLIGHT_SLOPE' },
+                      { label: 'Inclinado', value: 'STEEP' },
+                      { label: 'Accidentado', value: 'IRREGULAR' },
+                    ]}
                   />
                 </div>
 
-                <OptionSelector
-                  label="Uso de suelo"
-                  value={formData.landUse || 'RESIDENTIAL'}
-                  onChange={(value) => onChange('landUse', value)}
-                  options={[
-                    { label: 'Residencial', value: 'RESIDENTIAL' },
-                    { label: 'Comercial', value: 'COMMERCIAL' },
-                    { label: 'Mixto', value: 'MIXED' },
-                  ]}
-                />
+                {/* ── SERVICIOS BASICOS ── */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Servicios basicos</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {[
+                      ['hasWater', 'Agua'],
+                      ['hasElectricity', 'Electricidad'],
+                      ['hasSewerage', 'Desague'],
+                      ['hasGas', 'Gas natural'],
+                    ].map(([key, label]) => (
+                      <label key={key} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={(formData as any)[key] || false}
+                          onChange={(e) => onChange(key, e.target.checked)}
+                          className="rounded text-[#00a63e] focus:ring-[#00a63e]"
+                        />
+                        <span className="text-sm text-gray-700">{label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ── ZONIFICACION Y DOCUMENTOS ── */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Zonificacion y documentos</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <OptionSelector
+                      label="Zonificacion / Uso de suelo"
+                      value={formData.zoning || 'RESIDENTIAL'}
+                      onChange={(value) => onChange('zoning', value)}
+                      options={[
+                        { label: 'Residencial', value: 'RESIDENTIAL' },
+                        { label: 'Comercial', value: 'COMMERCIAL' },
+                        { label: 'Industrial', value: 'INDUSTRIAL' },
+                        { label: 'Agricola', value: 'AGRICULTURAL' },
+                        { label: 'Rustico', value: 'RUSTIC' },
+                        { label: 'Mixto', value: 'MIXED' },
+                      ]}
+                    />
+                    <div className="space-y-3 pt-2">
+                      <label className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={formData.hasPropertyTitle || false}
+                          onChange={(e) => onChange('hasPropertyTitle', e.target.checked)}
+                          className="rounded text-[#00a63e] focus:ring-[#00a63e]"
+                        />
+                        <span className="text-sm text-gray-700">Cuenta con titulo de propiedad</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
             </section>
           </>
