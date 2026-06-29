@@ -368,17 +368,13 @@ export function ChannelPostsPanel({
   const currentUserInitial = currentUserName.charAt(0).toUpperCase();
 
   return (
-    <div className="h-full flex flex-col relative" style={{
-      backgroundColor: '#e5ddd5',
-      backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0)`,
-      backgroundSize: '24px 24px',
-    }}>
+    <div className="h-full flex flex-col relative bg-white dark:bg-gray-900">
       {/* Header */}
-      <div className="sticky top-0 bg-white border-b border-gray-200 p-4 z-10">
+      <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 z-10">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">{channelName}</h2>
-            <p className="text-sm text-gray-500">Posts del canal</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{channelName}</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Posts del canal</p>
           </div>
           <div className="flex gap-2">
             <button
@@ -439,15 +435,15 @@ export function ChannelPostsPanel({
             <>
               {!hasPosts && showWelcome ? (
                 // Initial state: "write first post" and "skip" buttons
-                <div className="bg-white m-4 rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="bg-white dark:bg-gray-800 m-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                   <div className="text-center">
                     <div className="w-16 h-16 mx-auto mb-4">
                       <UserAvatar size="lg" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
                       ¡Bienvenido a {channelName}!
                     </h3>
-                    <p className="text-gray-600 text-sm mb-6">
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">
                       Este es el inicio del canal. Sé el primero en compartir algo.
                     </p>
                     <div className="flex gap-3">
@@ -468,16 +464,16 @@ export function ChannelPostsPanel({
                 </div>
               ) : (
                 // Facebook-style chat line
-                <div className="bg-white m-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="bg-white dark:bg-gray-800 m-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                   <div className="p-3">
                     <div className="flex items-start gap-3">
                       <UserAvatar size="sm" />
                       <div className="flex-1">
                         <div
                           onClick={() => setShowCreateForm(true)}
-                          className="w-full px-4 py-2.5 bg-gray-50 rounded-lg text-gray-500 cursor-text hover:bg-gray-100 transition-colors"
+                          className="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-500 dark:text-gray-400 cursor-text hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                         >
-                          <span className="text-gray-500">¿Qué estás pensando?</span>
+                          <span className="text-gray-500 dark:text-gray-400">¿Qué estás pensando?</span>
                         </div>
                       </div>
                     </div>
@@ -515,15 +511,15 @@ export function ChannelPostsPanel({
             {/* Create Post Modal */}
             {showCreateForm && (
               <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-                <div className="relative bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-                  <div className="p-6 border-b border-gray-200">
+                <div className="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+                  <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-semibold text-gray-900">Crear publicación</h2>
+                      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Crear publicación</h2>
                       <button
                         onClick={() => setShowCreateForm(false)}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                       >
-                        <X className="w-5 h-5 text-gray-500" />
+                        <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                       </button>
                     </div>
                   </div>
@@ -532,8 +528,8 @@ export function ChannelPostsPanel({
                     <div className="flex items-start gap-3 mb-4">
                       <UserAvatar size="sm" />
                       <div>
-                        <p className="font-semibold text-gray-900">{currentUserName}</p>
-                        <p className="text-xs text-gray-500">Creando post en {channelName}</p>
+                        <p className="font-semibold text-gray-900 dark:text-gray-100">{currentUserName}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Creando post en {channelName}</p>
                       </div>
                     </div>
 
@@ -541,7 +537,7 @@ export function ChannelPostsPanel({
                       value={newPost}
                       onChange={(e) => setNewPost(e.target.value)}
                       placeholder="¿Qué estás pensando?"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       rows={6}
                       autoFocus
                     />

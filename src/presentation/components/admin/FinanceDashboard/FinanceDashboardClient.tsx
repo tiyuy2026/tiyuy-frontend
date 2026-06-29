@@ -561,7 +561,7 @@ export function FinanceDashboardClient() {
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: '#94a3b8', fontSize: 10 }}
-                    tickFormatter={(v) => v >= 1000 ? `S/ ${(v / 1000).toFixed(0)}K` : `S/ ${v}`}
+                    tickFormatter={(v: any) => v >= 1000 ? `S/ ${(v / 1000).toFixed(0)}K` : `S/ ${v}`}
                     dx={-4}
                     width={56}
                   />

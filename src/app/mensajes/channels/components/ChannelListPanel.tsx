@@ -58,19 +58,19 @@ function CanalesListPanel({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900">
       {/* Header estilo Facebook */}
-      <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+      <div className="px-4 pt-4 pb-3 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between mb-3">
-          <h1 className="text-xl font-bold text-gray-900">Canales</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Canales</h1>
         </div>
-        <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2">
-          <Search className="w-4 h-4 fill-gray-400" />
+        <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-full px-3 py-2">
+          <Search className="w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input 
             placeholder="Buscar canales" 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-transparent text-sm text-gray-700 placeholder-gray-400 flex-1 focus:outline-none" 
+            className="bg-transparent text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 flex-1 focus:outline-none" 
           />
         </div>
       </div>
@@ -80,7 +80,7 @@ function CanalesListPanel({
         <button
           onClick={() => onSectionChange('mis-canales-creados')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'mis-canales-creados' ? 'bg-[var(--brand-primary-light)] text-gray-900' : 'text-gray-600 hover:bg-gray-100'
+            activeSection === 'mis-canales-creados' ? 'bg-[var(--brand-primary-light)] text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
           <ArrowLeft className="w-5 h-5" />
@@ -95,7 +95,7 @@ function CanalesListPanel({
         <button
           onClick={() => onSectionChange('mis-canales-suscritos')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'mis-canales-suscritos' ? 'bg-[var(--brand-primary-light)] text-gray-900' : 'text-gray-600 hover:bg-gray-100'
+            activeSection === 'mis-canales-suscritos' ? 'bg-[var(--brand-primary-light)] text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
           <Users className="w-5 h-5" />
@@ -110,7 +110,7 @@ function CanalesListPanel({
         <button
           onClick={() => onSectionChange('descubrir-canales')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'descubrir-canales' ? 'bg-[var(--brand-primary-light)] text-gray-900' : 'text-gray-600 hover:bg-gray-100'
+            activeSection === 'descubrir-canales' ? 'bg-[var(--brand-primary-light)] text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
           <Search className="w-5 h-5" />
@@ -120,7 +120,7 @@ function CanalesListPanel({
         <button
           onClick={() => onSectionChange('crear-canal')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'crear-canal' ? 'bg-[var(--brand-primary-light)] text-gray-900' : 'text-gray-600 hover:bg-gray-100'
+            activeSection === 'crear-canal' ? 'bg-[var(--brand-primary-light)] text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
           <Plus className="w-5 h-5" />
@@ -128,12 +128,12 @@ function CanalesListPanel({
         </button>
       </div>
 
-      <div className="border-t border-gray-100" />
+      <div className="border-t border-gray-100 dark:border-gray-700" />
 
       {/* Mini lista de canales creados filtrados */}
       {filteredCanalesCreados.length > 0 && (
         <div className="px-3 py-3">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
             Mis Canales Creados {searchQuery && `(${filteredCanalesCreados.length})`}
           </h3>
           <div className="space-y-1">
@@ -141,12 +141,12 @@ function CanalesListPanel({
               <button
                 key={channel.id}
                 onClick={() => onChannelSelect(channel)}
-                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 <span className="text-lg">{getChannelEmoji(channel.city)}</span>
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-medium text-gray-900 truncate">{channel.name}</p>
-                  <p className="text-xs text-gray-400">{channel.subscriberCount} suscriptores</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{channel.name}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{channel.subscriberCount} suscriptores</p>
                 </div>
               </button>
             ))}
@@ -157,7 +157,7 @@ function CanalesListPanel({
       {/* Mini lista de canales suscritos filtrados */}
       {filteredCanalesSuscritos.length > 0 && (
         <div className="px-3 py-3">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
             Suscrito {searchQuery && `(${filteredCanalesSuscritos.length})`}
           </h3>
           <div className="space-y-1">
@@ -165,12 +165,12 @@ function CanalesListPanel({
               <button
                 key={channel.id}
                 onClick={() => onChannelSelect(channel)}
-                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 <span className="text-lg">{getChannelEmoji(channel.city)}</span>
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-medium text-gray-900 truncate">{channel.name}</p>
-                  <p className="text-xs text-gray-400">{channel.subscriberCount} suscriptores</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{channel.name}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{channel.subscriberCount} suscriptores</p>
                 </div>
               </button>
             ))}
@@ -181,7 +181,7 @@ function CanalesListPanel({
       {/* Mensaje cuando no hay resultados de búsqueda */}
       {searchQuery && filteredCanalesCreados.length === 0 && filteredCanalesSuscritos.length === 0 && (
         <div className="px-3 py-6 text-center">
-          <p className="text-sm text-gray-400">No se encontraron canales con "{searchQuery}"</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">No se encontraron canales con "{searchQuery}"</p>
         </div>
       )}
 
@@ -197,21 +197,19 @@ function CanalesListPanel({
       <div className="px-3 pb-3">
         <button
           onClick={() => {
-            // Verificar si el usuario puede crear canales según su rol
             const canCreate = user?.role === 'AGENT' || user?.role === 'INMOBILIARIA';
             if (canCreate) {
               onSectionChange('crear-canal');
             } else {
-              // Mostrar mensaje amable si no tiene permisos
               setInfoDialog(true);
             }
           }}
           className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-colors relative ${
             hasChannel 
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+              ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed' 
               : (user?.role === 'AGENT' || user?.role === 'INMOBILIARIA')
                 ? 'bg-[var(--brand-primary-light)] text-[var(--text-primary)] hover:bg-[var(--brand-primary-light-hover)]'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
           }`}
         >
           {hasChannel && (
@@ -225,7 +223,7 @@ function CanalesListPanel({
             (user?.role === 'AGENT' || user?.role === 'INMOBILIARIA') ? 'Crear nuevo canal' : 'No tienes permisos'}
         </button>
         {hasChannel && (
-          <p className="text-xs text-gray-400 text-center mt-1">
+          <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-1">
             Ya tienes 1 canal activo
           </p>
         )}

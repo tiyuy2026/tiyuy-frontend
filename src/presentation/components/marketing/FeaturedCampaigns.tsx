@@ -36,7 +36,7 @@ export function FeaturedCampaigns() {
 
   if (loading) {
     return (
-      <section className="py-8 sm:py-16 bg-background border-b border-gray-100">
+      <section className="py-8 sm:py-16 bg-background border-b border-[var(--border-light)]">
         <div className="w-full max-w-[1920px] mx-auto px-8 xl:px-16">
           <div className="animate-pulse space-y-4">
             <div className="h-8 w-72 bg-gray-200 rounded-lg" />
@@ -59,7 +59,7 @@ export function FeaturedCampaigns() {
   const showViewAllCard = campaigns.length > MAX_VISIBLE_CARDS;
 
   return (
-    <section className="py-8 sm:py-16 bg-background border-b border-gray-100">
+    <section className="py-8 sm:py-16 bg-background border-b border-[var(--border-light)]">
       <div className="w-full max-w-[1920px] mx-auto px-8 xl:px-16">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -108,7 +108,7 @@ export function FeaturedCampaigns() {
                 href={targetUrl}
                 className="group block"
               >
-                <div className="bg-white rounded-[18px] shadow-sm hover:shadow-lg transition-all duration-250 overflow-hidden h-full hover:-translate-y-1 flex flex-col">
+                <div className="bg-[var(--bg-card)] rounded-[18px] shadow-sm hover:shadow-lg transition-all duration-250 overflow-hidden h-full hover:-translate-y-1 flex flex-col">
                   {/* Imagen - 160px height con logo superpuesto */}
                   <div className="relative w-full h-[160px] overflow-hidden rounded-t-[18px] flex-shrink-0">
                     {campaign.imageUrl ? (
@@ -141,7 +141,7 @@ export function FeaturedCampaigns() {
                           className="w-9 h-9 rounded-[10px] flex items-center justify-center shadow-sm"
                           style={{ background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(8px)' }}
                         >
-                          <Building2 className="w-4 h-4 text-gray-500" />
+                          <Building2 className="w-4 h-4 text-[var(--text-secondary)]" />
                         </div>
                       )}
                     </div>
@@ -175,13 +175,13 @@ export function FeaturedCampaigns() {
                   {/* Bloque de información - compacto */}
                   <div className="p-3 flex flex-col flex-1 gap-1.5">
                     {/* Nombre del proyecto */}
-                    <h3 className="text-[15px] font-bold text-gray-900 leading-tight line-clamp-1">
+                    <h3 className="text-[15px] font-bold text-[var(--text-primary)] leading-tight line-clamp-1">
                       {entityName}
                     </h3>
 
                     {/* Descripción corta - 1 línea */}
                     {campaign.description && (
-                      <p className="text-[12px] text-gray-500 leading-relaxed line-clamp-1">
+                      <p className="text-[12px] text-[var(--text-secondary)] leading-relaxed line-clamp-1">
                         {campaign.description.length > 80
                           ? campaign.description.substring(0, 80) + '...'
                           : campaign.description}
@@ -190,22 +190,22 @@ export function FeaturedCampaigns() {
 
                     {/* Información rápida - 2 líneas máximo */}
                     <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-auto">
-                      <div className="flex items-center gap-1 text-[11px] text-gray-500">
+                      <div className="flex items-center gap-1 text-[11px] text-[var(--text-secondary)]">
                         <MapPin className="w-3 h-3 flex-shrink-0" />
                         <span className="truncate max-w-[100px]">{locationText}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-[11px] text-gray-500">
+                      <div className="flex items-center gap-1 text-[11px] text-[var(--text-secondary)]">
                         {entityIcon}
                         <span className="truncate max-w-[80px]">{projectTypeLabel}</span>
                       </div>
                       {areaText && (
-                        <div className="flex items-center gap-1 text-[11px] text-gray-500">
+                        <div className="flex items-center gap-1 text-[11px] text-[var(--text-secondary)]">
                           <Ruler className="w-3 h-3 flex-shrink-0" />
                           <span>{areaText}</span>
                         </div>
                       )}
                       {priceText && (
-                        <div className="flex items-center gap-1 text-[11px] text-gray-500">
+                        <div className="flex items-center gap-1 text-[11px] text-[var(--text-secondary)]">
                           <DollarSign className="w-3 h-3 flex-shrink-0" />
                           <span className="font-semibold text-emerald-600">{priceText}</span>
                         </div>
@@ -213,8 +213,8 @@ export function FeaturedCampaigns() {
                     </div>
 
                     {/* Footer compacto */}
-                    <div className="flex items-center justify-between pt-1.5 border-t border-gray-100 mt-1">
-                      <span className="text-[10px] text-gray-400">
+                    <div className="flex items-center justify-between pt-1.5 border-t border-[var(--border-light)] mt-1">
+                      <span className="text-[10px] text-[var(--text-muted)]">
                         {campaign.endDate
                           ? `Hasta ${new Date(campaign.endDate).toLocaleDateString('es-PE', { day: 'numeric', month: 'short' })}`
                           : '7 días'}
@@ -232,15 +232,15 @@ export function FeaturedCampaigns() {
               href="/campaigns"
               className="group block"
             >
-              <div className="bg-white rounded-[18px] border-2 border-dashed border-gray-200 hover:border-emerald-400 hover:bg-emerald-50/30 transition-all duration-250 overflow-hidden h-full flex flex-col items-center justify-center min-h-[340px] cursor-pointer hover:scale-[1.03]">
+              <div className="bg-[var(--bg-card)] rounded-[18px] border-2 border-dashed border-[var(--border-color)] hover:border-emerald-400 hover:bg-emerald-50/30 hover:dark:bg-emerald-950/20 transition-all duration-250 overflow-hidden h-full flex flex-col items-center justify-center min-h-[340px] cursor-pointer hover:scale-[1.03]">
                 <div className="flex flex-col items-center justify-center p-6 text-center">
-                  <div className="w-16 h-16 mb-3 rounded-full bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
+                  <div className="w-16 h-16 mb-3 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/40 transition-colors">
                     <ArrowRight className="w-8 h-8 text-emerald-500" />
                   </div>
-                  <p className="text-[16px] font-bold text-gray-900 mb-1">
+                  <p className="text-[16px] font-bold text-[var(--text-primary)] mb-1">
                     Ver todos los proyectos
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-[var(--text-secondary)]">
                     Explora todas las campañas disponibles
                   </p>
                 </div>

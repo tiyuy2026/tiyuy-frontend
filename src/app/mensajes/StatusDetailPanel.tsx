@@ -43,6 +43,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
   // Ref para evitar bucle infinito Y persistir isInitialized
   const localCommentsRef = useRef(localComments);
   const isInitializedRef = useRef(false);
+  const hasLocalLikeRef = useRef(false);
   localCommentsRef.current = localComments;
 
   const queryClient = useQueryClient();
@@ -132,16 +133,12 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
   // Efecto para sincronizar contadores con el estado actual
   useEffect(() => {
     if (updatedStatus) {
-      setLikeCount(updatedStatus.likeCount || 0);
-      setShareCount(updatedStatus.shareCount || 0);
-      // Verificar si el usuario actual ya dio like
-      if (updatedStatus.hasUserLiked) {
-        setIsLiked(true);
-      } else {
-        setIsLiked(false);
+      if (!hasLocalLikeRef.current) {
+        setLikeCount(updatedStatus.likeCount || 0);
+        setIsLiked(!!updatedStatus.hasUserLiked);
       }
+      setShareCount(updatedStatus.shareCount || 0);
     } else {
-      // Si el estado se elimina o expira, limpiar todo
       setLikeCount(0);
       setShareCount(0);
       setIsLiked(false);
@@ -175,6 +172,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
   };
 
   const handleLike = () => {
+    hasLocalLikeRef.current = true;
     if (isLiked) {
       unlikeMutation.mutate(status.id);
     } else {
@@ -225,9 +223,9 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
   const encoded = encodeURIComponent(`${shareText} ${shareUrl}`);
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-800">
       {/* Header con información del publicador */}
-      <div className="border-b border-gray-100 p-4">
+      <div className="border-b border-gray-100 dark:border-gray-700 p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <UserAvatar 
@@ -235,13 +233,13 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
               size="sm" 
             />
             <div>
-              <h3 className="font-semibold text-gray-900">
+              <h3 className="font-semibold text-gray-900 dark:text-white">
                 {status.user?.id === user?.id || status.userId === user?.id
                   ? currentUserName
                   : status.userName || status.user?.name || 'Usuario'
                 }
               </h3>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 {formatDistanceToNow(new Date(status.createdAt), {
                   addSuffix: true
                 })}
@@ -251,7 +249,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
           {onClose && (
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -260,7 +258,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
 
         {/* Contenido del estado */}
         <div className="mb-4">
-          <p className="text-gray-800 whitespace-pre-wrap">{status.content}</p>
+          <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{status.content}</p>
 
           {/* Tags si existen */}
           {status.tags && status.tags.length > 0 && (
@@ -281,26 +279,26 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
         <div className="flex items-center gap-6">
           <button
             onClick={handleLike}
-            className={`flex items-center gap-2 text-sm font-medium transition-colors ${isLiked ? 'text-red-600' : 'text-gray-600 hover:text-red-600'
+            className={`flex items-center gap-2 text-sm font-medium transition-colors ${isLiked ? 'text-red-600' : 'text-gray-600 dark:text-gray-400 hover:text-red-600'
               }`}
           >
             <Heart className="w-5 h-5" fill={isLiked ? 'currentColor' : 'none'} />
             {likeCount > 0 && likeCount}
           </button>
 
-          <button className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-brand transition-colors">
+          <button className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-brand transition-colors">
             <MessageCircle className="w-5 h-5" />
             Comentar
           </button>
 
           <button
             onClick={handleShare}
-            className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors"
+            className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-green-600 transition-colors"
           >
             <Share2 className="w-5 h-5" />
             Compartir
             {shareCount > 0 && (
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+              <span className="text-xs text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-400 px-2 py-0.5 rounded-full">
                 {shareCount}
               </span>
             )}
@@ -310,13 +308,13 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
 
       {/* Sección de comentarios */}
       <div className="flex-1 overflow-y-auto p-4">
-        <h4 className="font-semibold text-gray-900 mb-4">Comentarios ({updatedStatus.commentCount || 0})</h4>
+        <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Comentarios ({updatedStatus.commentCount || 0})</h4>
 
         {/* Lista de comentarios */}
         <div className="space-y-4">
           {isLoading ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 text-sm">Cargando comentarios...</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Cargando comentarios...</p>
             </div>
           ) : localComments && Array.isArray(localComments) && localComments.length > 0 ? (
             // Mostrar comentarios locales (con estado de likes actualizado)
@@ -329,23 +327,23 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                     size="sm" 
                   />
                   <div className="flex-1">
-                    <div className="bg-gray-50 rounded-2xl p-4 shadow-sm">
+                    <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4 shadow-sm dark:shadow-none">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-gray-900 text-sm">
+                          <span className="font-semibold text-gray-900 dark:text-white text-sm">
                             {isCurrentUserComment(comment)
                               ? currentUserName
                               : comment.userName || comment.user?.name || 'Usuario'
                             }
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
                             {comment.timeAgo || formatDistanceToNow(new Date(comment.createdAt), {
                               addSuffix: true
                             })}
                           </span>
                         </div>
                       </div>
-                      <p className="text-gray-800 text-sm leading-relaxed">{comment.content}</p>
+                      <p className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed">{comment.content}</p>
                     </div>
 
                     {/* Botones de interacción */}
@@ -378,9 +376,9 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                           size="xs" 
                         />
                         <div className="flex-1">
-                          <div className="bg-gray-100 rounded-xl p-3">
+                          <div className="bg-gray-100 dark:bg-gray-600 rounded-xl p-3">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="font-medium text-gray-900 text-xs">
+                              <span className="font-medium text-gray-900 dark:text-white text-xs">
                                 {isCurrentUserComment(reply)
                                   ? currentUserName
                                   : reply.userName || reply.user?.name || 'Usuario'
@@ -392,7 +390,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                                 })}
                               </span>
                             </div>
-                            <p className="text-gray-700 text-xs">{reply.content}</p>
+                            <p className="text-gray-700 dark:text-gray-300 text-xs">{reply.content}</p>
 
                             {/* Botón de like para respuestas */}
                             <div className="flex items-center gap-3 mt-2">
@@ -422,9 +420,9 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                   size="xs" 
                 />
                 <div className="flex-1">
-                  <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-sm text-gray-900">
+                      <span className="font-medium text-sm text-gray-900 dark:text-white">
                         {isCurrentUserComment(comment)
                           ? currentUserName
                           : comment.userName || 'Usuario'
@@ -466,18 +464,18 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                   size="xs" 
                 />
                 <div className="flex-1">
-                  <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-sm text-gray-900">
+                      <span className="font-medium text-sm text-gray-900 dark:text-white">
                         {comment.user?.name || 'Usuario'}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {formatDistanceToNow(new Date(comment.createdAt), {
                           addSuffix: true
                         })}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-800">{comment.content}</p>
+                    <p className="text-sm text-gray-800 dark:text-gray-200">{comment.content}</p>
                   </div>
                   <div className="flex items-center gap-4 mt-2 ml-3">
                     <button
@@ -500,15 +498,15 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
             ))
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-500 text-sm">No hay comentarios aún</p>
-              <p className="text-gray-400 text-xs mt-1">Sé el primero en comentar</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">No hay comentarios aún</p>
+              <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">Sé el primero en comentar</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Input para nuevo comentario */}
-      <div className="border-t border-gray-100 p-4">
+      <div className="border-t border-gray-100 dark:border-gray-700 p-4">
         {/* Mostrar respuesta seleccionada */}
         {replyingTo && (
           <div className="mb-3 p-3 bg-brand/10 border-l-4 border-blue-500 rounded-lg">
@@ -529,7 +527,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
               </div>
               <button
                 onClick={handleCancelReply}
-                className="ml-3 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded hover:bg-gray-200"
+                className="ml-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -547,7 +545,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder={replyingTo ? `Escribe una respuesta a ${replyingTo.userName || replyingTo.user?.name || 'Usuario'}...` : `Escribe un comentario como ${currentUserName}...`}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all dark:text-white dark:placeholder-gray-400"
                 onKeyPress={(e) => e.key === "Enter" && handleComment()}
               />
               {commentText && (
@@ -566,14 +564,14 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
       {/* Modal de compartir */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
             <div className="bg-gradient-to-r brand p-5">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-white font-bold text-lg">Compartir Estado</h2>
                   <p className="text-white/70 text-xs mt-0.5">Elige dónde quieres compartir</p>
                 </div>
-                <button onClick={() => setShowShareModal(false)} className="text-white/70 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-xl leading-none"></button>
+                <button onClick={() => setShowShareModal(false)} className="text-white/70 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-xl leading-none"><X className="w-5 h-5" /></button>
               </div>
             </div>
 
@@ -585,12 +583,12 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                     navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
                     setShowShareModal(false);
                   }}
-                  className="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="flex flex-col items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                 >
                   <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
                     <Copy className="w-5 h-5 fill-white" />
                   </div>
-                  <span className="text-xs text-gray-700 font-medium">Copiar</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">Copiar</span>
                 </button>
 
                 {/* WhatsApp */}

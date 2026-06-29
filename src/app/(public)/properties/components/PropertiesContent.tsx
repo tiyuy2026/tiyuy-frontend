@@ -54,19 +54,19 @@ export default function PropertiesContent() {
   });
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-[var(--bg-secondary)]">
       {/* Sección de Propiedades Destacadas */}
-      <section className="py-8 sm:py-16 bg-white">
+      <section className="py-8 sm:py-16 bg-[var(--bg-primary)]">
         <div className="w-full max-w-[1920px] mx-auto">
           <div className="text-center mb-12 px-8 xl:px-16">
-            <div className="inline-flex items-center gap-2 bg-brand-light text-brand px-4 py-2 rounded-full text-sm font-semibold mb-4">
+            <div className="inline-flex items-center gap-2 bg-[var(--brand-primary-light)] text-brand px-4 py-2 rounded-full text-sm font-semibold mb-4">
               <Icon icon="mdi:star" className="w-4 h-4" />
               <span>PROPIEDADES DESTACADAS</span>
             </div>
             <h2 className="text-3xl font-bold text-brand mb-2">
               Propiedades destacadas cerca de ti
             </h2>
-            <p className="text-gray-600 text-lg">
+            <p className="text-[var(--text-secondary)] text-lg">
               Descubre los mejores departamentos, casas y terrenos en las principales zonas del Perú
             </p>
           </div>
@@ -76,18 +76,18 @@ export default function PropertiesContent() {
       </section>
 
       {/* Todas las Propiedades */}
-      <section className="py-8 sm:py-16 bg-white">
+      <section className="py-8 sm:py-16 bg-[var(--bg-primary)]">
         <div className="w-full px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-4">
                 Todas las Propiedades
               </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              <p className="text-lg text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Explora nuestro catálogo completo de propiedades inmobiliarias en todo el Perú
               </p>
               {totalElements > 0 && (
-                <p className="text-sm text-gray-400 mt-2">
+                <p className="text-sm text-[var(--text-muted)] mt-2">
                   {totalElements} propiedad{totalElements !== 1 ? 'es' : ''} encontrada{totalElements !== 1 ? 's' : ''}
                 </p>
               )}
@@ -107,14 +107,14 @@ export default function PropertiesContent() {
                 ))}
               </div>
             ) : error ? (
-              <div className="text-center py-20 bg-red-50 rounded-2xl">
+              <div className="text-center py-20 bg-red-50 dark:bg-red-950/30 rounded-2xl">
                 <div className="flex justify-center mb-4">
                   <AlertTriangle className="w-16 h-16 text-red-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-4">
                   Error al cargar propiedades
                 </h3>
-                <p className="text-gray-600 mb-6">{error}</p>
+                <p className="text-[var(--text-secondary)] mb-6">{error}</p>
                 <button 
                   onClick={reload}
                   className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
@@ -123,14 +123,14 @@ export default function PropertiesContent() {
                 </button>
               </div>
             ) : allProperties.length === 0 ? (
-              <div className="text-center py-20 bg-gray-50 rounded-2xl">
+              <div className="text-center py-20 bg-[var(--bg-tertiary)] rounded-2xl">
                 <div className="flex justify-center mb-4">
-                  <Icon icon="mdi:home-outline" className="w-16 h-16 text-gray-300" />
+                  <Icon icon="mdi:home-outline" className="w-16 h-16 text-[var(--text-muted)]" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-4">
                   No hay propiedades disponibles
                 </h3>
-                <p className="text-gray-600 mb-6">
+                <p className="text-[var(--text-secondary)] mb-6">
                   Pronto tendremos nuevas propiedades inmobiliarias para ti
                 </p>
               </div>
@@ -154,7 +154,7 @@ export default function PropertiesContent() {
                 {isLoadingMore && (
                   <div className="flex items-center justify-center gap-2 mt-8 py-4">
                     <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
-                    <span className="text-sm text-gray-500">Cargando más propiedades...</span>
+                    <span className="text-sm text-[var(--text-secondary)]">Cargando más propiedades...</span>
                   </div>
                 )}
 

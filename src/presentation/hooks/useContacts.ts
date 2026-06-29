@@ -560,11 +560,45 @@ export function useCreateStatusPost() {
 
       }),
 
-    onSuccess: () => {
+    onSuccess: (data, postId) => {
 
-      queryClient.invalidateQueries({ queryKey: ['status-posts'] });
+      queryClient.setQueriesData({ queryKey: ['status-posts'] }, (old: any) => {
 
-      toast.success('Estado publicado');
+        if (!old?.pages) return old;
+
+        
+
+        return {
+
+          ...old,
+
+          pages: old.pages.map((page: any) =>
+
+            page.map((post: any) => {
+
+              if (post.id === postId) {
+
+                return {
+
+                  ...post,
+
+                  hasUserLiked: false,
+
+                  likeCount: Math.max((post.likeCount || 0) - 1, 0)
+
+                };
+
+              }
+
+              return post;
+
+            })
+
+          )
+
+        };
+
+      });
 
     },
 
@@ -630,11 +664,9 @@ export function useLikeStatusPost() {
 
     onSuccess: (data, postId) => {
 
-      //  Actualizar el estado del post en la cache
+      queryClient.setQueriesData({ queryKey: ['status-posts'] }, (old: any) => {
 
-      queryClient.setQueryData(['status-posts'], (old: any) => {
-
-        if (!old?.pages) return old;
+        if (!old?.pages || !Array.isArray(old.pages)) return old;
 
         
 
@@ -644,7 +676,7 @@ export function useLikeStatusPost() {
 
           pages: old.pages.map((page: any) =>
 
-            page.map((post: any) => {
+            Array.isArray(page) ? page.map((post: any) => {
 
               if (post.id === postId) {
 
@@ -652,13 +684,9 @@ export function useLikeStatusPost() {
 
                   ...post,
 
-                  hasUserLiked: data.isCurrentlyActive,
+                  hasUserLiked: false,
 
-                  likeCount: data.isCurrentlyActive 
-
-                    ? (post.likeCount || 0) + 1 
-
-                    : Math.max((post.likeCount || 0) - 1, 0)
+                  likeCount: Math.max((post.likeCount || 0) - 1, 0)
 
                 };
 
@@ -666,23 +694,13 @@ export function useLikeStatusPost() {
 
               return post;
 
-            })
+            }) : page
 
           )
 
         };
 
       });
-
-      
-
-      // Invalidar para asegurar sincronización
-
-      queryClient.invalidateQueries({ queryKey: ['status-posts'] });
-
-      
-
-      toast.success(data.isCurrentlyActive ? '¡Like al comentario!' : 'Like eliminado');
 
     },
 
@@ -714,9 +732,45 @@ export function useUnlikeStatusPost() {
 
     }),
 
-    onSuccess: () => {
+    onSuccess: (data, postId) => {
 
-      queryClient.invalidateQueries({ queryKey: ['status-posts'] });
+      queryClient.setQueriesData({ queryKey: ['status-posts'] }, (old: any) => {
+
+        if (!old?.pages) return old;
+
+        
+
+        return {
+
+          ...old,
+
+          pages: old.pages.map((page: any) =>
+
+            page.map((post: any) => {
+
+              if (post.id === postId) {
+
+                return {
+
+                  ...post,
+
+                  hasUserLiked: false,
+
+                  likeCount: Math.max((post.likeCount || 0) - 1, 0)
+
+                };
+
+              }
+
+              return post;
+
+            })
+
+          )
+
+        };
+
+      });
 
     },
 

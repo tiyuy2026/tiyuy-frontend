@@ -89,12 +89,12 @@ export default function GruposPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       {/* Panel izquierdo - Lista de grupos */}
-      <div className="w-96 bg-white border-r border-gray-200 flex flex-col">
+      <div className="w-96 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
         {/* Header */}
-        <div className="p-4 border-b border-gray-200">
-          <h1 className="text-xl font-bold text-gray-900">Mis Grupos</h1>
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Mis Grupos</h1>
           <div className="flex items-center space-x-2 mt-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -103,33 +103,33 @@ export default function GruposPage() {
                 placeholder="Buscar grupos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
-            <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+            <button className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
               <Filter className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Estadísticas */}
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="grid grid-cols-3 gap-2 text-center">
             <div>
               <div className="text-lg font-bold text-blue-600">{groups.length}</div>
-              <div className="text-xs text-gray-600">Total</div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">Total</div>
             </div>
             <div>
               <div className="text-lg font-bold text-green-600">
                 {groups.filter(g => g.isUserMember).length}
               </div>
-              <div className="text-xs text-gray-600">Unidos</div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">Unidos</div>
             </div>
             <div>
               <div className="text-lg font-bold text-purple-600">
                 {groups.reduce((sum, g) => sum + g.postCount, 0)}
               </div>
-              <div className="text-xs text-gray-600">Posts</div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">Posts</div>
             </div>
           </div>
         </div>
@@ -143,7 +143,7 @@ export default function GruposPage() {
           ) : filteredGroups.length === 0 ? (
             <div className="text-center py-8">
               <Users className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {searchTerm ? 'No se encontraron grupos' : 'No tienes grupos'}
               </p>
             </div>
@@ -154,8 +154,8 @@ export default function GruposPage() {
                   key={grupo.id}
                   className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
                     selectedGrupo?.id === grupo.id
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300 bg-white'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 bg-white dark:bg-gray-800'
                   }`}
                   onClick={() => setSelectedGrupo(grupo as Group)}
                 >
@@ -164,10 +164,10 @@ export default function GruposPage() {
                       {grupo.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-gray-900 truncate">{grupo.name}</div>
-                      <div className="text-sm text-gray-600 truncate">{grupo.description}</div>
+                      <div className="font-semibold text-gray-900 dark:text-gray-100 truncate">{grupo.name}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400 truncate">{grupo.description}</div>
                       <div className="flex items-center space-x-2 mt-1">
-                        <span className="text-xs text-gray-500">{grupo.memberCount} miembros</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">{grupo.memberCount} miembros</span>
                         {grupo.postCount > 0 && (
                           <span className="text-xs text-blue-600">{grupo.postCount} posts</span>
                         )}
@@ -177,7 +177,7 @@ export default function GruposPage() {
                       {grupo.isUserMember ? (
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       ) : (
-                        <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                        <div className="w-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
                       )}
                     </div>
                   </div>
@@ -192,20 +192,20 @@ export default function GruposPage() {
       {selectedGrupo ? (
         <div className="flex-1 flex flex-col">
           {/* Header del grupo */}
-          <div className="bg-white border-b border-gray-200 p-4">
+          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
                   {selectedGrupo.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">{selectedGrupo.name}</h2>
-                  <p className="text-sm text-gray-600">{selectedGrupo.description}</p>
+                  <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">{selectedGrupo.name}</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{selectedGrupo.description}</p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedGrupo(null)}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
                 ✕
               </button>
@@ -224,13 +224,13 @@ export default function GruposPage() {
           )}
         </div>
       ) : (
-        <div className="flex-1 flex items-center justify-center bg-gray-50">
+        <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
           <div className="text-center">
-            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
               <Users className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Selecciona un grupo</h3>
-            <p className="text-gray-600">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Selecciona un grupo</h3>
+            <p className="text-gray-600 dark:text-gray-400">
               Elige un grupo de la lista para ver sus publicaciones y participar
             </p>
           </div>

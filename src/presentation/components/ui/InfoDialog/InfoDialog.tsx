@@ -17,35 +17,35 @@ interface InfoDialogProps {
 const variantStyles: Record<InfoDialogVariant, { icon: React.ReactNode; iconBg: string; titleColor: string; border: string }> = {
   info: {
     icon: (
-      <Info className="w-6 h-6 text-blue-600" />
+      <Info className="w-6 h-6 text-blue-600 dark:text-blue-400" />
     ),
-    iconBg: 'bg-blue-100',
-    titleColor: 'text-blue-900',
-    border: 'border-blue-100',
+    iconBg: 'bg-blue-100 dark:bg-blue-900/30',
+    titleColor: 'text-blue-900 dark:text-blue-300',
+    border: 'border-blue-100 dark:border-blue-800',
   },
   success: {
     icon: (
-      <CheckCircle className="w-6 h-6 text-green-600" />
+      <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
     ),
-    iconBg: 'bg-green-100',
-    titleColor: 'text-green-900',
-    border: 'border-green-100',
+    iconBg: 'bg-green-100 dark:bg-green-900/30',
+    titleColor: 'text-green-900 dark:text-green-300',
+    border: 'border-green-100 dark:border-green-800',
   },
   warning: {
     icon: (
-      <TriangleAlert className="w-6 h-6 text-yellow-600" />
+      <TriangleAlert className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
     ),
-    iconBg: 'bg-yellow-100',
-    titleColor: 'text-yellow-900',
-    border: 'border-yellow-100',
+    iconBg: 'bg-yellow-100 dark:bg-yellow-900/30',
+    titleColor: 'text-yellow-900 dark:text-yellow-300',
+    border: 'border-yellow-100 dark:border-yellow-800',
   },
   error: {
     icon: (
-      <XCircle className="w-6 h-6 text-red-600" />
+      <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
     ),
-    iconBg: 'bg-red-100',
-    titleColor: 'text-red-900',
-    border: 'border-red-100',
+    iconBg: 'bg-red-100 dark:bg-red-900/30',
+    titleColor: 'text-red-900 dark:text-red-300',
+    border: 'border-red-100 dark:border-red-800',
   },
 };
 
@@ -75,7 +75,7 @@ export const InfoDialog: React.FC<InfoDialogProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div
-        className={`relative bg-white rounded-2xl shadow-2xl w-full max-w-sm border ${styles.border} animate-in fade-in zoom-in duration-200`}
+        className={`relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm border ${styles.border} animate-in fade-in zoom-in duration-200`}
       >
         <div className="p-6 flex flex-col items-center text-center gap-4">
           <div className={`w-12 h-12 rounded-full ${styles.iconBg} flex items-center justify-center flex-shrink-0`}>
@@ -86,7 +86,7 @@ export const InfoDialog: React.FC<InfoDialogProps> = ({
             <h3 className={`text-lg font-bold ${styles.titleColor}`}>{title}</h3>
           )}
 
-          <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">{message}</p>
+          <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-line">{message}</p>
 
           <div className="flex flex-col gap-3 w-full">
             {showRegisterButton && onRegister && (

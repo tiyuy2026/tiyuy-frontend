@@ -60,24 +60,24 @@ export function ChannelCard({ channel, currentUserId }: ChannelCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-md transition-shadow duration-200">
       {/* Header del canal */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {channel.name}
             </h3>
             {/* Badge de tipo de canal */}
             <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
               channel.isPublic 
-                ? 'bg-green-100 text-green-700' 
-                : 'bg-orange-100 text-orange-700'
+                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' 
+                : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400'
             }`}>
               {channel.isPublic ? '🌐 Público' : '🔒 Privado'}
             </span>
           </div>
-          <p className="text-sm text-gray-600">{channel.city}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{channel.city}</p>
         </div>
         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-teal-500 flex items-center justify-center text-lg flex-shrink-0">
           {getChannelEmoji(channel.city)}
@@ -87,36 +87,36 @@ export function ChannelCard({ channel, currentUserId }: ChannelCardProps) {
       {/* Estadisticas */}
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="text-center">
-          <div className="flex items-center justify-center text-blue-600 mb-1">
+          <div className="flex items-center justify-center text-blue-600 dark:text-blue-400 mb-1">
             <Users className="w-4 h-4" />
           </div>
-          <div className="text-lg font-semibold text-gray-900">{channel.subscriberCount}</div>
-          <div className="text-xs text-gray-500">Suscriptores</div>
+          <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">{channel.subscriberCount}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">Suscriptores</div>
         </div>
         
         <div className="text-center">
-          <div className="flex items-center justify-center text-green-600 mb-1">
+          <div className="flex items-center justify-center text-green-600 dark:text-green-400 mb-1">
             <MessageCircle className="w-4 h-4" />
           </div>
-          <div className="text-lg font-semibold text-gray-900">{channel.postsPerDay || 0}</div>
-          <div className="text-xs text-gray-500">Posts/dia</div>
+          <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">{channel.postsPerDay || 0}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">Posts/dia</div>
         </div>
         
         <div className="text-center">
-          <div className="flex items-center justify-center text-purple-600 mb-1">
+          <div className="flex items-center justify-center text-purple-600 dark:text-purple-400 mb-1">
             <Calendar className="w-4 h-4" />
           </div>
-          <div className="text-lg font-semibold text-gray-900">
+          <div className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {new Date(channel.createdAt).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })}
           </div>
-          <div className="text-xs text-gray-500">Creado</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">Creado</div>
         </div>
       </div>
 
       {/* Rol del usuario */}
       {channel.isSubscribed && (
         <div className="mb-4">
-          <div className="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
+          <div className="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-medium">
             {channel.isAdmin ? 'Administrador' : 'Suscriptor'}
           </div>
         </div>
@@ -128,12 +128,12 @@ export function ChannelCard({ channel, currentUserId }: ChannelCardProps) {
         disabled={isSubscribing || isUnsubscribing}
         className={`w-full py-2 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2 ${
           channel.isSubscribed
-            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50'
+            ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50'
             : 'bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50'
         }`}
       >
         {isSubscribing || isUnsubscribing ? (
-          <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent animate-spin" />
+          <div className="w-4 h-4 border-2 border-gray-300 dark:border-gray-500 border-t-transparent animate-spin" />
         ) : channel.isSubscribed ? (
           <>
             <UserMinus className="w-4 h-4" />
@@ -148,8 +148,8 @@ export function ChannelCard({ channel, currentUserId }: ChannelCardProps) {
       </button>
 
       {/* Informacion adicional */}
-      <div className="mt-4 pt-4 border-t border-gray-100">
-        <div className="flex items-center justify-between text-xs text-gray-500">
+      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
           <span>ID: #{channel.id}</span>
           <span>Actualizado: {new Date(channel.updatedAt).toLocaleDateString('es-ES')}</span>
         </div>
