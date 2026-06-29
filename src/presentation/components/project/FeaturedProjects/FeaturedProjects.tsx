@@ -210,7 +210,7 @@ export function FeaturedProjects() {
 
           {/* Tarjeta de Ver Todos */}
           <div className="carousel-card flex-shrink-0 snap-start">
-            <Link href="/projects" className="flex flex-col items-center justify-center h-full min-h-[160px] sm:min-h-[320px] w-full bg-gray-50 hover:bg-gray-100/70 rounded-[14px] sm:rounded-2xl border border-gray-200 transition-all hover:shadow-sm group">
+            <Link href="/projects" className="flex flex-col items-center justify-center h-full min-h-[160px] sm:min-h-[320px] w-full bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] rounded-[14px] sm:rounded-2xl border border-[var(--border-color)] transition-all hover:shadow-sm group">
               <div className="relative w-16 h-12 sm:w-32 sm:h-24 mb-3 sm:mb-6 group-hover:scale-105 transition-transform duration-300">
                 <div className="absolute top-0 left-0 w-10 h-10 sm:w-20 sm:h-20 bg-gray-200 rounded-lg sm:rounded-xl border-2 border-white shadow-sm -rotate-6 transform origin-bottom-left z-10 overflow-hidden">
                   <div className="w-full h-full bg-blue-100/50"></div>

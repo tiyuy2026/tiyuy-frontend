@@ -669,6 +669,47 @@ html.dark .from-gray-50 {
   --tw-gradient-from: #0f172a !important;
 }
 
+/* Messages empty state dark mode */
+html.dark [data-msg-bg] {
+  background-color: #1e293b !important;
+  background-image: none !important;
+}
+
+/* Chat conversation dark mode */
+html.dark [data-chat-area] {
+  background-color: #0f172a !important;
+  background-image: none !important;
+}
+
+html.dark [data-is-own="true"] {
+  background-color: #1a3a2a !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark [data-is-own="false"] {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark [data-msg-time] {
+  color: #6b7280 !important;
+}
+
+html.dark [data-date-sep] {
+  background-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark [data-chat-input] {
+  background-color: #1e293b !important;
+}
+
+html.dark .bg-\[\#f0f2f5\] {
+  background-color: #1e293b !important;
+}
+
+
+
 html.dark .to-white {
   --tw-gradient-to: #1e293b !important;
 }

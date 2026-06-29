@@ -260,7 +260,7 @@ export default function StatusInput({
   };
 
   return (
-    <div className="space-y-4 p-4 bg-white">
+    <div className="space-y-4 p-4 bg-white dark:bg-gray-800">
       {/* Input principal */}
       <div className="relative">
         <textarea
@@ -270,7 +270,7 @@ export default function StatusInput({
           onKeyPress={handleKeyPress}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-300 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          className="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm dark:text-white dark:placeholder-gray-400"
           rows={3}
           style={{
             minHeight: '80px',
@@ -300,7 +300,7 @@ export default function StatusInput({
           <select
             value={textStyle}
             onChange={(e) => setTextStyle(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
           >
             <option value="NORMAL">Normal</option>
             <option value="BOLD">Negrita</option>
@@ -311,7 +311,7 @@ export default function StatusInput({
         
         {/* Colores predefinidos */}
         <div className="space-y-2">
-          <p className="text-xs font-medium text-gray-700">Color del estado:</p>
+          <p className="text-xs font-medium text-gray-700 dark:text-gray-300">Color del estado:</p>
           <div className="flex gap-2 flex-wrap">
             {predefinedColors.map((color) => (
               <button
@@ -341,13 +341,13 @@ export default function StatusInput({
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="📍 Ubicación (ej: Miraflores, Lima)"
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
           />
           
           <select
             value={propertyType}
             onChange={(e) => setPropertyType(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white"
           >
             <option value="">🏠 Tipo de propiedad</option>
             <option value="HOUSE">🏠 Casa</option>
@@ -362,8 +362,8 @@ export default function StatusInput({
 
       {/* Preview del estado */}
       {content.trim() && (
-        <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-          <p className="text-xs font-medium text-gray-600 mb-2">Preview del estado:</p>
+        <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Preview del estado:</p>
           <div 
             className={`p-3 rounded-lg text-sm leading-relaxed ${getTextStyleClass()}`}
             style={{ 

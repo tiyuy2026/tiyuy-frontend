@@ -249,7 +249,7 @@ export default function HomePage() {
                   Encuentra tu hogar
                 </h1>
 
-                <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200/80">
+                <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200/80 dark:border-gray-700/80">
                   <div className="border-b border-gray-200 rounded-t-2xl bg-white overflow-hidden">
                     <div className="flex">
                       <button
@@ -395,7 +395,7 @@ export default function HomePage() {
                 <Link key={href} href={href} className="block group h-full">
                   <div className="flex flex-col h-full bg-white rounded-xl p-6 sm:p-10 shadow-sm border border-gray-200 hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
                     <div className="flex-grow">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-brand-light rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-light-hover transition-colors">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[var(--brand-primary-light)] rounded-xl flex items-center justify-center mb-5 group-hover:bg-[var(--brand-primary-light-hover)] transition-colors">
                         <Icon icon={icon} className="w-6 h-6 sm:w-7 sm:h-7 text-brand" />
                       </div>
                       <h3 className="text-lg sm:text-xl font-bold text-foreground mb-3 group-hover:text-brand transition-colors">

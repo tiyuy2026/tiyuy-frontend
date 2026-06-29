@@ -438,11 +438,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
   }
 
   return (
-    <div className="h-full flex flex-col relative" style={{
-      backgroundColor: '#e5ddd5',
-      backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0)`,
-      backgroundSize: '24px 24px',
-    }}>
+    <div className="h-full flex flex-col relative bg-white dark:bg-gray-900">
       {/* Conditional area: initial buttons or chat line */}
       {!hasPosts && showWelcome && !postsLoading ? (
         // Initial state: "write first post" and "skip" buttons
@@ -462,7 +458,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
             </p>
           </div>
           {/* Footer con botones */}
-          <div className="bg-white p-4 flex gap-3 justify-center">
+          <div className="bg-white dark:bg-gray-800 p-4 flex gap-3 justify-center">
             <button
               onClick={handleWriteFirstPost}
               className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
@@ -474,7 +470,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
             </button>
             <button
               onClick={handleSkip}
-              className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all border border-gray-300"
+              className="px-6 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all border border-gray-300 dark:border-gray-600"
             >
               Omitir
             </button>
@@ -482,16 +478,16 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
         </div>
       ) : (
         // Interacted state: Facebook-style chat line
-        <div className="bg-white mx-4 mt-4 rounded-xl shadow-md border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 mx-4 mt-4 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
           <div className="p-4">
             <div className="flex items-start gap-3">
               <UserAvatar size="sm" />
               <div className="flex-1">
                 <div
                   onClick={() => setShowCreateForm(true)}
-                  className="w-full px-4 py-3 bg-gray-50 rounded-xl text-gray-500 cursor-text hover:bg-gray-100 transition-colors border border-gray-200"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-xl text-gray-500 dark:text-gray-400 cursor-text hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors border border-gray-200 dark:border-gray-600"
                 >
-                  <span className="text-gray-500">¿Qué estás pensando, {currentUserName}?</span>
+                  <span className="text-gray-500 dark:text-gray-400">¿Qué estás pensando, {currentUserName}?</span>
                 </div>
               </div>
             </div>
@@ -502,15 +498,15 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
       {/* Modal de creación de posts que cubre toda la parte derecha */}
       {showCreateForm && (
         <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
-          <div className="relative bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
+          <div className="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200 dark:border-gray-700">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900">Crear publicación</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Crear publicación</h2>
                 <button
                   onClick={() => setShowCreateForm(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </button>
               </div>
             </div>
@@ -523,7 +519,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                     value={newPost}
                     onChange={(e) => setNewPost(e.target.value)}
                     placeholder="¿Qué estás pensando?"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     rows={6}
                     autoFocus
                   />
@@ -534,11 +530,11 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
               <div className="space-y-4 mb-4">
                 {/* Tipos de letra */}
                 <div className="flex items-center gap-4">
-                  <label className="text-sm font-medium text-gray-700">Tipo de letra:</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de letra:</label>
                   <select
                     value={fontStyle}
                     onChange={(e) => setFontStyle(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   >
                     <option value="normal">Normal</option>
                     <option value="bold">Negrita</option>
@@ -549,7 +545,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                   <select
                     value={borderStyle}
                     onChange={(e) => setBorderStyle(e.target.value as any)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   >
                     <option value="none">Sin borde</option>
                     <option value="solid">Borde sólido</option>
@@ -558,8 +554,8 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                   </select>
 
                   {/* Indicador de color de texto automático */}
-                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
-                    <span className="text-sm text-gray-600">Texto:</span>
+                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">Texto:</span>
                     <div 
                       className="w-6 h-6 rounded border border-gray-300"
                       style={{ backgroundColor: textColor }}
@@ -568,9 +564,9 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                   </div>
                 </div>
 
-                {/* Selector de color de fondo mejorado */}
+                  {/* Selector de color de fondo mejorado */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Color de fondo:</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Color de fondo:</label>
                   <div className="flex gap-2 flex-wrap">
                     {backgroundColors.map((color) => (
                       <button
@@ -584,14 +580,14 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                       />
                     ))}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                      El color del texto se ajusta automáticamente
                   </div>
                 </div>
 
                 {/* Emojis */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Emojis:</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Emojis:</label>
                   <div className="flex gap-2 flex-wrap">
                     {[
                       { emoji: '🔥', id: 'fire' },
@@ -610,7 +606,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                       <button
                         key={item.id}
                         onClick={() => setNewPost(newPost + item.emoji)}
-                        className="text-2xl hover:bg-gray-100 p-1 rounded transition-colors"
+                        className="text-2xl hover:bg-gray-100 dark:hover:bg-gray-700 p-1 rounded transition-colors"
                         title={item.id}
                       >
                         {item.emoji}
@@ -633,7 +629,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       disabled={selectedImages.length >= 3}
-                      className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      className="px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                       <Image className="w-4 h-4" />
                       <span>Agregar imagen ({selectedImages.length}/3)</span>
@@ -647,7 +643,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                           <img
                             src={URL.createObjectURL(image)}
                             alt={`Preview ${index + 1}`}
-                            className="w-20 h-20 object-cover rounded-lg border border-gray-200"
+                            className="w-20 h-20 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
                           />
                           <button
                             onClick={() => removeImage(index)}
@@ -663,13 +659,13 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
 
                 {/* Ubicación */}
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-gray-500" />
+                  <MapPin className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                   <input
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     placeholder="Agregar ubicación (opcional)"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
                 </div>
               </div>
@@ -687,7 +683,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                     setFontStyle('normal');
                     setBorderStyle('none');
                   }}
-                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                  className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 >
                   Cancelar
                 </button>
@@ -725,7 +721,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
             {filteredPosts.map((post) => (
               <div 
                 key={post.id} 
-                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200 w-full"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow duration-200 w-full"
               >
                 {/* Header del post tipo Facebook */}
                 <div className="p-4">
@@ -737,44 +733,44 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <div>
-                          <span className="font-semibold text-gray-900">
+                          <span className="font-semibold text-gray-900 dark:text-gray-100">
                             {post.userId === currentUserId 
                               ? currentUserName 
                               : post.userName || 'Usuario'
                             }
                           </span>
                           {post.isPinned && (
-                            <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">
+                            <span className="ml-2 px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-xs font-medium rounded-full">
                               Fijado
                             </span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
                             {post.timeAgo}
                           </span>
                           {post.userId === currentUserId && (
                             <div className="relative">
                               <button
                                 onClick={() => setShowPostMenu({ ...showPostMenu, [post.id]: !showPostMenu[post.id] })}
-                                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
                               >
-                                <MoreVertical className="w-4 h-4 text-gray-500" />
+                                <MoreVertical className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                               </button>
                               
                               {/* Menú desplegable */}
                               {showPostMenu[post.id] && (
-                                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-32">
+                                <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 min-w-32">
                                   <button
                                     onClick={() => handleEditPost(post)}
-                                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
+                                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors text-gray-900 dark:text-gray-100"
                                   >
                                     <Edit className="w-4 h-4" />
                                     Editar
                                   </button>
                                   <button
                                     onClick={() => handleDeletePost(post)}
-                                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 text-red-600 flex items-center gap-2 transition-colors"
+                                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-red-600 flex items-center gap-2 transition-colors"
                                   >
                                     <Trash2 className="w-4 h-4" />
                                     Eliminar
@@ -785,7 +781,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                           )}
                         </div>
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
                         {groupName}
                       </div>
                     </div>
@@ -806,14 +802,14 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                         <textarea
                           value={editContent[post.id] || ''}
                           onChange={(e) => setEditContent({ ...editContent, [post.id]: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                           rows={3}
                           autoFocus
                         />
                         <div className="flex gap-2 justify-end">
                           <button
                             onClick={() => handleCancelEdit(post.id)}
-                            className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                            className="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                           >
                             Cancelar
                           </button>
@@ -868,7 +864,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                   )}
 
                   {/* Facebook-style interaction counter - ABOVE buttons */}
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-3 pb-2 border-b border-gray-100">
+                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-3 pb-2 border-b border-gray-100 dark:border-gray-700">
                     <div className="flex items-center gap-4">
                       <span className="flex items-center gap-1">
                         <Heart className="w-4 h-4 text-red-500" />
@@ -883,7 +879,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                         <span>{post.shareCount}</span>
                       </span>
                     </div>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-gray-400 dark:text-gray-500">
                       {post.viewCount} views
                     </span>
                   </div>
@@ -896,7 +892,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                       className={`flex-1 py-2 px-3 rounded-lg transition-colors font-medium disabled:opacity-50 ${
                         post.hasUserLiked 
                           ? 'bg-brand/10 text-brand hover:bg-brand/20' 
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
                       {isLikingPost ? (
@@ -908,7 +904,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                     </button>
                     <button
                       onClick={() => handleComment(post)}
-                      className="flex-1 py-2 px-3 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+                      className="flex-1 py-2 px-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors font-medium"
                     >
                       <MessageSquare className="w-4 h-4 inline mr-1" />
                       Comment
@@ -918,8 +914,8 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                       disabled={isSharingPost}
                       className={`flex-1 py-2 px-3 rounded-lg transition-colors font-medium disabled:opacity-50 ${
                         isSharingPost 
-                          ? 'bg-gray-100 text-gray-400' 
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500' 
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
                       {isSharingPost ? (
@@ -933,7 +929,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                 </div>
 
                 {/* Área de comentarios tipo Facebook */}
-                <div className="bg-gray-50 p-4 border-t border-gray-100">
+                <div className="bg-gray-50 dark:bg-gray-800/50 p-4 border-t border-gray-100 dark:border-gray-700">
                   
                   {/* Input para nuevo comentario */}
                   <div className="flex items-start gap-2 mb-3">
@@ -945,7 +941,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                         onChange={(e) => handleCommentInputChange(post.id, e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleCommentSubmit(post.id)}
                         placeholder={`Escribe un comentario como ${currentUserName}...`}
-                        className="flex-1 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                       />
                       <button
                         onClick={() => handleCommentSubmit(post.id)}
@@ -1002,20 +998,20 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
       {filteredPosts?.map((post) => (
         showShareModal[post.id] && (
           <div key={`share-${post.id}`} className="fixed right-8 bottom-20 z-50">
-            <div className="bg-white rounded-xl p-8 max-w-md w-96 shadow-2xl border border-gray-200">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-md w-96 shadow-2xl border border-gray-200 dark:border-gray-700">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Share post</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Share post</h3>
                 <button 
                   onClick={() => setShowShareModal(prev => ({ ...prev, [post.id]: false }))} 
-                  className="text-gray-400 hover:text-gray-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-xl leading-none"
+                  className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xl leading-none"
                 >
                   ✕
                 </button>
               </div>
               
               <div className="mb-4">
-                <p className="text-sm text-gray-600 line-clamp-3">{post.content}</p>
-                <p className="text-xs text-gray-500 mt-2">by {post.userName} in {groupName}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">{post.content}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">by {post.userName} in {groupName}</p>
               </div>
 
               <div className="grid grid-cols-4 gap-3">
@@ -1184,9 +1180,9 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
     fetchComments();
   }, [postId, groupId, refreshTrigger]);
 
-  if (loading) return <div className="text-xs text-gray-400 py-2">Cargando comentarios...</div>;
+  if (loading) return <div className="text-xs text-gray-400 dark:text-gray-500 py-2">Cargando comentarios...</div>;
   if (comments.length === 0) return (
-    <div className="text-xs text-gray-400 py-2">
+    <div className="text-xs text-gray-400 dark:text-gray-500 py-2">
       No hay comentarios visibles. 
       <br />
       <span className="text-xs">Escribe un comentario abajo para verlo aquí inmediatamente</span>
@@ -1204,12 +1200,12 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
             size="xs" 
           />
           <div className="flex-1">
-            <div className="bg-white rounded-lg px-3 py-2 border border-gray-200">
-              <span className="font-semibold text-xs text-gray-900">
+            <div className="bg-white dark:bg-gray-700 rounded-lg px-3 py-2 border border-gray-200 dark:border-gray-600">
+              <span className="font-semibold text-xs text-gray-900 dark:text-gray-100">
                 {comment.userId === currentUserId ? currentUserName : comment.userName || 'Usuario'}
               </span>
-              <p className="text-sm text-gray-800 mt-0.5">{comment.content}</p>
-              <span className="text-xs text-gray-400">{comment.timeAgo}</span>
+              <p className="text-sm text-gray-800 dark:text-gray-200 mt-0.5">{comment.content}</p>
+              <span className="text-xs text-gray-400 dark:text-gray-500">{comment.timeAgo}</span>
             </div>
             
             {/* Like and Reply buttons */}
@@ -1244,12 +1240,12 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
             {/* Reply input (WhatsApp style) */}
             {replyingTo === comment.id && (
               <div className="mt-2 px-3">
-                <div className="bg-gray-50 rounded-lg p-2 border border-gray-200">
-                  <div className="flex items-center gap-2 mb-2 text-xs text-gray-600">
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-2 border border-gray-200 dark:border-gray-600">
+                  <div className="flex items-center gap-2 mb-2 text-xs text-gray-600 dark:text-gray-300">
                     <span>Respondiendo a {replyingToName}</span>
                     <button
                       onClick={() => setReplyingTo(null)}
-                      className="text-gray-400 hover:text-gray-600"
+                      className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                     >
                       
                     </button>
@@ -1262,7 +1258,7 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
                       onChange={(e) => handleReplyInputChange(comment.id, e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleReplySubmit(comment.id, postId)}
                       placeholder={`Escribe una respuesta...`}
-                      className="flex-1 px-2 py-1 bg-white border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="flex-1 px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-900 dark:text-gray-100"
                       autoFocus
                     />
                     <button
@@ -1286,12 +1282,12 @@ function PostCommentsList({ postId, groupId, currentUserId, currentUserName, cur
                       user={reply.userId === currentUserId ? currentUser : { firstName: reply.userName }} 
                       size="xs" 
                     />
-                    <div className="flex-1 bg-gray-50 rounded-lg px-2 py-1 border border-gray-100">
-                      <span className="font-semibold text-xs text-gray-900">
+                    <div className="flex-1 bg-gray-50 dark:bg-gray-700 rounded-lg px-2 py-1 border border-gray-100 dark:border-gray-600">
+                      <span className="font-semibold text-xs text-gray-900 dark:text-gray-100">
                         {reply.userId === currentUserId ? currentUserName : reply.userName || 'Usuario'}
                       </span>
-                      <p className="text-xs text-gray-800 mt-0.5">{reply.content}</p>
-                      <span className="text-xs text-gray-400">{reply.timeAgo}</span>
+                      <p className="text-xs text-gray-800 dark:text-gray-200 mt-0.5">{reply.content}</p>
+                      <span className="text-xs text-gray-400 dark:text-gray-500">{reply.timeAgo}</span>
                     </div>
                   </div>
                 ))}

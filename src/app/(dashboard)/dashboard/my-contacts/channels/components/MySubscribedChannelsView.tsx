@@ -40,11 +40,11 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Search className="w-8 h-8 text-gray-400" />
+          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No se encontraron canales</h3>
-          <p className="text-gray-500 text-sm">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No se encontraron canales</h3>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             No hay canales suscritos que coincidan con "{searchQuery}"
           </p>
         </div>
@@ -56,16 +56,16 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Users className="w-8 h-8 text-gray-400" />
+          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="w-8 h-8 text-gray-400 dark:text-gray-500" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No estás suscrito a canales</h3>
-          <p className="text-gray-500 text-sm mb-4">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No estás suscrito a canales</h3>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
             Descubre canales de otros agentes e inmobiliarias para estar al día con las últimas novedades del mercado.
           </p>
-          <div className="bg-teal-50 border border-teal-200 rounded-lg p-3">
-            <p className="text-teal-700 text-sm font-medium mb-1"> Beneficios de suscribirte:</p>
-            <ul className="text-teal-600 text-xs space-y-1">
+          <div className="bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg p-3">
+            <p className="text-teal-700 dark:text-teal-300 text-sm font-medium mb-1"> Beneficios de suscribirte:</p>
+            <ul className="text-teal-600 dark:text-teal-400 text-xs space-y-1">
               <li>• Recibir actualizaciones de propiedades</li>
               <li>• Conocer nuevas oportunidades</li>
               <li>• Comentar y interactuar</li>
@@ -80,25 +80,25 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
   return (
     <div className="flex-1 p-6">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Mis Canales Suscritos</h2>
-        <p className="text-gray-600 text-sm mb-4">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">Mis Canales Suscritos</h2>
+        <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
           Canales en los que estás suscrito. Puedes ver contenido, comentar y interactuar con las publicaciones.
         </p>
         
         {/* Input de búsqueda */}
-        <div className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 max-w-md relative">
-          <Search className="w-4 h-4 text-gray-400" />
+        <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-full px-4 py-2 max-w-md relative">
+          <Search className="w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input 
             type="text"
             placeholder="Buscar canales suscritos por nombre, descripción, categoría o ciudad..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-transparent text-sm text-gray-700 placeholder-gray-400 flex-1 focus:outline-none" 
+            className="bg-transparent text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 flex-1 focus:outline-none" 
           />
           {searchQuery && (
             <button 
               onClick={() => setSearchQuery('')}
-              className="text-gray-400 hover:text-gray-600 cursor-pointer"
+              className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -106,7 +106,7 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
         </div>
         
         {searchQuery && (
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
             Se encontraron {filteredChannels.length} canal(es) suscrito(s) que coinciden con "{searchQuery}"
           </p>
         )}
@@ -116,13 +116,13 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
         {filteredChannels.map((channel: any) => (
           <div
             key={channel.id}
-            className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
             onClick={() => onChannelSelect(channel)}
           >
             {/* Header del canal */}
             <div className="h-20 bg-gradient-to-r from-teal-500 to-blue-400 relative">
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-white/90 dark:bg-gray-800/90 rounded-full flex items-center justify-center">
                   <Radio className="w-6 h-6 text-teal-600" />
                 </div>
               </div>
@@ -135,10 +135,10 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
 
             {/* Content */}
             <div className="p-4">
-              <h3 className="font-semibold text-gray-900 mb-1 truncate">{channel.name}</h3>
-              <p className="text-sm text-gray-500 mb-3 line-clamp-2">{channel.description}</p>
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1 truncate">{channel.name}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">{channel.description}</p>
               
-              <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
+              <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-3">
                 <div className="flex items-center gap-1">
                   <MapPin className="w-3 h-3" />
                   {channel.city}
@@ -150,10 +150,10 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
               </div>
 
               <div className="flex gap-2">
-                <button className="flex-1 bg-teal-50 text-teal-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-teal-100 transition-colors cursor-pointer">
+                <button className="flex-1 bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 py-2 px-3 rounded-lg text-xs font-medium hover:bg-teal-100 dark:hover:bg-teal-900/40 transition-colors cursor-pointer">
                   Ver posts
                 </button>
-                <button className="flex-1 bg-gray-50 text-gray-600 py-2 px-3 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors cursor-pointer">
+                <button className="flex-1 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400 py-2 px-3 rounded-lg text-xs font-medium hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors cursor-pointer">
                   Comentar
                 </button>
               </div>

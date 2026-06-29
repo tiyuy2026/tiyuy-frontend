@@ -84,7 +84,7 @@ export default function CampaignsPage() {
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="bg-emerald-50 rounded-xl p-3">
+          <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-xl p-3">
             <Star className="w-6 h-6 text-emerald-600" />
           </div>
           <div>
@@ -99,7 +99,7 @@ export default function CampaignsPage() {
 
         {campaigns.length === 0 ? (
           <div className="text-center py-20">
-            <Star className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <Star className="w-16 h-16 text-[var(--text-muted)] mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-foreground/60 mb-2">
               No hay campañas activas
             </h2>
@@ -128,7 +128,7 @@ export default function CampaignsPage() {
                   href={targetUrl}
                   className="group block"
                 >
-                  <div className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden h-full">
+                  <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden h-full">
                     {/* Imagen */}
                     <div className="relative h-48 overflow-hidden">
                       {campaign.imageUrl ? (
@@ -145,7 +145,7 @@ export default function CampaignsPage() {
 
                       {/* Logo del owner */}
                       {campaign.ownerLogoUrl && (
-                        <div className="absolute bottom-2 left-2 w-10 h-10 rounded-full border-2 border-white shadow-md overflow-hidden bg-white">
+                        <div className="absolute bottom-2 left-2 w-10 h-10 rounded-full border-2 border-white dark:border-gray-700 shadow-md overflow-hidden bg-[var(--bg-card)]">
                           <img
                             src={campaign.ownerLogoUrl}
                             alt={campaign.ownerName || 'Logo'}
@@ -169,12 +169,12 @@ export default function CampaignsPage() {
                           e.stopPropagation();
                           toggleFavorite(campaign.id);
                         }}
-                        className="absolute top-2 right-2 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-all shadow-sm"
+                        className="absolute top-2 right-2 p-2 rounded-full bg-[var(--bg-card)]/80 backdrop-blur-sm hover:bg-[var(--bg-card)] transition-all shadow-sm"
                         aria-label={isFavorited ? 'Quitar de favoritos' : 'Agregar a favoritos'}
                       >
                         <Heart
                           className={`w-4 h-4 transition-colors ${
-                            isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-600'
+                            isFavorited ? 'fill-red-500 text-red-500' : 'text-[var(--text-secondary)]'
                           }`}
                         />
                       </button>
@@ -183,16 +183,16 @@ export default function CampaignsPage() {
                     {/* Información */}
                     <div className="p-4">
                       {campaign.ownerName && (
-                        <p className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1">
+                        <p className="text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1">
                           {campaign.ownerName}
                         </p>
                       )}
 
-                      <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-1">
+                      <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1 line-clamp-1">
                         {entityName}
                       </h3>
 
-                      <div className="flex items-center gap-1 text-[11px] text-gray-500 mb-2">
+                      <div className="flex items-center gap-1 text-[11px] text-[var(--text-secondary)] mb-2">
                         {entityIcon}
                         <span>{entityType}</span>
                       </div>
@@ -204,12 +204,12 @@ export default function CampaignsPage() {
                       )}
 
                       <div className="flex items-center gap-1.5">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-medium border border-emerald-200">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-medium border border-emerald-200 dark:border-emerald-800">
                           <Star className="w-2.5 h-2.5" />
                           7 Días Premium
                         </span>
                         {campaign.endDate && (
-                          <span className="text-[10px] text-gray-400">
+                          <span className="text-[10px] text-[var(--text-muted)]">
                             Hasta {new Date(campaign.endDate).toLocaleDateString('es-PE', { day: 'numeric', month: 'short' })}
                           </span>
                         )}

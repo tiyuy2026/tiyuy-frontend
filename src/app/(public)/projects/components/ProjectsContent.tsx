@@ -62,13 +62,12 @@ export default function ProjectsContent() {
   });
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-[var(--bg-secondary)]">
       {/* Estilos globales inyectados para forzar la reducción estética y simetría en móviles */}
       <style>{`
         @media (max-width: 639px) {
           /* Reset de tarjetas inferiores para imitar tamaño mini de Airbnb */
           .compact-mobile-card > div {
-            background: transparent !important;
             border: none !important;
             box-shadow: none !important;
             padding: 0 !important;
@@ -85,12 +84,10 @@ export default function ProjectsContent() {
             font-size: 13px !important;
             font-weight: 600 !important;
             line-height: 1.2 !important;
-            color: #1f2937 !important;
           }
           .compact-mobile-card p, 
           .compact-mobile-card span {
             font-size: 11px !important;
-            color: #6b7280 !important;
           }
           .compact-mobile-card svg {
             width: 12px !important;
@@ -103,18 +100,18 @@ export default function ProjectsContent() {
       `}</style>
 
       {/* Sección de Proyectos Destacados (Carrusel) */}
-      <section className="py-6 sm:py-16 bg-white w-full">
+      <section className="py-6 sm:py-16 bg-[var(--bg-primary)] w-full">
         <div className="max-w-[1920px] mx-auto">
           {/* Sincronizado a px-4 en móvil para calzar con la sección inferior */}
           <div className="text-center mb-6 sm:mb-12 px-4 sm:px-8 xl:px-16">
-            <div className="inline-flex items-center gap-2 bg-brand-light text-brand px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold mb-3 sm:mb-4">
+            <div className="inline-flex items-center gap-2 bg-[var(--brand-primary-light)] text-brand px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold mb-3 sm:mb-4">
               <Icon icon="mdi:star" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>PROYECTOS DESTACADOS</span>
             </div>
             <h2 className="text-xl sm:text-3xl font-bold text-brand mb-2">
               Proyectos destacados cerca de ti
             </h2>
-            <p className="text-gray-600 text-sm sm:text-lg max-w-2xl mx-auto">
+            <p className="text-[var(--text-secondary)] text-sm sm:text-lg max-w-2xl mx-auto">
               Descubre los mejores proyectos de vivienda e inversión de las principales inmobiliarias del Perú
             </p>
           </div>
@@ -125,18 +122,18 @@ export default function ProjectsContent() {
 
       {/* Todos los Proyectos (Grid Estilo Airbnb Compacto) */}
       {/* Sincronizado el padding lateral de la sección (px-4 en móvil) */}
-      <section className="py-6 sm:py-16 bg-white border-t border-gray-100">
+      <section className="py-6 sm:py-16 bg-[var(--bg-primary)] border-t border-[var(--border-light)]">
         <div className="w-full px-4 sm:px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             <div className="text-center mb-6 sm:mb-12">
-              <h2 className="text-xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-4">
+              <h2 className="text-xl sm:text-3xl font-bold text-[var(--text-primary)] mb-2 sm:mb-4">
                 Todos los Proyectos
               </h2>
-              <p className="text-sm sm:text-lg text-gray-600 max-w-2xl mx-auto">
+              <p className="text-sm sm:text-lg text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Explora nuestro catálogo completo de proyectos inmobiliarios en todo el Perú
               </p>
               {totalElements > 0 && (
-                <p className="text-xs sm:text-sm text-gray-400 mt-1.5">
+                <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1.5">
                   {totalElements} proyecto{totalElements !== 1 ? 's' : ''} encontrado{totalElements !== 1 ? 's' : ''}
                 </p>
               )}
@@ -155,14 +152,14 @@ export default function ProjectsContent() {
                 ))}
               </div>
             ) : error ? (
-              <div className="text-center py-16 sm:py-20 bg-red-50 rounded-2xl mx-4 sm:mx-0">
+              <div className="text-center py-16 sm:py-20 bg-red-50 dark:bg-red-950/30 rounded-2xl mx-4 sm:mx-0">
                 <div className="flex justify-center mb-4">
                   <AlertTriangle className="w-12 h-12 sm:w-16 h-16 text-red-400" />
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-4">
+                <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-2 sm:mb-4">
                   Error al cargar proyectos
                 </h3>
-                <p className="text-gray-600 text-sm sm:text-base mb-6 px-4">{error}</p>
+                <p className="text-[var(--text-secondary)] text-sm sm:text-base mb-6 px-4">{error}</p>
                 <button 
                   onClick={reload}
                   className="bg-red-600 text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors text-sm sm:text-base"
@@ -171,14 +168,14 @@ export default function ProjectsContent() {
                 </button>
               </div>
             ) : allProjects.length === 0 ? (
-              <div className="text-center py-16 sm:py-20 bg-gray-50 rounded-2xl mx-4 sm:mx-0">
+              <div className="text-center py-16 sm:py-20 bg-[var(--bg-tertiary)] rounded-2xl mx-4 sm:mx-0">
                 <div className="flex justify-center mb-4">
-                  <Icon icon="mdi:building-outline" className="w-12 h-12 sm:w-16 h-16 text-gray-300" />
+                  <Icon icon="mdi:building-outline" className="w-12 h-12 sm:w-16 h-16 text-[var(--text-muted)]" />
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-4">
+                <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-2 sm:mb-4">
                   No hay proyectos disponibles
                 </h3>
-                <p className="text-gray-600 text-sm sm:text-base mb-6 px-4">
+                <p className="text-[var(--text-secondary)] text-sm sm:text-base mb-6 px-4">
                   Pronto tendremos nuevos proyectos inmobiliarios para ti
                 </p>
               </div>
@@ -203,7 +200,7 @@ export default function ProjectsContent() {
                 {isLoadingMore && (
                   <div className="flex items-center justify-center gap-2 mt-8 py-4">
                     <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 animate-spin" />
-                    <span className="text-xs sm:text-sm text-gray-500">Cargando más proyectos...</span>
+                    <span className="text-xs sm:text-sm text-[var(--text-secondary)]">Cargando más proyectos...</span>
                   </div>
                 )}
 

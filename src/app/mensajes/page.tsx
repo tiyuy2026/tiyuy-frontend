@@ -339,13 +339,13 @@ function NewStatusModal({ onClose, userRole }: { onClose: () => void; userRole?:
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">Crear nuevo estado</h2>
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Crear nuevo estado</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
@@ -362,10 +362,10 @@ function NewStatusModal({ onClose, userRole }: { onClose: () => void; userRole?:
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end p-6 border-t border-gray-200 bg-gray-50">
+        <div className="flex justify-end p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
           <button
             onClick={onClose}
-            className="px-6 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+            className="px-6 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors"
           >
             Cancelar
           </button>
@@ -414,28 +414,28 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
   if (hasGroup) {
     return (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
           <div className="bg-brand p-5">
             <div className="text-center">
               <h2 className="text-white font-bold text-lg"> LIMITE ALCANZADO</h2>
             </div>
           </div>
           <div className="p-6 text-center">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/40 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl"></span>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
               NO PUEDES CREAR MAS GRUPOS
             </h3>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-              <p className="text-red-800 text-sm font-medium">
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4">
+              <p className="text-red-800 dark:text-red-300 text-sm font-medium">
                 Ya alcanzaste el LIMITE de 1 grupo activo
               </p>
             </div>
-            <p className="text-gray-600 text-sm mb-4">
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
               Tu grupo actual: <strong>"{userGroups[0]?.name}"</strong>
             </p>
-            <p className="text-gray-500 text-xs mb-6">
+            <p className="text-gray-500 dark:text-gray-400 text-xs mb-6">
               En Tiyuy cada usuario puede tener UNICAMENTE UN (1) grupo activo.
             </p>
             <button
@@ -460,7 +460,7 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
       variant={infoDialog.variant}
     />
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
         <div className="bg-brand p-5">
           <div className="flex items-center justify-between">
             <div>
@@ -472,34 +472,34 @@ function NewGroupModal({ onClose }: { onClose: () => void }) {
         </div>
         <div className="p-5 space-y-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">Nombre del grupo</label>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1.5">Nombre del grupo</label>
             <input value={name} onChange={e => setName(e.target.value)}
               placeholder="Ej: Alquiler Miraflores, Venta Casas Lima Norte..."
-              className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all" />
+              className="w-full text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">Descripción</label>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1.5">Descripción</label>
             <textarea value={description} onChange={e => setDescription(e.target.value)}
               rows={2} placeholder="¿De qué trata este grupo?"
-              className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none transition-all" />
+              className="w-full text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none transition-all" />
           </div>
-          <div className="flex items-center justify-between p-3.5 bg-gray-50 rounded-xl border border-gray-100">
+          <div className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-600">
             <div>
-              <p className="text-sm font-medium text-gray-700">Restringir por correo</p>
-              <p className="text-xs text-gray-400 mt-0.5">Solo emails aprobados pueden unirse</p>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Restringir por correo</p>
+              <p className="text-xs text-gray-400 dark:text-gray-400 mt-0.5">Solo emails aprobados pueden unirse</p>
             </div>
             <button onClick={() => setIsRestricted(!isRestricted)}
-              className={`w-12 h-6 rounded-full transition-colors relative flex-shrink-0 ${isRestricted ? 'bg-brand' : 'bg-gray-300'}`}>
-              <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${isRestricted ? 'left-7' : 'left-1'}`} />
+              className={`w-12 h-6 rounded-full transition-colors relative flex-shrink-0 ${isRestricted ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-600'}`}>
+              <span className={`absolute top-1 w-4 h-4 bg-white dark:bg-gray-200 rounded-full shadow-sm transition-all ${isRestricted ? 'left-7' : 'left-1'}`} />
             </button>
           </div>
           <div className="flex items-center gap-2 bg-brand rounded-xl p-3 border border-brand">
             <span className="text-brand"></span>
-            <p className="text-xs text-brand">Podrás compartir el link del grupo en WhatsApp, Telegram y otras redes para atraer miembros</p>
+            <p className="text-xs text-white">Podrás compartir el link del grupo en WhatsApp, Telegram y otras redes para atraer miembros</p>
           </div>
           <div className="flex gap-3 pt-1">
             <button onClick={onClose}
-              className="flex-1 py-2.5 text-sm border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors font-medium">
+              className="flex-1 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium">
               Cancelar
             </button>
             <button onClick={handleSubmit} disabled={!name.trim() || createGroup.isPending}
@@ -841,10 +841,10 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
   return (
     <div className="flex flex-col h-full">
       {/* Search con Filtro Integrado */}
-      <div className="px-3 py-3 bg-white border-b border-gray-100">
+      <div className="px-3 py-3 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div className="relative flex-1">
-            <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2">
+            <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-full px-3 py-2">
               <IC.Search />
               <input 
                 placeholder="Buscar..."
@@ -956,13 +956,13 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
       </div>
 
       {/* Filters de chats existentes */}
-      <div className="flex gap-2 px-3 py-2 bg-white border-b border-gray-100 overflow-x-auto scrollbar-hide">
+      <div className="flex gap-2 px-3 py-2 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 overflow-x-auto scrollbar-hide">
         {filters.map(f => (
           <button key={f.key} onClick={() => setFilter(f.key)}
             className={`px-4 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
               filter === f.key
                 ? 'bg-brand text-white shadow-sm'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}>
             {f.label}
           </button>
@@ -970,7 +970,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
       </div>
 
       {/* Lista */}
-      <div className="flex-1 overflow-y-auto bg-white">
+      <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-800">
         {loadingSearch ? (
           <div className="flex justify-center py-16">
             <div className="w-8 h-8 rounded-full border-4 border-brand border-t-transparent animate-spin" />
@@ -1016,7 +1016,7 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
         ) : (
           chats.map((chat: any) => (
             <div key={chat.id} onClick={() => setSelectedChatId(chat.id)}
-              className={`flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 transition-colors ${selectedChatId === chat.id ? 'bg-[#f0f2f5]' : ''}`}>
+              className={`flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 transition-colors ${selectedChatId === chat.id ? 'bg-[#f0f2f5] dark:bg-gray-600' : ''}`}>
               <div className="relative">
                 <Avatar name={chat.participantName ?? chat.groupName ?? 'U'} role="USER" size="md" src={chat.participantAvatar} />
                 {chat.type === 'GROUP' && (
@@ -1027,15 +1027,15 @@ function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: any; se
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-sm font-semibold text-gray-900 truncate">
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                     {chat.type === 'GROUP' ? chat.groupName : chat.participantName}
                   </span>
-                  <span className={`text-[11px] flex-shrink-0 ml-2 ${chat.unreadCount > 0 ? 'text-[#25d366] font-medium' : 'text-gray-400'}`}>
+                  <span className={`text-[11px] flex-shrink-0 ml-2 ${chat.unreadCount > 0 ? 'text-[#25d366] font-medium' : 'text-gray-400 dark:text-gray-500'}`}>
                     {chat.lastMessageAt ? timeAgo(new Date(chat.lastMessageAt)) : ''}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-500 truncate">{chat.lastMessagePreview ?? 'Sin mensajes'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-300 truncate">{chat.lastMessagePreview ?? 'Sin mensajes'}</p>
                   {chat.unreadCount > 0 && (
                     <span className="w-5 h-5 bg-[#25d366] rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0 ml-2">
                       {chat.unreadCount > 9 ? '9+' : chat.unreadCount}
@@ -1094,9 +1094,9 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-800">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700">
         <h2 className="font-semibold text-gray-800">Estados · 48h</h2>
         <button onClick={onNewStatus}
           className="text-xs bg-brand text-white px-4 py-1.5 rounded-full font-medium hover:opacity-90 transition-opacity shadow-sm">
@@ -1105,8 +1105,8 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
       </div>
 
       {/* Filtro ubicación */}
-      <div className="px-4 py-2 border-b border-gray-100">
-        <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1.5">
+      <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+        <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-full px-3 py-1.5">
           <IC.Search />
           <input
             value={locationFilter}
@@ -1119,10 +1119,10 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
 
       {/* Mi estado */}
       <div onClick={onNewStatus}
-        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-colors">
+        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 transition-colors">
         <div className="relative">
           <div className="w-12 h-12 rounded-full p-0.5 bg-brand">
-            <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
+            <div className="w-full h-full rounded-full bg-white dark:bg-gray-700 flex items-center justify-center overflow-hidden">
               <Avatar name={user?.firstName ?? 'U'} role={user?.role} size="md" />
             </div>
           </div>
@@ -1165,7 +1165,7 @@ function EstadosPanel({ user, onNewStatus, onStatusSelect, selectedStatusId }: {
               const roleLabel = ROLE_LABEL[post.userRole] ?? 'Usuario';
               return (
                 <div key={post.id} 
-                     className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition-colors cursor-pointer ${selectedStatusId === post.id ? 'bg-brand' : ''}`}
+                     className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 transition-colors cursor-pointer ${selectedStatusId === post.id ? 'bg-brand/10 dark:bg-gray-600' : ''}`}
                      onClick={() => handleStatusClick(post.id)}>
                   {/* Avatar con anillo SVG de tiempo */}
                   <div className="relative flex-shrink-0 w-12 h-12">
@@ -1288,7 +1288,7 @@ function CanalesPanel({ user }: { user: any }) {
         ) : (
           displayChannels.map((channel: any) => (
             <div key={channel.id}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition-colors">
+              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 border-b border-gray-100 transition-colors">
               <div className="w-12 h-12 rounded-full bg-brand flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
                 {cityEmojis[channel.city] ?? '️'}
               </div>
@@ -1472,7 +1472,7 @@ function GruposListPanel({
                   onGroupSelect(group);
                   onSectionChange('mis-grupos');
                 }}
-                className="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded-xl transition-colors text-left"
+                className="w-full flex items-center gap-3 p-2 hover:bg-gray-100 rounded-xl transition-colors text-left"
               >
                 <div className="w-10 h-10 rounded-xl bg-brand flex items-center justify-center text-lg flex-shrink-0">
                   {getGroupEmoji(group.name)}
@@ -1508,10 +1508,10 @@ function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+    <div className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900">
       {/* Header estilo Facebook */}
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-xl font-bold text-gray-900">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
           Todos los grupos a los que te uniste ({misGrupos.length})
         </h2>
         <button className="text-sm text-brand font-medium hover:underline">
@@ -1528,8 +1528,8 @@ function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect
       {!isLoading && misGrupos.length === 0 && (
         <div className="text-center py-20">
           <div className="text-6xl mb-4"></div>
-          <p className="text-gray-700 font-semibold text-lg">No eres miembro de ningún grupo aún</p>
-          <p className="text-gray-400 text-sm mt-1">Ve a "Descubrir" para unirte a grupos</p>
+          <p className="text-gray-700 dark:text-gray-300 font-semibold text-lg">No eres miembro de ningún grupo aún</p>
+          <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Ve a "Descubrir" para unirte a grupos</p>
         </div>
       )}
 
@@ -1538,7 +1538,7 @@ function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect
         {misGrupos.map((group: any) => (
           <div
             key={group.id}
-            className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all cursor-pointer"
+            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:shadow-md transition-all cursor-pointer"
           >
             {/* Banner del grupo */}
             <div
@@ -1561,10 +1561,10 @@ function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect
               
               onGroupSelect(group);
             }}>
-              <h3 className="font-bold text-gray-900 text-sm line-clamp-2 leading-snug mb-1">
+              <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm line-clamp-2 leading-snug mb-1">
                 {group.name}
               </h3>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 {group.memberCount || 0} miembros  {group.postCount || 0} publicaciones
               </p>
             </div>
@@ -1590,9 +1590,9 @@ function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect
                     link: `${window.location.origin}/groups/${group.id}` 
                   });
                 }}
-                className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               >
-                <span className="text-gray-500 text-xs">···</span>
+                <span className="text-gray-500 dark:text-gray-400 text-xs">···</span>
               </button>
             </div>
           </div>
@@ -1622,7 +1622,7 @@ function GrupoDetailPanel({ group, user, onBack }: { group: any; user: any; onBa
   };
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900">
       {/* Header del grupo estilo Tiyuy */}
       <div className="bg-brand p-4 text-white">
         <div className="flex items-center justify-between">
@@ -1915,7 +1915,7 @@ function MisContactosPageContent() {
   ];
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-[#efebe2] overflow-hidden">
+    <div className="flex h-[calc(100vh-64px)] bg-[#efebe2] dark:bg-gray-900 overflow-hidden">
       {/* Modal simple para usuarios no logueados */}
       {!isAuthenticated && (
         <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1952,7 +1952,7 @@ function MisContactosPageContent() {
       )}
 
       {/*  Sidebar iconos estilo WhatsApp  */}
-      <div className="w-[76px] bg-white flex flex-col items-center py-3 gap-1 flex-shrink-0 flex">
+      <div className="w-[76px] bg-white dark:bg-gray-800 flex flex-col items-center py-3 gap-1 flex-shrink-0 flex">
         {/* Logo Tiyuy */}
         <div className="w-10 h-10 mb-6 rounded-full bg-brand flex items-center justify-center shadow-lg">
           <span className="text-white font-bold text-sm">T</span>
@@ -1962,10 +1962,10 @@ function MisContactosPageContent() {
           <button key={key} onClick={() => setActiveTab(key)}
             title={label}
             className={`relative w-12 h-12 rounded-2xl flex flex-col items-center justify-center gap-1 transition-all group ${
-              activeTab === key ? 'bg-[#e9edef]' : 'hover:bg-[#f0f2f5]'
+              activeTab === key ? 'bg-[#e9edef] dark:bg-gray-600' : 'hover:bg-[#f0f2f5] dark:hover:bg-gray-700'
             }`}>
             <Icon a={activeTab === key} />
-            <span className={`text-[9px] font-medium transition-all ${activeTab === key ? 'text-[#111b21]' : 'text-[#667781]'}`}>
+            <span className={`text-[9px] font-medium transition-all ${activeTab === key ? 'text-[#111b21] dark:text-white' : 'text-[#667781] dark:text-gray-400'}`}>
               {label}
             </span>
             {badge ? (
@@ -1985,7 +1985,7 @@ function MisContactosPageContent() {
       {/*  Contenedor principal para chats y conversación  */}
       <div className="flex-1 flex overflow-hidden">
         {/*  Panel lista izquierdo  */}
-        <div className="flex-initial w-[350px] flex flex-col bg-white border-r border-[#e9edef] overflow-hidden">
+        <div className="flex-initial w-[350px] flex flex-col bg-white dark:bg-gray-800 border-r border-[#e9edef] dark:border-gray-700 overflow-hidden">
         {/* Header del panel con gradiente Tiyuy */}
         <div className="bg-brand px-4 py-3 flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -2090,6 +2090,7 @@ function MisContactosPageContent() {
             {/*  ÁREA DE MENSAJES  */}
             <div
               className="flex-1 overflow-y-auto px-3 py-3 space-y-1"
+              data-chat-area
               style={{
                 backgroundColor: '#e5ddd5',
                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M0 0h80v80H0z' fill='%23e5ddd5'/%3E%3Cpath d='M40 0v80M0 40h80' stroke='%23d4c9bf' stroke-width='0.5' opacity='0.4'/%3E%3C/svg%3E")`,
@@ -2144,6 +2145,7 @@ function MisContactosPageContent() {
                           <div className="flex justify-center my-3">
                             <span
                               className="text-[11px] px-3 py-1 rounded-lg shadow-sm"
+                              data-date-sep
                               style={{ background: '#d9f0f9', color: '#54656f' }}
                             >
                               {formatDateSeparator(new Date(msg.createdAt))}
@@ -2170,6 +2172,7 @@ function MisContactosPageContent() {
                               }
                               ${isPinned ? 'ring-2 ring-[#075e54]' : ''}
                             `}
+                            data-is-own={isMe ? 'true' : 'false'}
                             style={{
                               background: isMe ? '#dcf8c6' : '#ffffff',
                               color: '#111b21',
@@ -2223,7 +2226,7 @@ function MisContactosPageContent() {
     
                             {/* Timestamp + doble check */}
                             <div className="absolute bottom-1 right-2 flex items-center gap-0.5 pointer-events-none">
-                              <span className="text-[10px]" style={{ color: '#667781' }}>
+                              <span className="text-[10px]" data-msg-time style={{ color: '#667781' }}>
                                 {new Date(msg.createdAt).toLocaleTimeString('es-PE', {
                                   hour: '2-digit',
                                   minute: '2-digit',
@@ -2423,6 +2426,7 @@ function MisContactosPageContent() {
         ) : (
           /* Si no hay chat seleccionado, mostrar contenido estático */
           <div className="flex-1 flex items-center justify-center"
+            data-msg-bg="true"
             style={{
               backgroundColor: '#e5ddd5',
               backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0)`,
@@ -2435,16 +2439,16 @@ function MisContactosPageContent() {
                 <div className="w-20 h-20 rounded-full bg-brand flex items-center justify-center mb-6 shadow-2xl">
                   <span className="text-white font-bold text-3xl">T</span>
                 </div>
-                <h2 className="text-gray-800 text-2xl font-light mb-2">Tiyuy Mensajes</h2>
-                <p className="text-gray-600 text-sm text-center max-w-xs leading-relaxed mb-6">
+                <h2 className="text-gray-800 dark:text-white text-2xl font-light mb-2">Tiyuy Mensajes</h2>
+                <p className="text-gray-600 dark:text-gray-300 text-sm text-center max-w-xs leading-relaxed mb-6">
                   Selecciona un chat para comenzar a conversar con clientes
                 </p>
                 <div className="text-center px-4">
-                  <p className="text-gray-500 text-xs mb-2">
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mb-2">
                     Busca y agrega contactos por teléfono (solo Perú)
                   </p>
                 </div>
-                <div className="flex items-center gap-2 text-gray-400 text-xs">
+                <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-xs">
                   <Lock className="w-3 h-3 fill-current" />
                   Tus mensajes están cifrados de extremo a extremo
                 </div>
@@ -2456,16 +2460,16 @@ function MisContactosPageContent() {
                 <div className="w-20 h-20 rounded-full bg-brand flex items-center justify-center mb-6 shadow-2xl">
                   <span className="text-white font-bold text-3xl">E</span>
                 </div>
-                <h2 className="text-gray-800 text-2xl font-light mb-2">Estados</h2>
-                <p className="text-gray-600 text-sm text-center max-w-xs leading-relaxed mb-6">
+                <h2 className="text-gray-800 dark:text-white text-2xl font-light mb-2">Estados</h2>
+                <p className="text-gray-600 dark:text-gray-300 text-sm text-center max-w-xs leading-relaxed mb-6">
                   Comparte tu estado con otros profesionales
                 </p>
                 <div className="text-center px-4">
-                  <p className="text-gray-500 text-xs mb-2">
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mb-2">
                     Publica propiedades y novedades
                   </p>
                 </div>
-                <div className="flex items-center gap-2 text-gray-400 text-xs">
+                <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-xs">
                   <Globe className="w-3 h-3 fill-current" />
                   Actualiza tu estado diariamente
                 </div>
@@ -2480,7 +2484,7 @@ function MisContactosPageContent() {
         {activeTab === 'canales' && (
           selectedChannel ? (
             // Vista detallada del canal seleccionado
-            <div className="flex-1 flex flex-col bg-white overflow-hidden">
+            <div className="flex-1 flex flex-col bg-white dark:bg-gray-900 overflow-hidden">
               {/* Header del canal */}
               <div className="flex-none flex items-center gap-3 px-4 py-3 bg-brand border-b border-[#054d44]">
                 <button onClick={() => setSelectedChannel(null)}
@@ -2514,7 +2518,7 @@ function MisContactosPageContent() {
             </div>
           ) : (
             // Vista por defecto - contenido según sección seleccionada
-            <div className="flex-1 overflow-y-auto bg-gray-50">
+            <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
               {channelsSection === 'mis-canales-creados' && (
                 <MisCanalesCreadosView
                   user={user}

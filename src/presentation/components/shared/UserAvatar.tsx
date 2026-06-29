@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuthStore } from '@/presentation/store/authStore';
 
 interface UserAvatarProps {
@@ -28,15 +29,14 @@ export function UserAvatar({
   className = '',
   fallback = 'U'
 }: UserAvatarProps) {
-  // Si no se pasa usuario, usar el del authStore
   const { user: authUser } = useAuthStore();
   const user = propUser || authUser;
+  const [imgError, setImgError] = useState(false);
   
   const photoUrl = user?.photoUrl;
   const firstName = user?.firstName || '';
   const lastName = user?.lastName || '';
   
-  // Generar iniciales de fallback
   const getInitials = () => {
     if (firstName && lastName) {
       return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -49,17 +49,13 @@ export function UserAvatar({
 
   const baseClasses = `rounded-full flex items-center justify-center font-semibold overflow-hidden bg-gradient-to-br from-teal-400 to-emerald-500 text-white ${sizeClasses[size]}`;
   
-  if (photoUrl) {
+  if (photoUrl && !imgError) {
     return (
       <img 
         src={photoUrl} 
         alt={`${firstName} ${lastName}`}
         className={`${baseClasses} object-cover ${className}`}
-        onError={(e) => {
-          // Si la imagen falla, mostrar iniciales
-          (e.target as HTMLImageElement).style.display = 'none';
-          (e.target as HTMLImageElement).parentElement?.classList.add('fallback-avatar');
-        }}
+        onError={() => setImgError(true)}
       />
     );
   }
