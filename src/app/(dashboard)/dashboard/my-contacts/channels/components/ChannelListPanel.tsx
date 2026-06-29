@@ -51,6 +51,12 @@ function CanalesListPanel({
   const hasChannel = misCanalesCreados.length > 0;
   const isAuthorizedRole = user?.role === 'AGENT' || user?.role === 'INMOBILIARIA';
 
+  // Helper para limpiar la vista del canal actual y cambiar de pestaña fluidamente
+  const handleSectionNavigation = (section: 'mis-canales-creados' | 'mis-canales-suscritos' | 'descubrir-canales' | 'crear-canal') => {
+    onChannelSelect(null); // Deselecciona el canal activo para regresar a las listas globales
+    onSectionChange(section);
+  };
+
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-900">
       <div className="px-4 pt-4 pb-3 border-b border-gray-100 dark:border-gray-700">
@@ -70,7 +76,7 @@ function CanalesListPanel({
 
       <div className="px-3 py-2 space-y-1">
         <button
-          onClick={() => onSectionChange('mis-canales-creados')}
+          onClick={() => handleSectionNavigation('mis-canales-creados')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
             activeSection === 'mis-canales-creados' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
@@ -85,7 +91,7 @@ function CanalesListPanel({
         </button>
 
         <button
-          onClick={() => onSectionChange('mis-canales-suscritos')}
+          onClick={() => handleSectionNavigation('mis-canales-suscritos')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
             activeSection === 'mis-canales-suscritos' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
@@ -100,7 +106,7 @@ function CanalesListPanel({
         </button>
 
         <button
-          onClick={() => onSectionChange('descubrir-canales')}
+          onClick={() => handleSectionNavigation('descubrir-canales')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
             activeSection === 'descubrir-canales' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
@@ -113,7 +119,7 @@ function CanalesListPanel({
           onClick={() => {
             if (hasChannel) return;
             if (isAuthorizedRole) {
-              onSectionChange('crear-canal');
+              handleSectionNavigation('crear-canal');
             } else {
               setInfoDialog(true);
             }
@@ -203,7 +209,7 @@ function CanalesListPanel({
           onClick={() => {
             if (hasChannel) return;
             if (isAuthorizedRole) {
-              onSectionChange('crear-canal');
+              handleSectionNavigation('crear-canal');
             } else {
               setInfoDialog(true);
             }
