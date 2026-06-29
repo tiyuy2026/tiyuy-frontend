@@ -1,5 +1,9 @@
 'use client';
 
+import { useState } from 'react';
+import { Shield, 
+  ChevronDown, Check, MapPin, DollarSign, TrendingUp, ShieldCheck, Camera, Users, Tag } from 'lucide-react';
+
 interface SEOContentProps {
   propertyType: string;
   propertyTypeLabel: string;
@@ -11,37 +15,37 @@ interface SEOContentProps {
 export function SEOContent({ propertyType, propertyTypeLabel, district, transactionType, properties }: SEOContentProps) {
   console.log('SEOContent renderizado:', { propertyType, propertyTypeLabel, district, transactionType, propertiesCount: properties.length });
   
-  const isRent = transactionType === 'rent';
-  const isSale = transactionType === 'sale';
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
-  // Títulos dinámicos según tipo
+  const isRent = transactionType === 'rent';
+
   const mainTitle = isRent 
     ? `¿Por qué alquilar ${propertyTypeLabel.toLowerCase()} en ${district}?`
     : `¿Por qué comprar ${propertyTypeLabel.toLowerCase()} en ${district}?`;
 
-  // Contenido dinámico según tipo
-  const firstSection = isRent ? {
-    title: ' Ubicación privilegiada',
-    content: `${district} es uno de los distritos más estratégicos de Lima, con excelente conectividad, acceso a servicios básicos, centros comerciales, restaurantes y una amplia oferta educativa y de salud. Ideal para familias y profesionales que buscan calidad de vida.`
-  } : {
-    title: ' Ubicación privilegiada',
-    content: `${district} es uno de los distritos más estratégicos de Lima, con excelente conectividad, acceso a servicios básicos, centros comerciales, restaurantes y una amplia oferta educativa y de salud. Ideal para familias y profesionales.`
+  const firstSection = {
+    title: 'Ubicación privilegiada',
+    content: `${district} es uno de los distritos más estratégicos de Lima, con excelente conectividad, acceso a servicios básicos, centros comerciales, restaurantes y una amplia oferta educativa y de salud. Ideal para familias y profesionales${isRent ? ' que buscan calidad de vida.' : '.'}`
   };
 
   const secondSection = isRent ? {
-    title: ' Precios competitivos',
+    title: 'Precios competitivos',
     content: `Encontrarás ${propertyTypeLabel.toLowerCase()} en alquiler con las mejores tarifas del mercado. Opciones para todos los presupuestos con excelente relación calidad-precio y flexibilidad de contratos adaptados a tus necesidades.`
   } : {
-    title: ' Plusvalía garantizada',
+    title: 'Plusvalía garantizada',
     content: `Las propiedades en ${district} han mostrado un crecimiento constante en su valor, convirtiéndose en una excelente inversión a largo plazo. La demanda creciente asegura que tu propiedad se revalorice con el tiempo.`
   };
 
-  // Preguntas frecuentes dinámicas
+  const validPrices = properties?.filter(p => p && typeof p.price === 'number' && p.price > 0).map(p => p.price) || [];
+  const hasPrices = validPrices.length > 0;
+  const minPrice = hasPrices ? Math.min(...validPrices) : 0;
+  const maxPrice = hasPrices ? Math.max(...validPrices) : 0;
+
   const faqQuestions = isRent ? [
     {
       question: `¿Cuál es el precio promedio de alquiler de ${propertyTypeLabel.toLowerCase()} en ${district}?`,
-      answer: properties.length > 0 
-        ? `Los precios varían según la ubicación exacta, características y estado de la propiedad. En TIYUY encontrarás opciones desde S/.${Math.min(...properties.filter(p => p.price > 0).map((p) => p.price))} hasta S/.${Math.max(...properties.map((p) => p.price))}.`
+      answer: hasPrices 
+        ? `Los precios varían según la ubicación exacta, características y estado de la propiedad. En TIYUY encontrarás opciones desde S/. ${minPrice.toLocaleString('es-PE')} hasta S/. ${maxPrice.toLocaleString('es-PE')}.`
         : `Los precios varían según la ubicación exacta, características y estado de la propiedad. Contáctanos para conocer las opciones disponibles en ${district}.`
     },
     {
@@ -59,8 +63,8 @@ export function SEOContent({ propertyType, propertyTypeLabel, district, transact
   ] : [
     {
       question: `¿Cuál es el precio promedio de ${propertyTypeLabel.toLowerCase()} en ${district}?`,
-      answer: properties.length > 0 
-        ? `Los precios varían según la ubicación exacta, características y estado de la propiedad. En TIYUY encontrarás opciones desde S/.${Math.min(...properties.filter(p => p.price > 0).map((p) => p.price))} hasta S/.${Math.max(...properties.map((p) => p.price))}.`
+      answer: hasPrices 
+        ? `Los precios varían según la ubicación exacta, características y estado de la propiedad. En TIYUY encontrarás opciones desde S/. ${minPrice.toLocaleString('es-PE')} hasta S/. ${maxPrice.toLocaleString('es-PE')}.`
         : `Los precios varían según la ubicación exacta, características y estado de la propiedad. Contáctanos para conocer las opciones disponibles en ${district}.`
     },
     {
@@ -77,99 +81,156 @@ export function SEOContent({ propertyType, propertyTypeLabel, district, transact
     }
   ];
 
+  const toggleFaq = (index: number) => {
+    setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
+
   return (
-    <>
-      {/* ── SEO CONTENT ── */}
-      <section className="px-8 py-16">
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 shadow-lg">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
+    <div className="w-full max-w-8xl mx-auto space-y-4">
+      
+      <section className="px-4 sm:px-6 lg:px-8 py-12">
+        <div className="bg-gradient-to-br from-zinc-50 via-background to-muted/20 dark:from-zinc-900/40 dark:to-background border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 sm:p-8 shadow-sm">
+          
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight mb-8">
             {mainTitle}
           </h2>
+          
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-gray-800">{firstSection.title}</h3>
-              <p className="text-gray-700 leading-relaxed">
+            <div className="space-y-3">
+              <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-brand" />
+                {firstSection.title}
+              </h3>
+              <p className="text-sm text-foreground/70 leading-relaxed">
                 {firstSection.content}
               </p>
             </div>
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-gray-800">{secondSection.title}</h3>
-              <p className="text-gray-700 leading-relaxed">
+            
+            <div className="space-y-3">
+              <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                {isRent ? <DollarSign className="w-5 h-5 text-brand" /> : <TrendingUp className="w-5 h-5 text-brand" />}
+                {secondSection.title}
+              </h3>
+              <p className="text-sm text-foreground/70 leading-relaxed">
                 {secondSection.content}
               </p>
             </div>
           </div>
 
-          <div className="mt-8 grid md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-lg p-6 text-center">
-              <div className="text-3xl mb-3"></div>
-              <h4 className="font-semibold text-gray-900 mb-2">Seguridad</h4>
-              <p className="text-sm text-gray-600">Zonas seguras con vigilancia y acceso controlado</p>
+          {/* Mini Cards de Características de la zona */}
+          <div className="mt-10 grid sm:grid-cols-3 gap-4">
+            <div className="bg-background border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 hover:border-brand/30 transition-all shadow-sm">
+              <div className="p-2 bg-brand/10 w-fit rounded-lg text-brand mb-3">
+                <Shield className="w-5 h-5" />
+              </div>
+              <h4 className="font-bold text-sm text-foreground mb-1">Seguridad</h4>
+              <p className="text-xs text-foreground/60">Zonas seguras con patrullaje constante y accesos controlados.</p>
             </div>
-            <div className="bg-white rounded-lg p-6 text-center">
-              <div className="text-3xl mb-3"></div>
-              <h4 className="font-semibold text-gray-900 mb-2">Transporte</h4>
-              <p className="text-sm text-gray-600">Excelente conexión con transporte público</p>
+            
+            <div className="bg-background border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 hover:border-brand/30 transition-all shadow-sm">
+              <div className="p-2 bg-brand/10 w-fit rounded-lg text-brand mb-3">
+                <MapPin className="w-5 h-5" />
+              </div>
+              <h4 className="font-bold text-sm text-foreground mb-1">Transporte</h4>
+              <p className="text-xs text-foreground/60">Excelente conectividad y acceso inmediato a vías principales de Lima.</p>
             </div>
-            <div className="bg-white rounded-lg p-6 text-center">
-              <div className="text-3xl mb-3"></div>
-              <h4 className="font-semibold text-gray-900 mb-2">Comercio</h4>
-              <p className="text-sm text-gray-600">Centros comerciales y tiendas cercanas</p>
+            
+            <div className="bg-background border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 hover:border-brand/30 transition-all shadow-sm">
+              <div className="p-2 bg-brand/10 w-fit rounded-lg text-brand mb-3">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+              <h4 className="font-bold text-sm text-foreground mb-1">Comercio</h4>
+              <p className="text-xs text-foreground/60">Cercanía a los principales centros comerciales, bancos y tiendas locales.</p>
             </div>
           </div>
 
-          <div className="mt-8 p-6 bg-white rounded-lg">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4"> Por qué elegir TIYUY</h3>
-            <div className="grid md:grid-cols-2 gap-4">
+          <div className="mt-10 p-6 bg-muted/30 border border-zinc-100 dark:border-zinc-900 rounded-xl">
+            <h3 className="text-lg font-bold text-foreground mb-6">Por qué buscar en TIYUY</h3>
+            
+            <div className="grid sm:grid-cols-2 gap-6">
               <div className="flex items-start gap-3">
-                <span className="text-green-600 text-xl">✓</span>
+                <div className="p-1 bg-emerald-500/10 rounded-md text-emerald-600 dark:text-emerald-400 mt-0.5">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
                 <div>
-                  <strong className="text-gray-900">Propiedades verificadas</strong>
-                  <p className="text-sm text-gray-600">Todas nuestras propiedades son revisadas y validadas</p>
+                  <strong className="text-sm font-bold text-foreground">Propiedades verificadas</strong>
+                  <p className="text-xs text-foreground/60 mt-0.5">Filtros estrictos y control de documentación legal de los listados.</p>
                 </div>
               </div>
+              
               <div className="flex items-start gap-3">
-                <span className="text-green-600 text-xl">✓</span>
+                <div className="p-1 bg-emerald-500/10 rounded-md text-emerald-600 dark:text-emerald-400 mt-0.5">
+                  <Camera className="w-4 h-4" />
+                </div>
                 <div>
-                  <strong className="text-gray-900">Fotos reales y actualizadas</strong>
-                  <p className="text-sm text-gray-600">Imágenes recientes que muestran el estado actual</p>
+                  <strong className="text-sm font-bold text-foreground">Fotos reales y actualizadas</strong>
+                  <p className="text-xs text-foreground/60 mt-0.5">Imágenes recientes que reflejan el estado real exacto del inmueble.</p>
                 </div>
               </div>
+              
               <div className="flex items-start gap-3">
-                <span className="text-green-600 text-xl">✓</span>
+                <div className="p-1 bg-emerald-500/10 rounded-md text-emerald-600 dark:text-emerald-400 mt-0.5">
+                  <Users className="w-4 h-4" />
+                </div>
                 <div>
-                  <strong className="text-gray-900">Asesoría personalizada</strong>
-                  <p className="text-sm text-gray-600">Expertos que te guiarán en todo el proceso</p>
+                  <strong className="text-sm font-bold text-foreground">Trato directo y transparente</strong>
+                  <p className="text-xs text-foreground/60 mt-0.5">Contacto ágil con propietarios y asesores especializados del sector.</p>
                 </div>
               </div>
+              
               <div className="flex items-start gap-3">
-                <span className="text-green-600 text-xl">✓</span>
+                <div className="p-1 bg-emerald-500/10 rounded-md text-emerald-600 dark:text-emerald-400 mt-0.5">
+                  <Tag className="w-4 h-4" />
+                </div>
                 <div>
-                  <strong className="text-gray-900">Precios competitivos</strong>
-                  <p className="text-sm text-gray-600">Las mejores ofertas del mercado</p>
+                  <strong className="text-sm font-bold text-foreground">Precios competitivos</strong>
+                  <p className="text-xs text-foreground/60 mt-0.5">Acceso a las mejores oportunidades comerciales vigentes en el mercado.</p>
                 </div>
               </div>
             </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── SECCIÓN PREGUNTAS FRECUENTES (INTERACTIVA) ── */}
+      <section className="px-4 sm:px-6 lg:px-8 py-10">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-2xl font-bold text-foreground text-center mb-2">Preguntas frecuentes</h2>
+          <p className="text-xs text-foreground/50 text-center mb-8">Todo lo que necesitas saber sobre los inmuebles en {district}</p>
+          
+          <div className="space-y-3">
+            {faqQuestions.map((faq, index) => {
+              const isOpen = openFaqIndex === index;
+              return (
+                <div 
+                  key={index} 
+                  className="bg-background border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden transition-all duration-200"
+                >
+                  <button
+                    onClick={() => toggleFaq(index)}
+                    className="w-full flex items-center justify-between p-5 text-left font-bold text-sm text-foreground hover:bg-muted/30 transition-colors gap-4"
+                  >
+                    <span>{faq.question}</span>
+                    <ChevronDown className={`w-4 h-4 text-foreground/40 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-brand' : ''}`} />
+                  </button>
+                  
+                  <div 
+                    className={`transition-all duration-200 ease-in-out ${
+                      isOpen ? 'max-h-[500px] border-t border-zinc-100 dark:border-zinc-900/60 p-5' : 'max-h-0 opacity-0 pointer-events-none'
+                    }`}
+                  >
+                    <p className="text-sm text-foreground/70 leading-relaxed">
+                      {faq.answer}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="px-8 py-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Preguntas frecuentes</h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          {faqQuestions.map((faq, index) => (
-            <div key={index} className="bg-white rounded-lg p-6 shadow-md">
-              <h3 className="font-semibold text-gray-900 mb-3">
-                {faq.question}
-              </h3>
-              <p className="text-gray-700">
-                {faq.answer}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-    </>
+    </div>
   );
 }
