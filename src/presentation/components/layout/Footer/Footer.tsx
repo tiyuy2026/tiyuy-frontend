@@ -31,11 +31,10 @@ const FOOTER_COLUMNS = [
   {
     title: 'Asistencia',
     links: [
-      { label: 'Centro de ayuda', href: '/#ayuda' },
-      { label: 'Opciones de seguridad', href: '/#seguridad' },
-      { label: 'Nuestra política antidiscriminación', href: '/#antidiscriminacion' },
-      { label: 'Apoyo a personas con discapacidad', href: '/#discapacidad' },
-      { label: 'Opciones de cancelación', href: '/#cancelacion' },
+      { label: 'Opciones de seguridad', href: '/seguridad' },
+      { label: 'Nuestra política antidiscriminación', href: '/antidiscriminacion' },
+      { label: 'Apoyo a personas con discapacidad', href: '/discapacidad' },
+      { label: 'Opciones de cancelación', href: '/cancelacion' },
       { label: 'Libro de Reclamaciones', href: '/libro-de-reclamaciones' },
 
       { label: 'Centro de Soporte', href: '/soporte' },

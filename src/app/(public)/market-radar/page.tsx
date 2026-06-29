@@ -3,9 +3,9 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import {
-  TrendingUp, MapPin, Home, Eye, Heart, Phone, BarChart3,
+  TrendingUp, Home, Eye, Heart, Phone, BarChart3,
   Activity, Zap, ChevronRight, RefreshCw, ArrowUpRight,
-  ArrowDownRight, Building2, LandPlot, FolderGit, Shield,
+  ArrowDownRight, Building2, LandPlot, FolderGit,
   Clock, Layers, DollarSign, Search, Users, Info, Filter,
   X, ChevronDown, Loader
 } from 'lucide-react';
@@ -35,9 +35,8 @@ const formatCompact = (n: number) => n >= 1_000_000 ? (n / 1_000_000).toFixed(1)
 const propertyLabel = (t: string) => ({ APARTMENT: 'Departamento', HOUSE: 'Casa', LAND: 'Terreno', OFFICE: 'Oficina', COMMERCIAL: 'Local', ROOM: 'Habitacion' }[t] || t);
 const phaseLabel = (p: string) => ({ PRE_SALE: 'Preventa', CONSTRUCTION: 'Construccion', DELIVERY: 'Entrega inmediata', COMPLETED: 'Entregado' }[p] || p);
 
-const chartW = 720; const chartH = 240;
+const chartW = 720; const chartH = 260;
 const padding = { top: 20, right: 20, bottom: 30, left: 55 };
-const monthNames = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Set','Oct','Nov','Dic'];
 
 const METRICS_BY_VERTICAL: Record<Vertical, MetricKey[]> = {
   general: ['precio', 'nuevos', 'vistas', 'favoritos', 'contactos'],
@@ -88,6 +87,8 @@ export default function MarketRadarPage() {
   const [proyectos, setProyectos] = useState<ProyectoRadar | null>(null);
   const [lotes, setLotes] = useState<LoteRadar | null>(null);
   const [tooltip, setTooltip] = useState<{ label: string; value: string; x: number; y: number } | null>(null);
+  const [hoveredPoint, setHoveredPoint] = useState<number | null>(null);
+  const [chartMode, setChartMode] = useState<'line' | 'bars'>('line');
 
   const filteredRegions = useMemo(() => {
     if (!regionSearch) return regions;
@@ -104,7 +105,6 @@ export default function MarketRadarPage() {
     return districts.filter(d => d.toLowerCase().includes(districtSearch.toLowerCase()));
   }, [districts, districtSearch]);
 
-  // Close dropdowns on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (regionRef.current && !regionRef.current.contains(e.target as Node)) setShowRegionDropdown(false);
@@ -132,7 +132,7 @@ export default function MarketRadarPage() {
       const [g, v, p, l] = await Promise.all([
         publicApiClient.get<GeneralRadar>('/analytics/market-radar/general', { params }),
         publicApiClient.get<ViviendaRadar>('/analytics/market-radar/viviendas', { params }),
-        publicApiClient.get<ProyectoRadar>('/analytics/market-radar/proyectos', { params: { region, province, district } }),
+        publicApiClient.get<ProyectoRadar>('/analytics/market-radar/proyectos', { params: { region: region || undefined, province: province || undefined, district: district || undefined } }),
         publicApiClient.get<LoteRadar>('/analytics/market-radar/lotes', { params }),
       ]);
       setGeneral(g.data); setViviendas(v.data); setProyectos(p.data); setLotes(l.data);
@@ -161,7 +161,7 @@ export default function MarketRadarPage() {
     if (vertical === 'proyectos' && proyectos) {
       if (metric === 'nuevos') {
         return proyectos.phases.map((d: any, i: number) => ({
-          label: d.phase, value: Number(d.count || 0), x: i
+          label: phaseLabel(d.phase), value: Number(d.count || 0), x: i
         }));
       }
       return proyectos.hotDistricts.slice(0, Math.min(topN, proyectos.hotDistricts.length)).map((d: any, i: number) => ({
@@ -182,44 +182,54 @@ export default function MarketRadarPage() {
     const max = Math.max(...trendData.map(d => d.value));
     return max > 0 ? max * 1.15 : 100;
   }, [trendData]);
+
   const xScale = (i: number) => padding.left + (i / Math.max(trendData.length - 1, 1)) * (chartW - padding.left - padding.right);
   const yScale = (v: number) => {
     if (chartMax <= 0 || v <= 0) return chartH - padding.bottom;
     return padding.top + chartH - padding.top - padding.bottom - (v / chartMax) * (chartH - padding.top - padding.bottom);
   };
 
+  // Line chart handler
+  const handleChartMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (trendData.length === 0) return;
+    const svgRect = e.currentTarget.getBoundingClientRect();
+    const mx = e.clientX - svgRect.left;
+    let closest = 0;
+    let minDist = Infinity;
+    for (let i = 0; i < trendData.length; i++) {
+      const d = Math.abs(xScale(i) - mx);
+      if (d < minDist) { minDist = d; closest = i; }
+    }
+    setHoveredPoint(closest);
+    const pt = trendData[closest];
+    setTooltip({
+      label: pt.label,
+      value: metric === 'precio' ? formatPrice(pt.value) : metric === 'heat' ? `${pt.value} pts` : formatCompact(pt.value),
+      x: e.currentTarget.getBoundingClientRect().left + xScale(closest),
+      y: e.currentTarget.getBoundingClientRect().top + yScale(pt.value),
+    });
+  };
+  const handleChartLeave = () => { setHoveredPoint(null); setTooltip(null); };
+
   if (loading && !general) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-gray-400 text-sm font-medium">Cargando radar...</p>
-        </div>
-      </div>
-    );
+    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center space-y-4"><div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto" /><p className="text-gray-400 text-sm font-medium">Cargando radar...</p></div></div>;
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* HERO */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full tracking-wide uppercase">
-                <BarChart3 className="w-3.5 h-3.5" />
-                Inteligencia de Mercado
-              </div>
+              <div className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full tracking-wide uppercase"><BarChart3 className="w-3.5 h-3.5" />Inteligencia de Mercado</div>
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">Radar del Mercado</h1>
-              <p className="text-gray-500 text-base max-w-2xl leading-relaxed">
-                Indicadores de precio, oferta, demanda y actividad. Datos agregados del inventario de Tiyuy.
-              </p>
+              <p className="text-gray-500 text-base max-w-2xl leading-relaxed">Indicadores de precio, oferta, demanda y actividad. Datos agregados del inventario de Tiyuy.</p>
             </div>
             <div className="flex items-center gap-3">
               {lastUpdated && <span className="text-xs text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" />{lastUpdated}</span>}
-              <button onClick={fetchRadar} className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition-all shadow-sm"><RefreshCw className="w-4 h-4" />Actualizar</button>
+              <button onClick={fetchRadar} className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 shadow-sm"><RefreshCw className="w-4 h-4" />Actualizar</button>
               <button onClick={() => setShowMethodology(!showMethodology)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-white text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition-all border border-gray-200"><Info className="w-4 h-4" />Metodologia</button>
+                className="flex items-center gap-2 px-4 py-2.5 bg-white text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 border border-gray-200"><Info className="w-4 h-4" />Metodologia</button>
             </div>
           </div>
         </div>
@@ -242,7 +252,6 @@ export default function MarketRadarPage() {
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* VERTICAL TABS */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
           {[
             { key: 'general' as Vertical, label: 'General', icon: <BarChart3 className="w-4 h-4" /> },
@@ -251,7 +260,7 @@ export default function MarketRadarPage() {
             { key: 'lotes' as Vertical, label: 'Lotes', icon: <LandPlot className="w-4 h-4" /> },
           ].map(v => (
             <button key={v.key} onClick={() => setVertical(v.key)}
-              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-all flex-shrink-0 cursor-pointer ${vertical === v.key ? 'bg-gray-900 text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-all cursor-pointer ${vertical === v.key ? 'bg-gray-900 text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>
               {v.icon}{v.label}
             </button>
           ))}
@@ -259,91 +268,149 @@ export default function MarketRadarPage() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* LEFT: Chart */}
           <div className="flex-1 min-w-0 space-y-6">
-            {/* Metric Tabs */}
             <div className="flex gap-2 overflow-x-auto pb-1">
               {METRICS_BY_VERTICAL[vertical].map(m => (
                 <button key={m} onClick={() => setMetric(m)}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg transition-all flex-shrink-0 cursor-pointer ${metric === m ? 'bg-teal-50 text-teal-700 border border-teal-200' : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-200'}`}>
+                  className={`flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg transition-all cursor-pointer ${metric === m ? 'bg-teal-50 text-teal-700 border border-teal-200' : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-200'}`}>
                   {METRIC_ICONS[m]}{METRIC_LABELS[m]}
                 </button>
               ))}
             </div>
 
-            {/* CHART */}
-            <div className={`bg-white rounded-2xl border border-gray-100 p-6 ${chartLoading ? 'opacity-60' : ''}`}>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="font-bold text-gray-900">{METRIC_LABELS[metric]}</h3>
-                  <p className="text-sm text-gray-400">Distribucion por distrito - Top {topN}</p>
+            {/* Premium Line Chart */}
+            <div className={`bg-white rounded-3xl border border-gray-100/80 shadow-sm p-7 ${chartLoading ? 'opacity-60' : ''}`}>
+              <div className="flex items-start justify-between mb-7">
+                <div className="space-y-1.5">
+                  <h3 className="text-base font-semibold text-gray-900 tracking-tight">{METRIC_LABELS[metric]}</h3>
+                  <p className="text-sm text-gray-400 font-normal">Distribucion por distrito - Top {topN}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   {chartLoading && <Loader className="w-4 h-4 animate-spin text-teal-600" />}
+                  <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-0.5">
+                    <button onClick={() => setChartMode('line')}
+                      className={`px-2.5 py-1.5 text-[11px] font-medium rounded-md transition-all ${chartMode === 'line' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
+                      <TrendingUp className="w-3 h-3 inline mr-1" />Lineal
+                    </button>
+                    <button onClick={() => setChartMode('bars')}
+                      className={`px-2.5 py-1.5 text-[11px] font-medium rounded-md transition-all ${chartMode === 'bars' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
+                      <BarChart3 className="w-3 h-3 inline mr-1" />Barras
+                    </button>
+                  </div>
                   <select value={topN} onChange={e => setTopN(Number(e.target.value))}
-                    className="text-xs bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 cursor-pointer outline-none">
+                    className="text-xs bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 cursor-pointer outline-none text-gray-500">
                     <option value={5}>Top 5</option><option value={10}>Top 10</option><option value={20}>Top 20</option>
                   </select>
                 </div>
               </div>
 
               {trendData.length === 0 ? (
-                <div className="text-center py-12">
-                  <BarChart3 className="w-10 h-10 text-gray-200 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">No hay datos suficientes para esta metrica</p>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center mb-3"><BarChart3 className="w-6 h-6 text-gray-200" /></div>
+                  <p className="text-sm font-medium text-gray-400">No hay datos suficientes</p>
+                  <p className="text-xs text-gray-300 mt-1">Intenta con otro filtro o periodo</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto pb-2">
-                  <svg width={chartW} height={chartH} className="min-w-[700px]">
+                  <svg width={720} height={260} className="min-w-[700px]"
+                    onMouseMove={handleChartMove}
+                    onMouseLeave={handleChartLeave}
+                    style={{cursor: 'crosshair'}}>
                     {[0, 0.25, 0.5, 0.75, 1].map(frac => {
                       const y = yScale(chartMax * frac);
                       const val = chartMax * frac;
                       return (
                         <g key={frac}>
-                          <line x1={padding.left} y1={y} x2={chartW - padding.right} y2={y} stroke="#f0f0f0" strokeWidth={1} />
-                          <text x={padding.left - 8} y={y + 4} textAnchor="end" className="text-xs" fill="#9ca3af">
-                            {val >= 1000000 ? (val / 1000000).toFixed(1) + 'M' : val >= 1000 ? (val / 1000).toFixed(0) + 'K' : Math.round(val).toString()}
+                          <line x1={55} y1={y} x2={720-20} y2={y} stroke="#f1f5f9" strokeWidth={1} />
+                          <text x={55-8} y={y+4} textAnchor="end" className="text-[11px]" fill="#94a3b8">
+                            {val >= 1_000_000 ? (val / 1_000_000).toFixed(1) + 'M' : val >= 1_000 ? (val / 1_000).toFixed(0) + 'K' : Math.round(val).toString()}
                           </text>
                         </g>
                       );
                     })}
-                    {trendData.map((d, i) => {
-                      const barW = Math.max(12, Math.min(40, (chartW - padding.left - padding.right) / trendData.length * 0.5));
-                      const x = xScale(d.x) - barW / 2;
+
+                    {chartMode === 'line' && (
+                      <>
+                        <polyline fill="none" stroke="#0d9488" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"
+                          points={trendData.map((d, i) => `${xScale(i)},${yScale(d.value)}`).join(' ')} />
+                        <path d={trendData.map((d, i) => `${i===0?'M':'L'}${xScale(i)},${yScale(d.value)}`).join(' ') + ` L${xScale(trendData.length-1)},${chartH-30} L${xScale(0)},${chartH-30} Z`}
+                          fill="url(#radarGrad)" opacity={0.06} />
+                        <defs><linearGradient id="radarGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0d9488" /><stop offset="100%" stopColor="#0d9488" stopOpacity={0} /></linearGradient></defs>
+                        {hoveredPoint !== null && (
+                          <line x1={xScale(hoveredPoint)} y1={20} x2={xScale(hoveredPoint)} y2={chartH-30}
+                            stroke="#cbd5e1" strokeWidth={1} strokeDasharray="3,3" />
+                        )}
+                        {trendData.map((d, i) => {
+                          const isHovered = hoveredPoint === i;
+                          const show = isHovered || trendData.length <= 12;
+                          if (!show) return null;
+                          return (
+                            <circle key={i} cx={xScale(i)} cy={yScale(d.value)}
+                              r={isHovered ? 6 : 3.5} fill={isHovered ? '#ffffff' : '#0d9488'}
+                              stroke="#0d9488" strokeWidth={isHovered ? 3 : 2}
+                              style={{filter: isHovered ? 'drop-shadow(0 2px 6px rgba(13,148,136,0.35))' : 'none'}} />
+                          );
+                        })}
+                      </>
+                    )}
+
+                    {chartMode === 'bars' && trendData.map((d, i) => {
+                      const maxBarW = Math.min(50, (720 - 55 - 10) / Math.max(trendData.length, 1) * 0.6);
+                      const barW = Math.max(12, maxBarW);
+                      const cx = 55 + (i + 0.5) / Math.max(trendData.length, 1) * (720 - 55 - 20);
+                      const x = Math.max(55, cx - barW / 2);
                       const y = yScale(d.value);
-                      const h = chartH - padding.bottom - y;
-                      const intensity = 1 - (i / Math.max(trendData.length - 1, 1));
-                      const tooltipValue = metric === 'precio' ? formatPrice(d.value) : metric === 'heat' ? `${d.value} pts` : formatCompact(d.value);
+                      const h = Math.max(1, chartH - 30 - y);
+                      const colors = ['#0d9488','#2563eb','#f97316','#8b5cf6','#ec4899','#14b8a6','#eab308','#6366f1'];
+                      const c = colors[i % colors.length];
+                      const isHovered = hoveredPoint === i;
                       return (
-                        <g key={i}>
-                          <rect x={x} y={y} width={barW} height={h} rx={3}
-                            fill={`rgba(13, 148, 136, ${0.3 + intensity * 0.5})`}
-                            className="cursor-pointer hover:opacity-80 transition-opacity"
+                        <g key={`bar-${i}`}>
+                          <rect x={x} y={y} width={barW} height={h} rx={4}
+                            fill={isHovered ? c : c} opacity={isHovered ? 1 : 0.7}
+                            style={{filter: isHovered ? 'drop-shadow(0 2px 8px rgba(13,148,136,0.25))' : 'none'}}
+                            className="transition-all duration-150 cursor-pointer"
                             onMouseEnter={(e) => {
-                              const rect = (e.target as SVGRectElement).getBoundingClientRect();
-                              setTooltip({ label: d.label, value: tooltipValue, x: rect.left + rect.width / 2, y: rect.top - 8 });
+                              setHoveredPoint(i);
+                              const r = e.currentTarget.getBoundingClientRect();
+                              setTooltip({ label: d.label, value: metric === 'precio' ? formatPrice(d.value) : metric === 'heat' ? `${d.value} pts` : formatCompact(d.value), x: r.left + r.width/2, y: r.top });
                             }}
-                            onMouseLeave={() => setTooltip(null)} />
+                            onMouseLeave={() => { setHoveredPoint(null); setTooltip(null); }} />
                           {trendData.length <= 10 && (
-                            <text x={x + barW / 2} y={chartH - 8} textAnchor="end" className="text-[8px]" fill="#9ca3af"
-                              transform={`rotate(-45, ${x + barW / 2}, ${chartH - 8})`}>{d.label}</text>
+                            <text x={x + barW/2} y={236} textAnchor="end" className="text-[9px]" fill="#94a3b8"
+                              transform={`rotate(-25, ${x + barW/2}, 236)`}>{d.label}</text>
                           )}
                         </g>
                       );
                     })}
+
+                    {/* Labels del eje X - solo en modo línea (modo barras ya muestra labels rotados) */}
+                    {chartMode === 'line' && trendData.map((d, i) => ({ ...d, idx: i }))
+                      .filter((d, i, arr) => i % Math.max(1, Math.floor(arr.length / 8)) === 0)
+                      .map((d) => (
+                        <text key={d.idx} x={xScale(d.idx)} y={240 - 8} textAnchor="middle" className="text-[10px]" fill="#94a3b8">{d.label}</text>
+                      ))}
                   </svg>
-                  {tooltip && (
-                    <div className="fixed z-50 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg pointer-events-none"
-                      style={{ left: tooltip.x, top: tooltip.y - 50, transform: 'translateX(-50%)' }}>
-                      <p className="font-semibold">{tooltip.label}</p>
-                      <p>{tooltip.value}</p>
+
+                  {/* Tooltip premium */}
+                  {tooltip && hoveredPoint !== null && (
+                    <div className="fixed z-50 pointer-events-none"
+                      style={{ left: tooltip.x, top: tooltip.y - 60, transform: 'translateX(-50%)' }}>
+                      <div className="bg-white/95 backdrop-blur-md rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-gray-100/80 px-4 py-3 min-w-[130px]">
+                        <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">{tooltip.label}</p>
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full" style={{backgroundColor: '#0d9488'}} />
+                          <span className="text-[11px] text-gray-400">Valor</span>
+                          <span className="text-sm font-bold text-gray-900 ml-auto">{tooltip.value}</span>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
               )}
             </div>
 
-            {/* INSIGHTS */}
+            {/* Insights */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {vertical === 'viviendas' && viviendas && (
                 <>
@@ -375,7 +442,7 @@ export default function MarketRadarPage() {
               )}
             </div>
 
-            {/* RANKING */}
+            {/* Ranking */}
             {vertical === 'viviendas' && viviendas && viviendas.hotDistricts.length > 0 && (
               <div className="bg-white rounded-2xl border border-gray-100 p-5">
                 <h3 className="font-bold text-gray-900 mb-1">Ranking de distritos</h3>
@@ -409,7 +476,6 @@ export default function MarketRadarPage() {
               </div>
             )}
 
-            {/* WEEKLY HIGHLIGHTS */}
             {vertical === 'viviendas' && viviendas && viviendas.weeklyHighlights.length > 0 && (
               <div className="bg-white rounded-2xl border border-gray-100 p-5">
                 <div className="flex items-center justify-between mb-4">
@@ -434,7 +500,6 @@ export default function MarketRadarPage() {
             )}
           </div>
 
-          {/* RIGHT: Filters */}
           <div className={`lg:w-72 flex-shrink-0 ${mobileFiltersOpen ? 'block' : 'hidden lg:block'}`}>
             <div className="bg-white rounded-2xl border border-gray-100 p-5 sticky top-24 space-y-5">
               <div className="flex items-center justify-between">
@@ -442,24 +507,18 @@ export default function MarketRadarPage() {
                 <button onClick={() => setMobileFiltersOpen(false)} className="lg:hidden text-gray-400 hover:text-gray-600"><X className="w-4 h-4" /></button>
               </div>
 
-              {/* Operacion */}
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Operacion</label>
                 <div className="flex gap-2">
                   {['SALE', 'RENT'].map(op => (
                     <button key={op} onClick={() => setOperation(op)}
-                      className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all cursor-pointer ${
-                        operation === op
-                          ? 'bg-gray-900 text-white shadow-sm'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}>
+                      className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all cursor-pointer ${operation === op ? 'bg-gray-900 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
                       {op === 'SALE' ? 'Venta' : 'Alquiler'}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Region - Searchable */}
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Region</label>
                 <div className="relative">
@@ -474,7 +533,7 @@ export default function MarketRadarPage() {
                     <button onClick={() => { setRegionLabel(''); setRegion(''); setRegionSearch(''); setShowRegionDropdown(false); setProvince(''); setDistrict(''); }}
                       className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${!region ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-600'}`}>Todo el pais</button>
                     {filteredRegions.map(r => (
-                      <button key={r} onClick={() => { setRegionLabel(r); setRegion(r); setRegionSearch(r); setShowRegionDropdown(false); setProvince(''); setDistrict(''); }}
+                      <button key={r} onClick={() => { setRegionLabel(r); setRegion(r); setRegionSearch(r); setShowRegionDropdown(false); }}
                         className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${region === r ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-600'}`}>{r}</button>
                     ))}
                     {filteredRegions.length === 0 && <p className="px-3 py-2 text-sm text-gray-400">Sin resultados</p>}
@@ -482,7 +541,6 @@ export default function MarketRadarPage() {
                 )}
               </div>
 
-              {/* Provincia - Searchable */}
               {region && (
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Provincia</label>
@@ -498,7 +556,7 @@ export default function MarketRadarPage() {
                       <button onClick={() => { setProvinceLabel(''); setProvince(''); setProvinceSearch(''); setShowProvinceDropdown(false); setDistrict(''); }}
                         className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${!province ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-600'}`}>Todas</button>
                       {filteredProvinces.map(p => (
-                        <button key={p} onClick={() => { setProvinceLabel(p); setProvince(p); setProvinceSearch(p); setShowProvinceDropdown(false); setDistrict(''); }}
+                        <button key={p} onClick={() => { setProvinceLabel(p); setProvince(p); setProvinceSearch(p); setShowProvinceDropdown(false); }}
                           className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${province === p ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-600'}`}>{p}</button>
                       ))}
                       {filteredProvinces.length === 0 && <p className="px-3 py-2 text-sm text-gray-400">Sin resultados</p>}
@@ -507,7 +565,6 @@ export default function MarketRadarPage() {
                 </div>
               )}
 
-              {/* Distrito - Searchable */}
               {province && (
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Distrito</label>
@@ -532,28 +589,19 @@ export default function MarketRadarPage() {
                 </div>
               )}
 
-              {/* Top */}
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Top distritos</label>
                 <div className="flex gap-2">
                   {[5, 10, 20, 50].map(n => (
                     <button key={n} onClick={() => setTopN(n)}
-                      className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all cursor-pointer ${
-                        topN === n
-                          ? 'bg-gray-900 text-white shadow-sm'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}>
-                      {n}
-                    </button>
+                      className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all cursor-pointer ${topN === n ? 'bg-gray-900 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{n}</button>
                   ))}
                 </div>
               </div>
 
-              {/* Aplicar */}
               <button onClick={() => { setChartLoading(true); fetchRadar().finally(() => setChartLoading(false)); }}
-                className="w-full py-2.5 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-gray-800 transition-all shadow-sm flex items-center justify-center gap-2">
-                <Loader className={`w-4 h-4 ${chartLoading ? 'animate-spin' : 'hidden'}`} />
-                Aplicar filtros
+                className="w-full py-2.5 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-gray-800 shadow-sm flex items-center justify-center gap-2">
+                <Loader className={`w-4 h-4 ${chartLoading ? 'animate-spin' : 'hidden'}`} />Aplicar filtros
               </button>
 
               <div className="pt-3 border-t border-gray-100">
@@ -564,7 +612,7 @@ export default function MarketRadarPage() {
         </div>
 
         <div className="text-center py-8 border-t border-gray-100 mt-8">
-          <p className="text-xs text-gray-400 max-w-xl mx-auto">Indicadores calculados de anuncios y proyectos en Tiyuy. Precios de oferta, no de cierre. Metricas de demanda basadas en vistas, favoritos y contactos agregados.</p>
+          <p className="text-xs text-gray-400 max-w-xl mx-auto">Indicadores calculados de anuncios y proyectos en Tiyuy. Precios de oferta, no de cierre.</p>
         </div>
       </div>
     </div>

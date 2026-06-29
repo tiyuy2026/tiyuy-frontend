@@ -898,7 +898,7 @@ export function Header() {
                                 </li>
                                 <li>
                                   <Link
-                                    href="/#tips-decoracion"
+                                    href="/tips-decoracion"
                                     className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer"
                                   >
                                     Tips de decoración
