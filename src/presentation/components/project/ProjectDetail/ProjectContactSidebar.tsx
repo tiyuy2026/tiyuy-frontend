@@ -530,6 +530,8 @@ export function ProjectContactSidebar({ project, units, currency }: ProjectConta
             projectId={project.id}
             size="md"
             showValue
+            averageRating={rating?.averageRating || 0}
+            totalRatings={rating?.totalRatings || 0}
             onRatingSaved={() => {
               fetch(`/api/projects/${project.id}/rating`).then(res => {
                 if (res.ok) res.json().then(data => setRating(data));

@@ -218,8 +218,10 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
     setReplyingTo(null);
   };
 
-  const shareUrl = `${window.location.origin}/dashboard/my-contacts/status/${status.id}`;
-  const shareText = `Mira este estado de ${status.user?.name || 'Usuario'}: ${status.content?.substring(0, 100)}...`;
+  const siteUrl = window.location.origin;
+  const shareLink = status.shareLink || `status-${status.id}`;
+  const shareUrl = `${siteUrl}/public/view/status/${shareLink}`;
+  const shareText = `Mira este estado de ${status.user?.name || status.userName || 'Usuario'}: ${status.content?.substring(0, 100)}...`;
   const encoded = encodeURIComponent(`${shareText} ${shareUrl}`);
 
   return (

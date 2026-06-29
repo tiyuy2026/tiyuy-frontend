@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { BadgeCheck, Star, AlertCircle, Clock, MessageCircle } from 'lucide-react';
 import type { Property, PropertySummary } from '@/core/domain/entities/Property';
@@ -9,6 +9,11 @@ import { LazyImage } from '@/presentation/components/ui/LazyImage/LazyImage';
 
 interface PropertyCardProps {
   property: Property | PropertySummary;
+}
+
+interface RatingData {
+  averageRating: number;
+  totalRatings: number;
 }
 
 function isFullProperty(property: Property | PropertySummary): property is Property {
@@ -24,6 +29,23 @@ function getPropertySlug(property: Property | PropertySummary): string {
 
 export function PropertyCard({ property }: PropertyCardProps) {
   const commentCount: number | null = null;
+  const [rating, setRating] = useState<RatingData | null>(null);
+
+  // Cargar rating de la propiedad
+  useEffect(() => {
+    const fetchRating = async () => {
+      try {
+        const res = await fetch(`/api/properties/${property.id}/rating`);
+        if (res.ok) {
+          const data = await res.json();
+          setRating(data);
+        }
+      } catch {
+        // Silently fail
+      }
+    };
+    fetchRating();
+  }, [property.id]);
 
   const PROPERTY_TYPE_LABELS: Record<string, string> = {
     APARTMENT: 'Departamento',
@@ -124,8 +146,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
             {PROPERTY_TYPE_LABELS[property.type] || 'Propiedad'} en {'location' in property ? property.location?.district : property.district || 'Ubicación'}
           </h3>
           <div className="flex items-center gap-0.5 sm:gap-1 text-[13px] sm:text-[14px] text-gray-900 flex-shrink-0 min-w-fit pl-0.5">
-            <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-900 fill-gray-900 flex-shrink-0" />
-            <span className="whitespace-nowrap select-none">Nuevo</span>
+            <Star className={`w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0 ${rating && rating.averageRating > 0 ? 'text-yellow-500 fill-yellow-500' : 'text-gray-900 fill-gray-900'}`} />
+            <span className="whitespace-nowrap select-none">
+              {rating && rating.averageRating > 0 ? rating.averageRating.toFixed(1) : 'Nuevo'}
+            </span>
           </div>
         </div>
 

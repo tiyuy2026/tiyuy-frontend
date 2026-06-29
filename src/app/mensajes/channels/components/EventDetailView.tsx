@@ -216,7 +216,7 @@ export default function EventDetailView({
   const endDate = event.endDateTime ? formatDate(event.endDateTime) : null;
 
   const shareUrl = typeof window !== 'undefined' 
-    ? `${window.location.origin}/dashboard/my-contacts/channels/${channelId}/eventos/${event.id}`
+    ? `${window.location.origin}/public/view/event/${channelId}/${event.id}`
     : '';
 
   const handleShare = () => {

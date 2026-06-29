@@ -24,6 +24,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       };
     }
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tiyuy.com';
+    const propertyUrl = `${siteUrl}/property/${id}`;
+
     return {
       title: `${property.title} | TIYUY`,
       description: property.description || `Propiedad en ${property.location?.district || 'Perú'}`,
@@ -37,6 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         'tiyuy'
       ].filter(Boolean),
       openGraph: {
+        url: propertyUrl,
         title: property.title,
         description: property.description || `Propiedad en ${property.location?.district || 'Perú'}`,
         images: property.coverPhotoUrl ? [{
@@ -44,7 +48,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           width: 1200,
           height: 630,
           alt: property.title,
-        }] : [],
+        }] : [{
+          url: '/assets/images/logo.png',
+          width: 512,
+          height: 512,
+          alt: 'TIYUY',
+        }],
       },
       twitter: {
         card: 'summary_large_image',
@@ -53,10 +62,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: property.coverPhotoUrl ? [{
           url: property.coverPhotoUrl,
           alt: property.title,
-        }] : [],
+        }] : ['/assets/images/logo.png'],
       },
       alternates: {
-        canonical: `https://tiyuy.com/property/${id}`,
+        canonical: propertyUrl,
       },
     };
   } catch (error) {

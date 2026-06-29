@@ -1018,8 +1018,8 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
                 {/* Copy link */}
                 <button
                   onClick={() => {
-                    const shareUrl = `${window.location.origin}/dashboard/my-contacts/groups/${groupId}`;
-                    const shareText = `Check out this post from ${post.userName} in "${groupName}": ${post.content?.substring(0, 100)}...`;
+                    const shareUrl = `${window.location.origin}/public/view/group/${groupId}`;
+                    const shareText = `Mira esta publicacion de ${post.userName} en "${groupName}": ${post.content?.substring(0, 100)}...`;
                     navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
                     setShowShareModal(prev => ({ ...prev, [post.id]: false }));
                     toast.success('Link copiado al portapapeles');
@@ -1032,7 +1032,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
 
                 {/* WhatsApp */}
                 <a
-                  href={`https://wa.me/?text=${encodeURIComponent(`Check out this post from ${post.userName} in "${groupName}": ${post.content?.substring(0, 100)}... ${window.location.origin}/dashboard/my-contacts/groups/${groupId}`)}`}
+                  href={`https://wa.me/?text=${encodeURIComponent(`Mira esta publicacion de ${post.userName} en "${groupName}": ${post.content?.substring(0, 100)}... ${window.location.origin}/public/view/group/${groupId}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setShowShareModal(prev => ({ ...prev, [post.id]: false }))}
@@ -1044,7 +1044,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
 
                 {/* Facebook */}
                 <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${window.location.origin}/dashboard/my-contacts/groups/${groupId}`)}&quote=${encodeURIComponent(`Mira esta publicación de ${post.userName} en "${groupName}": ${post.content?.substring(0, 100)}...`)}`}
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${window.location.origin}/public/view/group/${groupId}`)}&quote=${encodeURIComponent(`Mira esta publicacion de ${post.userName} en "${groupName}": ${post.content?.substring(0, 100)}...`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setShowShareModal(prev => ({ ...prev, [post.id]: false }))}
@@ -1056,7 +1056,7 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
 
                 {/* TikTok */}
                 <a
-                  href={`https://www.tiktok.com/@tiktok/upload?text=${encodeURIComponent(`Mira esta publicación de ${post.userName} en "${groupName}": ${post.content?.substring(0, 100)}... ${window.location.origin}/dashboard/my-contacts/groups/${groupId}`)}`}
+                  href={`https://www.tiktok.com/@tiktok/upload?text=${encodeURIComponent(`Mira esta publicacion de ${post.userName} en "${groupName}": ${post.content?.substring(0, 100)}... ${window.location.origin}/public/view/group/${groupId}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setShowShareModal(prev => ({ ...prev, [post.id]: false }))}

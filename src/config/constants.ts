@@ -25,29 +25,43 @@ export const CURRENCIES = {
 
 // Enums para Proyectos (deben coincidir exactamente con el backend)
 export const PROJECT_PHASES = {
-  PRE_SALE: 'PRE_SALE',        // Backend: PRE_SALE
-  CONSTRUCTION: 'CONSTRUCTION', // Backend: CONSTRUCTION  
-  FINISHING: 'FINISHING',       // Backend: FINISHING
-  READY: 'READY',             // Backend: READY
-  DELIVERED: 'DELIVERED',     // Backend: DELIVERED
-  SOLD_OUT: 'SOLD_OUT'        // Backend: SOLD_OUT
+  PRE_SALE: 'PRE_SALE',
+  CONSTRUCTION: 'CONSTRUCTION',
+  FINISHING: 'FINISHING',
+  READY: 'READY',
+  DELIVERED: 'DELIVERED',
+  SOLD_OUT: 'SOLD_OUT',
+  LAND_BANK: 'LAND_BANK',
+  PRE_LOTIZATION: 'PRE_LOTIZATION',
+  URBANIZATION: 'URBANIZATION',
+  PLOTTING: 'PLOTTING',
+  REGISTRATION: 'REGISTRATION',
+  COMPLETED: 'COMPLETED'
 } as const;
 
 // Etiquetas en español para mostrar en la UI
 export const PROJECT_PHASES_LABELS = {
   PRE_SALE: 'Preventa',
-  CONSTRUCTION: 'En Construcción',
+  CONSTRUCTION: 'En Construccion',
   FINISHING: 'Acabados',
   READY: 'Listo para Entrega',
   DELIVERED: 'Entregado',
-  SOLD_OUT: 'Agotado'
+  SOLD_OUT: 'Agotado',
+  LAND_BANK: 'Banco de Terrenos',
+  PRE_LOTIZATION: 'Pre-Lotizacion',
+  URBANIZATION: 'Habilitacion Urbana',
+  PLOTTING: 'Lotizacion',
+  REGISTRATION: 'Registro de Propiedad',
+  COMPLETED: 'Completado'
 } as const;
 
 export const PROJECT_TYPES = {
   INDUSTRIAL: 'INDUSTRIAL',
   COMMERCIAL: 'COMMERCIAL', 
   MIXED_USE: 'MIXED_USE',
-  RESIDENTIAL: 'RESIDENTIAL'
+  RESIDENTIAL: 'RESIDENTIAL',
+  LOTIZATION: 'LOTIZATION',
+  LAND_SUBDIVISION: 'LAND_SUBDIVISION'
 } as const;
 
 // Etiquetas en español para mostrar en la UI
@@ -55,7 +69,9 @@ export const PROJECT_TYPES_LABELS = {
   INDUSTRIAL: 'Industrial',
   COMMERCIAL: 'Comercial',
   MIXED_USE: 'Uso Mixto',
-  RESIDENTIAL: 'Residencial'
+  RESIDENTIAL: 'Residencial',
+  LOTIZATION: 'Lotizacion',
+  LAND_SUBDIVISION: 'Subdivision de Terrenos'
 } as const;
 
 export const PROJECT_UNIT_TYPES = {
