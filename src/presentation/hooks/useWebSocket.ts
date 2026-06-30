@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { authStorage } from '@/infrastructure/storage/auth-storage';
+import { env } from '@/config/env';
 
 // Singleton global para WebSocket - una sola conexión por usuario
 let globalWebSocket: WebSocket | null = null;
@@ -98,7 +99,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         // Usar ruta relativa para WebSocket - Vercel no soporta WebSocket proxy, 
         // así que necesitamos la URL real del backend para WebSocket
         const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-        const host = process.env.NEXT_PUBLIC_WS_HOST || (window.location.hostname === 'localhost' ? 'localhost:8080' : window.location.hostname + ':8080');
+        const host = env.wsHost || (window.location.hostname === 'localhost' ? 'localhost:8080' : window.location.hostname + ':8080');
         wsUrl = `${wsProtocol}://${host}/ws/chat`;
       }
 

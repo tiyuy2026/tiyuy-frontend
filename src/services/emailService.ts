@@ -1,4 +1,5 @@
 import { buildWelcomeEmail, buildPasswordResetEmail } from './emailTemplates';
+import { env } from '@/config/env';
 
 export const emailService = {
   async sendWelcomeEmail(userData: {
@@ -28,7 +29,7 @@ export const emailService = {
   },
 
   async sendPasswordResetEmail(email: string, resetToken: string) {
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+    const resetUrl = `${env.appUrl}/reset-password?token=${resetToken}`;
 
     const resetEmail = {
       to: email,

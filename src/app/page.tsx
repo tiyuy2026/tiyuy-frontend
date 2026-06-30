@@ -447,7 +447,7 @@ export default function HomePage() {
 
       {/* PROYECTOS INMOBILIARIOS */}
       <section className="py-2 sm:py-3 bg-background">
-        <div className="w-full max-w-[1920px] mx-auto">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16">
           <FeaturedProjects />
         </div>
       </section>

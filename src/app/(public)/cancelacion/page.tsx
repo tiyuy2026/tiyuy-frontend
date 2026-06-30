@@ -11,6 +11,8 @@ import {
 import { useCreateSupportTicket } from '@/presentation/hooks/admin/useSupportTickets';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { TicketCategory, TicketSeverity } from '@/core/domain/entities/Admin';
+import { useRouter } from 'next/navigation';
+import { LogIn, UserPlus } from 'lucide-react';
 
 const CANCEL_SCENARIOS = [
   {
@@ -19,7 +21,8 @@ const CANCEL_SCENARIOS = [
     color: 'bg-indigo-50 text-indigo-600',
     desc: 'Puedes cancelar tu plan en cualquier momento. La cancelación se hace efectiva al final del período ya facturado. Sigues accediendo a los beneficios hasta esa fecha.',
     action: 'Ir a Mis Planes',
-    href: '/dashboard/planes',
+    href: '/plans',
+    requiresAuth: true,
   },
   {
     title: 'Desactivar renovación automática',
@@ -27,7 +30,8 @@ const CANCEL_SCENARIOS = [
     color: 'bg-amber-50 text-amber-600',
     desc: 'Si no quieres que tu plan se renueve al finalizar el ciclo, puedes desactivar la renovación automática desde tu panel. Tu plan seguirá activo hasta el final del período pagado.',
     action: 'Ir a Configuración',
-    href: '/dashboard/preferences',
+    href: '/notifications',
+    requiresAuth: true,
   },
   {
     title: 'Desactivar publicación activa',
@@ -36,6 +40,7 @@ const CANCEL_SCENARIOS = [
     desc: 'Puedes pausar o desactivar una publicación en cualquier momento. La propiedad dejará de ser visible, pero conservas el derecho a reactivarla dentro del ciclo de facturación si tu plan lo permite.',
     action: 'Ir a Mis Propiedades',
     href: '/my-properties',
+    requiresAuth: true,
   },
   {
     title: 'Detener o no renovar destacado',
@@ -44,6 +49,7 @@ const CANCEL_SCENARIOS = [
     desc: 'Si tienes una promoción o destacado activo, puedes optar por no renovarlo al finalizar su período. El destacado seguirávisible hasta que termine el tiempo contratado.',
     action: 'Ir a Mis Propiedades',
     href: '/my-properties',
+    requiresAuth: true,
   },
 ];
 
@@ -88,9 +94,12 @@ const FAQS = [
 export default function CancelacionPage() {
   const { user } = useAuthStore();
   const isAuthenticated = !!user;
+  const router = useRouter();
 
   const [showForm, setShowForm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<TicketCategory>('PAYMENT_ISSUE');
   const [selectedSeverity, setSelectedSeverity] = useState<TicketSeverity>('MEDIUM');
   const [subject, setSubject] = useState('');
@@ -201,10 +210,17 @@ export default function CancelacionPage() {
                   <h3 className="text-lg font-black text-[var(--text-primary)]">{s.title}</h3>
                 </div>
                 <p className="text-sm text-[var(--text-secondary)] font-medium leading-relaxed mb-6">{s.desc}</p>
-                <Link href={s.href}
-                  className="inline-flex items-center gap-2 text-sm font-bold text-[var(--brand-primary)] hover:opacity-80 transition-colors bg-[var(--brand-primary)]/10 px-4 py-2 rounded-lg">
+                <button onClick={() => {
+                  if (s.requiresAuth && !isAuthenticated) {
+                    setPendingHref(s.href);
+                    setShowAuthModal(true);
+                  } else {
+                    window.location.href = s.href;
+                  }
+                }}
+                  className="inline-flex items-center gap-2 text-sm font-bold text-[var(--brand-primary)] hover:opacity-80 transition-colors bg-[var(--brand-primary)]/10 px-4 py-2 rounded-lg cursor-pointer">
                   {s.action} <ArrowRight className="w-4 h-4" />
-                </Link>
+                </button>
               </div>
             ))}
           </div>
@@ -339,6 +355,33 @@ export default function CancelacionPage() {
           </div>
         </div>
       </div>
+
+      {/* MODAL DE AUTENTICACIÓN */}
+      {showAuthModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowAuthModal(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 relative" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowAuthModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                <CreditCard className="w-8 h-8 text-blue-500" />
+              </div>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-2">Accede a tu cuenta</h3>
+            <p className="text-sm text-gray-500 text-center mb-6">Para gestionar tus planes, propiedades y configuraciones, inicia sesión o crea una cuenta.</p>
+            <div className="space-y-3">
+              <button onClick={() => { setShowAuthModal(false); router.push('/profile-selector'); }} className="w-full flex items-center justify-center gap-2 bg-teal-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-teal-700 transition-colors">
+                <LogIn className="w-4 h-4" /> Iniciar sesión
+              </button>
+              <button onClick={() => { setShowAuthModal(false); router.push('/profile-selector'); }} className="w-full flex items-center justify-center gap-2 bg-white text-teal-600 font-semibold py-3 px-4 rounded-xl border-2 border-teal-600 hover:bg-teal-50 transition-colors">
+                <UserPlus className="w-4 h-4" /> Crear cuenta gratis
+              </button>
+              <button onClick={() => setShowAuthModal(false)} className="w-full text-sm text-gray-400 hover:text-gray-600 py-2 transition-colors">
+                Ahora no
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

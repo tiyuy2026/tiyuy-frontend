@@ -10,6 +10,7 @@ import { SearchTrackingProvider } from '@/presentation/components/searchTracking
 import { PropertyMapWrapper } from '@/presentation/features/property-map/components/PropertyMapWrapper';
 import { propertyMapResultToGeneric } from '@/core/domain/adapters/MapItemAdapters';
 import { MapFilters } from '@/core/domain/entities/MapTypes';
+import { env } from '@/config/env';
 
 interface Props {
   params: Promise<{
@@ -98,7 +99,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     }
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const siteUrl = env.siteUrl;
   const canonicalUrl = `${siteUrl}/sale/${resolvedParams.propertyType}/${resolvedParams.district}${
     isFiltered
       ? '?' +
@@ -216,7 +217,7 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
       : {}),
   };
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const siteUrl = env.siteUrl;
   const result = await propertyRepo.search(filters);
   const propertyTypeLabel = PROPERTY_TYPE_LABELS[resolvedParams.propertyType];
 

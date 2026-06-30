@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { serverEnv } from '@/config/env';
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     // Conectar con el backend real
     try {
-      const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080/api';
+      const backendUrl = serverEnv.backendUrl;
       const response = await fetch(`${backendUrl}/auth/reset-password`, {
         method: 'POST',
         headers: {

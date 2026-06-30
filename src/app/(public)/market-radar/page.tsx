@@ -212,7 +212,7 @@ export default function MarketRadarPage() {
   const handleChartLeave = () => { setHoveredPoint(null); setTooltip(null); };
 
   if (loading && !general) {
-    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center space-y-4"><div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto" /><p className="text-gray-400 text-sm font-medium">Cargando radar...</p></div></div>;
+    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center space-y-4"><div className="w-10 h-10 border-4 border-brand border-t-transparent rounded-full animate-spin mx-auto" /><p className="text-gray-400 text-sm font-medium">Cargando radar...</p></div></div>;
   }
 
   return (
@@ -221,13 +221,13 @@ export default function MarketRadarPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full tracking-wide uppercase"><BarChart3 className="w-3.5 h-3.5" />Inteligencia de Mercado</div>
+              <div className="inline-flex items-center gap-1.5 bg-brand-light text-brand-dark text-xs font-semibold px-3 py-1 rounded-full tracking-wide uppercase"><BarChart3 className="w-3.5 h-3.5" />Inteligencia de Mercado</div>
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">Radar del Mercado</h1>
               <p className="text-gray-500 text-base max-w-2xl leading-relaxed">Indicadores de precio, oferta, demanda y actividad. Datos agregados del inventario de Tiyuy.</p>
             </div>
             <div className="flex items-center gap-3">
               {lastUpdated && <span className="text-xs text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" />{lastUpdated}</span>}
-              <button onClick={fetchRadar} className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 shadow-sm"><RefreshCw className="w-4 h-4" />Actualizar</button>
+              <button onClick={fetchRadar} className="flex items-center gap-2 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-xl hover:bg-brand-dark shadow-sm"><RefreshCw className="w-4 h-4" />Actualizar</button>
               <button onClick={() => setShowMethodology(!showMethodology)}
                 className="flex items-center gap-2 px-4 py-2.5 bg-white text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 border border-gray-200"><Info className="w-4 h-4" />Metodologia</button>
             </div>
@@ -260,7 +260,7 @@ export default function MarketRadarPage() {
             { key: 'lotes' as Vertical, label: 'Lotes', icon: <LandPlot className="w-4 h-4" /> },
           ].map(v => (
             <button key={v.key} onClick={() => setVertical(v.key)}
-              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-all cursor-pointer ${vertical === v.key ? 'bg-gray-900 text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-all cursor-pointer ${vertical === v.key ? 'bg-brand text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>
               {v.icon}{v.label}
             </button>
           ))}
@@ -272,7 +272,7 @@ export default function MarketRadarPage() {
             <div className="flex gap-2 overflow-x-auto pb-1">
               {METRICS_BY_VERTICAL[vertical].map(m => (
                 <button key={m} onClick={() => setMetric(m)}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg transition-all cursor-pointer ${metric === m ? 'bg-teal-50 text-teal-700 border border-teal-200' : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-200'}`}>
+                  className={`flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg transition-all cursor-pointer ${metric === m ? 'bg-brand-light text-brand-dark border border-brand-light' : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-200'}`}>
                   {METRIC_ICONS[m]}{METRIC_LABELS[m]}
                 </button>
               ))}
@@ -286,7 +286,7 @@ export default function MarketRadarPage() {
                   <p className="text-sm text-gray-400 font-normal">Distribucion por distrito - Top {topN}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  {chartLoading && <Loader className="w-4 h-4 animate-spin text-teal-600" />}
+                  {chartLoading && <Loader className="w-4 h-4 animate-spin text-brand" />}
                   <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-0.5">
                     <button onClick={() => setChartMode('line')}
                       className={`px-2.5 py-1.5 text-[11px] font-medium rounded-md transition-all ${chartMode === 'line' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
@@ -414,30 +414,30 @@ export default function MarketRadarPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {vertical === 'viviendas' && viviendas && (
                 <>
-                  <InsightCard title="Subieron mas" badge="Precio" color="bg-emerald-50 text-emerald-700" items={viviendas.topRisers.slice(0, 4).map(d => ({ label: d.district, value: `+${d.changePct}%` }))} />
+                  <InsightCard title="Subieron mas" badge="Precio" color="bg-brand-light text-brand-dark" items={viviendas.topRisers.slice(0, 4).map(d => ({ label: d.district, value: `+${d.changePct}%` }))} />
                   <InsightCard title="Mas nuevos" badge="Oferta" color="bg-blue-50 text-blue-700" items={viviendas.newListings.slice(0, 4).map(d => ({ label: d.district, value: `${d.newListings} nuevos` }))} />
-                  <InsightCard title="Mas buscados" badge="Demanda" color="bg-teal-50 text-teal-700" items={viviendas.hotDistricts.slice(0, 4).map(d => ({ label: d.district, value: `${d.heatScore} pts` }))} />
+                  <InsightCard title="Mas buscados" badge="Demanda" color="bg-brand-light text-brand-dark" items={viviendas.hotDistricts.slice(0, 4).map(d => ({ label: d.district, value: `${d.heatScore} pts` }))} />
                 </>
               )}
               {vertical === 'general' && general && (
                 <>
                   <InsightCard title="Nuevos en periodo" badge="Oferta" color="bg-blue-50 text-blue-700" items={general.newByType.map(d => ({ label: d.label, value: `${d.count}` }))} />
-                  <InsightCard title="Subieron mas" badge="Precio" color="bg-emerald-50 text-emerald-700" items={general.topRisers.slice(0, 4).map(d => ({ label: d.district, value: `+${d.changePct}%` }))} />
-                  <InsightCard title="Mas buscados" badge="Demanda" color="bg-teal-50 text-teal-700" items={general.hotDistricts.slice(0, 4).map(d => ({ label: d.district, value: `${d.heatScore} pts` }))} />
+                  <InsightCard title="Subieron mas" badge="Precio" color="bg-brand-light text-brand-dark" items={general.topRisers.slice(0, 4).map(d => ({ label: d.district, value: `+${d.changePct}%` }))} />
+                  <InsightCard title="Mas buscados" badge="Demanda" color="bg-brand-light text-brand-dark" items={general.hotDistricts.slice(0, 4).map(d => ({ label: d.district, value: `${d.heatScore} pts` }))} />
                 </>
               )}
               {vertical === 'proyectos' && proyectos && (
                 <>
                   <InsightCard title="Proyectos activos" badge="Oferta" color="bg-indigo-50 text-indigo-700" items={proyectos.phases.map(d => ({ label: phaseLabel(d.phase), value: `${d.count}` }))} />
-                  <InsightCard title="Por distrito" badge="Demanda" color="bg-teal-50 text-teal-700" items={proyectos.hotDistricts.slice(0, 4).map(d => ({ label: d.district, value: `${d.heatScore} pts` }))} />
+                  <InsightCard title="Por distrito" badge="Demanda" color="bg-brand-light text-brand-dark" items={proyectos.hotDistricts.slice(0, 4).map(d => ({ label: d.district, value: `${d.heatScore} pts` }))} />
                   <InsightCard title="Nuevos proyectos" badge="Actividad" color="bg-amber-50 text-amber-700" items={[{ label: 'Nuevos este periodo', value: `${proyectos.newProjects}` }, { label: 'Unidades disponibles', value: formatCompact(proyectos.totalAvailable) }]} />
                 </>
               )}
               {vertical === 'lotes' && lotes && (
                 <>
                   <InsightCard title="Nuevos lotes" badge="Oferta" color="bg-blue-50 text-blue-700" items={lotes.newListings.slice(0, 4).map(d => ({ label: d.district, value: `${d.newListings} lotes` }))} />
-                  <InsightCard title="Precio m2 terr." badge="Precio" color="bg-emerald-50 text-emerald-700" items={[{ label: 'Promedio nacional', value: formatPrice(lotes.avgM2Terreno) }, { label: 'Ticket promedio', value: formatPrice(lotes.avgTotalPrice) }]} />
-                  <InsightCard title="Mas buscados" badge="Demanda" color="bg-teal-50 text-teal-700" items={lotes.hotDistricts.slice(0, 4).map(d => ({ label: d.district, value: `${d.heatScore} pts` }))} />
+                  <InsightCard title="Precio m2 terr." badge="Precio" color="bg-brand-light text-brand-dark" items={[{ label: 'Promedio nacional', value: formatPrice(lotes.avgM2Terreno) }, { label: 'Ticket promedio', value: formatPrice(lotes.avgTotalPrice) }]} />
+                  <InsightCard title="Mas buscados" badge="Demanda" color="bg-brand-light text-brand-dark" items={lotes.hotDistricts.slice(0, 4).map(d => ({ label: d.district, value: `${d.heatScore} pts` }))} />
                 </>
               )}
             </div>
@@ -480,14 +480,14 @@ export default function MarketRadarPage() {
               <div className="bg-white rounded-2xl border border-gray-100 p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div><h3 className="font-bold text-gray-900">Destacados de la semana</h3><p className="text-sm text-gray-400">Propiedades mas vistas en los ultimos 7 dias</p></div>
-                  <Activity className="w-5 h-5 text-teal-600" />
+                  <Activity className="w-5 h-5 text-brand" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {viviendas.weeklyHighlights.map((item, idx) => (
                     <Link key={item.id} href={`/property/${item.id}`}
-                      className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:shadow-md transition-all group">
+                      className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:shadow-lg hover:border-brand-light transition-all group">
                       <div className="flex items-start justify-between mb-2">
-                        <div className="w-8 h-8 bg-gray-100 rounded-xl flex items-center justify-center text-xs font-bold text-gray-400 group-hover:bg-teal-50 group-hover:text-teal-600">{idx + 1}</div>
+                        <div className="w-8 h-8 bg-gray-100 rounded-xl flex items-center justify-center text-xs font-bold text-gray-400 group-hover:bg-brand-light group-hover:text-brand">{idx + 1}</div>
                         <span className="text-[10px] font-semibold text-gray-400 uppercase">{propertyLabel(item.type)}</span>
                       </div>
                       <p className="font-semibold text-gray-900 text-sm mb-1 line-clamp-1">{item.title || `${propertyLabel(item.type)} en ${item.district}`}</p>
@@ -512,7 +512,7 @@ export default function MarketRadarPage() {
                 <div className="flex gap-2">
                   {['SALE', 'RENT'].map(op => (
                     <button key={op} onClick={() => setOperation(op)}
-                      className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all cursor-pointer ${operation === op ? 'bg-gray-900 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                      className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all cursor-pointer ${operation === op ? 'bg-brand text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
                       {op === 'SALE' ? 'Venta' : 'Alquiler'}
                     </button>
                   ))}
@@ -526,15 +526,15 @@ export default function MarketRadarPage() {
                   <input type="text" value={regionSearch || regionLabel || ''} placeholder="Buscar region..."
                     onChange={e => { setRegionSearch(e.target.value); setShowRegionDropdown(true); }}
                     onFocus={() => setShowRegionDropdown(true)}
-                    className="w-full pl-8 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500" />
+                    className="w-full pl-8 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-brand" />
                 </div>
                 {showRegionDropdown && (
                   <div className="mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto" ref={regionRef}>
                     <button onClick={() => { setRegionLabel(''); setRegion(''); setRegionSearch(''); setShowRegionDropdown(false); setProvince(''); setDistrict(''); }}
-                      className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${!region ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-600'}`}>Todo el pais</button>
+                      className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${!region ? 'bg-brand-light text-brand-dark font-medium' : 'text-gray-600'}`}>Todo el pais</button>
                     {filteredRegions.map(r => (
                       <button key={r} onClick={() => { setRegionLabel(r); setRegion(r); setRegionSearch(r); setShowRegionDropdown(false); }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${region === r ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-600'}`}>{r}</button>
+                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${region === r ? 'bg-brand-light text-brand-dark font-medium' : 'text-gray-600'}`}>{r}</button>
                     ))}
                     {filteredRegions.length === 0 && <p className="px-3 py-2 text-sm text-gray-400">Sin resultados</p>}
                   </div>
@@ -549,15 +549,15 @@ export default function MarketRadarPage() {
                     <input type="text" value={provinceSearch || provinceLabel || ''} placeholder="Buscar provincia..."
                       onChange={e => { setProvinceSearch(e.target.value); setShowProvinceDropdown(true); }}
                       onFocus={() => setShowProvinceDropdown(true)}
-                      className="w-full pl-8 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500" />
+                      className="w-full pl-8 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-brand" />
                   </div>
                   {showProvinceDropdown && (
                     <div className="mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto" ref={provinceRef}>
                       <button onClick={() => { setProvinceLabel(''); setProvince(''); setProvinceSearch(''); setShowProvinceDropdown(false); setDistrict(''); }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${!province ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-600'}`}>Todas</button>
+                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${!province ? 'bg-brand-light text-brand-dark font-medium' : 'text-gray-600'}`}>Todas</button>
                       {filteredProvinces.map(p => (
                         <button key={p} onClick={() => { setProvinceLabel(p); setProvince(p); setProvinceSearch(p); setShowProvinceDropdown(false); }}
-                          className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${province === p ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-600'}`}>{p}</button>
+                          className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${province === p ? 'bg-brand-light text-brand-dark font-medium' : 'text-gray-600'}`}>{p}</button>
                       ))}
                       {filteredProvinces.length === 0 && <p className="px-3 py-2 text-sm text-gray-400">Sin resultados</p>}
                     </div>
@@ -573,15 +573,15 @@ export default function MarketRadarPage() {
                     <input type="text" value={districtSearch || districtLabel || ''} placeholder="Buscar distrito..."
                       onChange={e => { setDistrictSearch(e.target.value); setShowDistrictDropdown(true); }}
                       onFocus={() => setShowDistrictDropdown(true)}
-                      className="w-full pl-8 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500" />
+                      className="w-full pl-8 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-brand" />
                   </div>
                   {showDistrictDropdown && (
                     <div className="mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto" ref={districtRef}>
                       <button onClick={() => { setDistrictLabel(''); setDistrict(''); setDistrictSearch(''); setShowDistrictDropdown(false); }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${!district ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-600'}`}>Todos</button>
+                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${!district ? 'bg-brand-light text-brand-dark font-medium' : 'text-gray-600'}`}>Todos</button>
                       {filteredDistricts.map(d => (
                         <button key={d} onClick={() => { setDistrictLabel(d); setDistrict(d); setDistrictSearch(d); setShowDistrictDropdown(false); }}
-                          className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${district === d ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-600'}`}>{d}</button>
+                          className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${district === d ? 'bg-brand-light text-brand-dark font-medium' : 'text-gray-600'}`}>{d}</button>
                       ))}
                       {filteredDistricts.length === 0 && <p className="px-3 py-2 text-sm text-gray-400">Sin resultados</p>}
                     </div>
@@ -594,13 +594,13 @@ export default function MarketRadarPage() {
                 <div className="flex gap-2">
                   {[5, 10, 20, 50].map(n => (
                     <button key={n} onClick={() => setTopN(n)}
-                      className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all cursor-pointer ${topN === n ? 'bg-gray-900 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{n}</button>
+                      className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all cursor-pointer ${topN === n ? 'bg-brand text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{n}</button>
                   ))}
                 </div>
               </div>
 
               <button onClick={() => { setChartLoading(true); fetchRadar().finally(() => setChartLoading(false)); }}
-                className="w-full py-2.5 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-gray-800 shadow-sm flex items-center justify-center gap-2">
+                className="w-full py-2.5 bg-brand text-white text-sm font-bold rounded-xl hover:bg-brand-dark shadow-sm flex items-center justify-center gap-2">
                 <Loader className={`w-4 h-4 ${chartLoading ? 'animate-spin' : 'hidden'}`} />Aplicar filtros
               </button>
 
@@ -621,7 +621,7 @@ export default function MarketRadarPage() {
 
 function InsightCard({ title, badge, color, items }: { title: string; badge: string; color: string; items: { label: string; value: string }[] }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-md hover:border-gray-200 transition-all">
+    <div className="bg-white rounded-2xl border border-gray-100 p-4 hover:shadow-lg hover:border-brand-light transition-all">
       <div className="flex items-center gap-2 mb-3">
         <h4 className="font-bold text-gray-900 text-sm">{title}</h4>
         <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md uppercase tracking-wider ${color}`}>{badge}</span>

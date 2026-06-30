@@ -18,11 +18,13 @@ const contactRepo = new ContactRepository();
 
 
 
+import { env } from '@/config/env';
+
 // API Configuration
 // En el navegador, usar el proxy de Next.js (/api) para evitar CORS
 // En el servidor (SSR), usar la URL directa del backend
 const API_BASE_URL = typeof window === 'undefined'
-  ? (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').replace(/\/api\/?$/, '')
+  ? env.apiUrl.replace(/\/api\/?$/, '')
   : '';
 
 // Helper function for API calls

@@ -1,4 +1,5 @@
 import { buildWelcomeEmail, buildPasswordResetEmail } from './emailTemplates';
+import { env } from '@/config/env';
 
 interface BrevoResponse {
   messageId?: string;
@@ -7,7 +8,7 @@ interface BrevoResponse {
 
 export const brevoService = {
   async sendPasswordResetEmail(email: string, resetToken: string): Promise<{ success: boolean; message: string }> {
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+    const resetUrl = `${env.appUrl}/reset-password?token=${resetToken}`;
 
     const emailHtml = buildPasswordResetEmail(resetUrl);
 

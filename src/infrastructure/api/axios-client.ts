@@ -1,10 +1,9 @@
 import axios from 'axios';
 import { getToken, isTokenExpired, clearTokens } from './token-utils';
+import { env, serverEnv } from '@/config/env';
 
 // El backend usa context-path /api
-const serverBaseURL = process.env.BACKEND_URL
-  ? `${process.env.BACKEND_URL}/api`
-  : 'http://localhost:8080/api';
+const serverBaseURL = `${serverEnv.backendUrl}/api`;
 
 // En el navegador, usar el proxy de Next.js (/api) para evitar CORS
 // En el servidor (SSR), usar la URL directa del backend

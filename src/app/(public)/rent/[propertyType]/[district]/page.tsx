@@ -10,6 +10,7 @@ import { SearchTrackingProvider } from '@/presentation/components/searchTracking
 import { PropertyMapWrapper } from '@/presentation/features/property-map/components/PropertyMapWrapper';
 import { propertyMapResultToGeneric } from '@/core/domain/adapters/MapItemAdapters';
 import { MapFilters } from '@/core/domain/entities/MapTypes';
+import { env } from '@/config/env';
 
 interface Props {
   params: Promise<{
@@ -65,7 +66,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = `${propertyTypeLabel} en Alquiler en ${district} | TIYUY`;
   const description = `Encuentra ${propertyTypeLabel.toLowerCase()} en alquiler en ${district}. Las mejores opciones con precios, fotos y detalles completos en TIYUY.`;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const siteUrl = env.siteUrl;
   const canonicalUrl = `${siteUrl}/rent/${resolvedParams.propertyType}/${resolvedParams.district}`;
 
   return {

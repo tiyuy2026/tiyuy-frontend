@@ -118,7 +118,7 @@ export default function PricePerM2Page() {
   const yS = (v: number) => pad.top + chartH - pad.top - pad.bottom - ((v - chartMin) / (chartMax - chartMin)) * (chartH - pad.top - pad.bottom);
 
   if (loading && !viviendaData && !loteData && !proyectoData) {
-    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center space-y-4"><div className="w-10 h-10 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto" /><p className="text-gray-400 text-sm">Cargando indice...</p></div></div>;
+    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="text-center space-y-4"><div className="w-10 h-10 border-4 border-brand border-t-transparent rounded-full animate-spin mx-auto" /><p className="text-gray-400 text-sm">Cargando indice...</p></div></div>;
   }
 
   return (
@@ -127,13 +127,13 @@ export default function PricePerM2Page() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full tracking-wide uppercase"><BarChart3 className="w-3 h-3" />Datos del Portal</div>
+              <div className="inline-flex items-center gap-1.5 bg-brand-light text-brand-dark text-xs font-semibold px-3 py-1 rounded-full tracking-wide uppercase"><BarChart3 className="w-3 h-3" />Datos del Portal</div>
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">Indice Tiyuy</h1>
               <p className="text-gray-500 text-base max-w-2xl">Precio por metro cuadrado, lotes y proyectos. Datos agregados del inventario de Tiyuy.</p>
             </div>
             <div className="flex items-center gap-3">
               {lastUpdated && <span className="text-xs text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" />{lastUpdated}</span>}
-              <button onClick={fetchData} className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 shadow-sm"><RefreshCw className="w-4 h-4" />Actualizar</button>
+              <button onClick={fetchData} className="flex items-center gap-2 px-4 py-2.5 bg-brand text-white text-sm font-medium rounded-xl hover:bg-brand-dark shadow-sm"><RefreshCw className="w-4 h-4" />Actualizar</button>
             </div>
           </div>
         </div>
@@ -149,7 +149,7 @@ export default function PricePerM2Page() {
             { k: 'proyectos' as Vertical, l: 'Proyectos', i: <FolderGit className="w-4 h-4" /> },
           ].map(v => (
             <button key={v.k} onClick={() => setVertical(v.k)}
-              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-all flex-shrink-0 cursor-pointer ${vertical === v.k ? 'bg-gray-900 text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>{v.i}{v.l}</button>
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-all flex-shrink-0 cursor-pointer ${vertical === v.k ? 'bg-brand text-white shadow-md' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}>{v.i}{v.l}</button>
           ))}
         </div>
 
@@ -162,7 +162,7 @@ export default function PricePerM2Page() {
               <div className="flex gap-1.5">
                 {['SALE','RENT'].map(op => (
                   <button key={op} onClick={() => setTxType(op)}
-                    className={`px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${txType === op ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{op === 'SALE' ? 'Venta' : 'Alquiler'}</button>
+                    className={`px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${txType === op ? 'bg-brand text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{op === 'SALE' ? 'Venta' : 'Alquiler'}</button>
                 ))}
               </div>
             </div>
@@ -174,7 +174,7 @@ export default function PricePerM2Page() {
                 <div className="flex gap-1.5">
                   {[{v:'',l:'Todos'},{v:'APARTMENT',l:'Dptos'},{v:'HOUSE',l:'Casas'}].map(t => (
                     <button key={t.v} onClick={() => setPropType(t.v)}
-                      className={`px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${propType === t.v ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{t.l}</button>
+                      className={`px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${propType === t.v ? 'bg-brand text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{t.l}</button>
                   ))}
                 </div>
               </div>
@@ -188,7 +188,7 @@ export default function PricePerM2Page() {
                 <input type="text" value={locationText} placeholder="Ej: Lima, Miraflores, San Isidro..."
                   onChange={e => { setLocationText(e.target.value); setShowSuggestions(true); }}
                   onFocus={() => setShowSuggestions(true)}
-                  className="w-full pl-8 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500" />
+                  className="w-full pl-8 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-brand" />
                 {locationText && (
                   <button onClick={() => { setLocationText(''); setShowSuggestions(false); }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -212,7 +212,7 @@ export default function PricePerM2Page() {
               <div className="flex gap-1.5">
                 {[{v:undefined,l:'Todo'},{v:1,l:'1m'},{v:3,l:'3m'},{v:6,l:'6m'},{v:12,l:'1a'},{v:24,l:'2a'},{v:60,l:'5a'}].map(t => (
                   <button key={String(t.v)} onClick={() => setPeriodMonths(t.v)}
-                    className={`px-2.5 py-2 text-[11px] font-semibold rounded-lg transition-all cursor-pointer ${periodMonths === t.v ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{t.l}</button>
+                    className={`px-2.5 py-2 text-[11px] font-semibold rounded-lg transition-all cursor-pointer ${periodMonths === t.v ? 'bg-brand text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{t.l}</button>
                 ))}
               </div>
             </div>
@@ -224,7 +224,7 @@ export default function PricePerM2Page() {
                 <div className="flex gap-1.5">
                   {[{v:'',l:'Todas'},{v:'PRE_SALE',l:'Preventa'},{v:'CONSTRUCTION',l:'Construccion'},{v:'DELIVERY',l:'Entrega'},{v:'COMPLETED',l:'Entregado'}].map(t => (
                     <button key={t.v} onClick={() => setProjPhase(t.v)}
-                      className={`px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${projPhase === t.v ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{t.l}</button>
+                      className={`px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${projPhase === t.v ? 'bg-brand text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{t.l}</button>
                   ))}
                 </div>
               </div>
@@ -286,7 +286,7 @@ function ViviendaView({ data, trend, chartMax, chartMin, xS, yS, tooltipPt, setT
                 </div>
                 <div>
                   <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wide">Variacion mensual</span>
-                  <p className={`text-xl font-bold ${monthlyChange != null && monthlyChange > 0 ? 'text-emerald-600' : monthlyChange != null && monthlyChange < 0 ? 'text-red-600' : 'text-gray-900'}`}>
+                  <p className={`text-xl font-bold ${monthlyChange != null && monthlyChange > 0 ? 'text-brand' : monthlyChange != null && monthlyChange < 0 ? 'text-red-600' : 'text-gray-900'}`}>
                     {monthlyChange != null ? `${monthlyChange > 0 ? '+' : ''}${monthlyChange.toFixed(1)}%` : '--'}
                   </p>
                 </div>
@@ -296,8 +296,8 @@ function ViviendaView({ data, trend, chartMax, chartMin, xS, yS, tooltipPt, setT
                 </div>
               </div>
             </div>
-            <div className="flex-shrink-0 w-12 h-12 bg-teal-50 rounded-2xl flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-teal-600" />
+            <div className="flex-shrink-0 w-12 h-12 bg-brand-light rounded-2xl flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-brand" />
             </div>
           </div>
         </div>
@@ -306,14 +306,14 @@ function ViviendaView({ data, trend, chartMax, chartMin, xS, yS, tooltipPt, setT
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KpiCard label="Mediana m2" value={formatM2(kpis.medianPriceM2)} icon={<TrendingUp className="w-4 h-4" />}
           subtitle={variation.monthlyChangePct !== null ? (
-            <span className={`inline-flex items-center gap-0.5 text-xs font-semibold ${variation.monthlyChangePct > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+            <span className={`inline-flex items-center gap-0.5 text-xs font-semibold ${variation.monthlyChangePct > 0 ? 'text-brand' : 'text-red-600'}`}>
               {variation.monthlyChangePct > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
               {Math.abs(variation.monthlyChangePct).toFixed(1)}% vs mes ant.
             </span>
           ) : <span className="text-xs text-gray-400">Sin variacion</span>} />
         <KpiCard label="Promedio m2" value={formatM2(kpis.avgPriceM2)} icon={<Building2 className="w-4 h-4" />} subtitle={<span className="text-xs text-gray-400">Media aritmetica</span>} />
         <KpiCard label="Variacion anual" value={variation.yearlyChangePct !== null ? (
-          <span className={`inline-flex items-center gap-1 ${variation.yearlyChangePct > 0 ? 'text-emerald-600' : variation.yearlyChangePct < 0 ? 'text-red-600' : 'text-gray-900'}`}>
+          <span className={`inline-flex items-center gap-1 ${variation.yearlyChangePct > 0 ? 'text-brand' : variation.yearlyChangePct < 0 ? 'text-red-600' : 'text-gray-900'}`}>
             {variation.yearlyChangePct > 0 ? '+' : ''}{variation.yearlyChangePct?.toFixed(1)}%
           </span>
         ) : <span className="text-gray-400 text-base">--</span>} icon={<Calendar className="w-4 h-4" />} subtitle={<span className="text-xs text-gray-400">vs mismo mes ano anterior</span>} />
@@ -334,7 +334,7 @@ function LoteView({ data, trend, chartMax, chartMin, xS, yS, tooltipPt, setToolt
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KpiCard label="Precio m2 terr." value={formatM2(avgM2Terreno)} icon={<LandPlot className="w-4 h-4" />}
           subtitle={variation.monthlyChangePct !== null ? (
-            <span className={`inline-flex items-center gap-0.5 text-xs font-semibold ${variation.monthlyChangePct > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+            <span className={`inline-flex items-center gap-0.5 text-xs font-semibold ${variation.monthlyChangePct > 0 ? 'text-brand' : 'text-red-600'}`}>
               {variation.monthlyChangePct > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
               {Math.abs(variation.monthlyChangePct).toFixed(1)}% vs mes ant.
             </span>
@@ -517,7 +517,7 @@ function ProyectoView({ data }: any) {
 
 function KpiCard({ label, value, icon, subtitle }: any) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md transition-all">
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-lg hover:border-brand-light transition-all">
       <div className="flex items-center gap-2 text-gray-400 mb-3">{icon}<span className="text-xs font-medium uppercase tracking-wider">{label}</span></div>
       <div className="text-2xl font-bold text-gray-900 tracking-tight mb-1">{value}</div>
       {subtitle && <div>{subtitle}</div>}
@@ -591,8 +591,8 @@ function ChartSection({ title, subtitle, data, chartMax, chartMin, xS, yS, toolt
               </div>
             </>
           )}
-          <div className="w-8 h-8 bg-teal-50/60 rounded-xl flex items-center justify-center">
-            <TrendingUp className="w-4 h-4 text-teal-600" />
+          <div className="w-8 h-8 bg-brand-light/60 rounded-xl flex items-center justify-center">
+            <TrendingUp className="w-4 h-4 text-brand" />
           </div>
         </div>
       </div>

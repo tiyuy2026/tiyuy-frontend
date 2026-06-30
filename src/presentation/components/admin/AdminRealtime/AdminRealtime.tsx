@@ -10,6 +10,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '@/presentation/store/authStore';
 import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/Card';
 import { Button } from '@/presentation/components/ui/Button';
+import { env } from '@/config/env';
 
 interface RealtimeEvent {
   type: 'new_message' | 'typing' | 'connection_established' | 'error' | 'campaign_update' | 'discount_update';
@@ -47,7 +48,7 @@ export function AdminRealtime() {
     try {
       // Usar ruta dinámica para WebSocket
       const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-      const host = process.env.NEXT_PUBLIC_WS_HOST || (window.location.hostname === 'localhost' ? 'localhost:8080' : window.location.hostname + ':8080');
+      const host = env.wsHost || (window.location.hostname === 'localhost' ? 'localhost:8080' : window.location.hostname + ':8080');
       const wsUrl = `${protocol}://${host}/ws/chat`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;

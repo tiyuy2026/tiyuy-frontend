@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useProjectMap } from '@/presentation/hooks/useProjectMap';
 import { ProjectMapView } from './ProjectMapView';
 import { ProjectMapSidebar } from './ProjectMapSidebar';
@@ -31,10 +31,12 @@ export function ProjectMapModal({ filters, onClose }: ProjectMapModalProps) {
     reset,
   } = useProjectMap();
 
+  const [page, setPage] = useState(0);
+  const ITEMS_PER_PAGE = 10;
+
   useEffect(() => {
-    if (filters) {
-      search(filters);
-    }
+    // Si hay filtros, buscar con filtros. Si no, cargar todos los proyectos
+    search(filters || {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -45,15 +47,24 @@ export function ProjectMapModal({ filters, onClose }: ProjectMapModalProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Resetear página cuando cambian los resultados
+  useEffect(() => {
+    setPage(0);
+  }, [searchResult?.projects?.length]);
+
+  const allProjects = searchResult?.projects || [];
+  const totalPages = Math.max(1, Math.ceil(allProjects.length / ITEMS_PER_PAGE));
+  const paginatedProjects = allProjects.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
+
   return (
     <div className="fixed inset-0 z-50 flex">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       <div className="relative w-full h-full flex flex-col md:flex-row">
-        <div className="md:w-96 md:max-w-md bg-white md:rounded-l-2xl overflow-hidden z-10
-          order-2 md:order-1 h-1/3 md:h-full">
+        <div className="md:w-72 lg:w-80 bg-white md:rounded-l-2xl overflow-hidden z-10
+          order-2 md:order-1 h-1/3 md:h-full flex flex-col">
           <ProjectMapSidebar
-            projects={searchResult?.projects || []}
+            projects={paginatedProjects}
             selectedProjectId={selectedProjectId}
             isLoading={isLoading}
             totalResults={searchResult?.totalResults || 0}
@@ -61,11 +72,34 @@ export function ProjectMapModal({ filters, onClose }: ProjectMapModalProps) {
             onSelectProject={selectProject}
             onClose={onClose}
           />
+          
+          {/* Paginación en el sidebar */}
+          {!isLoading && allProjects.length > ITEMS_PER_PAGE && (
+            <div className="border-t border-gray-200 px-4 py-3 flex items-center justify-between bg-white">
+              <button
+                onClick={() => setPage((p: number) => Math.max(0, p - 1))}
+                disabled={page === 0}
+                className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-brand-light text-brand-dark hover:bg-brand-light-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Anterior
+              </button>
+              <span className="text-xs text-brand-dark font-semibold">
+                {page + 1} / {totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p: number) => Math.min(totalPages - 1, p + 1))}
+                disabled={page >= totalPages - 1}
+                className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-brand-light text-brand-dark hover:bg-brand-light-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Siguiente
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex-1 order-1 md:order-2 h-2/3 md:h-full">
           <ProjectMapView
-            projects={searchResult?.projects || []}
+            projects={allProjects}
             selectedProjectId={selectedProjectId}
             onSelectProject={selectProject}
           />

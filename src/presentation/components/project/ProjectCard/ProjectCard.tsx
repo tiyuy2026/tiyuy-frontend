@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { BadgeCheck, Clock, AlertCircle, Star, MessageCircle } from 'lucide-react';
+import { BadgeCheck, Clock, AlertCircle, Star, MessageCircle, MessageCircleMore } from 'lucide-react';
 import type { Project, ProjectSummary } from '@/core/domain/entities/Project';
 import { LazyImage } from '@/presentation/components/ui/LazyImage/LazyImage';
 
@@ -138,7 +138,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             {project.name}
           </h3>
           <div className="flex items-center gap-1 text-[14px] text-gray-900 flex-shrink-0">
-            <Star className="w-3.5 h-3.5 text-gray-900 fill-gray-900" />
+            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
             <span>{rating && rating.averageRating > 0 ? rating.averageRating.toFixed(2) : 'Nuevo'}</span>
           </div>
         </div>
@@ -160,13 +160,24 @@ export function ProjectCard({ project }: ProjectCardProps) {
             </span>
           </div>
           
-          {/* Contador de comentarios pequeño */}
-          {commentCount !== null && commentCount > 0 && (
-            <div className="flex items-center gap-1 text-xs text-gray-400">
-              <MessageCircle className="w-3 h-3" />
-              <span>{commentCount}</span>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {/* Botón Contactar estilo WhatsApp */}
+            <Link
+              href={`/projects/${getProjectSlug(project)}`}
+              className="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-brand hover:bg-brand-dark px-2.5 py-1 rounded-md transition-colors shadow-sm"
+            >
+              <MessageCircleMore className="w-3.5 h-3.5" />
+              Contactar
+            </Link>
+
+            {/* Contador de comentarios pequeño */}
+            {commentCount !== null && commentCount > 0 && (
+              <div className="flex items-center gap-1 text-xs text-gray-400">
+                <MessageCircle className="w-3 h-3" />
+                <span>{commentCount}</span>
+              </div>
+            )}
+          </div>
         </div>
       </Link>
     </div>

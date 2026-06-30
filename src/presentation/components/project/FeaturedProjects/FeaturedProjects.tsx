@@ -103,72 +103,20 @@ export function FeaturedProjects() {
   return (
     <div className="w-full">
       <style>{`
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Estilo base móvil: tamaño ultra compacto estilo Airbnb */
-        .carousel-card {
-          width: 160px;
-        }
+        .carousel-card { width: calc(50% - 6px); flex-shrink: 0; }
 
-        /* Fuerza el reseteo estético solo en móvil para saltarse estilos globales del ProjectCard */
-        @media (max-width: 639px) {
-          .carousel-card > div {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-          }
-          .carousel-card img,
-          .carousel-card .relative {
-            border-radius: 14px !important;
-            aspect-ratio: 1 / 1 !important;
-            margin-bottom: 6px !important;
-          }
-          .carousel-card h3 {
-            font-size: 13px !important;
-            font-weight: 600 !important;
-            line-height: 1.2 !important;
-            color: #1f2937 !important;
-          }
-          .carousel-card p,
-          .carousel-card span {
-            font-size: 11px !important;
-            color: #6b7280 !important;
-          }
-          .carousel-card .hide-on-compact {
-            display: none !important;
-          }
-        }
-
-        /* Media queries Pro para pantallas de escritorio */
-        @media (min-width: 640px) {
-          .carousel-card { width: calc((100% - 20px) / 2); }
-        }
-        @media (min-width: 768px) {
-          .carousel-card { width: calc((100% - 2 * 24px) / 3); }
-        }
-        @media (min-width: 1024px) {
-          .carousel-card { width: calc((100% - 3 * 24px) / 4); }
-        }
-        @media (min-width: 1280px) {
-          .carousel-card { width: calc((100% - 4 * 24px) / 5); }
-        }
-        @media (min-width: 1536px) {
-          .carousel-card { width: calc((100% - 5 * 24px) / 6); }
-        }
-        @media (min-width: 1800px) {
-          .carousel-card { width: calc((100% - 6 * 24px) / 7); }
-        }
+        @media (min-width: 640px) { .carousel-card { width: calc((100% - 20px) / 2); } }
+        @media (min-width: 768px) { .carousel-card { width: calc((100% - 2 * 24px) / 3); } }
+        @media (min-width: 1024px) { .carousel-card { width: calc((100% - 3 * 24px) / 4); } }
+        @media (min-width: 1280px) { .carousel-card { width: calc((100% - 4 * 24px) / 5); } }
+        @media (min-width: 1536px) { .carousel-card { width: calc((100% - 5 * 24px) / 6); } }
+        @media (min-width: 1800px) { .carousel-card { width: calc((100% - 6 * 24px) / 7); } }
       `}</style>
 
-      <div className="w-full max-w-[1920px] mx-auto px-8 xl:px-16">
+      <div className="w-full">
 
         <div className="flex justify-between items-end mb-4">
           <h2 className="text-lg sm:text-2xl font-semibold text-foreground flex items-center gap-2 capitalize">
@@ -200,7 +148,7 @@ export function FeaturedProjects() {
 
         <div
           ref={scrollContainerRef}
-          className="flex overflow-x-auto gap-3 sm:gap-5 md:gap-6 hide-scrollbar snap-x snap-mandatory scroll-smooth pb-4"
+          className="flex overflow-x-auto gap-3 sm:gap-6 hide-scrollbar snap-x snap-mandatory scroll-smooth pb-4 pl-4 sm:pl-0"
         >
           {items.map((item: any) => (
             <div key={item.id} className="carousel-card flex-shrink-0 snap-start">

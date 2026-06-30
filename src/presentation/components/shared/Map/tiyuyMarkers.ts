@@ -92,6 +92,65 @@ export function createTiyuyIcon(isSelected: boolean = false): any {
 }
 
 /**
+ * SVG del marcador compacto con precio (para mini mapas)
+ */
+export function createCompactPriceMarkerSvg(price: string, isSelected: boolean = false): string {
+  const bgColor = isSelected ? '#2563EB' : '#1F2937';
+  const textColor = '#FFFFFF';
+  
+  return `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 22" width="70" height="22">
+  <rect x="0" y="0" width="70" height="18" rx="9" ry="9" fill="${bgColor}" opacity="0.95"/>
+  <text x="35" y="12" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="${textColor}">${price}</text>
+  <polygon points="33,18 37,18 35,22" fill="${bgColor}"/>
+</svg>`;
+}
+
+/**
+ * Crea un icono Leaflet con precio compacto (para mini mapas)
+ */
+export function createCompactPriceIcon(price: string, isSelected: boolean = false): any {
+  if (typeof window === 'undefined') return null;
+  const L = require('leaflet');
+  const svgContent = createCompactPriceMarkerSvg(price, isSelected);
+  return L.icon({
+    iconUrl: `data:image/svg+xml;base64,${btoa(svgContent)}`,
+    iconSize: [70, 22],
+    iconAnchor: [35, 22],
+    popupAnchor: [0, -28],
+  });
+}
+
+/**
+ * SVG del chincheta Tiyuy compacta (para mini mapas)
+ */
+export function createCompactTiyuySvg(isSelected: boolean = false): string {
+  const color = isSelected ? '#2563EB' : '#1F2937';
+  const size = isSelected ? 24 : 20;
+  return `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size*1.4}" width="${size}" height="${size*1.4}">
+  <path d="M${size/2} 0C${size/5} 0 0 ${size/4} 0 ${size/2}c0 ${size*0.4} ${size/2} ${size*0.9} ${size/2} ${size*0.9}s${size/2}-${size*0.5} ${size/2}-${size*0.9}C${size} ${size/4} ${size*0.8} 0 ${size/2} 0z" fill="${color}" opacity="0.9"/>
+  <circle cx="${size/2}" cy="${size*0.45}" r="${size*0.2}" fill="white"/>
+</svg>`;
+}
+
+/**
+ * Crea un icono Leaflet Tiyuy compacto (para mini mapas)
+ */
+export function createCompactTiyuyIcon(isSelected: boolean = false): any {
+  if (typeof window === 'undefined') return null;
+  const L = require('leaflet');
+  const svgContent = createCompactTiyuySvg(isSelected);
+  const size = isSelected ? 24 : 20;
+  return L.icon({
+    iconUrl: `data:image/svg+xml;base64,${btoa(svgContent)}`,
+    iconSize: [size, Math.round(size * 1.4)],
+    iconAnchor: [size/2, Math.round(size * 1.4)],
+    popupAnchor: [0, -Math.round(size * 1.4)],
+  });
+}
+
+/**
  * Crea un icono Leaflet con precio (tipo Urbania)
  * @param color - Color personalizado para el badge (opcional)
  */

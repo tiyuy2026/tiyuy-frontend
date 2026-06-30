@@ -1,3 +1,5 @@
+import { env } from '@/config/env';
+
 const SOCIAL_LINKS = [
   {
     href: 'https://www.instagram.com/tiyuyperu/',
@@ -228,11 +230,11 @@ function buildLayout(contentHtml: string): string {
               <a href="mailto:soporte@tiyuy.com">soporte@tiyuy.com</a>
             </p>
             <div style="margin-top:12px;font-size:12px;color:#9ca3af;">
-              <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://tiyuy.com'}/privacy" style="color:#9ca3af;">Privacidad</a>
+              <a href="${env.appUrl}/privacy" style="color:#9ca3af;">Privacidad</a>
               <span style="color:#d1d5db;margin:0 6px;">·</span>
-              <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://tiyuy.com'}/terms" style="color:#9ca3af;">Términos</a>
+              <a href="${env.appUrl}/terms" style="color:#9ca3af;">Términos</a>
               <span style="color:#d1d5db;margin:0 6px;">·</span>
-              <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://tiyuy.com'}" style="color:#9ca3af;">tiyuy.com</a>
+              <a href="${env.appUrl}" style="color:#9ca3af;">tiyuy.com</a>
             </div>
             <p style="margin-top:12px;font-size:11px;color:#d1d5db;">
               Este es un correo automático, por favor no respondas a este mensaje.
@@ -278,7 +280,7 @@ export function buildWelcomeEmail(firstName: string, role: string): string {
       ${featureContent}
 
       <div style="text-align:center;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard" class="cta-button">
+        <a href="${env.appUrl}/dashboard" class="cta-button">
           Ir a mi Dashboard
         </a>
       </div>

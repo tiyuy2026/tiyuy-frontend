@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 import { ProjectMapSummary } from '@/core/domain/entities/PropertyMapResult';
 import dynamic from 'next/dynamic';
-import { createTiyuyIcon, createPriceIcon } from '@/presentation/components/shared/Map/tiyuyMarkers';
+import { createTiyuyIcon, createPriceIcon, createCompactPriceIcon, createCompactTiyuyIcon } from '@/presentation/components/shared/Map/tiyuyMarkers';
 import { Building } from 'lucide-react';
 
 const LeafletMap = dynamic(
@@ -17,6 +17,7 @@ interface ProjectMapViewProps {
   onSelectProject: (id: number | null) => void;
   center?: [number, number];
   zoom?: number;
+  compact?: boolean;
 }
 
 export function ProjectMapView({
@@ -25,6 +26,7 @@ export function ProjectMapView({
   onSelectProject,
   center,
   zoom = 12,
+  compact = false,
 }: ProjectMapViewProps) {
   const mapRef = useRef<any>(null);
   const defaultCenter: [number, number] = [-12.0464, -77.0428];
@@ -81,10 +83,14 @@ export function ProjectMapView({
         const isSelected = selectedProjectId === project.id;
         const priceLabel = formatPrice(project.priceFrom);
         
-        // Usar icono con precio si hay precio, sino el icono Tiyuy
-        const icon = priceLabel 
-          ? createPriceIcon(priceLabel, isSelected)
-          : createTiyuyIcon(isSelected);
+        // Usar icono compacto o normal según el modo
+        const icon = compact
+          ? (priceLabel
+              ? createCompactPriceIcon(priceLabel, isSelected)
+              : createCompactTiyuyIcon(isSelected))
+          : (priceLabel
+              ? createPriceIcon(priceLabel, isSelected)
+              : createTiyuyIcon(isSelected));
 
         return (
           <Marker
