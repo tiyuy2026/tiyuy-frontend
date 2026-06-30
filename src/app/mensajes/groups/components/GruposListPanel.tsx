@@ -2,7 +2,7 @@
 
 import { useGetGroups } from '@/presentation/hooks/useContacts';
 import { Search, X } from 'lucide-react';
-import { IC } from '@/app/mensajes/page';
+import { EntityIcon } from '@/utils/entityIcons';
 
 
 export function GruposListPanel({
@@ -21,15 +21,6 @@ export function GruposListPanel({
     const userOwnedGroups = groups?.filter((g: any) => g.isMember && g.isOwner) ?? [];
     const hasGroup = userOwnedGroups.length > 0;
 
-    const getGroupEmoji = (name: string) => {
-        if (name.includes('Alquiler')) return '';
-        if (name.includes('Venta')) return '';
-        if (name.includes('Terreno') || name.includes('Lote')) return '';
-        if (name.includes('Inversion')) return '';
-        if (name.includes('Lima')) return '️';
-        return '️';
-    };
-
     return (
         <div className="flex flex-col h-full bg-white">
             {/* Header estilo Facebook */}
@@ -38,7 +29,7 @@ export function GruposListPanel({
                     <h1 className="text-xl font-bold text-gray-900">Grupos</h1>
                 </div>
                 <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2">
-                    <IC.Search />
+                    <Search className="w-4 h-4 text-gray-400" />
                     <input
                         placeholder="Buscar grupos"
                         className="bg-transparent text-sm text-gray-700 placeholder-gray-400 flex-1 focus:outline-none"
@@ -67,7 +58,7 @@ export function GruposListPanel({
                 >
                     <span className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${activeSection === 'mis-grupos' ? 'bg-brand' : 'bg-gray-200'
                         }`}>
-                        <IC.Groups a={activeSection === 'mis-grupos'} />
+                        <Search className="w-4 h-4 text-gray-400" />
                     </span>
                     Tus grupos
                 </button>
@@ -118,8 +109,8 @@ export function GruposListPanel({
                                 }}
                                 className="w-full flex items-center gap-3 p-2 hover:bg-gray-100 rounded-xl transition-colors text-left"
                             >
-                                <div className="w-10 h-10 rounded-xl bg-brand flex items-center justify-center text-lg flex-shrink-0">
-                                    {getGroupEmoji(group.name)}
+                                <div className="w-10 h-10 rounded-xl bg-brand flex items-center justify-center flex-shrink-0">
+                                    <EntityIcon name={group.name} className="w-5 h-5 text-white" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-semibold text-gray-900 truncate">{group.name}</p>

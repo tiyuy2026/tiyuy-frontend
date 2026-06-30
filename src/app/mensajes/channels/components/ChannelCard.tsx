@@ -3,6 +3,7 @@
 import React from 'react';
 import { useChannels } from '@/presentation/hooks/useChannels';
 import { Users, MessageCircle, Calendar, UserPlus, UserMinus, Bell, BellOff } from 'lucide-react';
+import { EntityIcon } from '@/utils/entityIcons';
 
 interface ChannelCardProps {
   channel: any;
@@ -44,17 +45,6 @@ export function ChannelCard({ channel, currentUserId }: ChannelCardProps) {
     }
   };
 
-  const getChannelEmoji = (city: string) => {
-    const cityEmojis: Record<string, string> = {
-      'Lima': '🏙️',
-      'Arequipa': '🌋',
-      'Trujillo': '🏺',
-      'Piura': '☀️',
-      'Chiclayo': '🌿',
-      'Cusco': '🏔️',
-    };
-    return cityEmojis[city] || '🏘️';
-  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-md transition-shadow duration-200">
@@ -76,8 +66,8 @@ export function ChannelCard({ channel, currentUserId }: ChannelCardProps) {
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">{channel.city}</p>
         </div>
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-teal-500 flex items-center justify-center text-lg flex-shrink-0">
-          {getChannelEmoji(channel.city)}
+        <div className="w-12 h-12 rounded-xl bg-brand flex items-center justify-center flex-shrink-0 shadow-sm">
+          <EntityIcon name={channel.name} className="w-6 h-6 text-white" />
         </div>
       </div>
 

@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useChannels } from '@/presentation/hooks/useChannels';
 import { formatCompactNumber } from '@/utils/formatters';
-import { Bell, BellOff, FileText, Search, Users } from 'lucide-react';;
+import { Bell, BellOff, FileText, Search, Users } from 'lucide-react';
+import { EntityIcon } from '@/utils/entityIcons';
 
 export default function DiscoverChannelsView({ user, onChannelSelect }: { user: any; onChannelSelect: (channel: any) => void }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,17 +19,6 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
     channel.city.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getChannelEmoji = (city: string) => {
-    const cityEmojis: Record<string, string> = {
-      'Lima': '️',
-      'Arequipa': '',
-      'Trujillo': '',
-      'Piura': '️',
-      'Chiclayo': '',
-      'Cusco': '️',
-    };
-    return cityEmojis[city] || '️';
-  };
 
   const handleSubscribeChannel = (channelId: number, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -105,7 +95,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
               >
                 {/* Banner del canal */}
                 <div className="h-24 bg-gradient-to-br brand flex items-center justify-center text-4xl">
-                  {getChannelEmoji(channel.city)}
+                  <EntityIcon name={channel.name} className="w-10 h-10 text-white" />
                 </div>
 
                 {/* Contenido */}

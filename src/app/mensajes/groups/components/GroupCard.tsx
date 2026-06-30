@@ -6,6 +6,7 @@
 import { Group } from '@/core/domain/entities/Group';
 import { useGroups } from '@/presentation/hooks/useGroups';
 import { Users, MessageCircle, Calendar, UserPlus, UserMinus } from 'lucide-react';
+import { EntityIcon } from '@/utils/entityIcons';
 
 interface GrupoCardProps {
   grupo: Group;
@@ -44,8 +45,12 @@ export function GrupoCard({ grupo, currentUserId }: GrupoCardProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200">
       {/* Header del grupo */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
+      <div className="flex items-start gap-4 mb-4">
+        {/* Icono del grupo */}
+        <div className="w-14 h-14 rounded-xl bg-brand flex items-center justify-center flex-shrink-0 shadow-sm">
+          <EntityIcon name={grupo.name} className="w-7 h-7 text-white" />
+        </div>
+        <div className="flex-1 min-w-0">
           <h3 className="text-lg font-semibold text-gray-900 mb-1">
             {grupo.name}
           </h3>
@@ -55,7 +60,7 @@ export function GrupoCard({ grupo, currentUserId }: GrupoCardProps) {
         </div>
         
         {/* Badge de estado */}
-        <div className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(grupo.status)} bg-opacity-10 ${getStatusColor(grupo.status).replace('text', 'bg')}`}>
+        <div className={`px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${getStatusColor(grupo.status)} bg-opacity-10 ${getStatusColor(grupo.status).replace('text', 'bg')}`}>
           {getStatusText(grupo.status)}
         </div>
       </div>

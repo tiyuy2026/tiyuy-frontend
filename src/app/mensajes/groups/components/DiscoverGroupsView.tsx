@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useGetGroups, useJoinGroup } from '@/presentation/hooks/useContacts';
 import { formatCompactNumber } from '@/utils/formatters';
-import { FileText, Search, Users } from 'lucide-react';;
+import { FileText, Search, Users } from 'lucide-react';
+import { EntityIcon } from '@/utils/entityIcons';
 
 export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any; onGroupSelect: (group: any) => void }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -14,14 +15,6 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
     group.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getGroupEmoji = (name: string) => {
-    if (name.includes('Alquiler')) return '';
-    if (name.includes('Venta')) return '';
-    if (name.includes('Terreno') || name.includes('Lote')) return '';
-    if (name.includes('Inversion')) return '';
-    if (name.includes('Lima')) return '';
-    return '';
-  };
 
   const handleJoinGroup = (groupId: number, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -99,7 +92,7 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
               >
                 {/* Banner del grupo */}
                 <div className="h-24 bg-gradient-to-br brand flex items-center justify-center text-4xl">
-                  {getGroupEmoji(group.name)}
+                  <EntityIcon name={group.name} className="w-10 h-10 text-white" />
                 </div>
 
                 {/* Contenido */}
