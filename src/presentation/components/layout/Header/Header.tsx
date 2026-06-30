@@ -473,20 +473,11 @@ export function Header() {
                               <h3 className="font-bold text-black text-lg mb-5">Servicios</h3>
                               <ul className="space-y-3">
                                 <li>
-                      <Link
-                        href="/dashboard"
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
-                      >
-                        Mi perfil
-                      </Link>
-
-                                </li>
-                                <li>
                                   <Link
-                                    href="/my-properties/new"
+                                    href="/servics"
                                     className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer"
                                   >
-                                    Publica un inmueble para venta
+                                    Servicios
                                   </Link>
                                 </li>
                               </ul>
@@ -498,7 +489,7 @@ export function Header() {
                               <ul className="space-y-3">
                                 <li>
                                   <Link
-                                    href="/#proyectos"
+                                    href="/projects"
                                     className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer"
                                   >
                                     Proyectos
@@ -540,262 +531,52 @@ export function Header() {
                       <div className="max-w-[1400px] mx-auto px-4 mt-2">
                         <div className="bg-white border border-gray-200 shadow-2xl rounded-2xl py-10 px-10">
                           <div className="grid grid-cols-5 gap-10">
-                            {/* COLUMNA 1: ESTADO */}
                             <div>
                               <h3 className="font-bold text-black text-lg mb-5">Estado</h3>
                               <ul className="space-y-3">
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('estado', 'lima')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.estado === 'lima' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Lima
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('estado', 'piura')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.estado === 'piura' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Piura
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('estado', 'callao')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.estado === 'callao' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Callao
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('estado', 'ica')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.estado === 'ica' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Ica
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('estado', 'lambayeque')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.estado === 'lambayeque' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Lambayeque
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('estado', 'lalibertad')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.estado === 'lalibertad' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    La Libertad
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('estado', 'arequipa')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.estado === 'arequipa' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Arequipa
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('estado', 'cusco')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.estado === 'cusco' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Cusco
-                                  </button>
-                                </li>
+                                <li><button onClick={() => handleAlquilarFilter('estado', 'lima')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.estado === 'lima' ? 'font-bold text-teal-600' : ''}`}>Lima</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('estado', 'piura')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.estado === 'piura' ? 'font-bold text-teal-600' : ''}`}>Piura</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('estado', 'callao')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.estado === 'callao' ? 'font-bold text-teal-600' : ''}`}>Callao</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('estado', 'ica')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.estado === 'ica' ? 'font-bold text-teal-600' : ''}`}>Ica</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('estado', 'lambayeque')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.estado === 'lambayeque' ? 'font-bold text-teal-600' : ''}`}>Lambayeque</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('estado', 'lalibertad')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.estado === 'lalibertad' ? 'font-bold text-teal-600' : ''}`}>La Libertad</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('estado', 'arequipa')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.estado === 'arequipa' ? 'font-bold text-teal-600' : ''}`}>Arequipa</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('estado', 'cusco')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.estado === 'cusco' ? 'font-bold text-teal-600' : ''}`}>Cusco</button></li>
                               </ul>
                             </div>
-
-                            {/* COLUMNA 2: TIPO DE PROPIEDAD */}
                             <div>
                               <h3 className="font-bold text-black text-lg mb-5">Tipo de propiedad</h3>
                               <ul className="space-y-3">
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('tipo', 'departamentos')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.tipo === 'departamentos' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Departamento
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('tipo', 'casas')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.tipo === 'casas' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Casa
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('tipo', 'terrenos')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.tipo === 'terrenos' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Terreno / Lote
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('tipo', 'oficinas')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.tipo === 'oficinas' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Oficina
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('tipo', 'locales')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.tipo === 'locales' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Local Comercial
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('tipo', 'habitaciones')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.tipo === 'habitaciones' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Habitación
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('tipo', 'minidepartamentos')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.tipo === 'minidepartamentos' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    Minidepartamento
-                                  </button>
-                                </li>
+                                <li><button onClick={() => handleAlquilarFilter('tipo', 'departamentos')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.tipo === 'departamentos' ? 'font-bold text-teal-600' : ''}`}>Departamento</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('tipo', 'casas')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.tipo === 'casas' ? 'font-bold text-teal-600' : ''}`}>Casa</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('tipo', 'terrenos')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.tipo === 'terrenos' ? 'font-bold text-teal-600' : ''}`}>Terreno / Lote</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('tipo', 'oficinas')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.tipo === 'oficinas' ? 'font-bold text-teal-600' : ''}`}>Oficina</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('tipo', 'locales')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.tipo === 'locales' ? 'font-bold text-teal-600' : ''}`}>Local Comercial</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('tipo', 'habitaciones')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.tipo === 'habitaciones' ? 'font-bold text-teal-600' : ''}`}>Habitación</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('tipo', 'minidepartamentos')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.tipo === 'minidepartamentos' ? 'font-bold text-teal-600' : ''}`}>Minidepartamento</button></li>
                               </ul>
                             </div>
-
-                            {/* COLUMNA 3: DORMITORIOS */}
                             <div>
                               <h3 className="font-bold text-black text-lg mb-5">Dormitorios</h3>
                               <ul className="space-y-3">
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('dormitorios', '3')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.dormitorios === '3' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    3 dormitorios
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('dormitorios', '2')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.dormitorios === '2' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    2 dormitorios
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('dormitorios', '4')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.dormitorios === '4' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    4 dormitorios
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('dormitorios', '5')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.dormitorios === '5' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    5 o más dormitorios
-                                  </button>
-                                </li>
-                                <li>
-                                  <button
-                                    onClick={() => handleAlquilarFilter('dormitorios', '1')}
-                                    className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left cursor-pointer ${
-                                      alquilarFilters.dormitorios === '1' ? 'font-bold text-teal-600' : ''
-                                    }`}
-                                  >
-                                    1 dormitorio
-                                  </button>
-                                </li>
+                                <li><button onClick={() => handleAlquilarFilter('dormitorios', '3')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.dormitorios === '3' ? 'font-bold text-teal-600' : ''}`}>3 dormitorios</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('dormitorios', '2')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.dormitorios === '2' ? 'font-bold text-teal-600' : ''}`}>2 dormitorios</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('dormitorios', '4')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.dormitorios === '4' ? 'font-bold text-teal-600' : ''}`}>4 dormitorios</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('dormitorios', '5')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.dormitorios === '5' ? 'font-bold text-teal-600' : ''}`}>5 o más dormitorios</button></li>
+                                <li><button onClick={() => handleAlquilarFilter('dormitorios', '1')} className={`text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer w-full text-left ${alquilarFilters.dormitorios === '1' ? 'font-bold text-teal-600' : ''}`}>1 dormitorio</button></li>
                               </ul>
                             </div>
-
-                            {/* COLUMNA 4: SERVICIOS */}
                             <div>
                               <h3 className="font-bold text-black text-lg mb-5">Servicios</h3>
                               <ul className="space-y-3">
-                                <li>
-                                  <Link
-                                    href="/#rental-guide"
-                                    className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer"
-                                  >
-                                    Guía para alquilar un inmueble
-                                  </Link>
-                                </li>
-                                <li>
-                                  <Link
-                                    href="/my-properties/new"
-                                    className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer"
-                                  >
-                                    Publica un inmueble para alquilar
-                                  </Link>
-                                </li>
+                                <li><Link href="/rental-guide" className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer">Guía para alquilar un inmueble</Link></li>
+                                <li><Link href="/my-properties/new" className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer">Publica un inmueble para alquilar</Link></li>
                               </ul>
                             </div>
-
-                            {/* COLUMNA 5: OTRAS OPERACIONES */}
                             <div>
                               <h3 className="font-bold text-black text-lg mb-5">Otras operaciones</h3>
                               <ul className="space-y-3">
-                                <li>
-                                  <Link
-                                    href="/#proyectos"
-                                    className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer"
-                                  >
-                                    Proyectos
-                                  </Link>
-                                </li>
+                                <li><Link href="/projects" className="text-gray-800 hover:text-black hover:bg-gray-100 px-2 -mx-2 rounded-md transition-colors text-base block cursor-pointer">Proyectos</Link></li>
                               </ul>
                             </div>
                           </div>
@@ -943,10 +724,16 @@ export function Header() {
               </div>
 
               <Link
-                href="/#inmobiliarias"
+                href="/agencies"
                 className="text-black hover:text-gray-800 font-normal text-base"
               >
                 Buscar inmobiliarias
+              </Link>
+              <Link
+                href="/agents"
+                className="text-black hover:text-gray-800 font-normal text-base"
+              >
+                Buscar agentes
               </Link>
             </nav>
 
@@ -1060,13 +847,6 @@ export function Header() {
                       >
                         <Bell className="w-4 h-4" />
                         Notificaciones
-                      </Link>
-                      <Link
-                        href="/dashboard"
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
-                      >
-                        <User className="w-4 h-4" />
-                        Mi perfil
                       </Link>
 
                       {adminRoleType && (

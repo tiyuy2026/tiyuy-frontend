@@ -44,9 +44,8 @@ const FOOTER_COLUMNS = [
     title: 'Descubre TIYUY',
     links: [
       { label: 'Publicar tu inmueble', href: '/my-properties/new' },
-      { label: 'TIYUY para Inmobiliarias', href: '/#inmobiliarias' },
-      { label: 'TIYUY para Corredores', href: '/#corredores' },
-      { label: 'TIYUY para Constructoras', href: '/#constructoras' },
+      { label: 'TIYUY para Inmobiliarias', href: '/inmobiliarias' },
+      { label: 'TIYUY para Corredores', href: '/corredores' },
       { label: 'Blog inmobiliario', href: '/blog' },
       { label: 'Servicios', href: '/servics' },
     ],
@@ -55,10 +54,10 @@ const FOOTER_COLUMNS = [
     title: 'Acerca de nosotros',
     links: [
       { label: 'Por qué elegir TIYUY', href: '/about-tiyuy' },
-      { label: 'Trabaja con nosotros', href: '/#trabaja' },
-      { label: 'Inversores', href: '/#inversores' },
-      { label: 'Noticias y comunicados', href: '/#prensa' },
-      { label: 'Impacto comunitario', href: '/#impacto' },
+      { label: 'Trabaja con nosotros', href: '/trabaja-con-nosotros' },
+      { label: 'Inversores', href: '/inversores' },
+      { label: 'Noticias y comunicados', href: '/noticias' },
+      { label: 'Impacto comunitario', href: '/impacto-comunitario' },
       { label: 'Contacto', href: '/contact' },
     ],
   },
@@ -133,17 +132,17 @@ export function Footer() {
             </p>
             
             <div className="space-y-4 text-[14px]">
-              <a href="mailto:contacto@tiyuy.com" className="flex items-center gap-3 hover:text-white transition-colors group w-fit">
+              <a href="mailto:tiyuy@saberoconsulting.com" className="flex items-center gap-3 hover:text-white transition-colors group w-fit">
                 <div className="size-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-[#4A9A3E]/10 group-hover:border-[#4A9A3E]/30 group-hover:text-[#4A9A3E] transition-all">
                    <Icon icon="lucide:mail" width="16" />
                 </div>
-                <span>contacto@tiyuy.com</span>
+                <span>tiyuy@saberoconsulting.com</span>
               </a>
-              <a href="tel:+51987654321" className="flex items-center gap-3 hover:text-white transition-colors group w-fit">
+              <a href="tel:+51923327532" className="flex items-center gap-3 hover:text-white transition-colors group w-fit">
                 <div className="size-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-[#4A9A3E]/10 group-hover:border-[#4A9A3E]/30 group-hover:text-[#4A9A3E] transition-all">
                    <Icon icon="lucide:phone" width="16" />
                 </div>
-                <span>+51 987 654 321</span>
+                <span>+51 923 327 532</span>
               </a>
             </div>
           </div>
