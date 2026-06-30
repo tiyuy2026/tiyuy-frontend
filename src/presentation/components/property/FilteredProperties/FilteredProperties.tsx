@@ -116,9 +116,9 @@ export function FilteredProperties({
         }
       `}</style>
 
-      <div className="w-full max-w-[1920px] mx-auto px-8 xl:px-16">
+      <div className="w-full">
         {/* Header and Navigation Controls */}
-        <div className="flex justify-between items-end mb-4 pr-4">
+        <div className="flex justify-between items-end mb-4">
           <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
             {title}
             <Link href={viewAllLink} className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors ml-1">

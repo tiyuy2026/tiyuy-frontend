@@ -96,7 +96,12 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
               <div
                 key={channel.id}
                 className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
-                onClick={() => onChannelSelect(channel)}
+                onClick={(e) => {
+                  if (!channel.isSubscribed) {
+                    handleSubscribeChannel(channel.id, e);
+                  }
+                  setTimeout(() => onChannelSelect(channel), 300);
+                }}
               >
                 {/* Banner del canal */}
                 <div className="h-24 bg-gradient-to-br brand flex items-center justify-center text-4xl">
@@ -112,7 +117,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                     {channel.description || 'Sin descripcion disponible'}
                   </p>
                   
-                  {/* Facebook-style stats */}
+                  {/* Stats */}
                   <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3 pb-2 border-b border-gray-100 dark:border-gray-700">
                     <div className="flex items-center gap-1">
                       <Users className="w-3 h-3" />
@@ -136,14 +141,10 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                     <span>{channel.city}</span>
                   </div>
 
-                  {/* Boton de suscribirse */}
-                  <button
-                    onClick={(e) => handleSubscribeChannel(channel.id, e)}
-                    disabled={isSubscribing}
-                    className="w-full py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubscribing ? 'Suscribiendose...' : 'Suscribirse'}
-                  </button>
+                  {/* Boton de entrada */}
+                  <div className="w-full py-2 bg-brand text-white text-sm font-semibold rounded-lg text-center">
+                    {channel.isSubscribed ? 'Entrar al canal' : isSubscribing ? 'Suscribiendose...' : 'Entrar'}
+                  </div>
                 </div>
               </div>
             ))}

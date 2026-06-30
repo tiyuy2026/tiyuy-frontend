@@ -155,8 +155,7 @@ export function FeaturedProperties({ hideViewAll = false }: FeaturedPropertiesPr
         }
       `}</style>
 
-      {/* Contenedor con padding lateral unificado */}
-      <div className="w-full max-w-[1920px] mx-auto px-8 xl:px-16">
+      <div className="w-full">
 
         {/* El título replica exactamente la rejilla y alineación del grid general en cualquier pantalla */}
         <div className="flex justify-between items-end mb-4">

@@ -234,8 +234,8 @@ export function Header() {
               <img
                 src="/assets/images/logo.png"
                 alt="TIYUY"
-                className="h-10 w-auto object-contain"
-                style={{ maxWidth: '180px' }}
+                className="h-16 w-auto object-contain sm:h-20"
+                style={{ maxWidth: '240px' }}
               />
             </Link>
 

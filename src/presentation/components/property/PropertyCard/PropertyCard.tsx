@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { BadgeCheck, Star, AlertCircle, Clock, MessageCircle } from 'lucide-react';
+import { BadgeCheck, Star, AlertCircle, Clock, MessageCircle, MessageCircleMore } from 'lucide-react';
 import type { Property, PropertySummary } from '@/core/domain/entities/Property';
 import { FavoriteButton } from '@/presentation/components/shared/FavoriteButton';
 import { LazyImage } from '@/presentation/components/ui/LazyImage/LazyImage';
@@ -146,7 +146,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
             {PROPERTY_TYPE_LABELS[property.type] || 'Propiedad'} en {'location' in property ? property.location?.district : property.district || 'Ubicación'}
           </h3>
           <div className="flex items-center gap-0.5 sm:gap-1 text-[13px] sm:text-[14px] text-gray-900 flex-shrink-0 min-w-fit pl-0.5">
-            <Star className={`w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0 ${rating && rating.averageRating > 0 ? 'text-yellow-500 fill-yellow-500' : 'text-gray-900 fill-gray-900'}`} />
+            <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0 text-amber-400 fill-amber-400" />
             <span className="whitespace-nowrap select-none">
               {rating && rating.averageRating > 0 ? rating.averageRating.toFixed(1) : 'Nuevo'}
             </span>
@@ -171,12 +171,20 @@ export function PropertyCard({ property }: PropertyCardProps) {
             </span>
           </div>
           
-          {commentCount !== null && commentCount > 0 && (
-            <div className="flex items-center gap-1 text-[11px] text-gray-400 flex-shrink-0">
-              <MessageCircle className="w-2.5 h-2.5" />
-              <span>{commentCount}</span>
-            </div>
-          )}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Botón Contactar estilo WhatsApp - usa span porque ya está dentro de un Link */}
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-brand hover:bg-brand-dark px-2.5 py-1 rounded-md transition-colors shadow-sm cursor-default">
+              <MessageCircleMore className="w-3.5 h-3.5" />
+              Contactar
+            </span>
+
+            {commentCount !== null && commentCount > 0 && (
+              <div className="flex items-center gap-1 text-[11px] text-gray-400">
+                <MessageCircle className="w-2.5 h-2.5" />
+                <span>{commentCount}</span>
+              </div>
+            )}
+          </div>
         </div>
       </Link>
     </div>

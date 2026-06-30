@@ -161,14 +161,11 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </div>
           
           <div className="flex items-center gap-2">
-            {/* Botón Contactar estilo WhatsApp */}
-            <Link
-              href={`/projects/${getProjectSlug(project)}`}
-              className="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-brand hover:bg-brand-dark px-2.5 py-1 rounded-md transition-colors shadow-sm"
-            >
+            {/* Botón Contactar estilo WhatsApp - span porque ya está dentro de un Link */}
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-brand hover:bg-brand-dark px-2.5 py-1 rounded-md transition-colors shadow-sm cursor-default">
               <MessageCircleMore className="w-3.5 h-3.5" />
               Contactar
-            </Link>
+            </span>
 
             {/* Contador de comentarios pequeño */}
             {commentCount !== null && commentCount > 0 && (

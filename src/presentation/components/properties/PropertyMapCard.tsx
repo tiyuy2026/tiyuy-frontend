@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Image } from 'lucide-react';
+import React, { useState } from 'react';
+import { Image, ChevronRight } from 'lucide-react';
 import { MapPropertySummary } from '@/core/domain/entities/Property';
 import Link from 'next/link';
 
@@ -13,7 +13,9 @@ interface PropertyMapCardProps {
   requestedDistrict?: string;
 }
 
-export function PropertyMapCard({ property, isSelected, onClick, requestedDistrict }: PropertyMapCardProps) {
+export function PropertyMapCard({ property, isSelected, onClick }: PropertyMapCardProps) {
+  const [imgError, setImgError] = useState(false);
+
   const formatPrice = (price: number, currency: string) => {
     return new Intl.NumberFormat('es-PE', {
       style: 'currency',
@@ -24,12 +26,12 @@ export function PropertyMapCard({ property, isSelected, onClick, requestedDistri
   };
 
   const typeLabels: Record<string, string> = {
-    APARTMENT: 'Departamento',
+    APARTMENT: 'Dpto',
     HOUSE: 'Casa',
     LAND: 'Terreno',
     OFFICE: 'Oficina',
     COMMERCIAL: 'Local',
-    ROOM: 'Habitación',
+    ROOM: 'Hab.',
   };
 
   const transactionLabels: Record<string, string> = {
@@ -39,73 +41,75 @@ export function PropertyMapCard({ property, isSelected, onClick, requestedDistri
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg ${
-        isSelected ? 'ring-2 ring-blue-500 shadow-lg' : ''
+      className={`w-full bg-white rounded-lg overflow-hidden transition-all duration-200 cursor-pointer hover:shadow-md border ${
+        isSelected ? 'border-brand ring-1 ring-brand shadow-md' : 'border-gray-100 shadow-sm hover:border-brand/40'
       }`}
       onClick={onClick}
     >
-      {/* Imagen */}
-      <div className="relative h-36 bg-gray-200">
-        {property.mainPhotoUrl ? (
-          <img
-            src={property.mainPhotoUrl}
-            alt={property.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-400">
-            <Image className="w-12 h-12" strokeWidth={1.5} />
+      <Link href={`/property/${property.slug}`} onClick={(e) => e.stopPropagation()}>
+        <div className="flex">
+          {/* Imagen - lado izquierdo */}
+          <div className="relative w-28 sm:w-32 h-24 sm:h-28 flex-shrink-0 bg-gray-100 overflow-hidden">
+            {property.mainPhotoUrl && !imgError ? (
+              <img
+                src={property.mainPhotoUrl}
+                alt={property.title}
+                className="w-full h-full object-cover"
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-300">
+                <Image className="w-8 h-8" strokeWidth={1.5} />
+              </div>
+            )}
+            {property.isFeatured && (
+              <span className="absolute top-1 left-1 bg-amber-400 text-amber-900 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
+                Destacado
+              </span>
+            )}
           </div>
-        )}
-        {property.isFeatured && (
-          <span className="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded">
-            Destacado
-          </span>
-        )}
-        {/* Badge de distrito cercano */}
-        {requestedDistrict && property.district?.toLowerCase() !== requestedDistrict.toLowerCase() && (
-          <span className="absolute top-2 right-2 bg-emerald-500 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded">
-            {property.district}
-          </span>
-        )}
-      </div>
 
-      {/* Info */}
-      <div className="p-3">
-        <h3 className="font-semibold text-sm text-gray-900 truncate">{property.title}</h3>
-        <p className="text-xs text-gray-500 mt-1">{property.district}, {property.province}</p>
+          {/* Contenido - lado derecho */}
+          <div className="flex-1 min-w-0 p-2.5 sm:p-3 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                {property.transactionType && (
+                  <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-brand-light text-brand-dark">
+                    {transactionLabels[property.transactionType] || property.transactionType}
+                  </span>
+                )}
+                {property.type && (
+                  <span className="text-[10px] text-gray-400 font-medium">
+                    {typeLabels[property.type] || property.type}
+                  </span>
+                )}
+              </div>
 
-        <div className="flex items-center gap-2 mt-2">
-          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-            {typeLabels[property.type] || property.type}
-          </span>
-          <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
-            {transactionLabels[property.transactionType] || property.transactionType}
-          </span>
+              <h3 className="text-sm font-semibold text-gray-900 leading-tight line-clamp-1">{property.title}</h3>
+              
+              <p className="text-[11px] text-gray-500 mt-0.5 truncate">
+                {property.district}{property.province ? `, ${property.province}` : ''}
+              </p>
+
+              <div className="flex items-center gap-2 mt-1 text-[11px] text-gray-500 flex-wrap">
+                {property.bedrooms && <span>{property.bedrooms} dorm</span>}
+                {property.bathrooms && <span>{property.bathrooms} baños</span>}
+                {property.area && <span>{property.area} m²</span>}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between mt-1.5 pt-1.5 border-t border-gray-50">
+              <div>
+                <p className="text-[10px] text-gray-400">Precio</p>
+                <p className="text-xs sm:text-sm font-bold text-gray-900">{formatPrice(property.price, property.currency)}</p>
+              </div>
+              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-white bg-brand px-2 py-1 rounded-md hover:bg-brand-dark transition-colors">
+                Ver <ChevronRight className="w-2.5 h-2.5" />
+              </span>
+            </div>
+          </div>
         </div>
-
-        <div className="flex items-center justify-between mt-2">
-          <div>
-            <p className="text-xs text-gray-500">Precio</p>
-            <p className="text-sm font-bold text-blue-600">
-              {formatPrice(property.price, property.currency)}
-            </p>
-          </div>
-          <div className="flex gap-2 text-xs text-gray-600">
-            {property.bedrooms && <span>{property.bedrooms} dorm</span>}
-            {property.bathrooms && <span>{property.bathrooms} baños</span>}
-            {property.area && <span>{property.area} m²</span>}
-          </div>
-        </div>
-
-        <Link
-          href={`/sale/${property.slug}`}
-          className="mt-2 block w-full text-center text-xs bg-blue-600 text-white py-1.5 rounded hover:bg-blue-700 transition-colors"
-          onClick={(e) => e.stopPropagation()}
-        >
-          Ver propiedad
-        </Link>
-      </div>
+      </Link>
     </div>
   );
 }

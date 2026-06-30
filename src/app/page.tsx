@@ -1,7 +1,7 @@
-'use client';
+ 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
 import { Footer } from '@/presentation/components/layout/Footer/Footer';
@@ -23,10 +23,25 @@ const FALLBACK_HERO_IMAGES = [
 const links = [
   { href: "/rent/departamentos/lima", label: "Alquilar" },
   { href: "/sale/departamentos/lima", label: "Comprar" },
+  { href: "/properties", label: "Propiedades" },
   { href: "/my-properties/new", label: "Publicar" },
   { href: "/projects/departamentos/lima", label: "Proyectos" },
 ];
 const quickLinks = [
+  {
+    href: "/properties",
+    icon: "material-symbols:home",
+    title: "Propiedades Inmobiliarias",
+    description: "Explora departamentos, casas, terrenos y locales en venta y alquiler en todo el Perú.",
+    actionText: "Ver propiedades",
+  },
+  {
+    href: "/projects",
+    icon: "material-symbols:apartment",
+    title: "Proyectos Inmobiliarios",
+    description: "Descubre los mejores proyectos de vivienda e inversión de las principales inmobiliarias.",
+    actionText: "Ver proyectos",
+  },
   {
     href: "/blog",
     icon: "material-symbols:article-outline",
@@ -40,13 +55,6 @@ const quickLinks = [
     title: "Guía para alquilar",
     description: "Lo que necesitas saber a la hora de alquilar en un solo lugar.",
     actionText: "Ver guía completa",
-  },
-  {
-    href: "/projects",
-    icon: "material-symbols:apartment",
-    title: "Proyectos Inmobiliarios",
-    description: "Descubre los mejores proyectos de vivienda y inversión de las principales inmobiliarias.",
-    actionText: "Ver proyectos",
   },
   {
     href: "/about-tiyuy",
@@ -145,6 +153,8 @@ export default function HomePage() {
     }
   }, [pathname]);
 
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+
   const getPropertyTypes = (tab = activeTab) => {
     switch (tab) {
       case 'projects':
@@ -164,6 +174,48 @@ export default function HomePage() {
           { value: 'locales', label: 'Local Comercial' }
         ];
     }
+  };
+
+  // Custom dropdown component
+  const CustomSelect = ({ options, value, onChange, placeholder }: { options: { value: string; label: string }[]; value: string; onChange: (v: string) => void; placeholder: string }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const selected = options.find(o => o.value === value);
+    
+    useEffect(() => {
+      const handler = (e: MouseEvent) => {
+        if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
+      };
+      document.addEventListener('mousedown', handler);
+      return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    return (
+      <div className="relative" ref={ref}>
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full flex items-center justify-between px-5 py-3.5 border border-gray-200 rounded-xl bg-white text-base text-gray-700 cursor-pointer transition-all hover:border-gray-300 shadow-sm focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none"
+        >
+          <span className={selected ? 'text-gray-700' : 'text-gray-400'}>{selected ? selected.label : placeholder}</span>
+          <svg className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+        </button>
+        {isOpen && (
+          <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+            {options.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => { onChange(opt.value); setIsOpen(false); }}
+                className={`w-full text-left px-5 py-3 text-sm transition-colors hover:bg-brand-light hover:text-brand-dark ${value === opt.value ? 'bg-brand-light text-brand-dark font-semibold' : 'text-gray-700'}`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   const handleTabClick = (tab: 'rent' | 'sale' | 'projects') => {
@@ -227,6 +279,32 @@ export default function HomePage() {
     <div className="min-h-screen bg-background text-foreground">
       {/* HERO */}
       <section className="relative">
+        <style>{`
+          .hero-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 12px 8px;
+            padding-right: 38px;
+          }
+          .hero-select::-ms-expand { display: none; }
+          .hero-select option {
+            padding: 8px 12px;
+            background: white;
+            color: #374151;
+          }
+          .hero-input-number::-webkit-inner-spin-button,
+          .hero-input-number::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+          }
+          .hero-input-number[type=number] {
+            -moz-appearance: textfield;
+          }
+        `}</style>
         <div className="relative h-[540px] overflow-hidden">
           {heroImages.map((image, index) => (
             <div
@@ -249,7 +327,7 @@ export default function HomePage() {
                   Encuentra tu hogar
                 </h1>
 
-                <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200/80 dark:border-gray-700/80">
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-200/80 dark:border-gray-700/80">
                   <div className="border-b border-gray-200 rounded-t-2xl bg-white overflow-hidden">
                     <div className="flex">
                       <button
@@ -286,56 +364,53 @@ export default function HomePage() {
                   </div>
 
                   <div className="p-6 bg-white rounded-b-2xl">
-                    <div className="flex flex-col lg:flex-row gap-3 relative">
+                    <div className="flex flex-col lg:flex-row gap-3 relative z-10">
                       <div className="flex-1">
-                        <select 
+                        <CustomSelect 
+                          options={getPropertyTypes()}
                           value={selectedPropertyType}
-                          onChange={(e) => setSelectedPropertyType(e.target.value)}
-                          className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white"
-                        >
-                          {getPropertyTypes().map(type => (
-                            <option key={type.value} value={type.value}>
-                              {type.label}
-                            </option>
-                          ))}
-                        </select>
+                          onChange={setSelectedPropertyType}
+                          placeholder="Tipo"
+                        />
                       </div>
 
                       {activeTab !== 'projects' && (selectedPropertyType === 'departamentos' || selectedPropertyType === 'casas') ? (
                         <div className="flex-1">
-                          <select 
+                          <CustomSelect 
+                            options={[
+                              { value: '', label: 'Habitaciones' },
+                              { value: '1', label: '1 habitación' },
+                              { value: '2', label: '2 habitaciones' },
+                              { value: '3', label: '3 habitaciones' },
+                              { value: '4', label: '4 habitaciones' },
+                              { value: '5', label: '5+ habitaciones' },
+                            ]}
                             value={selectedBedrooms}
-                            onChange={(e) => setSelectedBedrooms(e.target.value)}
-                            className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white"
-                          >
-                            <option value="">Habitaciones</option>
-                            <option value="1">1 habitación</option>
-                            <option value="2">2 habitaciones</option>
-                            <option value="3">3 habitaciones</option>
-                            <option value="4">4 habitaciones</option>
-                            <option value="5">5+ habitaciones</option>
-                          </select>
+                            onChange={setSelectedBedrooms}
+                            placeholder="Habitaciones"
+                          />
                         </div>
                       ) : activeTab !== 'projects' && selectedPropertyType === 'habitaciones' ? (
                         <div className="flex-1">
-                          <select 
+                          <CustomSelect 
+                            options={[
+                              { value: '', label: 'Baños' },
+                              { value: 'propio', label: 'Propio' },
+                              { value: 'compartido', label: 'Compartido' },
+                            ]}
                             value={selectedBathrooms}
-                            onChange={(e) => setSelectedBathrooms(e.target.value)}
-                            className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white"
-                          >
-                            <option value="">Baños</option>
-                            <option value="propio">Propio</option>
-                            <option value="compartido">Compartido</option>
-                          </select>
+                            onChange={setSelectedBathrooms}
+                            placeholder="Baños"
+                          />
                         </div>
                       ) : activeTab !== 'projects' && ['oficinas', 'terrenos', 'locales', 'lotes'].includes(selectedPropertyType) ? (
-                        <div className="flex-1">
+                        <div className="flex-1 relative">
                           <input
                             type="number"
                             placeholder="Área mínima (m²)"
                             value={selectedMinArea}
                             onChange={(e) => setSelectedMinArea(e.target.value)}
-                            className="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white"
+                            className="w-full hero-input-number px-5 py-3.5 border border-gray-200 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white transition-all hover:border-gray-300 shadow-sm"
                           />
                         </div>
                       ) : null}
@@ -390,24 +465,24 @@ export default function HomePage() {
       <section className="py-2 sm:py-3 bg-[var(--bg-primary)]">
         <div className="w-full px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
               {quickLinks.map(({ href, icon, title, description, actionText }) => (
                 <Link key={href} href={href} className="block group h-full">
-                  <div className="flex flex-col h-full bg-white rounded-xl p-6 sm:p-10 shadow-sm border border-gray-200 hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
+                  <div className="flex flex-col h-full bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-200 hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
                     <div className="flex-grow">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[var(--brand-primary-light)] rounded-xl flex items-center justify-center mb-5 group-hover:bg-[var(--brand-primary-light-hover)] transition-colors">
-                        <Icon icon={icon} className="w-6 h-6 sm:w-7 sm:h-7 text-brand" />
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[var(--brand-primary-light)] rounded-xl flex items-center justify-center mb-3 group-hover:bg-[var(--brand-primary-light-hover)] transition-colors">
+                        <Icon icon={icon} className="w-5 h-5 sm:w-6 sm:h-6 text-brand" />
                       </div>
-                      <h3 className="text-lg sm:text-xl font-bold text-foreground mb-3 group-hover:text-brand transition-colors">
+                      <h3 className="text-sm sm:text-base font-bold text-foreground mb-2 group-hover:text-brand transition-colors">
                         {title}
                       </h3>
-                      <p className="text-foreground/70 text-sm sm:text-base leading-relaxed mb-4">
+                      <p className="text-foreground/70 text-xs sm:text-sm leading-relaxed mb-3 line-clamp-2">
                         {description}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2 text-brand font-semibold text-xs sm:text-sm pt-2">
+                    <div className="flex items-center gap-1.5 text-brand font-semibold text-[11px] sm:text-xs pt-1">
                       <span>{actionText}</span>
-                      <Icon icon="material-symbols:arrow-forward-ios-rounded" className="w-3 h-3 transform group-hover:translate-x-1 transition-transform" />
+                      <Icon icon="material-symbols:arrow-forward-ios-rounded" className="w-2.5 h-2.5 transform group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
                 </Link>
@@ -418,14 +493,14 @@ export default function HomePage() {
       </section>
 
       <section className="py-2 sm:py-3 bg-background">
-        <div className="w-full max-w-[1920px] mx-auto">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16">
           <FeaturedProperties />
         </div>
       </section>
 
       {/* DEPARTAMENTOS EN ALQUILER */}
       <section className="py-2 sm:py-3 bg-background">
-        <div className="w-full max-w-[1920px] mx-auto">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16">
           <FilteredProperties 
             title="Departamentos para alquilar" 
             viewAllLink="/rent/departamentos/lima" 
@@ -436,7 +511,7 @@ export default function HomePage() {
 
       {/* CASAS EN VENTA */}
       <section className="py-2 sm:py-3 bg-background">
-        <div className="w-full max-w-[1920px] mx-auto">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16">
           <FilteredProperties 
             title="Casas disponibles para compra" 
             viewAllLink="/sale/casas/lima" 
@@ -454,7 +529,7 @@ export default function HomePage() {
 
       {/* OFICINAS Y LOCALES */}
       <section className="py-2 sm:py-3 bg-background">
-        <div className="w-full max-w-[1920px] mx-auto">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16">
           <FilteredProperties 
             title="Espacios para tu negocio" 
             viewAllLink="/sale/oficinas/lima" 
@@ -465,7 +540,7 @@ export default function HomePage() {
 
       {/* TERRENOS */}
       <section className="py-2 sm:py-3 bg-background">
-        <div className="w-full max-w-[1920px] mx-auto">
+        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16">
           <FilteredProperties 
             title="Terrenos y lotes de inversión" 
             viewAllLink="/sale/terrenos/lima" 

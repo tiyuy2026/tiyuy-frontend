@@ -90,7 +90,12 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
               <div
                 key={group.id}
                 className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
-                onClick={() => onGroupSelect(group)}
+                onClick={(e) => {
+                  if (!group.isMember) {
+                    handleJoinGroup(group.id, e);
+                  }
+                  setTimeout(() => onGroupSelect(group), 300);
+                }}
               >
                 {/* Banner del grupo */}
                 <div className="h-24 bg-gradient-to-br brand flex items-center justify-center text-4xl">
@@ -118,16 +123,10 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
                     </div>
                   </div>
 
-
-                  {/* Botón de unirse */}
-                  <button
-                    onClick={(e) => handleJoinGroup(group.id, e)}
-
-                    disabled={joinGroup.isPending}
-                    className="w-full py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {joinGroup.isPending ? 'Uniéndose...' : 'Unirse al grupo'}
-                  </button>
+                  {/* Indicador de estado */}
+                  <div className="w-full py-2 bg-brand text-white text-sm font-semibold rounded-lg text-center">
+                    {group.isMember ? 'Entrar al grupo' : joinGroup.isPending ? 'Uniéndose...' : 'Entrar'}
+                  </div>
                 </div>
               </div>
             ))}
