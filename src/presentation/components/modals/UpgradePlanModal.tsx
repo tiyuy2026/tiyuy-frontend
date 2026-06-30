@@ -159,23 +159,6 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   const hasAnyDiscountAvailable = isIntelligentDiscount || (hasAgencyRole && hasDiscountCodes) || appliedManualDiscount?.valid;
   const showDiscountField = hasAnyDiscountAvailable;
 
-  // DEBUG: Log para depurar
-  console.log('DEBUG UpgradePlanModal:', {
-    userRole,
-    isAgent,
-    availableDiscountCodes,
-    hasDiscountCodes,
-    autoDiscountCode,
-    autoDiscountPercentage,
-    discountCode,
-    isIntelligentDiscount,
-    showDiscountField,
-    userData: authStorage.getUser(),
-    availableDiscountCodesLength: availableDiscountCodes?.length || 0,
-    firstDiscountCode: availableDiscountCodes?.[0],
-    isLoading: false // Agregar esto para ver si está cargando
-  });
-
   useEffect(() => {
     const checkFreePlanUsage = async () => {
       if (isOpen) {

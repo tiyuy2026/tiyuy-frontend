@@ -162,16 +162,8 @@ export class FinanceRepository implements IFinanceRepository {
     validFrom: string;
     validUntil: string | null;
   }[]> {
-    // Usar el endpoint correcto para agentes que está configurado en la seguridad
-    console.log('🔍 DEBUG: Llamando a /admin/developers/available-discounts...');
     const response = await apiClient.get(`/admin/developers/available-discounts`);
-    console.log('🔍 DEBUG: Respuesta completa:', response);
-    console.log('🔍 DEBUG: response.data:', response.data);
-    console.log('🔍 DEBUG: response.data length:', response.data?.length || 0);
-    
-    // El endpoint devuelve una lista directamente, no un Page
     const result = response.data || [];
-    console.log('🔍 DEBUG: Resultado final:', result);
     return result;
   }
 }
