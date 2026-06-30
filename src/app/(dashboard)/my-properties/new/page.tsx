@@ -52,7 +52,7 @@ export default function NuevaPropiedadPage() {
         <div className="text-center">
           <div
             className="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent mx-auto mb-3"
-            style={{ borderColor: '#00a63e', borderTopColor: 'transparent' }}
+            style={{ borderColor: '#61BF53', borderTopColor: 'transparent' }}
           />
           <p className="text-sm text-gray-400 dark:text-gray-500">Verificando autenticación...</p>
         </div>
@@ -88,7 +88,7 @@ export default function NuevaPropiedadPage() {
             <span
               className={`text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-full ${
                 canPublish 
-                  ? 'bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400' 
+                  ? 'bg-brand/10 text-brand dark:bg-brand/20 dark:text-brand-light' 
                   : 'bg-red-50 text-red-600 dark:bg-red-950/30 dark:text-red-400'
               }`}
             >
@@ -98,8 +98,7 @@ export default function NuevaPropiedadPage() {
               <span className="sm:hidden">{canPublish ? `${remainingPublications}` : '0'}</span>
             </span>
             <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
-              style={{ backgroundColor: '#00a63e' }}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold bg-brand"
             >
               {user?.firstName?.[0] || 'U'}
             </div>
@@ -121,7 +120,7 @@ export default function NuevaPropiedadPage() {
                       className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
                       style={
                         isDone || isActive
-                          ? { backgroundColor: '#00a63e', color: '#fff' }
+                          ? { backgroundColor: '#61BF53', color: '#fff' }
                           : { backgroundColor: '#f3f4f6', color: '#9ca3af' }
                       }
                     >
@@ -130,7 +129,7 @@ export default function NuevaPropiedadPage() {
                       ) : step.number}
                     </div>
                     <p className={`text-[10px] font-medium mt-1 text-center ${
-                      isActive ? 'text-gray-900 dark:text-white' : isDone ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'
+                      isActive ? 'text-gray-900 dark:text-white' : isDone ? 'text-brand dark:text-brand-light' : 'text-gray-400 dark:text-gray-500'
                     }`}>
                       {step.title.split(' ')[0]}
                     </p>
@@ -138,7 +137,7 @@ export default function NuevaPropiedadPage() {
                   {index < STEPS.length - 1 && (
                     <div
                       className="w-8 sm:w-12 h-0.5 mx-1 rounded-full transition-all duration-300"
-                      style={{ backgroundColor: isDone ? '#00a63e' : '#e5e7eb' }}
+                      style={{ backgroundColor: isDone ? '#61BF53' : '#e5e7eb' }}
                     />
                   )}
                 </div>
@@ -170,8 +169,8 @@ export default function NuevaPropiedadPage() {
                         className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 transition-all duration-300"
                         style={
                           isDone || isActive
-                            ? { backgroundColor: '#00a63e', color: '#fff',
-                                boxShadow: isActive ? '0 0 0 4px #dcfce7' : 'none' }
+                            ? { backgroundColor: '#61BF53', color: '#fff',
+                                boxShadow: isActive ? '0 0 0 4px rgba(97, 191, 83, 0.2)' : 'none' }
                             : { backgroundColor: '#f3f4f6', color: '#9ca3af' }
                         }
                       >
@@ -182,13 +181,13 @@ export default function NuevaPropiedadPage() {
                       {index < STEPS.length - 1 && (
                         <div
                           className="w-0.5 h-10 mt-1 rounded-full transition-all duration-300"
-                          style={{ backgroundColor: isDone ? '#00a63e' : '#e5e7eb' }}
+                          style={{ backgroundColor: isDone ? '#61BF53' : '#e5e7eb' }}
                         />
                       )}
                     </div>
                     <div className="pb-10">
                       <p className={`text-sm font-semibold leading-none mt-1.5 ${
-                        isActive ? 'text-gray-900 dark:text-white' : isDone ? 'text-[#00a63e] dark:text-green-400' : 'text-gray-400 dark:text-gray-500'
+                        isActive ? 'text-gray-900 dark:text-white' : isDone ? 'text-brand dark:text-brand-light' : 'text-gray-400 dark:text-gray-500'
                       }`}>
                         {step.title}
                       </p>
@@ -215,7 +214,7 @@ export default function NuevaPropiedadPage() {
                 <a
                   key={label}
                   href={href}
-                  className="flex items-center gap-2 text-sm font-medium transition-colors hover:opacity-80 text-[#00a63e] dark:text-green-400"
+                  className="flex items-center gap-2 text-sm font-medium transition-colors hover:opacity-80 text-brand dark:text-brand-light"
                 >
                   <ChevronRight className="w-3.5 h-3.5" />
                   {label}
@@ -248,7 +247,7 @@ export default function NuevaPropiedadPage() {
                 'Soporte personalizado 24/7',
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
-                  <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#00a63e] dark:text-green-400" />
+                  <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-brand dark:text-brand-light" />
                   {item}
                 </li>
               ))}
@@ -265,7 +264,7 @@ export default function NuevaPropiedadPage() {
                 'Responde rápidamente a las consultas',
               ].map((tip) => (
                 <li key={tip} className="flex items-start gap-2">
-                  <span className="font-bold mt-0.5 text-[#00a63e] dark:text-green-400">·</span> {tip}
+                  <span className="font-bold mt-0.5 text-brand dark:text-brand-light">·</span> {tip}
                 </li>
               ))}
             </ul>

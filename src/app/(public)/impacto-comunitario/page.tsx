@@ -38,25 +38,33 @@ const IMPACT_AREAS = [
 
 export default function ImpactoComunitarioPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-br from-emerald-700 via-emerald-600 to-teal-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-          <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md text-white/90 text-xs font-semibold px-3 py-1.5 rounded-full tracking-wide uppercase mb-5">
+    <div className="min-h-screen bg-[var(--bg-secondary)] antialiased text-[var(--text-primary)] selection:bg-[var(--brand-primary)]/10">
+      <div className="bg-[var(--bg-primary)] border-b border-[var(--border-light)]">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16 py-20 sm:py-28 flex flex-col items-center justify-center text-center relative overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-gradient-to-r from-[var(--brand-primary)]/10 to-transparent blur-3xl pointer-events-none rounded-full" />
+          
+          <div className="max-w-3xl relative z-10 flex flex-col items-center">
+            <span className="inline-flex items-center gap-1.5 bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs font-bold px-3 py-1.5 rounded-full tracking-wider uppercase mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand-primary)] animate-pulse" />
               <Heart className="w-3.5 h-3.5" /> Impacto
             </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">Impacto comunitario</h1>
-            <p className="text-lg sm:text-xl text-gray-100 mt-5 leading-relaxed">Cómo Tiyuy genera un cambio positivo más allá del negocio.</p>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none text-[var(--text-primary)] text-balance">
+              Impacto <span className="text-[var(--brand-primary)] relative inline-block">comunitario<span className="absolute bottom-1 left-0 w-full h-[6px] bg-[var(--brand-primary)]/20 -skew-x-12" /></span>
+            </h1>
+            <p className="text-lg sm:text-xl text-[var(--text-secondary)] mt-6 leading-relaxed font-medium">
+              Cómo Tiyuy genera un cambio positivo más allá del negocio.
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-12 sm:space-y-16">
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16 py-12 sm:py-16 space-y-12 sm:space-y-16">
         {/* Propósito */}
-        <div className="max-w-3xl mx-auto text-center">
-          <Sparkles className="w-8 h-8 text-emerald-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Nuestro propósito</h2>
-          <p className="text-gray-600 leading-relaxed">
+        <div className="max-w-3xl mx-auto text-center relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-[var(--brand-primary)]/5 blur-3xl rounded-full" />
+          <Sparkles className="w-10 h-10 text-[var(--brand-primary)] mx-auto mb-6 relative z-10" />
+          <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-6 relative z-10">Nuestro propósito</h2>
+          <p className="text-[var(--text-secondary)] text-sm sm:text-base leading-relaxed font-medium relative z-10">
             En Tiyuy creemos que la tecnología puede hacer que encontrar un hogar sea más justo, transparente
             y accesible para todos. Trabajamos para reducir las barreras de información, conectar a las
             personas con oportunidades reales y fortalecer la confianza en el mercado inmobiliario.
@@ -66,17 +74,17 @@ export default function ImpactoComunitarioPage() {
         {/* Áreas */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {IMPACT_AREAS.map((area, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-md transition-all">
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-4">{area.icon}</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">{area.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{area.desc}</p>
+            <div key={i} className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-6 hover:border-[var(--brand-primary)]/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-300 group">
+              <div className="w-12 h-12 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center text-[var(--brand-primary)] mb-4 border border-[var(--border-light)] group-hover:bg-[var(--brand-primary)]/10 transition-colors">{area.icon}</div>
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 group-hover:text-[var(--brand-primary)] transition-colors">{area.title}</h3>
+              <p className="text-sm text-[var(--text-secondary)] font-medium leading-relaxed">{area.desc}</p>
             </div>
           ))}
         </div>
 
         {/* Iniciativas */}
-        <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Iniciativas destacadas</h2>
+        <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10">
+          <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-8">Iniciativas destacadas</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
               { title: 'Guía para alquilar en Perú', desc: 'Contenido educativo gratuito sobre SUNARP, SUNAT y protección contra estafas.' },
@@ -84,11 +92,11 @@ export default function ImpactoComunitarioPage() {
               { title: 'Tips de decoración', desc: 'Sección editorial con recomendaciones curadas para mejorar el hogar.' },
               { title: 'Política antidiscriminación', desc: 'Compromiso público con la igualdad de trato y la inclusión en la plataforma.' },
             ].map((init, i) => (
-              <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-gray-50">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+              <div key={i} className="flex items-start gap-4 p-5 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-light)] hover:border-[var(--brand-primary)]/30 transition-colors">
+                <CheckCircle2 className="w-5 h-5 text-[var(--brand-primary)] flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-semibold text-gray-900 text-sm">{init.title}</h4>
-                  <p className="text-xs text-gray-500 mt-0.5">{init.desc}</p>
+                  <h4 className="font-bold text-[var(--text-primary)] text-sm mb-1">{init.title}</h4>
+                  <p className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed">{init.desc}</p>
                 </div>
               </div>
             ))}
@@ -96,13 +104,18 @@ export default function ImpactoComunitarioPage() {
         </div>
 
         {/* CTA */}
-        <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-8 text-center text-white">
-          <Home className="w-10 h-10 mx-auto mb-4 opacity-80" />
-          <h2 className="text-2xl font-bold mb-3">Construyendo un mercado más justo</h2>
-          <p className="text-emerald-100 text-sm max-w-lg mx-auto mb-6">
-            El impacto no se mide solo en transacciones, sino en cuántas personas encuentran un hogar
-            de forma más segura, informada y digna.
-          </p>
+        <div className="bg-[var(--bg-card)] rounded-3xl p-8 sm:p-12 text-center border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden mt-12">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--brand-primary)]/5 blur-3xl rounded-full" />
+          <div className="relative z-10">
+            <div className="w-16 h-16 bg-[var(--brand-primary)]/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Home className="w-8 h-8 text-[var(--brand-primary)]" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-4">Construyendo un mercado más justo</h2>
+            <p className="text-[var(--text-secondary)] text-sm sm:text-base font-medium max-w-lg mx-auto mb-2 leading-relaxed">
+              El impacto no se mide solo en transacciones, sino en cuántas personas encuentran un hogar
+              de forma más segura, informada y digna.
+            </p>
+          </div>
         </div>
       </div>
     </div>

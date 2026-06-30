@@ -32,45 +32,63 @@ const NEWS = [
 
 export default function NoticiasPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-br from-gray-900 via-slate-800 to-blue-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-          <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md text-white/90 text-xs font-semibold px-3 py-1.5 rounded-full tracking-wide uppercase mb-5">
+    <div className="min-h-screen bg-[var(--bg-secondary)] antialiased text-[var(--text-primary)] selection:bg-[var(--brand-primary)]/10">
+      <div className="bg-[var(--bg-primary)] border-b border-[var(--border-light)]">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16 py-20 sm:py-28 flex flex-col items-center justify-center text-center relative overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-gradient-to-r from-[var(--brand-primary)]/10 to-transparent blur-3xl pointer-events-none rounded-full" />
+          
+          <div className="max-w-3xl relative z-10 flex flex-col items-center">
+            <span className="inline-flex items-center gap-1.5 bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] text-xs font-bold px-3 py-1.5 rounded-full tracking-wider uppercase mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand-primary)] animate-pulse" />
               <Newspaper className="w-3.5 h-3.5" /> Sala de prensa
             </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">Noticias y comunicados</h1>
-            <p className="text-lg sm:text-xl text-gray-300 mt-5 leading-relaxed">Entérate de los últimos anuncios, lanzamientos y novedades de Tiyuy.</p>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none text-[var(--text-primary)] text-balance">
+              Noticias y <span className="text-[var(--brand-primary)] relative inline-block">comunicados<span className="absolute bottom-1 left-0 w-full h-[6px] bg-[var(--brand-primary)]/20 -skew-x-12" /></span>
+            </h1>
+            <p className="text-lg sm:text-xl text-[var(--text-secondary)] mt-6 leading-relaxed font-medium">
+              Entérate de los últimos anuncios, lanzamientos y novedades de Tiyuy.
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 space-y-6">
-        {NEWS.map((item, i) => (
-          <div key={i} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-md transition-all">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{item.date}</span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">{item.tag}</span>
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16 py-12 sm:py-16">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {NEWS.map((item, i) => (
+            <div key={i} className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-light)] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-[var(--brand-primary)]/30 transition-all duration-300 group cursor-pointer">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">{item.date}</span>
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-md bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] uppercase tracking-wider">
+                      {item.tag}
+                    </span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-2 group-hover:text-[var(--brand-primary)] transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm sm:text-base text-[var(--text-secondary)] font-medium leading-relaxed">
+                    {item.desc}
+                  </p>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">{item.title}</h3>
-                <p className="text-sm text-gray-500">{item.desc}</p>
+                <div className="w-10 h-10 rounded-full bg-[var(--bg-secondary)] flex items-center justify-center border border-[var(--border-light)] group-hover:bg-[var(--brand-primary)]/10 group-hover:border-[var(--brand-primary)]/30 transition-colors mt-2 shrink-0">
+                  <ArrowRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--brand-primary)] transition-colors" />
+                </div>
               </div>
-              <ArrowRight className="w-5 h-5 text-gray-300 flex-shrink-0 mt-1" />
             </div>
-          </div>
-        ))}
+          ))}
 
-        <div className="bg-gradient-to-br from-blue-600 to-teal-700 rounded-3xl p-8 text-center text-white mt-8">
-          <h2 className="text-xl font-bold mb-3">Contacto para medios</h2>
-          <p className="text-blue-100 text-sm max-w-lg mx-auto mb-4">
-            Si eres periodista o medio de comunicación y deseas más información sobre Tiyuy, escríbenos.
-          </p>
-          <a href="mailto:tiyuy@saberoconsulting.com"
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-blue-700 font-semibold rounded-xl hover:bg-blue-50 transition-all">
-            tiyuy@saberoconsulting.com <ArrowRight className="w-4 h-4" />
-          </a>
+          <div className="bg-[var(--bg-card)] rounded-3xl p-8 sm:p-12 text-center border border-[var(--border-light)] shadow-sm mt-12 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--brand-primary)]/5 blur-3xl rounded-full" />
+            <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-3 relative z-10">Contacto para medios</h2>
+            <p className="text-[var(--text-secondary)] text-sm sm:text-base font-medium max-w-lg mx-auto mb-6 relative z-10">
+              Si eres periodista o medio de comunicación y deseas más información sobre Tiyuy, escríbenos.
+            </p>
+            <a href="mailto:tiyuy@saberoconsulting.com"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--brand-primary)] text-[var(--bg-primary)] font-bold rounded-xl hover:opacity-90 transition-opacity shadow-sm relative z-10">
+              tiyuy@saberoconsulting.com <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
         </div>
       </div>
     </div>
