@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Building2, Search, MapPin, Users, ChevronLeft, ChevronRight, ArrowRight, Home, FolderGit } from 'lucide-react';
+import { Building2, Search, MapPin, Users, ChevronLeft, ChevronRight, ArrowRight, Home, FolderGit, Shield, Sparkles, CheckCircle, ChevronDown } from 'lucide-react';
 import { publicApiClient } from '@/infrastructure/api/axios-client';
 
 interface PublicAgency {
@@ -25,17 +25,25 @@ interface PageResponse {
   size: number;
 }
 
+const FEATURES = [
+  { icon: <Shield className="w-5 h-5" />, title: 'Roommates seguros', desc: 'Verificación completa' },
+  { icon: <FolderGit className="w-5 h-5" />, title: 'Lotes transparentes', desc: 'Información clara' },
+  { icon: <Users className="w-5 h-5" />, title: 'Dueños sin barreras', desc: 'Acceso universal' },
+  { icon: <Sparkles className="w-5 h-5" />, title: 'Soporte Directo', desc: 'Trato preferencial' },
+];
+
 export default function AgenciesPage() {
   const [data, setData] = useState<PageResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [city, setCity] = useState('');
   const [page, setPage] = useState(0);
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
 
   const fetchAgencies = async () => {
     setLoading(true);
     try {
-      const params: Record<string, any> = { page, size: 10 };
+      const params: Record<string, any> = { page, size: 9 };
       if (search) params.q = search;
       if (city) params.city = city;
       const res = await publicApiClient.get<PageResponse>('/public/agencies', { params });
@@ -53,110 +61,205 @@ export default function AgenciesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero with SEO */}
-      <div className="bg-gradient-to-br from-gray-900 via-slate-800 to-teal-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md text-white/90 text-xs font-semibold px-3 py-1.5 rounded-full tracking-wide uppercase mb-4">
-              <Building2 className="w-3.5 h-3.5" /> Directorio
-            </span>
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight">Inmobiliarias en Perú</h1>
-            <p className="text-lg text-gray-300 mt-4 leading-relaxed">Directorio de empresas inmobiliarias, constructoras y desarrolladores registrados en Tiyuy. Explora sus proyectos, propiedades y descubre quiénes operan en tu ciudad.</p>
+    <div className="min-h-screen bg-[#FAFAF8]">
+      {/* ===== HERO PREMIUM ===== */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#3f9800] via-[#3f9800] to-[#2d6e00]">
+        {/* Imagen de fondo */}
+        <div className="absolute inset-0 z-0" style={{
+          backgroundImage: `url('https://edifica.com.pe/blog/wp-content/uploads/departamento-jovenes.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.12,
+        }} />
+
+        {/* Curva decorativa inferior */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#FAFAF8] to-transparent" />
+
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 pt-24 pb-32 lg:pb-36">
+            {/* Columna izquierda - Texto */}
+            <div className="space-y-8">
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/80 text-[11px] font-semibold px-3.5 py-1.5 rounded-full tracking-[0.15em] uppercase border border-white/10">
+                <Sparkles className="w-3 h-3" />
+                Directorio
+              </div>
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05] tracking-tight">
+                Inmobiliarias<br />
+                <span className="text-white/70">en Perú</span>
+              </h1>
+              <p className="text-lg text-white/60 leading-relaxed max-w-lg">
+                Empresas, constructoras y desarrolladores registrados en Tiyuy. Explora sus proyectos y propiedades en todo el Perú.
+              </p>
+            </div>
+
+            {/* Columna derecha - Tarjetas flotantes */}
+            <div className="hidden lg:grid grid-cols-2 gap-4 items-center">
+              {FEATURES.map((f, i) => (
+                <div key={i}
+                  className="group bg-white/95 backdrop-blur-md rounded-2xl p-5 border border-[#82db3e]/20 hover:border-[#82db3e]/40 shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_12px_40px_rgba(130,219,62,0.08)] transition-all duration-300 hover:-translate-y-0.5"
+                  style={{
+                    marginTop: i % 2 === 1 ? '24px' : '0',
+                  }}>
+                  <div className="w-10 h-10 rounded-xl bg-[#82db3e]/10 flex items-center justify-center text-[#82db3e] mb-3 group-hover:bg-[#82db3e] group-hover:text-white transition-all duration-300">
+                    {f.icon}
+                  </div>
+                  <h3 className="font-semibold text-[#1A1A1A] text-sm mb-0.5">{f.title}</h3>
+                  <p className="text-xs text-[#8A8A8A]">{f.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search */}
-        <form onSubmit={handleSearch} className="bg-white rounded-2xl border border-gray-100 p-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Buscar por nombre..." className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none" />
-            </div>
-            <select value={city} onChange={e => { setCity(e.target.value); setPage(0); }}
-              className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500 bg-white min-w-[140px]">
-              <option value="">Todas las ciudades</option>
-              <option value="Lima">Lima</option>
-              <option value="Arequipa">Arequipa</option>
-              <option value="Cusco">Cusco</option>
-              <option value="Trujillo">Trujillo</option>
-              <option value="Piura">Piura</option>
-              <option value="Ica">Ica</option>
-              <option value="Lambayeque">Lambayeque</option>
-              <option value="La Libertad">La Libertad</option>
-            </select>
-            <button type="submit" className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-xl transition-all">
-              Buscar
-            </button>
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 -mt-14 relative z-20">
+        {/* ===== BUSCADOR PREMIUM ===== */}
+        <form onSubmit={handleSearch}
+          className="bg-white rounded-2xl border border-[#E8E8E6] shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-2 flex items-center gap-2">
+          <div className="flex-1 flex items-center gap-2 pl-4">
+            <Search className="w-5 h-5 text-[#A0A0A0] flex-shrink-0" />
+            <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar por nombre..."
+              className="w-full py-3 text-sm outline-none bg-transparent text-[#1A1A1A] placeholder:text-[#B0B0B0]" />
           </div>
+          <div className="relative min-w-[160px]">
+            <button type="button" onClick={() => setShowCityDropdown(!showCityDropdown)}
+              className="w-full flex items-center justify-between px-4 py-3 text-sm bg-[#FAFAF8] border border-[#E8E8E6] rounded-xl text-[#5A5A5A] hover:border-[#c4beb6] focus:border-[#64cc39] focus:ring-1 focus:ring-[#64cc39]/30 transition-all duration-200">
+              <span className={city ? 'text-[#5A5A5A]' : 'text-[#B0B0B0]'}>{city || 'Todas las ciudades'}</span>
+              <ChevronDown className={`w-4 h-4 text-[#8A8A8A] transition-transform duration-200 ${showCityDropdown ? 'rotate-180' : ''}`} />
+            </button>
+            {showCityDropdown && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowCityDropdown(false)} />
+                <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-[#E8E8E6] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] z-20 overflow-hidden">
+                  {[{v:'',l:'Todas las ciudades'},{v:'Lima',l:'Lima'},{v:'Arequipa',l:'Arequipa'},{v:'Cusco',l:'Cusco'},{v:'Trujillo',l:'Trujillo'},{v:'Piura',l:'Piura'},{v:'Ica',l:'Ica'}].map(opt => (
+                    <button key={opt.v} type="button" onClick={() => { setCity(opt.v); setPage(0); setShowCityDropdown(false); }}
+                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-[#FAFAF8] ${city === opt.v ? 'bg-[#F0F7F3] text-[#1F5A3B] font-semibold' : 'text-[#5A5A5A]'}`}>
+                      {opt.l}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+          <button type="submit"
+            className="px-6 py-3 bg-[#1F5A3B] hover:bg-[#163F2B] text-white text-sm font-semibold rounded-xl transition-all duration-300 shadow-[0_4px_12px_rgba(31,90,59,0.2)] hover:shadow-[0_6px_20px_rgba(31,90,59,0.3)]">
+            Buscar
+          </button>
         </form>
 
-        {/* Results */}
-        {loading ? (
-          <div className="text-center py-12"><div className="w-8 h-8 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto" /></div>
-        ) : !data || data.content.length === 0 ? (
-          <div className="text-center py-12">
-            <Building2 className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-            <p className="text-sm font-medium text-gray-400">{search || city ? 'No se encontraron inmobiliarias' : 'No hay inmobiliarias registradas'}</p>
-            <p className="text-xs text-gray-300 mt-1">{search || city ? 'Intenta con otros términos' : 'Aún no hay inmobiliarias disponibles'}</p>
-          </div>
-        ) : (
-          <>
-            <div className="text-sm text-gray-500 mb-4">{data.totalElements} inmobiliarias encontradas</div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {data.content.map((agency) => (
-                <Link key={agency.id} href={`/agencies/${agency.slug}`}
-                  className="bg-white rounded-2xl border border-gray-100 p-5 hover:shadow-md hover:border-gray-200 transition-all group">
-                  <div className="flex items-start gap-4 mb-3">
-                    {agency.logoUrl ? (
-                      <img src={agency.logoUrl} alt={agency.name} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
-                    ) : (
-                      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-400 flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
-                        {agency.name?.[0] || 'I'}
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 truncate group-hover:text-teal-600 transition-colors">{agency.name}</h3>
-                      {agency.city && <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5"><MapPin className="w-3 h-3" />{agency.city}</p>}
-                    </div>
-                  </div>
-                  {agency.shortDescription && <p className="text-sm text-gray-500 line-clamp-2 mb-3">{agency.shortDescription}</p>}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 text-xs text-gray-400">
-                      {agency.activeProjectsCount > 0 && <span className="flex items-center gap-1"><FolderGit className="w-3 h-3" />{agency.activeProjectsCount} proy.</span>}
-                      {agency.activePropertiesCount > 0 && <span className="flex items-center gap-1"><Home className="w-3 h-3" />{agency.activePropertiesCount} prop.</span>}
-                      <span className="flex items-center gap-1"><Users className="w-3 h-3" />{agency.agentsCount} agentes</span>
-                    </div>
-                    <span className="text-xs font-semibold text-teal-600 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                      Ver perfil <ArrowRight className="w-3 h-3" />
-                    </span>
-                  </div>
-                </Link>
-              ))}
+        {/* ===== RESULTADOS ===== */}
+        <div className="mt-12 lg:mt-16">
+          {loading ? (
+            <div className="flex items-center justify-center py-24">
+              <div className="w-8 h-8 border-2 border-[#1F5A3B] border-t-transparent rounded-full animate-spin" />
             </div>
-
-            {/* Pagination */}
-            {data.totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-8">
-                <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-                  className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                {Array.from({ length: data.totalPages }, (_, i) => i).slice(Math.max(0, page - 2), Math.min(data.totalPages, page + 3)).map(i => (
-                  <button key={i} onClick={() => setPage(i)}
-                    className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${page === i ? 'bg-teal-600 text-white' : 'border border-gray-200 text-gray-600 hover:bg-gray-50'}`}>{i + 1}</button>
-                ))}
-                <button onClick={() => setPage(p => Math.min(data.totalPages - 1, p + 1))} disabled={page >= data.totalPages - 1}
-                  className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+          ) : !data || data.content.length === 0 ? (
+            <div className="text-center py-24">
+              <Building2 className="w-14 h-14 text-[#E0E0DE] mx-auto mb-4" />
+              <p className="text-base font-medium text-[#8A8A8A]">{search || city ? 'No se encontraron inmobiliarias' : 'No hay inmobiliarias registradas'}</p>
+              <p className="text-sm text-[#B0B0B0] mt-1">{search || city ? 'Intenta con otros términos' : 'Aún no hay inmobiliarias disponibles'}</p>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between mb-8">
+                <p className="text-sm text-[#8A8A8A]">{data.totalElements} inmobiliarias encontradas</p>
               </div>
-            )}
-          </>
-        )}
+
+              {/* ===== CARDS 3 por fila ===== */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {data.content.map((agency) => (
+                  <Link key={agency.id} href={`/agencies/${agency.slug}`}
+                    className="group bg-white rounded-2xl border-2 border-[#E8E8E6] p-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(100,204,57,0.08)] hover:border-[#64cc39] hover:-translate-y-0.5 transition-all duration-300 flex flex-col">
+
+                    {/* Logo + Nombre + Verificado */}
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-14 h-14 rounded-xl bg-[#F0F7F3] flex items-center justify-center text-[#1F5A3B] font-bold text-xl flex-shrink-0 border border-[#E8F0EB] overflow-hidden">
+                        {agency.logoUrl ? (
+                          <img src={agency.logoUrl} alt={agency.name} className="w-full h-full object-cover" />
+                        ) : (
+                          agency.name?.[0] || 'I'
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-[#1A1A1A] text-[15px] leading-tight truncate group-hover:text-[#1F5A3B] transition-colors">
+                            {agency.name}
+                          </h3>
+                          <CheckCircle className="w-4 h-4 text-[#1F5A3B] flex-shrink-0" />
+                        </div>
+                        {agency.city && (
+                          <p className="text-sm text-[#8A8A8A] flex items-center gap-1 mt-0.5">
+                            <MapPin className="w-3.5 h-3.5" />{agency.city}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Descripción */}
+                    {agency.shortDescription && (
+                      <p className="text-sm text-[#6A6A6A] leading-relaxed line-clamp-2 mb-5 flex-1">
+                        {agency.shortDescription}
+                      </p>
+                    )}
+
+                    {!agency.shortDescription && <div className="flex-1" />}
+
+                    {/* Métricas */}
+                    <div className="flex items-center gap-4 text-sm text-[#6A6A6A] border-t border-[#F0F0EE] pt-4">
+                      {agency.activeProjectsCount > 0 && (
+                        <span className="flex items-center gap-1.5">
+                          <FolderGit className="w-4 h-4 text-[#1F5A3B]/50" />
+                          <span className="font-medium">{agency.activeProjectsCount}</span> proy.
+                        </span>
+                      )}
+                      {agency.activePropertiesCount > 0 && (
+                        <span className="flex items-center gap-1.5">
+                          <Home className="w-4 h-4 text-[#1F5A3B]/50" />
+                          <span className="font-medium">{agency.activePropertiesCount}</span> prop.
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1.5">
+                        <Users className="w-4 h-4 text-[#1F5A3B]/50" />
+                        <span className="font-medium">{agency.agentsCount}</span>
+                      </span>
+                      <span className="ml-auto text-xs font-medium text-[#1F5A3B] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                        Ver <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              {/* ===== PAGINACIÓN ===== */}
+              {data.totalPages > 1 && (
+                <div className="flex items-center justify-center gap-2 mt-12 pb-8">
+                  <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
+                    className="w-10 h-10 flex items-center justify-center rounded-xl border border-[#E8E8E6] hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                    <ChevronLeft className="w-4 h-4 text-[#5A5A5A]" />
+                  </button>
+                  {Array.from({ length: data.totalPages }, (_, i) => i + 1)
+                    .filter(i => i === 1 || i === data.totalPages || Math.abs(i - (page + 1)) <= 1)
+                    .map((i, idx, arr) => (
+                      <span key={i}>
+                        {idx > 0 && arr[idx - 1] !== i - 1 && <span className="text-[#B0B0B0] px-1">...</span>}
+                        <button onClick={() => setPage(i - 1)}
+                          className={`w-10 h-10 rounded-xl text-sm font-medium transition-all ${
+                            page === i - 1
+                              ? 'bg-[#1F5A3B] text-white shadow-[0_4px_12px_rgba(31,90,59,0.2)]'
+                              : 'border border-[#E8E8E6] text-[#5A5A5A] hover:bg-white'
+                          }`}>{i}</button>
+                      </span>
+                    ))}
+                  <button onClick={() => setPage(p => Math.min(data.totalPages - 1, p + 1))} disabled={page >= data.totalPages - 1}
+                    className="w-10 h-10 flex items-center justify-center rounded-xl border border-[#E8E8E6] hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                    <ChevronRight className="w-4 h-4 text-[#5A5A5A]" />
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
