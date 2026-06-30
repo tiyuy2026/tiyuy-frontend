@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useChannels } from '@/presentation/hooks/useChannels';
 import { InfoDialog } from '@/presentation/components/ui';
-import { ArrowLeft, Plus, Search, Users } from 'lucide-react';;
+import { ArrowLeft, Plus, Search, Users } from 'lucide-react';
+import { EntityIcon } from '@/utils/entityIcons';
 
 function CanalesListPanel({ 
   user, 
@@ -42,17 +43,6 @@ function CanalesListPanel({
   // Verificar si el usuario ya es admin de un canal
   const hasChannel = misCanalesCreados.length > 0;
 
-  const getChannelEmoji = (city: string) => {
-    const cityEmojis: Record<string, string> = {
-      'Lima': '️',
-      'Arequipa': '',
-      'Trujillo': '',
-      'Piura': '️',
-      'Chiclayo': '',
-      'Cusco': '️',
-    };
-    return cityEmojis[city] || '️';
-  };
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-900">
@@ -140,7 +130,9 @@ function CanalesListPanel({
                 onClick={() => onChannelSelect(channel)}
                 className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
-                <span className="text-lg">{getChannelEmoji(channel.city)}</span>
+                <div className="w-9 h-9 rounded-lg bg-brand flex items-center justify-center flex-shrink-0">
+                  <EntityIcon name={channel.name} className="w-5 h-5 text-white" />
+                </div>
                 <div className="flex-1 text-left">
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{channel.name}</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500">{channel.subscriberCount} suscriptores</p>
@@ -164,7 +156,9 @@ function CanalesListPanel({
                 onClick={() => onChannelSelect(channel)}
                 className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
-                <span className="text-lg">{getChannelEmoji(channel.city)}</span>
+                <div className="w-9 h-9 rounded-lg bg-brand flex items-center justify-center flex-shrink-0">
+                  <EntityIcon name={channel.name} className="w-5 h-5 text-white" />
+                </div>
                 <div className="flex-1 text-left">
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{channel.name}</p>
                   <p className="text-xs text-gray-400 dark:text-gray-500">{channel.subscriberCount} suscriptores</p>

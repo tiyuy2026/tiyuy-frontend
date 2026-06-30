@@ -3,22 +3,13 @@
 import { useState } from 'react';
 import { useLeaveGroup, useGetGroups } from '@/presentation/hooks/useContacts';
 import { ShareModal } from "@/app/mensajes/page";
-
+import { EntityIcon } from '@/utils/entityIcons';
 
 export function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGroupSelect: (g: any) => void }) {
     const { data: groups, isLoading } = useGetGroups(0, 50);
     const leaveGroup = useLeaveGroup();
     const [shareTarget, setShareTarget] = useState<{ title: string; link: string } | null>(null);
     const misGrupos = groups?.filter((g: any) => g.isMember) ?? [];
-
-    const getGroupEmoji = (name: string) => {
-        if (name.includes('Alquiler')) return '';
-        if (name.includes('Venta')) return '';
-        if (name.includes('Terreno') || name.includes('Lote')) return '';
-        if (name.includes('Inversion')) return '';
-        if (name.includes('Lima')) return '️';
-        return '️';
-    };
 
     return (
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900">
@@ -55,12 +46,12 @@ export function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGrou
                     >
                         {/* Banner del grupo */}
                         <div
-                            className="h-28 bg-brand flex items-center justify-center text-5xl"
+                            className="h-28 bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center"
                             onClick={() => {
                                 onGroupSelect(group);
                             }}
                         >
-                            {getGroupEmoji(group.name)}
+                            <EntityIcon name={group.name} className="w-14 h-14 text-white/90" />
                         </div>
 
                         {/* Info */}

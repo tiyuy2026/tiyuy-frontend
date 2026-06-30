@@ -91,8 +91,8 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
                 }}
               >
                 {/* Banner del grupo */}
-                <div className="h-24 bg-gradient-to-br brand flex items-center justify-center text-4xl">
-                  <EntityIcon name={group.name} className="w-10 h-10 text-white" />
+                <div className="h-24 bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center">
+                  <EntityIcon name={group.name} className="w-12 h-12 text-white/90" />
                 </div>
 
                 {/* Contenido */}

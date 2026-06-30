@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useGetChannels } from '@/presentation/hooks/useContacts';
 import { formatCompactNumber } from '@/utils/formatters';
-import { MapPin, Search, Users, X } from 'lucide-react';;
+import { MapPin, Search, Users, X } from 'lucide-react';
+import { EntityIcon } from '@/utils/entityIcons';
 
 interface MisCanalesSuscritosViewProps {
   user: any;
@@ -25,17 +26,6 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
     channel.city?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const getChannelEmoji = (city: string) => {
-    const cityEmojis: Record<string, string> = {
-      'Lima': '️',
-      'Arequipa': '',
-      'Trujillo': '',
-      'Piura': '️',
-      'Chiclayo': '',
-      'Cusco': '️',
-    };
-    return cityEmojis[city] || '️';
-  };
 
   if (isLoading) {
     return (
@@ -132,10 +122,10 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
             onClick={() => onChannelSelect(channel)}
           >
             {/* Header del canal */}
-            <div className="h-20 bg-gradient-to-r from-teal-500 to-blue-400 relative">
+            <div className="h-20 bg-gradient-to-r from-brand to-brand-dark relative">
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 bg-[var(--bg-card)]/90 rounded-full flex items-center justify-center text-2xl">
-                  {getChannelEmoji(channel.city)}
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <EntityIcon name={channel.name} className="w-7 h-7 text-white" />
                 </div>
               </div>
               <div className="absolute top-2 right-2">

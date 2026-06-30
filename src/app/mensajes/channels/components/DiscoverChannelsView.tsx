@@ -94,8 +94,8 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                 }}
               >
                 {/* Banner del canal */}
-                <div className="h-24 bg-gradient-to-br brand flex items-center justify-center text-4xl">
-                  <EntityIcon name={channel.name} className="w-10 h-10 text-white" />
+                <div className="h-24 bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center">
+                  <EntityIcon name={channel.name} className="w-14 h-14 text-white/90" />
                 </div>
 
                 {/* Contenido */}
