@@ -1,6 +1,3 @@
-// COMPONENTES DE CANALES - Arquitectura Hexagonal
-// Este archivo pertenece al modulo de CANALES (Presentation Layer - Componentes UI)
-
 'use client';
 
 import React from 'react';

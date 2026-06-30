@@ -131,199 +131,212 @@ export default function CancelacionPage() {
 
   if (showSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-3xl shadow-sm border border-gray-200 p-12 text-center">
-          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-            <CheckCircle2 className="w-10 h-10 text-green-600" />
+      <div className="min-h-screen bg-[var(--bg-secondary)] antialiased flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-[var(--bg-card)] rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-[var(--border-light)] p-12 text-center">
+          <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center mx-auto mb-6 border border-green-200 dark:border-green-900/30">
+            <CheckCircle2 className="w-10 h-10 text-green-600 dark:text-green-500" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">Solicitud enviada</h2>
-          <p className="text-gray-600 mb-8">Hemos recibido tu solicitud. Nuestro equipo la revisará y te contactará a la brevedad.</p>
+          <h2 className="text-2xl font-black text-[var(--text-primary)] mb-3">Solicitud enviada</h2>
+          <p className="text-[var(--text-secondary)] font-medium mb-8">Hemos recibido tu solicitud. Nuestro equipo la revisará y te contactará a la brevedad.</p>
           <button onClick={() => setShowSuccess(false)}
-            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-all">Volver</button>
+            className="px-6 py-3 bg-[var(--brand-primary)] hover:opacity-90 text-[var(--bg-primary)] rounded-xl font-bold transition-all shadow-sm">Volver</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-[var(--bg-secondary)] antialiased text-[var(--text-primary)] selection:bg-[var(--brand-primary)]/10">
       {/* Hero */}
-      <div className="bg-gradient-to-r from-indigo-700 via-indigo-600 to-blue-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
-              <CreditCard className="w-7 h-7 text-white" />
+      <div className="bg-[var(--bg-primary)] border-b border-[var(--border-light)]">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16 py-16 sm:py-24 relative overflow-hidden">
+          <div className="absolute top-0 right-1/4 w-[600px] h-[300px] bg-gradient-to-r from-[var(--brand-primary)]/10 to-transparent blur-3xl pointer-events-none rounded-full" />
+          <div className="flex flex-col md:flex-row md:items-center gap-6 relative z-10 max-w-4xl">
+            <div className="w-16 h-16 rounded-2xl bg-[var(--brand-primary)]/10 flex items-center justify-center shrink-0 border border-[var(--border-light)]">
+              <CreditCard className="w-8 h-8 text-[var(--brand-primary)]" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold">Cancelaciones y facturación</h1>
-              <p className="text-white/80 mt-1">Planes, publicaciones, destacados y renovaciones</p>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-none text-[var(--text-primary)] text-balance">
+                Cancelaciones y <span className="text-[var(--brand-primary)]">facturación</span>
+              </h1>
+              <p className="text-[var(--text-secondary)] mt-3 leading-relaxed font-medium text-lg sm:text-xl">
+                Planes, publicaciones, destacados y renovaciones
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Política resumen */}
-        <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-8">
-          <div className="max-w-3xl">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Política de cancelación</h2>
-            <p className="text-gray-600 leading-relaxed">
-              En Tiyuy puedes cancelar tu plan, desactivar publicaciones o detener renovaciones en cualquier
-              momento, sin multas ni períodos forzosos. La cancelación se hace efectiva al final del ciclo
-              de facturación actual, y mantienes acceso a los beneficios hasta esa fecha.
-            </p>
-          </div>
-        </div>
-
-        {/* Reglas */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {RULES.map((r, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-5">
-              <div className="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 mb-3">{r.icon}</div>
-              <h4 className="font-semibold text-gray-900 text-sm">{r.title}</h4>
-              <p className="text-xs text-gray-500 mt-1 leading-relaxed">{r.desc}</p>
+      <div className="max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16 py-12 space-y-8">
+        <div className="max-w-6xl mx-auto space-y-8">
+          {/* Política resumen */}
+          <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10">
+            <div className="max-w-4xl">
+              <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-4">Política de cancelación</h2>
+              <p className="text-[var(--text-secondary)] leading-relaxed font-medium">
+                En Tiyuy puedes cancelar tu plan, desactivar publicaciones o detener renovaciones en cualquier
+                momento, sin multas ni períodos forzosos. La cancelación se hace efectiva al final del ciclo
+                de facturación actual, y mantienes acceso a los beneficios hasta esa fecha.
+              </p>
             </div>
-          ))}
-        </div>
-
-        {/* Escenarios */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {CANCEL_SCENARIOS.map((s, i) => (
-            <div key={i} className={`${s.color} rounded-2xl p-6`}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-white/80 flex items-center justify-center">{s.icon}</div>
-                <h3 className="font-semibold text-gray-900">{s.title}</h3>
-              </div>
-              <p className="text-sm text-gray-700 leading-relaxed mb-4">{s.desc}</p>
-              <Link href={s.href}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-700 hover:text-indigo-800 transition-colors">
-                {s.action} <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          ))}
-        </div>
-
-        {/* FAQ */}
-        <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-8">
-          <div className="flex items-center gap-2 mb-6">
-            <HelpCircle className="w-5 h-5 text-indigo-600" />
-            <h2 className="text-xl font-bold text-gray-900">Preguntas frecuentes</h2>
           </div>
-          <div className="space-y-3">
-            {FAQS.map((faq, i) => (
-              <div key={i} className="border border-gray-200 rounded-xl overflow-hidden hover:border-gray-300 transition-all">
-                <button onClick={() => toggleFaq(i)}
-                  className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors">
-                  <span className="font-medium text-gray-900 text-sm pr-4">{faq.q}</span>
-                  {expandedFaq === i ? <ChevronUp className="w-4 h-4 text-indigo-600 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />}
-                </button>
-                {expandedFaq === i && (
-                  <div className="px-4 pb-4 border-t border-gray-100 pt-3">
-                    <p className="text-sm text-gray-600 leading-relaxed">{faq.a}</p>
-                  </div>
-                )}
+
+          {/* Reglas */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {RULES.map((r, i) => (
+              <div key={i} className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+                <div className="w-12 h-12 rounded-xl bg-[var(--brand-primary)]/10 flex items-center justify-center text-[var(--brand-primary)] mb-4 border border-[var(--border-light)]">{r.icon}</div>
+                <h4 className="font-bold text-[var(--text-primary)] text-base mb-2">{r.title}</h4>
+                <p className="text-sm text-[var(--text-secondary)] font-medium leading-relaxed">{r.desc}</p>
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Formulario de billing */}
-        <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-8">
-          <div className="flex items-center gap-2 mb-4">
-            <FileText className="w-5 h-5 text-indigo-600" />
-            <h2 className="text-xl font-bold text-gray-900">Reportar problema de facturación</h2>
+          {/* Escenarios */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {CANCEL_SCENARIOS.map((s, i) => (
+              <div key={i} className="bg-[var(--bg-secondary)] border border-[var(--border-light)] rounded-3xl p-8 hover:border-[var(--brand-primary)]/30 transition-colors">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-light)] flex items-center justify-center shadow-sm text-[var(--brand-primary)]">{s.icon}</div>
+                  <h3 className="text-lg font-black text-[var(--text-primary)]">{s.title}</h3>
+                </div>
+                <p className="text-sm text-[var(--text-secondary)] font-medium leading-relaxed mb-6">{s.desc}</p>
+                <Link href={s.href}
+                  className="inline-flex items-center gap-2 text-sm font-bold text-[var(--brand-primary)] hover:opacity-80 transition-colors bg-[var(--brand-primary)]/10 px-4 py-2 rounded-lg">
+                  {s.action} <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            ))}
           </div>
-          <p className="text-sm text-gray-500 mb-6">Si tienes un cargo incorrecto, duplicado o no reconocido, repórtalo aquí.</p>
 
-          {!showForm ? (
-            <button onClick={() => setShowForm(true)}
-              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-all">
-              Reportar problema de cobro
-            </button>
-          ) : (
-            <div className="space-y-5 max-w-2xl">
-              {!isAuthenticated && (
-                <>
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                    <p className="text-sm text-amber-800">Proporciona tus datos para que podamos revisar tu caso.</p>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Nombre <span className="text-gray-400">(opcional)</span></label>
-                      <input type="text" value={guestName} onChange={e => setGuestName(e.target.value)} placeholder="Tu nombre"
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <div className="lg:col-span-3">
+              {/* FAQ */}
+              <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10">
+                <div className="flex items-center gap-2 mb-6">
+                  <HelpCircle className="w-6 h-6 text-[var(--brand-primary)]" />
+                  <h2 className="text-2xl font-black text-[var(--text-primary)]">Preguntas frecuentes</h2>
+                </div>
+                <div className="space-y-4">
+                  {FAQS.map((faq, i) => (
+                    <div key={i} className="border border-[var(--border-light)] rounded-2xl overflow-hidden hover:border-[var(--brand-primary)]/30 transition-all bg-[var(--bg-card)]">
+                      <button onClick={() => toggleFaq(i)}
+                        className="w-full flex items-center justify-between p-5 text-left hover:bg-[var(--bg-secondary)] transition-colors">
+                        <span className="font-bold text-[var(--text-primary)] text-sm pr-4">{faq.q}</span>
+                        {expandedFaq === i ? <ChevronUp className="w-5 h-5 text-[var(--brand-primary)] flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-[var(--text-muted)] flex-shrink-0" />}
+                      </button>
+                      {expandedFaq === i && (
+                        <div className="px-5 pb-5 border-t border-[var(--border-light)] pt-4 bg-[var(--bg-secondary)]">
+                          <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">{faq.a}</p>
+                        </div>
+                      )}
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono <span className="text-gray-400">(opcional)</span></label>
-                      <input type="tel" value={guestPhone} onChange={e => setGuestPhone(e.target.value)} placeholder="+51 999 999 999"
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Correo <span className="text-red-500">*</span></label>
-                    <input type="email" value={guestEmail} onChange={e => setGuestEmail(e.target.value)} placeholder="tucorreo@ejemplo.com"
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
-                  </div>
-                  <hr className="border-gray-200" />
-                </>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de problema</label>
-                <div className="flex flex-wrap gap-2">
-                  {[{v:'PAYMENT_ISSUE',l:'Cargo incorrecto'},{v:'PAYMENT_ISSUE',l:'Cargo duplicado'},{v:'PAYMENT_ISSUE',l:'No reconocido'},{v:'PAYMENT_ISSUE',l:'Reembolso'}].map((t, i) => (
-                    <button key={i} onClick={() => { setSelectedCategory('PAYMENT_ISSUE'); setSubject(t.l); }}
-                      className={`px-3 py-2 rounded-lg border text-xs font-medium transition-all ${subject === t.l ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}>{t.l}</button>
                   ))}
                 </div>
               </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Asunto <span className="text-red-500">*</span></label>
-                <input type="text" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Ej: Me cobraron dos veces el plan mensual"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descripción <span className="text-red-500">*</span></label>
-                <textarea value={description} onChange={e => setDescription(e.target.value)}
-                  placeholder="Detalla el problema: fecha del cobro, monto, método de pago, plan afectado y cualquier detalle relevante."
-                  rows={4} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none" />
-              </div>
-
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  Al enviar esta solicitud, Tiyuy revisará la información proporcionada y se comunicará
-                  contigo para resolver el problema. Los ajustes por errores de cobro se procesan en un
-                  plazo de 5 a 10 días hábiles.
-                </p>
-              </div>
-
-              <label className="flex items-start gap-3 cursor-pointer group">
-                <input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)}
-                  className="mt-0.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
-                  Confirmo que la información proporcionada es verídica y autorizo a Tiyuy a revisar mi caso.
-                </span>
-              </label>
-
-              {error && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-xl text-sm">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  {error}
+            <div className="lg:col-span-2">
+              {/* Formulario de billing */}
+              <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10 sticky top-24">
+                <div className="flex items-center gap-2 mb-4">
+                  <FileText className="w-6 h-6 text-[var(--brand-primary)]" />
+                  <h2 className="text-xl font-black text-[var(--text-primary)]">Reportar problema</h2>
                 </div>
-              )}
+                <p className="text-sm text-[var(--text-secondary)] mb-8 font-medium">Si tienes un cargo incorrecto, duplicado o no reconocido, repórtalo aquí.</p>
 
-              <div className="flex items-center gap-3 pt-2">
-                <button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors">Cancelar</button>
-                <button onClick={handleSubmit}
-                  disabled={!subject.trim() || !description.trim() || !accepted || createMutation.isPending}
-                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl text-sm font-medium transition-all flex items-center gap-2">
-                  {createMutation.isPending ? <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</> : <><Send className="w-4 h-4" /> Enviar</>}
-                </button>
+                {!showForm ? (
+                  <button onClick={() => setShowForm(true)}
+                    className="w-full px-6 py-4 bg-[var(--brand-primary)] hover:opacity-90 text-[var(--bg-primary)] rounded-xl text-sm font-bold transition-all shadow-sm">
+                    Reportar problema de cobro
+                  </button>
+                ) : (
+                  <div className="space-y-6">
+                    {!isAuthenticated && (
+                      <>
+                        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4">
+                          <p className="text-sm text-amber-800 dark:text-amber-400 font-medium leading-relaxed">Proporciona tus datos para revisar tu caso.</p>
+                        </div>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">Nombre <span className="text-[var(--text-muted)] font-medium">(opcional)</span></label>
+                            <input type="text" value={guestName} onChange={e => setGuestName(e.target.value)} placeholder="Tu nombre"
+                              className="w-full px-4 py-3 bg-[var(--bg-primary)] border border-[var(--border-light)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] font-medium transition-all" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">Teléfono <span className="text-[var(--text-muted)] font-medium">(opcional)</span></label>
+                            <input type="tel" value={guestPhone} onChange={e => setGuestPhone(e.target.value)} placeholder="+51 999 999 999"
+                              className="w-full px-4 py-3 bg-[var(--bg-primary)] border border-[var(--border-light)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] font-medium transition-all" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">Correo <span className="text-red-500">*</span></label>
+                            <input type="email" value={guestEmail} onChange={e => setGuestEmail(e.target.value)} placeholder="tucorreo@ejemplo.com"
+                              className="w-full px-4 py-3 bg-[var(--bg-primary)] border border-[var(--border-light)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] font-medium transition-all" />
+                          </div>
+                        </div>
+                        <hr className="border-[var(--border-light)] my-2" />
+                      </>
+                    )}
+
+                    <div>
+                      <label className="block text-sm font-bold text-[var(--text-primary)] mb-3">Tipo de problema</label>
+                      <div className="flex flex-wrap gap-2">
+                        {[{v:'PAYMENT_ISSUE',l:'Cargo incorrecto'},{v:'PAYMENT_ISSUE',l:'Cargo duplicado'},{v:'PAYMENT_ISSUE',l:'No reconocido'},{v:'PAYMENT_ISSUE',l:'Reembolso'}].map((t, i) => (
+                          <button key={i} onClick={() => { setSelectedCategory('PAYMENT_ISSUE'); setSubject(t.l); }}
+                            className={`px-4 py-2.5 rounded-xl border text-sm font-bold transition-all ${subject === t.l ? 'bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] border-[var(--brand-primary)]/30' : 'border-[var(--border-light)] bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:border-[var(--brand-primary)]/30'}`}>{t.l}</button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">Asunto <span className="text-red-500">*</span></label>
+                      <input type="text" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Ej: Me cobraron dos veces el plan mensual"
+                        className="w-full px-4 py-3 bg-[var(--bg-primary)] border border-[var(--border-light)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] font-medium transition-all" />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">Descripción <span className="text-red-500">*</span></label>
+                      <textarea value={description} onChange={e => setDescription(e.target.value)}
+                        placeholder="Detalla el problema: fecha del cobro, monto, método de pago, plan afectado y cualquier detalle relevante."
+                        rows={4} className="w-full px-4 py-3 bg-[var(--bg-primary)] border border-[var(--border-light)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] font-medium transition-all resize-none" />
+                    </div>
+
+                    <div className="bg-[var(--bg-secondary)] rounded-2xl p-5 border border-[var(--border-light)]">
+                      <p className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed">
+                        Al enviar esta solicitud, Tiyuy revisará la información proporcionada y se comunicará
+                        contigo para resolver el problema. Los ajustes por errores de cobro se procesan en un
+                        plazo de 5 a 10 días hábiles.
+                      </p>
+                    </div>
+
+                    <label className="flex items-start gap-3 cursor-pointer group pt-1">
+                      <input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)}
+                        className="mt-1 w-5 h-5 rounded border-[var(--border-light)] text-[var(--brand-primary)] focus:ring-[var(--brand-primary)] bg-[var(--bg-primary)]" />
+                      <span className="text-sm text-[var(--text-secondary)] font-medium group-hover:text-[var(--text-primary)] transition-colors leading-relaxed">
+                        Confirmo que la información proporcionada es verídica y autorizo a Tiyuy a revisar mi caso.
+                      </span>
+                    </label>
+
+                    {error && (
+                      <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-xl text-sm font-bold border border-red-200 dark:border-red-900/30">
+                        <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                        {error}
+                      </div>
+                    )}
+
+                    <div className="flex flex-col-reverse sm:flex-row items-center gap-3 pt-4 border-t border-[var(--border-light)]">
+                      <button onClick={() => setShowForm(false)} className="w-full sm:w-auto px-6 py-3.5 text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">Cancelar</button>
+                      <button onClick={handleSubmit}
+                        disabled={!subject.trim() || !description.trim() || !accepted || createMutation.isPending}
+                        className="w-full sm:w-auto sm:flex-1 px-6 py-3.5 bg-[var(--brand-primary)] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-[var(--bg-primary)] rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
+                        {createMutation.isPending ? <><Loader2 className="w-5 h-5 animate-spin" /> Enviando...</> : <><Send className="w-5 h-5" /> Enviar Reporte</>}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

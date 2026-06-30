@@ -9,9 +9,6 @@ import { apiClient } from '@/infrastructure/api/axios-client';
 import ChannelEventCard from './ChannelEventCard';
 import EventDetailView from './EventDetailView';
 
-// ============================================
-// TIPOS DE NOTIFICACIONES (100% DINÁMICO)
-// ============================================
 interface Notification {
   id: string;
   title: string;
@@ -54,6 +51,17 @@ export default function ChannelEventsPanel({
   onCreateEvent,
   isOwner = false
 }: ChannelEventsPanelProps) {
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'upcoming' | 'featured' | 'date' | 'location'>('all');
   // Estado para controlar si se están mostrando eventos del usuario
@@ -164,9 +172,9 @@ export default function ChannelEventsPanel({
         return data;
       } catch (error: any) {
         // Backend no disponible, usar fallback local
-        console.log('Backend notifications not available, using fallback');
         setUseBackendNotifications(false);
         throw error; // Para que React Query maneje el error
+
       }
     },
     enabled: !!currentUserId && showNotifications,
@@ -195,7 +203,6 @@ export default function ChannelEventsPanel({
     mutationFn: async (notificationId: string) => {
       // NUNCA enviar IDs locales al backend
       if (notificationId.startsWith('event-notification-')) {
-        console.log('Notificación local, no se envía al backend:', notificationId);
         return; // Solo actualizar estado local
       }
       
@@ -203,8 +210,8 @@ export default function ChannelEventsPanel({
         // Backend de eventos espera PUT
         await apiClient.put(`/notifications/events/${notificationId}/read`);
       } catch (error: any) {
-        console.error('Error marking notification as read:', error);
         throw error;
+
       }
     },
     onSuccess: () => {
@@ -217,7 +224,6 @@ export default function ChannelEventsPanel({
     mutationFn: async () => {
       // Solo ejecutar si estamos usando notificaciones del backend
       if (!useBackendNotifications) {
-        console.log('Usando notificaciones locales, no se envía al backend');
         return;
       }
       
@@ -225,8 +231,8 @@ export default function ChannelEventsPanel({
         // Backend de eventos espera PUT
         await apiClient.put(`/notifications/events/mark-all-read`);
       } catch (error: any) {
-        console.error('Error marking all notifications as read:', error);
         throw error;
+
       }
     },
     onSuccess: () => {
@@ -239,15 +245,14 @@ export default function ChannelEventsPanel({
     mutationFn: async (notificationId: string) => {
       // NUNCA enviar IDs locales al backend
       if (notificationId.startsWith('event-notification-')) {
-        console.log('Notificación local, no se envía al backend:', notificationId);
         return; // Solo actualizar estado local
       }
       
       try {
         await apiClient.delete(`/notifications/events/${notificationId}`);
       } catch (error: any) {
-        console.error('Error deleting notification:', error);
         throw error;
+
       }
     },
     onSuccess: () => {
@@ -304,8 +309,6 @@ export default function ChannelEventsPanel({
     
     // PRIMERO: Abrir el evento inmediatamente para mejor UX
     if (eventId) {
-      console.log(' Clic en notificación - eventId:', eventId);
-      
       // Buscar el evento en TODAS las fuentes disponibles
       let eventData = null;
       
@@ -318,23 +321,19 @@ export default function ChannelEventsPanel({
       
       if (Array.isArray(allEvents1)) {
         eventData = allEvents1.find((e: any) => e.id === eventId || e.id === Number(eventId));
-        if (eventData) console.log(' Evento encontrado en channelEventsForNotifications');
       }
       
       // Fuente 2: events (del query principal)
       if (!eventData && events && Array.isArray(events)) {
         eventData = events.find((e: any) => e.id === eventId || e.id === Number(eventId));
-        if (eventData) console.log(' Evento encontrado en events');
       }
       
       // Fuente 3: upcomingEvents
       if (!eventData && upcomingEvents && Array.isArray(upcomingEvents)) {
         eventData = upcomingEvents.find((e: any) => e.id === eventId || e.id === Number(eventId));
-        if (eventData) console.log(' Evento encontrado en upcomingEvents');
       }
       
       if (eventData) {
-        console.log(' Abriendo detalle del evento:', eventData.title || eventData.id);
         // Abrir el detalle del evento INMEDIATAMENTE
         setSelectedEvent(eventData);
         setShowNotifications(false);
@@ -347,8 +346,6 @@ export default function ChannelEventsPanel({
           }
         }
       } else {
-        console.warn('️ Evento no encontrado localmente:', eventId);
-        console.log('Recargando eventos del canal...');
         // Forzar recarga de eventos y luego intentar abrir
         queryClient.invalidateQueries({ queryKey: ['channelEvents', channelId] });
         queryClient.invalidateQueries({ queryKey: ['events'] });
@@ -358,7 +355,6 @@ export default function ChannelEventsPanel({
       }
     } else {
       // Si no tiene eventId, solo marcar como leída
-      console.log('Notificación sin eventId, marcando como leída');
       if (!notification.read) {
         handleMarkAsRead(notification.id);
       } else {
@@ -366,6 +362,7 @@ export default function ChannelEventsPanel({
       }
     }
   };
+
 
   // Obtener icono según tipo de notificación (DINÁMICO)
   const getNotificationIcon = (type: string) => {
@@ -440,13 +437,12 @@ export default function ChannelEventsPanel({
             const city = data.address?.city || data.address?.town || data.address?.municipality || 'Ubicación actual';
             setUserLocation(city);
           } catch (error) {
-            console.error('Error getting location name:', error);
             setUserLocation('Ubicación actual');
           }
         },
         (error) => {
-          console.error('Error getting location:', error);
           setUserLocation('Ubicación actual');
+
         }
       );
     } else {
@@ -488,47 +484,8 @@ export default function ChannelEventsPanel({
     queryClient.removeQueries({ queryKey: ['userEvents', currentUserId] });
   };
   
-  // DEBUG: Log para depurar eventos del usuario
-  React.useEffect(() => {
-    console.log('=== USER CREATED EVENTS DEBUG ===');
-    console.log('Current User ID:', currentUserId);
-    console.log('Current User:', currentUser);
-    console.log('Current User Role:', currentUser?.role);
-    console.log('Can Create Event:', canCreateEvent);
-    console.log('User Created Events Data:', userCreatedEvents);
-    console.log('User Created Events Loading:', userCreatedLoading);
-    
-    if (userCreatedEvents) {
-      console.log('Total elements:', userCreatedEvents.totalElements);
-      console.log('Content length:', userCreatedEvents.content?.length);
-      
-      if (userCreatedEvents.content && userCreatedEvents.content.length > 0) {
-        console.log('Eventos del usuario:');
-        userCreatedEvents.content.forEach((event: any, index: number) => {
-          console.log(`  ${index + 1}. ID: ${event.id}, Title: ${event.title}, Channel: ${event.channelId || event.channel?.id}`);
-          console.log(`      - Creator ID: ${event.creatorId || event.creator?.id}`);
-          console.log(`      - Start Date: ${event.startDateTime}`);
-          console.log(`      - Is Active: ${event.isActive}`);
-        });
-        
-        // Verificar si los datos parecen reales
-        const hasValidIds = userCreatedEvents.content.every((e: any) => e.id && e.id > 0);
-        const hasValidTitles = userCreatedEvents.content.every((e: any) => e.title && e.title.trim() !== '');
-        const hasValidDates = userCreatedEvents.content.every((e: any) => e.startDateTime);
-        
-        console.log('=== VERIFICACIÓN DE DATOS ===');
-        console.log('Todos tienen IDs válidos:', hasValidIds);
-        console.log('Todos tienen títulos válidos:', hasValidTitles);
-        console.log('Todos tienen fechas válidas:', hasValidDates);
-        console.log('¿Los datos parecen reales?', hasValidIds && hasValidTitles && hasValidDates);
-      } else {
-        console.log('NO HAY CONTENIDO EN userCreatedEvents.content');
-      }
-    } else {
-      console.log('userCreatedEvents es null o undefined');
-    }
-    console.log('=== END USER CREATED EVENTS DEBUG ===');
-  }, [currentUserId, currentUser, userCreatedEvents, userCreatedLoading, canCreateEvent]);
+  
+
   
   // Handle filter changes - makes API calls with dynamic filters
   const handleFilterChange = (filterType: string, value: any) => {
@@ -655,10 +612,46 @@ export default function ChannelEventsPanel({
   return (
     <div className="flex h-full bg-gray-50">
       {/* SIDEBAR IZQUIERDO */}
-      <div className="w-[280px] bg-white border-r border-gray-200 flex flex-col">
+      {/* Mobile overlay */}
+      {isMobile && showMobileSidebar && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={() => setShowMobileSidebar(false)}
+        />
+      )}
+      
+      {/* Mobile toggle button */}
+      {isMobile && (
+        <button
+          onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+          className="fixed bottom-20 left-4 z-50 w-12 h-12 bg-brand text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition-colors"
+        >
+          <Filter className="w-5 h-5" />
+        </button>
+      )}
+      
+      <div className={`${
+        isMobile 
+          ? `fixed inset-y-0 left-0 z-50 w-[280px] bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+              showMobileSidebar ? 'translate-x-0' : '-translate-x-full'
+            }`
+          : 'w-[280px]'
+      } bg-white border-r border-gray-200 flex flex-col`}>
         {/* Header */}
         <div className="p-4 border-b border-gray-100">
-          <h1 className="text-xl font-bold text-gray-900 mb-4">Eventos</h1>
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-xl font-bold text-gray-900">Eventos</h1>
+            {isMobile && (
+              <button
+                onClick={() => setShowMobileSidebar(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
           
           {/* Search */}
           <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2">
@@ -680,6 +673,7 @@ export default function ChannelEventsPanel({
               onClick={() => {
                 setShowUserEvents(!showUserEvents);
                 setShowNotifications(false);
+                if (isMobile) setShowMobileSidebar(false);
               }}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 showUserEvents
@@ -698,6 +692,7 @@ export default function ChannelEventsPanel({
             onClick={() => {
               setShowNotifications(true);
               setShowUserEvents(false);
+              if (isMobile) setShowMobileSidebar(false);
             }}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               showNotifications
@@ -729,7 +724,10 @@ export default function ChannelEventsPanel({
         {canCreateEvent && (
           <div className="p-3">
             <button
-              onClick={onCreateEvent}
+              onClick={() => {
+                if (onCreateEvent) onCreateEvent();
+                if (isMobile) setShowMobileSidebar(false);
+              }}
               className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r brand text-white rounded-lg font-medium hover:from-blue-700 hover:to-teal-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -749,7 +747,10 @@ export default function ChannelEventsPanel({
               {recommendedEvents.slice(0, 3).map((event: any) => (
                 <button
                   key={event.id}
-                  onClick={() => setSelectedEvent(event)}
+                  onClick={() => {
+                    setSelectedEvent(event);
+                    if (isMobile) setShowMobileSidebar(false);
+                  }}
                   className="w-full flex items-start gap-2 p-2 hover:bg-gray-50 rounded-lg text-left"
                 >
                   <div className="w-12 h-12 bg-gradient-to-br brand rounded-lg flex items-center justify-center flex-shrink-0">
@@ -777,7 +778,10 @@ export default function ChannelEventsPanel({
             {categories.map((category) => (
               <button
                 key={category.id}
-                onClick={() => handleFilterChange('category', category.id === selectedCategory ? null : category.id)}
+                onClick={() => {
+                  handleFilterChange('category', category.id === selectedCategory ? null : category.id);
+                  if (isMobile) setShowMobileSidebar(false);
+                }}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   selectedCategory === category.id
                     ? 'bg-brand/20 text-brand-dark'
@@ -791,6 +795,7 @@ export default function ChannelEventsPanel({
           </div>
         </div>
       </div>
+
 
       {/* CONTENIDO PRINCIPAL */}
       <div className="flex-1 overflow-hidden">
@@ -998,8 +1003,8 @@ export default function ChannelEventsPanel({
                                     setSelectedEvent(eventData);
                                     setShowNotifications(false);
                                   } else {
-                                    console.warn('Evento no encontrado:', notification.eventId);
                                     queryClient.invalidateQueries({ queryKey: ['channelEvents', channelId] });
+
                                   }
                                 }}
                                 className="text-xs bg-brand text-white px-3 py-1.5 rounded hover:bg-blue-700 transition-colors"
@@ -1108,14 +1113,13 @@ export default function ChannelEventsPanel({
                     const seenIds = new Set();
                     const uniqueEvents = normalizedEvents.filter((event: any) => {
                       if (!event.id || seenIds.has(event.id)) {
-                        console.warn('Evento duplicado o sin ID:', event);
                         return false;
                       }
                       seenIds.add(event.id);
                       return true;
                     });
-                    console.log('Eventos únicos a mostrar:', uniqueEvents.length);
                     return uniqueEvents;
+
                   })().map((event: any) => (
                     <div key={event.id} className="group relative">
                       <ChannelEventCard
@@ -1145,17 +1149,14 @@ export default function ChannelEventsPanel({
                               deleteEventMutation.mutate(
                                 { channelId, eventId: event.id },
                                 {
-                                  onSuccess: () => {
-                                    console.log('Evento eliminado exitosamente');
-                                  },
                                   onError: (error) => {
-                                    console.error('Error al eliminar evento:', error);
                                     toast.error('Error al eliminar el evento');
                                   }
                                 }
                               );
                             }
                           }}
+
                           className="p-2 bg-white rounded-lg shadow-md text-gray-400 hover:text-red-600 hover:bg-red-50"
                           title="Eliminar evento"
                           disabled={deleteEventMutation.isPending}

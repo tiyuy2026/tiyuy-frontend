@@ -110,274 +110,287 @@ export default function DiscapacidadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-[var(--bg-secondary)] antialiased text-[var(--text-primary)] selection:bg-[var(--brand-primary)]/10">
       {/* Hero */}
-      <div className="bg-gradient-to-r from-sky-700 via-sky-600 to-teal-600 text-white">
-        <div className="max-w-8xl mx-auto px-4 py-16">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
-              <Accessibility className="w-7 h-7 text-white" />
+      <div className="bg-[var(--bg-primary)] border-b border-[var(--border-light)]">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16 py-16 sm:py-24 relative overflow-hidden">
+          <div className="absolute top-0 right-1/4 w-[600px] h-[300px] bg-gradient-to-r from-[var(--brand-primary)]/10 to-transparent blur-3xl pointer-events-none rounded-full" />
+          <div className="flex flex-col md:flex-row md:items-center gap-6 relative z-10 max-w-4xl">
+            <div className="w-16 h-16 rounded-2xl bg-[var(--brand-primary)]/10 flex items-center justify-center shrink-0 border border-[var(--border-light)]">
+              <Accessibility className="w-8 h-8 text-[var(--brand-primary)]" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold">Apoyo a personas con discapacidad</h1>
-              <p className="text-white/80 mt-1">Accesibilidad, inclusión y acompañamiento para todos</p>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-none text-[var(--text-primary)] text-balance">
+                Apoyo a personas con <span className="text-[var(--brand-primary)]">discapacidad</span>
+              </h1>
+              <p className="text-[var(--text-secondary)] mt-3 leading-relaxed font-medium text-lg sm:text-xl">
+                Accesibilidad, inclusión y acompañamiento para todos
+              </p>
             </div>
           </div>
         </div>
       </div>
 
       {step === 'info' && (
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-          {/* Compromiso */}
-          <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-8">
-            <div className="max-w-3xl">
-              <div className="flex items-center gap-2 mb-4">
-                <Heart className="w-5 h-5 text-sky-600" />
-                <span className="text-xs font-semibold text-sky-600 uppercase tracking-widest">Nuestro compromiso</span>
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16 py-12 space-y-8">
+          <div className="max-w-4xl mx-auto space-y-8">
+            {/* Compromiso */}
+            <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10">
+              <div className="flex items-center gap-2 mb-6">
+                <Heart className="w-5 h-5 text-[var(--brand-primary)]" />
+                <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-widest">Nuestro compromiso</span>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Una plataforma para todos</h2>
-              <div className="prose prose-gray max-w-none">
-                <p className="text-gray-600 leading-relaxed">
+              <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-4">Una plataforma para todos</h2>
+              <div className="space-y-4">
+                <p className="text-[var(--text-secondary)] leading-relaxed font-medium">
                   En Tiyuy creemos que encontrar un hogar es un derecho, no un privilegio. Trabajamos para
                   que nuestra plataforma sea accesible, inclusiva y útil para todas las personas,
                   independientemente de sus capacidades.
                 </p>
-                <p className="text-gray-600 leading-relaxed mt-4">
+                <p className="text-[var(--text-secondary)] leading-relaxed font-medium">
                   Nadie puede ser discriminado por su discapacidad en Tiyuy. Todos los anunciantes deben
                   describir de forma honesta y clara las condiciones de accesibilidad de sus propiedades.
                   Si necesitas información adicional o apoyo para realizar una visita, estamos aquí para ayudarte.
                 </p>
               </div>
             </div>
-          </div>
 
-          {/* Apoyo disponible */}
-          <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-8">
-            <div className="flex items-center gap-2 mb-4">
-              <Shield className="w-5 h-5 text-sky-600" />
-              <span className="text-xs font-semibold text-sky-600 uppercase tracking-widest">Apoyo disponible</span>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">¿Qué tipo de apoyo puedes solicitar?</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { icon: <DoorOpen className="w-5 h-5" />, title: 'Info de accesibilidad', desc: 'Detalles sobre accesos, baños, estacionamiento y rutas de una propiedad.' },
-                { icon: <Users className="w-5 h-5" />, title: 'Acompañamiento en visita', desc: 'Solicita apoyo adicional para realizar una visita presencial.' },
-                { icon: <Volume2 className="w-5 h-5" />, title: 'Comunicación accesible', desc: 'Información en braille, letra grande, audio o formato adaptado.' },
-                { icon: <Monitor className="w-5 h-5" />, title: 'Apoyo en plataforma', desc: 'Asistencia para navegar, publicar o contactar en la web o app.' },
-                { icon: <Eye className="w-5 h-5" />, title: 'Reportar incumplimiento', desc: 'Denunciar anuncios que no informan correctamente su accesibilidad.' },
-                { icon: <HelpCircle className="w-5 h-5" />, title: 'Otro ajuste razonable', desc: 'Cualquier otra solicitud que necesites para participar en igualdad de condiciones.' },
-              ].map((item, idx) => (
-                <div key={idx} className="bg-gray-50 rounded-xl p-4 hover:shadow-sm transition-all">
-                  <div className="w-9 h-9 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600 mb-3">{item.icon}</div>
-                  <h4 className="font-semibold text-gray-900 text-sm">{item.title}</h4>
-                  <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Accesibilidad en anuncios */}
-          <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-8">
-            <div className="flex items-center gap-2 mb-4">
-              <Accessibility className="w-5 h-5 text-sky-600" />
-              <span className="text-xs font-semibold text-sky-600 uppercase tracking-widest">Anuncios accesibles</span>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Características que un anuncio debería informar</h2>
-            <p className="text-sm text-gray-500 mb-6">
-              Los anunciantes deben describir con claridad las condiciones de accesibilidad de sus
-              propiedades para que puedas tomar decisiones informadas.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {ACCESSIBILITY_FEATURES.map((feat, idx) => (
-                <div key={idx} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50">
-                  <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600 flex-shrink-0">{feat.icon}</div>
-                  <div>
-                    <h4 className="font-medium text-gray-900 text-sm">{feat.title}</h4>
-                    <p className="text-xs text-gray-500 mt-0.5">{feat.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* FAQ */}
-          <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-8">
-            <div className="flex items-center gap-2 mb-4">
-              <HelpCircle className="w-5 h-5 text-sky-600" />
-              <span className="text-xs font-semibold text-sky-600 uppercase tracking-widest">Preguntas</span>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Preguntas frecuentes</h2>
-            <div className="space-y-3">
-              {FAQS.map((faq, index) => (
-                <div key={index} className="border border-gray-200 rounded-xl overflow-hidden transition-all hover:border-gray-300">
-                  <button onClick={() => toggleFaq(index)}
-                    className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors">
-                    <span className="font-medium text-gray-900 text-sm pr-4">{faq.q}</span>
-                    {expandedFaq === index ? <ChevronUp className="w-4 h-4 text-sky-600 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />}
-                  </button>
-                  {expandedFaq === index && (
-                    <div className="px-4 pb-4 border-t border-gray-100 pt-3">
-                      <p className="text-sm text-gray-600 leading-relaxed">{faq.a}</p>
+            {/* Apoyo disponible */}
+            <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10">
+              <div className="flex items-center gap-2 mb-6">
+                <Shield className="w-5 h-5 text-[var(--brand-primary)]" />
+                <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-widest">Apoyo disponible</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-6">¿Qué tipo de apoyo puedes solicitar?</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { icon: <DoorOpen className="w-5 h-5" />, title: 'Info de accesibilidad', desc: 'Detalles sobre accesos, baños, estacionamiento y rutas de una propiedad.' },
+                  { icon: <Users className="w-5 h-5" />, title: 'Acompañamiento en visita', desc: 'Solicita apoyo adicional para realizar una visita presencial.' },
+                  { icon: <Volume2 className="w-5 h-5" />, title: 'Comunicación accesible', desc: 'Información en braille, letra grande, audio o formato adaptado.' },
+                  { icon: <Monitor className="w-5 h-5" />, title: 'Apoyo en plataforma', desc: 'Asistencia para navegar, publicar o contactar en la web o app.' },
+                  { icon: <Eye className="w-5 h-5" />, title: 'Reportar incumplimiento', desc: 'Denunciar anuncios que no informan correctamente su accesibilidad.' },
+                  { icon: <HelpCircle className="w-5 h-5" />, title: 'Otro ajuste razonable', desc: 'Cualquier otra solicitud que necesites para participar en igualdad de condiciones.' },
+                ].map((item, idx) => (
+                  <div key={idx} className="bg-[var(--bg-secondary)] border border-[var(--border-light)] rounded-2xl p-5 hover:border-[var(--brand-primary)]/30 transition-colors group">
+                    <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 flex items-center justify-center text-[var(--brand-primary)] mb-4 border border-[var(--border-light)] group-hover:bg-[var(--brand-primary)]/20">
+                      {item.icon}
                     </div>
-                  )}
-                </div>
-              ))}
+                    <h4 className="font-bold text-[var(--text-primary)] text-base mb-1">{item.title}</h4>
+                    <p className="text-sm text-[var(--text-secondary)] font-medium leading-relaxed">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* CTA */}
-          <div className="bg-gradient-to-br from-sky-600 to-teal-700 rounded-3xl p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
-              <Accessibility className="w-8 h-8 text-white" />
+            {/* Accesibilidad en anuncios */}
+            <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10">
+              <div className="flex items-center gap-2 mb-6">
+                <Accessibility className="w-5 h-5 text-[var(--brand-primary)]" />
+                <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-widest">Anuncios accesibles</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-2">Características que un anuncio debería informar</h2>
+              <p className="text-sm text-[var(--text-secondary)] mb-8 font-medium">
+                Los anunciantes deben describir con claridad las condiciones de accesibilidad de sus
+                propiedades para que puedas tomar decisiones informadas.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {ACCESSIBILITY_FEATURES.map((feat, idx) => (
+                  <div key={idx} className="flex items-start gap-4 p-5 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-light)] hover:border-[var(--brand-primary)]/30 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 flex items-center justify-center text-[var(--brand-primary)] flex-shrink-0 border border-[var(--border-light)]">{feat.icon}</div>
+                    <div>
+                      <h4 className="font-bold text-[var(--text-primary)] text-sm mb-1">{feat.title}</h4>
+                      <p className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed">{feat.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-3">¿Necesitas apoyo o información?</h2>
-            <p className="text-sky-100 text-sm max-w-lg mx-auto mb-6">
-              Estamos aquí para ayudarte. Cuéntanos qué necesitas y te responderemos a la brevedad.
-            </p>
-            <button onClick={() => setStep('form')}
-              className="px-8 py-3 bg-white text-sky-700 font-semibold rounded-xl hover:bg-sky-50 transition-all shadow-lg inline-flex items-center gap-2">
-              <Send className="w-4 h-4" />
-              Solicitar apoyo
-            </button>
+
+            {/* FAQ */}
+            <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10">
+              <div className="flex items-center gap-2 mb-6">
+                <HelpCircle className="w-5 h-5 text-[var(--brand-primary)]" />
+                <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-widest">Preguntas</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-6">Preguntas frecuentes</h2>
+              <div className="space-y-4">
+                {FAQS.map((faq, index) => (
+                  <div key={index} className="border border-[var(--border-light)] rounded-2xl overflow-hidden transition-all hover:border-[var(--brand-primary)]/30 bg-[var(--bg-card)]">
+                    <button onClick={() => toggleFaq(index)}
+                      className="w-full flex items-center justify-between p-5 text-left hover:bg-[var(--bg-secondary)] transition-colors">
+                      <span className="font-bold text-[var(--text-primary)] pr-4">{faq.q}</span>
+                      {expandedFaq === index ? <ChevronUp className="w-5 h-5 text-[var(--brand-primary)] flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-[var(--text-muted)] flex-shrink-0" />}
+                    </button>
+                    {expandedFaq === index && (
+                      <div className="px-5 pb-5 border-t border-[var(--border-light)] pt-4 bg-[var(--bg-secondary)]">
+                        <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">{faq.a}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="bg-[var(--bg-card)] rounded-3xl p-8 sm:p-12 text-center border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-[var(--brand-primary)]/5 blur-3xl rounded-full" />
+              <div className="relative z-10">
+                <div className="w-20 h-20 rounded-3xl bg-[var(--brand-primary)]/10 flex items-center justify-center mx-auto mb-6 border border-[var(--brand-primary)]/20">
+                  <Accessibility className="w-10 h-10 text-[var(--brand-primary)]" />
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-4">¿Necesitas apoyo o información?</h2>
+                <p className="text-[var(--text-secondary)] text-base max-w-lg mx-auto mb-8 font-medium leading-relaxed">
+                  Estamos aquí para ayudarte. Cuéntanos qué necesitas y te responderemos a la brevedad.
+                </p>
+                <button onClick={() => setStep('form')}
+                  className="px-8 py-4 bg-[var(--brand-primary)] text-[var(--bg-primary)] font-bold rounded-xl hover:opacity-90 transition-all shadow-sm inline-flex items-center gap-2">
+                  <Send className="w-5 h-5" />
+                  Solicitar apoyo
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
       {/* Formulario */}
       {step === 'form' && (
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-8">
-            <div className="flex items-center justify-between mb-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="bg-[var(--bg-card)] rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-[var(--border-light)] p-8 sm:p-10">
+            <div className="flex items-center justify-between mb-8 border-b border-[var(--border-light)] pb-6">
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">Solicitar apoyo</h2>
-                <p className="text-sm text-gray-500 mt-1">Cuéntanos qué necesitas y te ayudaremos</p>
+                <h2 className="text-2xl font-black text-[var(--text-primary)]">Solicitar apoyo</h2>
+                <p className="text-sm text-[var(--text-secondary)] mt-1 font-medium">Cuéntanos qué necesitas y te ayudaremos</p>
               </div>
-              <button onClick={() => setStep('info')} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-                <X className="w-5 h-5 text-gray-400" />
+              <button onClick={() => setStep('info')} className="p-2 hover:bg-[var(--bg-secondary)] rounded-xl transition-colors">
+                <X className="w-6 h-6 text-[var(--text-muted)] hover:text-[var(--text-primary)]" />
               </button>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-6">
               {!isAuthenticated && (
                 <>
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                    <p className="text-sm text-amber-800">Si nos dejas tus datos podremos darte seguimiento personalizado.</p>
+                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-5">
+                    <p className="text-sm text-amber-800 dark:text-amber-400 font-medium leading-relaxed">Si nos dejas tus datos podremos darte seguimiento personalizado.</p>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Nombre <span className="text-gray-400">(opcional)</span></label>
+                      <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">Nombre <span className="text-[var(--text-muted)] font-medium">(opcional)</span></label>
                       <input type="text" value={guestName} onChange={e => setGuestName(e.target.value)}
-                        placeholder="Tu nombre" className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent" />
+                        placeholder="Tu nombre" className="w-full px-4 py-3 bg-[var(--bg-primary)] border border-[var(--border-light)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] font-medium transition-all" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono <span className="text-gray-400">(opcional)</span></label>
+                      <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">Teléfono <span className="text-[var(--text-muted)] font-medium">(opcional)</span></label>
                       <input type="tel" value={guestPhone} onChange={e => setGuestPhone(e.target.value)}
-                        placeholder="+51 999 999 999" className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent" />
+                        placeholder="+51 999 999 999" className="w-full px-4 py-3 bg-[var(--bg-primary)] border border-[var(--border-light)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] font-medium transition-all" />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Correo electrónico <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">Correo electrónico <span className="text-red-500">*</span></label>
                     <input type="email" value={guestEmail} onChange={e => setGuestEmail(e.target.value)}
-                      placeholder="tucorreo@ejemplo.com" className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent" />
+                      placeholder="tucorreo@ejemplo.com" className="w-full px-4 py-3 bg-[var(--bg-primary)] border border-[var(--border-light)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] font-medium transition-all" />
                   </div>
-                  <hr className="border-gray-200" />
+                  <hr className="border-[var(--border-light)] my-2" />
                 </>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de apoyo</label>
-                <div className="grid gap-2">
+                <label className="block text-sm font-bold text-[var(--text-primary)] mb-3">Tipo de apoyo</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {SUPPORT_TYPES.map(cat => (
                     <button key={cat.value} onClick={() => setSelectedCategory(cat.value)}
-                      className={`flex items-center gap-3 p-3 rounded-xl border text-left text-sm transition-all ${
-                        selectedCategory === cat.value ? 'border-sky-500 bg-sky-50 text-sky-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      className={`flex items-start gap-4 p-4 rounded-xl border text-left transition-all ${
+                        selectedCategory === cat.value ? 'border-[var(--brand-primary)] bg-[var(--brand-primary)]/5' : 'border-[var(--border-light)] hover:border-[var(--brand-primary)]/30 bg-[var(--bg-secondary)]'
                       }`}>
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${selectedCategory === cat.value ? 'bg-sky-100 text-sky-600' : 'bg-gray-100 text-gray-400'}`}>{cat.icon}</div>
-                      <div><p className="font-medium">{cat.label}</p><p className="text-xs text-gray-400">{cat.desc}</p></div>
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${selectedCategory === cat.value ? 'bg-[var(--brand-primary)]/20 text-[var(--brand-primary)]' : 'bg-[var(--bg-primary)] border border-[var(--border-light)] text-[var(--text-muted)]'}`}>{cat.icon}</div>
+                      <div>
+                        <p className={`font-bold text-sm mb-1 ${selectedCategory === cat.value ? 'text-[var(--brand-primary)]' : 'text-[var(--text-primary)]'}`}>{cat.label}</p>
+                        <p className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed">{cat.desc}</p>
+                      </div>
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Propiedad relacionada <span className="text-gray-400">(opcional)</span></label>
+                  <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">Propiedad relacionada <span className="text-[var(--text-muted)] font-medium">(opcional)</span></label>
                   <input type="text" value={propertyLink} onChange={e => setPropertyLink(e.target.value)}
-                    placeholder="URL o nombre del anuncio" className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent" />
+                    placeholder="URL o nombre del anuncio" className="w-full px-4 py-3 bg-[var(--bg-primary)] border border-[var(--border-light)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] font-medium transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de necesidad <span className="text-gray-400">(opcional)</span></label>
+                  <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">Fecha de necesidad <span className="text-[var(--text-muted)] font-medium">(opcional)</span></label>
                   <input type="date" value={supportDate} onChange={e => setSupportDate(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent" />
+                    className="w-full px-4 py-3 bg-[var(--bg-primary)] border border-[var(--border-light)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] font-medium transition-all [color-scheme:light] dark:[color-scheme:dark]" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Asunto <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">Asunto <span className="text-red-500">*</span></label>
                 <input type="text" value={subject} onChange={e => setSubject(e.target.value)}
-                  placeholder="Ej: Necesito información sobre accesibilidad de un departamento" className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent" />
+                  placeholder="Ej: Necesito información sobre accesibilidad de un departamento" className="w-full px-4 py-3 bg-[var(--bg-primary)] border border-[var(--border-light)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] font-medium transition-all" />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descripción <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-bold text-[var(--text-primary)] mb-2">Descripción <span className="text-red-500">*</span></label>
                 <textarea value={description} onChange={e => setDescription(e.target.value)}
                   placeholder="Cuéntanos qué necesitas con el mayor detalle posible. Por ejemplo: tipo de apoyo, fechas estimadas, preguntas específicas sobre la propiedad, etc."
-                  rows={5} className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-transparent resize-none" />
+                  rows={5} className="w-full px-4 py-3 bg-[var(--bg-primary)] border border-[var(--border-light)] rounded-xl text-sm focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] font-medium transition-all resize-none" />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Urgencia</label>
-                <div className="flex gap-2">
-                  {[{v:'LOW',l:'Baja',c:'bg-gray-100 text-gray-700 border-gray-200'},{v:'MEDIUM',l:'Media',c:'bg-yellow-100 text-yellow-700 border-yellow-200'},{v:'HIGH',l:'Alta',c:'bg-orange-100 text-orange-700 border-orange-200'},{v:'CRITICAL',l:'Urgente',c:'bg-red-100 text-red-700 border-red-200'}].map(sev => (
+                <label className="block text-sm font-bold text-[var(--text-primary)] mb-3">Urgencia</label>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {[{v:'LOW',l:'Baja',c:'bg-[var(--bg-secondary)] text-[var(--text-primary)] border-[var(--border-light)]'},{v:'MEDIUM',l:'Media',c:'bg-yellow-100 text-yellow-700 border-yellow-200'},{v:'HIGH',l:'Alta',c:'bg-orange-100 text-orange-700 border-orange-200'},{v:'CRITICAL',l:'Urgente',c:'bg-red-100 text-red-700 border-red-200'}].map(sev => (
                     <button key={sev.v} onClick={() => setSelectedSeverity(sev.v as TicketSeverity)}
-                      className={`flex-1 px-3 py-2 rounded-lg border text-xs font-medium transition-all ${
-                        selectedSeverity === sev.v ? `${sev.c} ring-2 ring-offset-1` : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      className={`flex-1 px-4 py-3 rounded-xl border text-sm font-bold transition-all ${
+                        selectedSeverity === sev.v ? `${sev.c} ring-2 ring-offset-2 ring-offset-[var(--bg-card)] ring-${sev.c.includes('red') ? 'red' : sev.c.includes('orange') ? 'orange' : sev.c.includes('yellow') ? 'yellow' : 'gray'}-500` : 'border-[var(--border-light)] bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:border-[var(--border-light)]/80'
                       }`}>{sev.l}</button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">¿Cómo prefieres que te contactemos? <span className="text-gray-400">(opcional)</span></label>
-                <div className="flex gap-2">
+                <label className="block text-sm font-bold text-[var(--text-primary)] mb-3">¿Cómo prefieres que te contactemos? <span className="text-[var(--text-muted)] font-medium">(opcional)</span></label>
+                <div className="flex flex-wrap gap-3">
                   {[{v:'EMAIL',l:'Email'},{v:'PHONE',l:'Teléfono'},{v:'WHATSAPP',l:'WhatsApp'}].map(ch => (
                     <button key={ch.v} onClick={() => setPreferredChannel(ch.v)}
-                      className={`px-3 py-2 rounded-lg border text-xs font-medium transition-all ${
-                        preferredChannel === ch.v ? 'bg-sky-50 text-sky-700 border-sky-200' : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      className={`px-4 py-2.5 rounded-xl border text-sm font-bold transition-all ${
+                        preferredChannel === ch.v ? 'bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] border-[var(--brand-primary)]/30' : 'border-[var(--border-light)] bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:border-[var(--brand-primary)]/30'
                       }`}>{ch.l}</button>
                   ))}
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <p className="text-xs text-gray-500 leading-relaxed">
+              <div className="bg-[var(--bg-secondary)] rounded-2xl p-5 border border-[var(--border-light)]">
+                <p className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed">
                   Al enviar esta solicitud, autorizas a Tiyuy a revisar la información proporcionada y
                   coordinar con el anunciante si es necesario. Tu identidad y datos serán tratados de
                   forma confidencial.
                 </p>
               </div>
 
-              <label className="flex items-start gap-3 cursor-pointer group">
+              <label className="flex items-start gap-3 cursor-pointer group pt-2">
                 <input type="checkbox" checked={acceptedTerms} onChange={e => setAcceptedTerms(e.target.checked)}
-                  className="mt-0.5 rounded border-gray-300 text-sky-600 focus:ring-sky-500" />
-                <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
+                  className="mt-1 w-5 h-5 rounded border-[var(--border-light)] text-[var(--brand-primary)] focus:ring-[var(--brand-primary)] bg-[var(--bg-primary)]" />
+                <span className="text-sm text-[var(--text-secondary)] font-medium group-hover:text-[var(--text-primary)] transition-colors leading-relaxed">
                   Acepto que Tiyuy gestione mi solicitud y se comunique conmigo para brindarme apoyo.
                 </span>
               </label>
 
               {error && (
-                <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-xl text-sm">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-xl text-sm font-bold border border-red-200 dark:border-red-900/30">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
                   {error}
                 </div>
               )}
 
-              <div className="flex items-center justify-between pt-2">
-                <button onClick={() => setStep('info')} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors">← Volver</button>
+              <div className="flex flex-col-reverse sm:flex-row items-center justify-between pt-6 border-t border-[var(--border-light)] gap-4">
+                <button onClick={() => setStep('info')} className="w-full sm:w-auto px-6 py-3 text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">← Volver</button>
                 <button onClick={handleSubmit}
                   disabled={!subject.trim() || !description.trim() || !acceptedTerms || createMutation.isPending}
-                  className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl text-sm font-medium transition-all flex items-center gap-2">
-                  {createMutation.isPending ? <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</> : <><Send className="w-4 h-4" /> Enviar Solicitud</>}
+                  className="w-full sm:w-auto px-8 py-3.5 bg-[var(--brand-primary)] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-[var(--bg-primary)] rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 shadow-sm">
+                  {createMutation.isPending ? <><Loader2 className="w-5 h-5 animate-spin" /> Enviando...</> : <><Send className="w-5 h-5" /> Enviar Solicitud</>}
                 </button>
               </div>
             </div>
@@ -386,19 +399,22 @@ export default function DiscapacidadPage() {
       )}
 
       {step === 'success' && (
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-12 text-center">
-            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="w-10 h-10 text-green-600" />
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="bg-[var(--bg-card)] rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-[var(--border-light)] p-12 text-center relative overflow-hidden">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 bg-green-500/10 blur-3xl rounded-full" />
+            <div className="relative z-10">
+              <div className="w-24 h-24 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center mx-auto mb-6 border border-green-200 dark:border-green-900/30">
+                <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-500" />
+              </div>
+              <h2 className="text-3xl font-black text-[var(--text-primary)] mb-4">Solicitud recibida</h2>
+              <p className="text-[var(--text-secondary)] max-w-md mx-auto mb-4 font-medium leading-relaxed">
+                Hemos recibido tu solicitud. Nuestro equipo la revisará y te contactará a la brevedad
+                para brindarte el apoyo que necesitas.
+              </p>
+              <p className="text-sm text-[var(--text-muted)] font-bold mb-10">Recibirás actualizaciones en tu correo.</p>
+              <button onClick={() => setStep('info')}
+                className="px-8 py-3.5 bg-[var(--brand-primary)] hover:opacity-90 text-[var(--bg-primary)] rounded-xl font-bold transition-all shadow-sm">Volver al inicio</button>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">Solicitud recibida</h2>
-            <p className="text-gray-600 max-w-md mx-auto mb-2">
-              Hemos recibido tu solicitud. Nuestro equipo la revisará y te contactará a la brevedad
-              para brindarte el apoyo que necesitas.
-            </p>
-            <p className="text-sm text-gray-400 mb-8">Recibirás actualizaciones en tu correo.</p>
-            <button onClick={() => setStep('info')}
-              className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-medium transition-all">Volver al inicio</button>
           </div>
         </div>
       )}

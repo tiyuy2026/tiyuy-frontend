@@ -17,16 +17,12 @@ interface StatusDetailPanelProps {
 
 export default function StatusDetailPanel({ status, user, onClose }: StatusDetailPanelProps) {
 
-  //  Nombre real del usuario autenticado - usar firstName + lastName (campos válidos)
-  console.log(' StatusDetailPanel - user:', user); // ← DEBUG
   const currentUserName = user?.firstName && user?.lastName
     ? `${user.firstName} ${user.lastName}`
     : user?.firstName
     || user?.lastName
     || `Usuario ${user?.id || ''}`;
-  console.log(' StatusDetailPanel - currentUserName:', currentUserName); // ← DEBUG
 
-  //  Función helper para detectar si un comentario es del usuario actual
   const isCurrentUserComment = (comment: any) => {
     return comment.userId === user?.id
       || comment.user?.id === user?.id;
@@ -68,14 +64,6 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
   // Encontrar el estado actualizado en la lista
   const updatedStatus = statusPostsData?.pages?.flat()?.find(s => s.id === status.id) || status;
 
-  //  DEBUG en consola (limitado para evitar payload errors)
-  console.log('StatusDetailPanel comments:', {
-    statusId: status.id,
-    length: rawComments?.length || 0,
-    error
-  });
-
-  //  Usar rawComments directamente sin useMemo para evitar bucles
   const comments = rawComments || [];
 
   //  Sincronización inteligente - preservar likes locales al invalidar cache
@@ -156,12 +144,8 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
       const createdAt = new Date(status.createdAt);
       const hoursSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
 
-      // Si han pasado más de 48 horas, ocultar el estado
       if (hoursSinceCreation > 48) {
-        // No guardar más información de este estado
         console.log('Estado expirado, ocultando...');
-        // El estado se dejará de mostrar en la lista principal
-        // Esto evita saturar el backend con información antigua
       }
     }
   }, [status]);

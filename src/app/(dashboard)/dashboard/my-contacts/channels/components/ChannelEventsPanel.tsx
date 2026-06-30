@@ -490,14 +490,6 @@ export default function ChannelEventsPanel({
   
   // DEBUG: Log para depurar eventos del usuario
   React.useEffect(() => {
-    console.log('=== USER CREATED EVENTS DEBUG ===');
-    console.log('Current User ID:', currentUserId);
-    console.log('Current User:', currentUser);
-    console.log('Current User Role:', currentUser?.role);
-    console.log('Can Create Event:', canCreateEvent);
-    console.log('User Created Events Data:', userCreatedEvents);
-    console.log('User Created Events Loading:', userCreatedLoading);
-    
     if (userCreatedEvents) {
       console.log('Total elements:', userCreatedEvents.totalElements);
       console.log('Content length:', userCreatedEvents.content?.length);

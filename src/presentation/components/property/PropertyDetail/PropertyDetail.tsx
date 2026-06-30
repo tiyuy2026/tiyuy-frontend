@@ -252,10 +252,6 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
               currentType={property.type}
             />
           </div>
-
-          {/* ════════════════════════════════════════
-              SIDEBAR  (1 / 3)  — sticky
-          ════════════════════════════════════════ */}
           <div className="lg:col-span-3">
             <div className="sticky top-4 space-y-4">
 
@@ -310,7 +306,6 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
                   ))}
                 </div>
 
-                {/* Rating promedio */}
                 {rating && rating.totalRatings > 0 && (
                   <div className="mt-3 pt-3 border-t border-gray-100">
                     <div className="flex items-center justify-center gap-2">
@@ -336,7 +331,6 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
                 </p>
               </div>
 
-              {/* ⭐ CALIFICAR PROPIEDAD */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                 <h3 className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-3">Calificar propiedad</h3>
                 <div className="flex flex-col items-center gap-2">
@@ -347,7 +341,6 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
                     averageRating={rating?.averageRating || 0}
                     totalRatings={rating?.totalRatings || 0}
                     onRatingSaved={() => {
-                      // Recargar rating después de calificar
                       fetch(`/api/properties/${property.id}/rating`).then(res => {
                         if (res.ok) res.json().then(data => setRating(data));
                       }).catch(() => {});
@@ -364,7 +357,6 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
                 </div>
               </div>
 
-              {/* ✅ BOTÓN DESTACAR PROPIEDAD */}
               <FeaturePropertyButton 
                 propertyId={property.id}
                 ownerId={property.owner.id}

@@ -3,7 +3,6 @@
 
 'use client';
 
-import React from 'react';
 import { Group } from '@/core/domain/entities/Group';
 import { useGroups } from '@/presentation/hooks/useGroups';
 import { Users, MessageCircle, Calendar, UserPlus, UserMinus } from 'lucide-react';

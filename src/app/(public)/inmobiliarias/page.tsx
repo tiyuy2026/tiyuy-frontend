@@ -124,7 +124,7 @@ export default function InmobiliariasPage() {
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
               <Link href="/register"
-                className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl transition-all shadow-lg inline-flex items-center gap-2">
+                className="px-6 py-3 bg-brand hover:bg-brand-dark text-white font-semibold rounded-xl transition-all shadow-lg inline-flex items-center gap-2">
                 <Building2 className="w-4 h-4" />
                 Crear cuenta profesional
               </Link>
@@ -177,8 +177,8 @@ export default function InmobiliariasPage() {
                       : 'Variación de precio por distrito'}
                   </p>
                 </div>
-                <div className="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-teal-600" />
+                <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-brand" />
                 </div>
               </div>
               {zoneTrend.length === 0 ? (
@@ -224,8 +224,8 @@ export default function InmobiliariasPage() {
                       : 'Distribución de la oferta actual'}
                   </p>
                 </div>
-                <div className="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center">
-                  <Home className="w-5 h-5 text-teal-600" />
+                <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
+                  <Home className="w-5 h-5 text-brand" />
                 </div>
               </div>
               {typeData.length === 0 ? (
@@ -242,7 +242,7 @@ export default function InmobiliariasPage() {
                             <span className="text-sm font-semibold text-gray-700">{t.count}</span>
                           </div>
                           <div className="w-full bg-gray-100 rounded-full h-2.5">
-                            <div className="h-2.5 rounded-full bg-teal-500" style={{ width: `${Math.min(pct, 100)}%` }} />
+                            <div className="h-2.5 rounded-full bg-brand" style={{ width: `${Math.min(pct, 100)}%` }} />
                           </div>
                         </div>
                       </div>
@@ -263,8 +263,8 @@ export default function InmobiliariasPage() {
                       : 'Ranking de distritos más activos'}
                   </p>
                 </div>
-                <div className="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center">
-                  <Activity className="w-5 h-5 text-teal-600" />
+                <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-brand" />
                 </div>
               </div>
               {hotZones.length === 0 ? (
@@ -315,7 +315,7 @@ export default function InmobiliariasPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {BENEFITS.map((b, i) => (
               <div key={i} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-md hover:border-gray-200 transition-all">
-                <div className="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 mb-4">{b.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center text-brand mb-4">{b.icon}</div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{b.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{b.desc}</p>
               </div>
@@ -335,7 +335,7 @@ export default function InmobiliariasPage() {
                 <button onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
                   className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors">
                   <span className="font-medium text-gray-900 text-sm pr-4">{faq.q}</span>
-                  {expandedFaq === i ? <ChevronUp className="w-4 h-4 text-teal-600 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />}
+                  {expandedFaq === i ? <ChevronUp className="w-4 h-4 text-brand flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />}
                 </button>
                 {expandedFaq === i && (
                   <div className="px-4 pb-4 border-t border-gray-100 pt-3">
@@ -348,13 +348,13 @@ export default function InmobiliariasPage() {
         </div>
 
         {/* CTA Final */}
-        <div className="bg-gradient-to-br from-teal-600 to-teal-800 rounded-3xl p-8 sm:p-10 text-center">
+        <div className="bg-gradient-to-br from-brand to-brand-dark rounded-3xl p-8 sm:p-10 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">Únete a las inmobiliarias que ya crecen con Tiyuy</h2>
-          <p className="text-teal-100 text-sm sm:text-base max-w-lg mx-auto mb-6">
+          <p className="text-white/80 text-sm sm:text-base max-w-lg mx-auto mb-6">
             Comienza a publicar, conectar y cerrar más negocios. Crea tu cuenta profesional hoy.
           </p>
           <Link href="/register"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-white text-teal-700 font-semibold rounded-xl hover:bg-teal-50 transition-all shadow-lg">
+            className="inline-flex items-center gap-2 px-8 py-3 bg-white text-brand-dark font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-lg">
             <Building2 className="w-4 h-4" />
             Crear cuenta profesional
           </Link>

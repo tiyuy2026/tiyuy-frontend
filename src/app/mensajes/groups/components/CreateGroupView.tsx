@@ -18,7 +18,6 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
           </button>
         </div>
 
-        {/* Contenido */}
         <div className="text-center py-8">
           <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mx-auto mb-6">
             <span className="text-3xl">Grupos</span>

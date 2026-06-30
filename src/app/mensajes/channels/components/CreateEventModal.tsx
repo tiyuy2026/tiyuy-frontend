@@ -14,7 +14,6 @@ interface CreateEventModalProps {
   onSuccess?: () => void;
 }
 
-// Enums que coinciden con el backend
 const EVENT_TYPES = [
   { value: 'FERIA_INMOBILIARIA', label: 'Ferias inmobiliarias' },
   { value: 'OPEN_HOUSE', label: 'Open House' },
@@ -405,309 +404,317 @@ export default function CreateEventModal({ isOpen, onClose, channelId, onSuccess
     setImagePreviewUrls(prev => prev.filter((_, i) => i !== index));
   };
 
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Crear Nuevo Evento" size="lg">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Información Básica */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900">Información Básica</h3>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Título <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.title ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="Título del evento"
-              maxLength={200}
-            />
-            {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Descripción
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={3}
-              placeholder="Describe tu evento..."
-              maxLength={2000}
-            />
-            {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tipo de Evento <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={formData.eventType}
-                onChange={(e) => handleInputChange('eventType', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {EVENT_TYPES.map(type => (
-                  <option key={type.value} value={type.value}>{type.label}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Visibilidad <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={formData.visibility}
-                onChange={(e) => handleInputChange('visibility', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {VISIBILITY_TYPES.map(type => (
-                  <option key={type.value} value={type.value}>{type.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+ return (
+  <Modal isOpen={isOpen} onClose={onClose} title="Crear Nuevo Evento" size="lg">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Información Básica */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          Información Básica
+        </h3>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Título <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={formData.title}
+            onChange={(e) => handleInputChange('title', e.target.value)}
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 ${
+              errors.title ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+            }`}
+            placeholder="Título del evento"
+            maxLength={200}
+          />
+          {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
         </div>
 
-        {/* Imagenes */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900">Imagenes del Evento</h3>
-          <p className="text-sm text-gray-500">Maximo {MAX_IMAGES} imagenes. La primera sera la portada.</p>
-          
-          <div className="grid grid-cols-3 gap-4">
-            {imagePreviewUrls.map((url, index) => (
-              <div key={index} className="relative aspect-square">
-                <img 
-                  src={url} 
-                  alt={`Preview ${index + 1}`}
-                  className="w-full h-full object-cover rounded-lg"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeImage(index)}
-                  className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-                {index === 0 && (
-                  <span className="absolute bottom-1 left-1 px-2 py-0.5 bg-brand text-white text-xs rounded">
-                    Portada
-                  </span>
-                )}
-              </div>
-            ))}
-            
-            {selectedImages.length < MAX_IMAGES && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Descripción
+          </label>
+          <textarea
+            value={formData.description}
+            onChange={(e) => handleInputChange('description', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+            rows={3}
+            placeholder="Describe tu evento..."
+            maxLength={2000}
+          />
+          {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Tipo de Evento <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.eventType}
+              onChange={(e) => handleInputChange('eventType', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
+            >
+              {EVENT_TYPES.map(type => (
+                <option key={type.value} value={type.value} className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">
+                  {type.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Visibilidad <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.visibility}
+              onChange={(e) => handleInputChange('visibility', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 dark:bg-gray-800 dark:text-white"
+            >
+              {VISIBILITY_TYPES.map(type => (
+                <option key={type.value} value={type.value} className="bg-white text-gray-900 dark:bg-gray-800 dark:text-white">
+                  {type.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Imágenes */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          Imágenes del Evento
+        </h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Máximo {MAX_IMAGES} imágenes. La primera será la portada.
+        </p>
+        
+        <div className="grid grid-cols-3 gap-4">
+          {imagePreviewUrls.map((url, index) => (
+            <div key={index} className="relative aspect-square">
+              <img 
+                src={url} 
+                alt={`Preview ${index + 1}`}
+                className="w-full h-full object-cover rounded-lg border dark:border-gray-700"
+              />
               <button
                 type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-brand/10 transition-colors"
+                onClick={() => removeImage(index)}
+                className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
               >
-                <Upload className="w-8 h-8 text-gray-400" />
-                <span className="text-sm text-gray-500">Agregar imagen</span>
+                <X className="w-4 h-4" />
               </button>
-            )}
-          </div>
-          
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handleImageSelect}
-          />
-        </div>
-
-        {/* Fechas y Horas */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900">Fechas y Horas</h3>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Fecha y Hora de Inicio <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="datetime-local"
-                value={formData.startDateTime}
-                onChange={(e) => handleInputChange('startDateTime', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.startDateTime ? 'border-red-500' : 'border-gray-300'
-                }`}
-              />
-              {errors.startDateTime && <p className="text-red-500 text-xs mt-1">{errors.startDateTime}</p>}
+              {index === 0 && (
+                <span className="absolute bottom-1 left-1 px-2 py-0.5 bg-brand text-white text-xs rounded">
+                  Portada
+                </span>
+              )}
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Fecha y Hora de Fin
-              </label>
-              <input
-                type="datetime-local"
-                value={formData.endDateTime}
-                onChange={(e) => handleInputChange('endDateTime', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.endDateTime ? 'border-red-500' : 'border-gray-300'
-                }`}
-              />
-              {errors.endDateTime && <p className="text-red-500 text-xs mt-1">{errors.endDateTime}</p>}
-            </div>
-          </div>
-        </div>
-
-        {/* Ubicacion */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900">Ubicacion</h3>
+          ))}
           
-          {/* Buscar direccion - Autocomplete */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Buscar ubicacion
-            </label>
-            <input
-              ref={locationInputRef}
-              type="text"
-              value={formData.address}
-              onChange={(e) => handleInputChange('address', e.target.value)}
-              placeholder="Escribe una direccion para buscar"
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.address ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
-          </div>
-
-          {/* Google Map */}
-          <div className="space-y-2">
-            <p className="text-sm text-gray-600">
-              Haz clic en el mapa o arrastra el marcador para ajustar la ubicacion exacta
-            </p>
-            <div
-              key={isOpen ? 'map-open' : 'map-closed'}
-              ref={mapRef}
-              className="w-full h-64 rounded-lg border border-gray-300 bg-gray-100"
-              style={{ display: mapLoaded ? 'block' : 'none' }}
+          {selectedImages.length < MAX_IMAGES && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="aspect-square border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-brand/10 transition-colors bg-gray-50 dark:bg-gray-800/50"
             >
-            </div>
-            {!mapLoaded && (
-              <div className="w-full h-64 rounded-lg border border-gray-300 bg-gray-100 flex items-center justify-center">
-                <div className="flex flex-col items-center gap-2">
-                  <Loader2 className="w-8 h-8 animate-spin text-brand" />
-                  <span className="text-sm text-gray-500">Cargando mapa...</span>
-                </div>
-              </div>
-            )}
+              <Upload className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+              <span className="text-sm text-gray-500 dark:text-gray-400">Agregar imagen</span>
+            </button>
+          )}
+        </div>
+        
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={handleImageSelect}
+        />
+      </div>
+
+      {/* Fechas y Horas */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Fechas y Horas</h3>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Fecha y Hora de Inicio <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="datetime-local"
+              value={formData.startDateTime}
+              onChange={(e) => handleInputChange('startDateTime', e.target.value)}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 dark:bg-gray-800 dark:text-white ${
+                errors.startDateTime ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+              }`}
+            />
+            {errors.startDateTime && <p className="text-red-500 text-xs mt-1">{errors.startDateTime}</p>}
           </div>
 
-          {/* Direccion exacta - Resultado del mapa */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Direccion exacta
-              <span className="text-gray-400 font-normal ml-1">(se rellena al marcar en el mapa)</span>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Fecha y Hora de Fin
             </label>
+            <input
+              type="datetime-local"
+              value={formData.endDateTime}
+              onChange={(e) => handleInputChange('endDateTime', e.target.value)}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 dark:bg-gray-800 dark:text-white ${
+                errors.endDateTime ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+              }`}
+            />
+            {errors.endDateTime && <p className="text-red-500 text-xs mt-1">{errors.endDateTime}</p>}
+          </div>
+        </div>
+      </div>
+
+      {/* Ubicación */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Ubicación</h3>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Buscar ubicación
+          </label>
+          <input
+            ref={locationInputRef}
+            type="text"
+            value={formData.address}
+            onChange={(e) => handleInputChange('address', e.target.value)}
+            placeholder="Escribe una dirección para buscar"
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 ${
+              errors.address ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+            }`}
+          />
+          {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
+        </div>
+
+        {/* Google Map */}
+        <div className="space-y-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Haz clic en el mapa o arrastra el marcador para ajustar la ubicación exacta
+          </p>
+          <div
+            key={isOpen ? 'map-open' : 'map-closed'}
+            ref={mapRef}
+            className="w-full h-64 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800"
+            style={{ display: mapLoaded ? 'block' : 'none' }}
+          ></div>
+          {!mapLoaded && (
+            <div className="w-full h-64 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+              <div className="flex flex-col items-center gap-2">
+                <Loader2 className="w-8 h-8 animate-spin text-brand" />
+                <span className="text-sm text-gray-500 dark:text-gray-400">Cargando mapa...</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Dirección exacta */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Dirección exacta
+            <span className="text-gray-400 dark:text-gray-500 font-normal ml-1">(se rellena al marcar en el mapa)</span>
+          </label>
+          <input
+            type="text"
+            value={formData.address || ''}
+            onChange={(e) => handleInputChange('address', e.target.value)}
+            placeholder="Calle, número, distrito, referencia..."
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 ${
+              errors.address ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+            }`}
+          />
+          {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ciudad</label>
             <input
               type="text"
-              value={formData.address || ''}
-              onChange={(e) => handleInputChange('address', e.target.value)}
-              placeholder="Calle, numero, distrito, referencia..."
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.address ? 'border-red-500' : 'border-gray-300'
+              value={formData.city}
+              onChange={(e) => handleInputChange('city', e.target.value)}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 ${
+                errors.city ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
+              placeholder="Ciudad"
+              maxLength={100}
             />
-            {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
+            {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
-              <input
-                type="text"
-                value={formData.city}
-                onChange={(e) => handleInputChange('city', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.city ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="Ciudad"
-                maxLength={100}
-              />
-              {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Pais</label>
-              <input
-                type="text"
-                value={formData.country}
-                onChange={(e) => handleInputChange('country', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.country ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="Pais"
-                maxLength={100}
-              />
-              {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country}</p>}
-            </div>
-          </div>
-        </div>
-
-        {/* Configuracion Adicional */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900">Configuracion Adicional</h3>
-          
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Maximo de Asistentes
-            </label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">País</label>
             <input
-              type="number"
-              value={formData.maxAttendees}
-              onChange={(e) => handleInputChange('maxAttendees', e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.maxAttendees ? 'border-red-500' : 'border-gray-300'
+              type="text"
+              value={formData.country}
+              onChange={(e) => handleInputChange('country', e.target.value)}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 ${
+                errors.country ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               }`}
-              placeholder="Sin limite"
-              min="1"
-              max="10000"
+              placeholder="País"
+              maxLength={100}
             />
-            {errors.maxAttendees && <p className="text-red-500 text-xs mt-1">{errors.maxAttendees}</p>}
+            {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country}</p>}
           </div>
         </div>
+      </div>
 
-        {/* Botones */}
-        <div className="flex gap-3 pt-4 border-t">
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            disabled={createEventMutation.isPending || uploadEventImagesMutation.isPending}
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            className="flex-1 px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={createEventMutation.isPending || uploadEventImagesMutation.isPending}
-          >
-            {createEventMutation.isPending || uploadEventImagesMutation.isPending ? (
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin" />
-                {uploadEventImagesMutation.isPending ? 'Subiendo imagenes...' : 'Creando...'}
-              </div>
-            ) : (
-              'Crear Evento'
-            )}
-          </button>
+      {/* Configuración Adicional */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Configuración Adicional</h3>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Máximo de Asistentes
+          </label>
+          <input
+            type="number"
+            value={formData.maxAttendees}
+            onChange={(e) => handleInputChange('maxAttendees', e.target.value)}
+            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 ${
+              errors.maxAttendees ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+            }`}
+            placeholder="Sin límite"
+            min="1"
+            max="10000"
+          />
+          {errors.maxAttendees && <p className="text-red-500 text-xs mt-1">{errors.maxAttendees}</p>}
         </div>
-      </form>
-    </Modal>
-  );
+      </div>
+
+      {/* Botones */}
+      <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          disabled={createEventMutation.isPending || uploadEventImagesMutation.isPending}
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={createEventMutation.isPending || uploadEventImagesMutation.isPending}
+        >
+          {createEventMutation.isPending || uploadEventImagesMutation.isPending ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin" />
+              {uploadEventImagesMutation.isPending ? 'Subiendo imágenes...' : 'Creando...'}
+            </div>
+          ) : (
+            'Crear Evento'
+          )}
+        </button>
+      </div>
+    </form>
+  </Modal>
+);
 }

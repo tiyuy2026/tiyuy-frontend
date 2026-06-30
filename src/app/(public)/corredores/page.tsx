@@ -95,7 +95,7 @@ export default function CorredoresPage() {
             </p>
             <div className="flex flex-wrap gap-3 mt-8">
               <Link href="/register"
-                className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-xl transition-all shadow-lg inline-flex items-center gap-2">
+                className="px-6 py-3 bg-brand hover:bg-brand-dark text-white font-semibold rounded-xl transition-all shadow-lg inline-flex items-center gap-2">
                 <UserCheck className="w-4 h-4" />
                 Crear perfil de agente
               </Link>
@@ -114,7 +114,7 @@ export default function CorredoresPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-7">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+              <div className="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center text-brand">
                 <Users className="w-6 h-6" />
               </div>
               <div>
@@ -130,7 +130,7 @@ export default function CorredoresPage() {
           </div>
           <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-7">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600">
+              <div className="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center text-brand">
                 <Home className="w-6 h-6" />
               </div>
               <div>
@@ -165,7 +165,7 @@ export default function CorredoresPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {BENEFITS.map((b, i) => (
               <div key={i} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-md hover:border-gray-200 transition-all">
-                <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4">{b.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center text-brand mb-4">{b.icon}</div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{b.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{b.desc}</p>
               </div>
@@ -174,11 +174,11 @@ export default function CorredoresPage() {
         </div>
 
         {/* Confianza */}
-        <div className="bg-gradient-to-br from-indigo-600 to-teal-700 rounded-3xl p-8 sm:p-10">
+        <div className="bg-gradient-to-br from-brand to-brand-dark rounded-3xl p-8 sm:p-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Confianza que se ve</h2>
-              <p className="text-indigo-100 text-sm sm:text-base leading-relaxed mb-6">
+              <p className="text-white/80 text-sm sm:text-base leading-relaxed mb-6">
                 Tu perfil en Tiyuy es tu carta de presentación. Foto profesional, especialidad, reseñas de clientes
                 y un portafolio ordenado. Cuando un cliente te encuentra aquí, ya sabe que eres un agente serio.
               </p>
@@ -190,7 +190,7 @@ export default function CorredoresPage() {
                   'Contacto directo sin intermediarios',
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-white/90 text-sm">
-                    <CheckCircle2 className="w-4 h-4 text-teal-300 flex-shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-white flex-shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -230,7 +230,7 @@ export default function CorredoresPage() {
               <ul className="space-y-2">
                 {['Galería de imágenes profesional', 'Ubicación precisa en mapa interactivo', 'Estadísticas de vistas y contactos', 'Compartir en redes sociales'].map((item, i) => (
                   <li key={i} className="flex items-center gap-2 text-sm text-gray-700">
-                    <CheckCircle2 className="w-4 h-5 text-teal-600 flex-shrink-0" />
+                    <CheckCircle2 className="w-4 h-5 text-brand flex-shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -239,7 +239,7 @@ export default function CorredoresPage() {
             <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-teal-600"><Home className="w-5 h-5" /></div>
+                  <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center text-brand"><Home className="w-5 h-5" /></div>
                   <div>
                     <p className="font-semibold text-gray-900 text-sm">Departamento en Miraflores</p>
                     <p className="text-xs text-gray-400">Publicado por Carlos López</p>
@@ -255,7 +255,7 @@ export default function CorredoresPage() {
               <div className="aspect-[16/9] bg-gray-200 rounded-xl mb-3 flex items-center justify-center text-gray-400 text-sm">📍 Miraflores · 80 m² · 3 dorm.</div>
               <div className="flex items-center justify-between">
                 <span className="text-lg font-bold text-gray-900">S/ 426,000</span>
-                <span className="text-xs font-medium text-teal-600 bg-teal-50 px-2 py-1 rounded-md">En venta</span>
+                <span className="text-xs font-medium text-brand bg-brand/10 px-2 py-1 rounded-md">En venta</span>
               </div>
             </div>
           </div>
@@ -273,7 +273,7 @@ export default function CorredoresPage() {
                 <button onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
                   className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors">
                   <span className="font-medium text-gray-900 text-sm pr-4">{faq.q}</span>
-                  {expandedFaq === i ? <ChevronUp className="w-4 h-4 text-indigo-600 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />}
+                  {expandedFaq === i ? <ChevronUp className="w-4 h-4 text-brand flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />}
                 </button>
                 {expandedFaq === i && (
                   <div className="px-4 pb-4 border-t border-gray-100 pt-3">
@@ -286,13 +286,13 @@ export default function CorredoresPage() {
         </div>
 
         {/* CTA */}
-        <div className="bg-gradient-to-br from-indigo-600 to-teal-700 rounded-3xl p-8 sm:p-10 text-center">
+        <div className="bg-gradient-to-br from-brand to-brand-dark rounded-3xl p-8 sm:p-10 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">Comienza a construir tu presencia profesional</h2>
-          <p className="text-indigo-100 text-sm sm:text-base max-w-lg mx-auto mb-6">
+          <p className="text-white/80 text-sm sm:text-base max-w-lg mx-auto mb-6">
             Crea tu perfil, publica tus propiedades y forma parte de una red de agentes que crecen con Tiyuy.
           </p>
           <Link href="/register"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-white text-indigo-700 font-semibold rounded-xl hover:bg-indigo-50 transition-all shadow-lg">
+            className="inline-flex items-center gap-2 px-8 py-3 bg-white text-brand-dark font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-lg">
             <UserCheck className="w-4 h-4" />
             Crear perfil de agente
           </Link>
