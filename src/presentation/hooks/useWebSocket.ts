@@ -102,11 +102,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         wsUrl = `${wsProtocol}://${host}/ws/chat`;
       }
 
-      console.log('🔌 Creando nueva conexión WebSocket a:', wsUrl);
       globalWebSocket = new WebSocket(wsUrl);
 
       globalWebSocket.onopen = () => {
-        console.log('🔌 WebSocket conectado exitosamente');
         isConnectingRef.current = false;
         setIsConnected(true);
         setConnectionError(null);
@@ -116,8 +114,6 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         if (globalWebSocket && token) {
           setTimeout(() => {
             if (globalWebSocket && globalWebSocket.readyState === WebSocket.OPEN) {
-              console.log('Enviando token de autenticación WebSocket:', token.substring(0, 20) + '...');
-              console.log('URL WebSocket:', wsUrl);
               globalWebSocket.send(JSON.stringify({
                 type: 'auth',
                 token: token
@@ -132,38 +128,28 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       globalWebSocket.onmessage = (event) => {
         try {
           const data: WebSocketMessage = JSON.parse(event.data);
-          console.log('📨 WebSocket message:', data);
-
           switch (data.type) {
             case 'connection_established':
-              console.log('✅ Conexión WebSocket establecida para usuario:', data.userId);
-              globalUserId = data.userId || null; // 🔥 Guardar userId global
+              globalUserId = data.userId || null; 
               break;
 
             case 'new_message':
-              console.log('💬 Nuevo mensaje recibido:', data);
-              options.onNewMessage?.(data); // Enviar data completo, no data.message
-              break;
+              options.onNewMessage?.(data); 
 
             case 'typing':
-              console.log('⌨️ Usuario escribiendo:', data.userId, 'en chat:', data.chatId);
               options.onTyping?.(data.userId!, data.chatId!);
               break;
 
             case 'subscribed_to_chat':
-              console.log('✅ Suscrito al chat:', data.chatId);
               break;
 
             case 'unsubscribed_from_chat':
-              console.log('❌ Cancelada suscripción al chat:', data.chatId);
               break;
 
             case 'error':
-              // Solo loguear si hay detalles del error
               if (data.message || data.code) {
                 console.error('Error WebSocket:', data.message || data.code);
                 
-                // Si el error es de token inválido, limpiar el token guardado
                 if (data.message?.includes('Token de autenticación inválido') || 
                     data.code === 'INVALID_TOKEN') {
                   console.warn('Token JWT inválido detectado, limpiando almacenamiento...');
@@ -275,32 +261,26 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   useEffect(() => {
     // Si está deshabilitado, no conectar
     if (!shouldConnect) {
-      console.log('🔌 WebSocket deshabilitado, no conectando');
       return;
     }
     
-    // 🔥 SINGLETON: Incrementar contador de instancias
     globalConnectionCount++;
-    console.log(`🔌 useWebSocket instancia ${globalConnectionCount} (ID: ${instanceId.current})`);
     
-    // Solo conectar si es la primera instancia
     if (globalConnectionCount === 1) {
       connect();
     }
 
     return () => {
-      // 🔥 SINGLETON: Decrementar contador
       globalConnectionCount--;
       console.log(`🔌 useWebSocket cleanup, quedan ${globalConnectionCount} instancias`);
       
-      // Solo desconectar si es la última instancia
       if (globalConnectionCount === 0) {
         disconnect();
         globalWebSocket = null;
         globalUserId = null;
       }
     };
-  }, []); // Solo al montar/desmontar
+  }, []); 
 
   return {
     isConnected,

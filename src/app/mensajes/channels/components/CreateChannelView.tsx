@@ -24,13 +24,11 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validar tipo de archivo
       if (!file.type.startsWith('image/')) {
         toast.error('Por favor selecciona una imagen valida (JPG, PNG, GIF)');
         return;
       }
       
-      // Validar tamaño (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast.error('La imagen no debe superar los 5MB');
         return;
@@ -38,7 +36,6 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
       
       setAvatarFile(file);
       
-      // Crear preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatarPreview(reader.result as string);
@@ -55,7 +52,6 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
       return;
     }
 
-    // Usar evaluación inicial de permisos
     if (!canCreateChannel) {
       toast.error('¡Hola! Para crear canales necesitas ser Agente Inmobiliario o Empresa. Si quieres crear un canal, contacta a nuestro equipo para actualizar tu rol.');
       return;
@@ -64,11 +60,8 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
     setIsCreating(true);
     
     try {
-      // Subir avatar si existe
       let avatarUrl = '';
       if (avatarFile) {
-        // Aquí iría la lógica de subida a un servicio como Cloudinary, S3, etc.
-        // Por ahora simulamos la subida
         avatarUrl = `https://api.tiyuy.com/avatars/${Date.now()}_${avatarFile.name}`;
       }
       
@@ -107,7 +100,6 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
           </button>
         </div>
 
-        {/* Si no tiene permisos, mostrar mensaje temprano */}
         {!canCreateChannel ? (
           <div className="bg-gradient-to-r from-amber-50 dark:from-amber-900/30 to-orange-50 dark:to-orange-900/30 border border-amber-200 dark:border-amber-700 rounded-xl p-8 text-center">
             <div className="w-20 h-20 rounded-full bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center mx-auto mb-6">

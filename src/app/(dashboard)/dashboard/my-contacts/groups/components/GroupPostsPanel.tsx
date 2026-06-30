@@ -46,8 +46,6 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
     isDeletingPost 
   } = useGroupPosts(groupId);
 
-  console.log('GrupoPostsPanel render - posts.length:', posts?.length || 0);
-  console.log('GrupoPostsPanel render - posts:', posts);
   
   // Debug: Check imageUrls in each post
   posts?.forEach((post, index) => {

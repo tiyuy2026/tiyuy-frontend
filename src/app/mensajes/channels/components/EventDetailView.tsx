@@ -5,15 +5,7 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Building2, Calendar, Check, ChevronRight, Clock, Globe, Heart, MapPin, MessageCircle, MessageSquare, Search, Share2, Ticket, Users, X } from 'lucide-react';;
 import { axiosClient } from '@/infrastructure/api/axios-client';
-import { 
-  useGetChannelEventAttendees, 
-  useRsvpChannelEvent, 
-  useCancelRsvpChannelEvent,
-  useInterestedChannelEvent,
-  useChannelSubscribers,
-  useGetChannelEvent,
-  useSubscribeToChannel
-} from '@/presentation/hooks/useContacts';
+import { useGetChannelEventAttendees, useRsvpChannelEvent, useCancelRsvpChannelEvent,useInterestedChannelEvent,useChannelSubscribers,useGetChannelEvent,useSubscribeToChannel} from '@/presentation/hooks/useContacts';
 
 interface EventDetailViewProps {
   event: any;

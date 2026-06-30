@@ -134,76 +134,66 @@ export default function LibroReclamacionesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 py-8 px-4 transition-colors duration-200">
       <div className="max-w-4xl mx-auto">
-        {/* Header - Estilo PDF Indecopi */}
-        <div className="bg-white border-2 border-gray-300 rounded-t-lg p-6 text-center relative">
+        <div className="bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-700 rounded-t-lg p-6 text-center relative">
           <div className="absolute right-6 top-1/2 -translate-y-1/2">
             <img 
               src="/assets/images/logo_s.png" 
               alt="TIYUY" 
-              className="h-12 w-auto"
+              className="h-12 w-auto dark:brightness-110"
             />
-
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white uppercase tracking-wide">
             LIBRO DE RECLAMACIONES
           </h1>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             (Ley N° 29571, Código de Protección y Defensa del Consumidor)
           </p>
         </div>
 
-
-
-        {/* Form - Estilo tabla PDF */}
-        <form onSubmit={handleSubmit} className="bg-white border-x-2 border-b-2 border-gray-300 rounded-b-lg overflow-hidden">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-900 border-x-2 border-b-2 border-gray-300 dark:border-gray-700 rounded-b-lg overflow-hidden">
           {error && (
-            <div className="flex items-start gap-3 bg-red-50 border-b-2 border-red-200 p-4">
+            <div className="flex items-start gap-3 bg-red-50 dark:bg-red-950/50 border-b-2 border-red-200 dark:border-red-900/50 p-4">
               <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
-              <p className="text-sm text-red-700">{error}</p>
+              <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
             </div>
           )}
 
-          {/* I. DATOS DE LA EMPRESA */}
-          <div className="border-b-2 border-gray-300">
-            <div className="bg-gray-100 px-4 py-2 border-b border-gray-300">
-              <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide">
+          <div className="border-b-2 border-gray-300 dark:border-gray-700">
+            <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 border-b border-gray-300 dark:border-gray-700">
+              <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wide">
                 I. Datos de la Empresa
               </h2>
             </div>
-            <table className="w-full">
+            <table className="w-full table-fixed">
               <tbody>
-                <tr className="border-b border-gray-200">
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200">Razón Social</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">LOPEZ SOFTWARE SOLUTIONS E.I.R.L.</td>
-
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800">Razón Social</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">LOPEZ SOFTWARE SOLUTIONS E.I.R.L.</td>
                 </tr>
-                <tr className="border-b border-gray-200">
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200">RUC</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">20615573711</td>
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800">RUC</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">20615573711</td>
                 </tr>
                 <tr>
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200">Dirección</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">Jr. Lopez Aldana 286, La Victoria, Lima, Perú</td>
-
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800">Dirección</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">Jr. Lopez Aldana 286, La Victoria, Lima, Perú</td>
                 </tr>
-
               </tbody>
             </table>
           </div>
 
-          {/* II. IDENTIFICACIÓN DEL CONSUMIDOR */}
-          <div className="border-b-2 border-gray-300">
-            <div className="bg-gray-100 px-4 py-2 border-b border-gray-300">
-              <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide">
+          <div className="border-b-2 border-gray-300 dark:border-gray-700">
+            <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 border-b border-gray-300 dark:border-gray-700">
+              <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wide">
                 II. Identificación del Consumidor
               </h2>
             </div>
-            <table className="w-full">
+            <table className="w-full table-fixed">
               <tbody>
-                <tr className="border-b border-gray-200">
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200">
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800">
                     Nombres y Apellidos <span className="text-red-500">*</span>
                   </td>
                   <td className="px-4 py-3">
@@ -213,13 +203,13 @@ export default function LibroReclamacionesPage() {
                       value={form.nombre}
                       onChange={handleChange}
                       required
-                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Ingrese sus nombres y apellidos"
                     />
                   </td>
                 </tr>
-                <tr className="border-b border-gray-200">
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200">
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800">
                     Domicilio <span className="text-red-500">*</span>
                   </td>
                   <td className="px-4 py-3">
@@ -229,13 +219,13 @@ export default function LibroReclamacionesPage() {
                       value={form.domicilio}
                       onChange={handleChange}
                       required
-                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Ingrese su domicilio"
                     />
                   </td>
                 </tr>
-                <tr className="border-b border-gray-200">
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200">
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800">
                     DNI / CE <span className="text-red-500">*</span>
                   </td>
                   <td className="px-4 py-3">
@@ -245,13 +235,13 @@ export default function LibroReclamacionesPage() {
                       value={form.dniCe}
                       onChange={handleChange}
                       required
-                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="N° de DNI o Carné de Extranjería"
                     />
                   </td>
                 </tr>
-                <tr className="border-b border-gray-200">
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200">
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800">
                     Teléfono
                   </td>
                   <td className="px-4 py-3">
@@ -260,13 +250,13 @@ export default function LibroReclamacionesPage() {
                       name="telefono"
                       value={form.telefono}
                       onChange={handleChange}
-                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Teléfono de contacto"
                     />
                   </td>
                 </tr>
-                <tr className="border-b border-gray-200">
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200">
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800">
                     Correo Electrónico <span className="text-red-500">*</span>
                   </td>
                   <td className="px-4 py-3">
@@ -276,14 +266,14 @@ export default function LibroReclamacionesPage() {
                       value={form.correo}
                       onChange={handleChange}
                       required
-                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="correo@ejemplo.com"
                     />
                   </td>
                 </tr>
                 <tr>
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200">
-                    Padre o Madre <br/><span className="text-xs font-normal text-gray-500">(si es menor de edad)</span>
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800">
+                    Padre o Madre <br/><span className="text-xs font-normal text-gray-500 dark:text-gray-400">(si es menor de edad)</span>
                   </td>
                   <td className="px-4 py-3">
                     <input
@@ -291,7 +281,7 @@ export default function LibroReclamacionesPage() {
                       name="padreMadre"
                       value={form.padreMadre}
                       onChange={handleChange}
-                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Nombre del padre o madre"
                     />
                   </td>
@@ -300,48 +290,47 @@ export default function LibroReclamacionesPage() {
             </table>
           </div>
 
-          {/* III. IDENTIFICACIÓN DEL BIEN CONTRATADO */}
-          <div className="border-b-2 border-gray-300">
-            <div className="bg-gray-100 px-4 py-2 border-b border-gray-300">
-              <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide">
+          <div className="border-b-2 border-gray-300 dark:border-gray-700">
+            <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 border-b border-gray-300 dark:border-gray-700">
+              <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wide">
                 III. Identificación del Bien Contratado
               </h2>
             </div>
-            <table className="w-full">
+            <table className="w-full table-fixed">
               <tbody>
-                <tr className="border-b border-gray-200">
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200">
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800">
                     Tipo de Bien <span className="text-red-500">*</span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-6">
-                      <label className="flex items-center gap-2 cursor-pointer">
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
                         <input
                           type="radio"
                           name="tipoBien"
                           value="PRODUCTO"
                           checked={form.tipoBien === 'PRODUCTO'}
                           onChange={handleChange}
-                          className="w-4 h-4 text-blue-600"
+                          className="w-4 h-4 text-blue-600 bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 focus:ring-blue-500 focus:ring-offset-white dark:focus:ring-offset-gray-900"
                         />
-                        <span className="text-sm text-gray-700">Producto</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Producto</span>
                       </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
                         <input
                           type="radio"
                           name="tipoBien"
                           value="SERVICIO"
                           checked={form.tipoBien === 'SERVICIO'}
                           onChange={handleChange}
-                          className="w-4 h-4 text-blue-600"
+                          className="w-4 h-4 text-blue-600 bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 focus:ring-blue-500 focus:ring-offset-white dark:focus:ring-offset-gray-900"
                         />
-                        <span className="text-sm text-gray-700">Servicio</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Servicio</span>
                       </label>
                     </div>
                   </td>
                 </tr>
-                <tr className="border-b border-gray-200">
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200">
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800">
                     Monto Reclamado (S/)
                   </td>
                   <td className="px-4 py-3">
@@ -352,13 +341,13 @@ export default function LibroReclamacionesPage() {
                       name="montoReclamado"
                       value={form.montoReclamado}
                       onChange={handleChange}
-                      className="w-full max-w-xs px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full max-w-xs px-2 py-1.5 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="0.00"
                     />
                   </td>
                 </tr>
                 <tr>
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200">
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800">
                     Descripción del Bien <span className="text-red-500">*</span>
                   </td>
                   <td className="px-4 py-3">
@@ -368,7 +357,7 @@ export default function LibroReclamacionesPage() {
                       onChange={handleChange}
                       required
                       rows={2}
-                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Describa el producto o servicio contratado"
                     />
                   </td>
@@ -377,42 +366,41 @@ export default function LibroReclamacionesPage() {
             </table>
           </div>
 
-          {/* IV. RECLAMO O QUEJA */}
-          <div className="border-b-2 border-gray-300">
-            <div className="bg-gray-100 px-4 py-2 border-b border-gray-300">
-              <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide">
+          <div className="border-b-2 border-gray-300 dark:border-gray-700">
+            <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 border-b border-gray-300 dark:border-gray-700">
+              <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wide">
                 IV. Reclamo o Queja
               </h2>
             </div>
-            <table className="w-full">
+            <table className="w-full table-fixed">
               <tbody>
                 <tr>
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200">
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800">
                     Tipo <span className="text-red-500">*</span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-6">
-                      <label className="flex items-center gap-2 cursor-pointer">
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
                         <input
                           type="radio"
                           name="tipoReclamo"
                           value="RECLAMO"
                           checked={form.tipoReclamo === 'RECLAMO'}
                           onChange={handleChange}
-                          className="w-4 h-4 text-blue-600"
+                          className="w-4 h-4 text-blue-600 bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 focus:ring-blue-500 focus:ring-offset-white dark:focus:ring-offset-gray-900"
                         />
-                        <span className="text-sm text-gray-700">Reclamo</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Reclamo</span>
                       </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
                         <input
                           type="radio"
                           name="tipoReclamo"
                           value="QUEJA"
                           checked={form.tipoReclamo === 'QUEJA'}
                           onChange={handleChange}
-                          className="w-4 h-4 text-blue-600"
+                          className="w-4 h-4 text-blue-600 bg-white dark:bg-gray-950 border-gray-300 dark:border-gray-700 focus:ring-blue-500 focus:ring-offset-white dark:focus:ring-offset-gray-900"
                         />
-                        <span className="text-sm text-gray-700">Queja</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">Queja</span>
                       </label>
                     </div>
                   </td>
@@ -421,17 +409,16 @@ export default function LibroReclamacionesPage() {
             </table>
           </div>
 
-          {/* V. DETALLE */}
-          <div className="border-b-2 border-gray-300">
-            <div className="bg-gray-100 px-4 py-2 border-b border-gray-300">
-              <h2 className="text-sm font-bold text-gray-800 uppercase tracking-wide">
+          <div className="border-b-2 border-gray-300 dark:border-gray-700">
+            <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 border-b border-gray-300 dark:border-gray-700">
+              <h2 className="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wide">
                 V. Detalle
               </h2>
             </div>
-            <table className="w-full">
+            <table className="w-full table-fixed">
               <tbody>
-                <tr className="border-b border-gray-200">
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200 align-top">
+                <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800 align-top">
                     Detalle de la Reclamación <span className="text-red-500">*</span>
                   </td>
                   <td className="px-4 py-3">
@@ -441,13 +428,13 @@ export default function LibroReclamacionesPage() {
                       onChange={handleChange}
                       required
                       rows={4}
-                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Describa detalladamente los hechos que motivan su reclamo o queja..."
                     />
                   </td>
                 </tr>
                 <tr>
-                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 bg-gray-50 border-r border-gray-200 align-top">
+                  <td className="w-1/4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/40 border-r border-gray-200 dark:border-gray-800 align-top">
                     Pedido del Consumidor <span className="text-red-500">*</span>
                   </td>
                   <td className="px-4 py-3">
@@ -457,7 +444,7 @@ export default function LibroReclamacionesPage() {
                       onChange={handleChange}
                       required
                       rows={3}
-                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1.5 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="¿Qué es lo que solicita como solución?"
                     />
                   </td>
@@ -466,12 +453,11 @@ export default function LibroReclamacionesPage() {
             </table>
           </div>
 
-          {/* Submit */}
-          <div className="px-4 py-4 bg-gray-50 border-t border-gray-300">
+          <div className="px-4 py-4 bg-gray-50 dark:bg-gray-800/30 border-t border-gray-300 dark:border-gray-700">
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-red-600 text-white font-semibold rounded hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm uppercase tracking-wide"
+              className="w-full py-3 bg-red-600 text-white font-semibold rounded hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm uppercase tracking-wide shadow-sm"
             >
               {loading ? (
                 <>
@@ -482,7 +468,7 @@ export default function LibroReclamacionesPage() {
                 'Enviar Reclamo'
               )}
             </button>
-            <p className="text-xs text-gray-500 text-center mt-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
               Al enviar, acepta los términos del Libro de Reclamaciones de TIYUY
             </p>
           </div>

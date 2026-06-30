@@ -11,11 +11,7 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
   const [searchTerm, setSearchTerm] = useState('');
   const { data: groups, isLoading } = useGetGroups(0, 50);
   const joinGroup = useJoinGroup();
-  
-  // Filtrar grupos donde el usuario NO es miembro
-  console.log(' All groups from API:', groups);
   const availableGroups = groups?.filter((g: any) => !g.isMember) ?? [];
-  console.log(' Available groups (not member):', availableGroups);
   const filteredGroups = availableGroups.filter((group: any) =>
     group.name.toLowerCase().includes(searchTerm.toLowerCase())
   );

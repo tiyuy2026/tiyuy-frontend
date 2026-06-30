@@ -18,13 +18,11 @@ interface StatusDetailPanelProps {
 export default function StatusDetailPanel({ status, user, onClose }: StatusDetailPanelProps) {
 
   //  Nombre real del usuario autenticado - usar firstName + lastName (campos válidos)
-  console.log(' StatusDetailPanel - user:', user); //  DEBUG
   const currentUserName = user?.firstName && user?.lastName
     ? `${user.firstName} ${user.lastName}`
     : user?.firstName
     || user?.lastName
     || `Usuario ${user?.id || ''}`;
-  console.log(' StatusDetailPanel - currentUserName:', currentUserName); //  DEBUG
 
   //  Función helper para detectar si un comentario es del usuario actual
   const isCurrentUserComment = (comment: any) => {
@@ -69,12 +67,6 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
   // Encontrar el estado actualizado en la lista
   const updatedStatus = statusPostsData?.pages?.flat()?.find(s => s.id === status.id) || status;
 
-  //  DEBUG en consola (limitado para evitar payload errors)
-  console.log('StatusDetailPanel comments:', {
-    statusId: status.id,
-    length: rawComments?.length || 0,
-    error
-  });
 
   //  Usar rawComments directamente sin useMemo para evitar bucles
   const comments = rawComments || [];

@@ -2,15 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { toast } from '@/presentation/store/toastStore';
-import { 
-  useChannelPosts, 
-  useUserEvents,
-  useChannelCollaborators,
-  useChannelStatistics,
-  useCanUserPublish,
-  useCreateChannelComment,
-  useGetChannelComments
-} from '@/presentation/hooks/useChannels';
+import { useChannelPosts, useUserEvents,useChannelCollaborators,useChannelStatistics,useCanUserPublish,useCreateChannelComment,useGetChannelComments} from '@/presentation/hooks/useChannels';
 import { useLikeChannelComment } from '@/presentation/hooks/useContacts';
 import { Plus, MessageSquare, Heart, Share2, Image, X, Send, MoreVertical, Edit, Trash2, Calendar, Shield, BarChart3, FileText, Paperclip } from 'lucide-react';
 import { UserAvatar } from '@/presentation/components/shared/UserAvatar';
