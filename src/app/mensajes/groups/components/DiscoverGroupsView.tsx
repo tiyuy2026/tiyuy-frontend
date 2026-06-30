@@ -5,8 +5,6 @@ import { useGetGroups, useJoinGroup } from '@/presentation/hooks/useContacts';
 import { formatCompactNumber } from '@/utils/formatters';
 import { FileText, Search, Users } from 'lucide-react';;
 
-console.log(' DiscoverGroupsView: useJoinGroup imported:', useJoinGroup);
-
 export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any; onGroupSelect: (group: any) => void }) {
   const [searchTerm, setSearchTerm] = useState('');
   const { data: groups, isLoading } = useGetGroups(0, 50);
@@ -27,18 +25,11 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
 
   const handleJoinGroup = (groupId: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log(' DiscoverGroupsView: handleJoinGroup called for group:', groupId);
-    console.log(' DiscoverGroupsView: joinGroup object:', joinGroup);
-    console.log('DiscoverGroupsView: joinGroup.mutate exists:', typeof joinGroup.mutate);
-    console.log(' DiscoverGroupsView: joinGroup.isPending:', joinGroup.isPending);
-    
     if (joinGroup.mutate) {
-      console.log(' DiscoverGroupsView: Calling joinGroup.mutate...');
       joinGroup.mutate(groupId);
-    } else {
-      console.error(' DiscoverGroupsView: ERROR - joinGroup.mutate is not a function!');
     }
   };
+
 
   return (
     <div className="h-full bg-white p-6 overflow-y-auto">
@@ -115,24 +106,23 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
                     {group.description || 'Sin descripción disponible'}
                   </p>
                   
-                  {/* Facebook-style stats */}
-                  <div className="flex items-center justify-between text-xs text-gray-500 mb-3 pb-2 border-b border-gray-100">
-                    <div className="flex items-center gap-1">
-                      <Users className="w-3 h-3" />
+                  {/* Group stats aligned */}
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-3 pb-2 border-b border-gray-100">
+                    <div className="flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
                       <span>{formatCompactNumber(group.memberCount)} members</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <FileText className="w-3 h-3" />
+                    <div className="flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
                       <span>{group.postCount || 0} posts</span>
                     </div>
                   </div>
 
+
                   {/* Botón de unirse */}
                   <button
-                    onClick={(e) => {
-                      console.log(' BUTTON CLICKED! Group ID:', group.id);
-                      handleJoinGroup(group.id, e);
-                    }}
+                    onClick={(e) => handleJoinGroup(group.id, e)}
+
                     disabled={joinGroup.isPending}
                     className="w-full py-2 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >

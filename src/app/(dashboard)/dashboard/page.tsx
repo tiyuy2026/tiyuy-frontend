@@ -534,46 +534,55 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-4">Zona Horaria</h3>
-                  <select
-                    value={timezone}
-                    onChange={(e) => setTimezone(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all"
-                  >
-                    {timezones.map((tz) => (
-                      <option key={tz.value} value={tz.value}>{tz.label}</option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-gray-500 mt-2">Se usara para mostrar fechas y horas correctamente.</p>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm text-gray-600 mb-1 block font-medium">Zona Horaria</label>
+                      <select
+                        value={timezone}
+                        onChange={(e) => setTimezone(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all"
+                      >
+                        {timezones.map((tz) => (
+                          <option key={tz.value} value={tz.value}>{tz.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <p className="text-xs text-gray-500">Se usara para mostrar fechas y horas correctamente.</p>
+                  </div>
                 </div>
 
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-4">Ubicacion</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm text-gray-600 mb-1 block">Pais</label>
-                      <input
-                        type="text"
-                        value={country}
-                        onChange={(e) => setCountry(e.target.value)}
-                        placeholder="Ej: Peru"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all"
-                      />
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1">
+                        <label className="text-sm text-gray-600 mb-1 block font-medium">Pais</label>
+                        <input
+                          type="text"
+                          value={country}
+                          onChange={(e) => setCountry(e.target.value)}
+                          placeholder="Ej: Peru"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-sm text-gray-600 mb-1 block font-medium">Ciudad</label>
+                        <input
+                          type="text"
+                          value={city}
+                          onChange={(e) => setCity(e.target.value)}
+                          placeholder="Ej: Lima"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label className="text-sm text-gray-600 mb-1 block">Ciudad</label>
-                      <input
-                        type="text"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        placeholder="Ej: Lima"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all"
-                      />
-                    </div>
+                    <p className="text-xs text-gray-500">Tu ubicacion ayuda a personalizar la experiencia.</p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-3">Tu ubicacion ayuda a personalizar la experiencia.</p>
                 </div>
               </div>
             </div>
+
+
 
             {/* Seguridad */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
