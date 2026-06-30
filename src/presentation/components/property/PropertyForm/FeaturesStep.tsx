@@ -93,7 +93,7 @@ export function FeaturesStep({ formData, onChange }: FeaturesStepProps) {
             value={formData.totalArea}
             onChange={(e) => onChange('totalArea', Number(e.target.value))}
             required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
             placeholder="Ej: 120"
           />
         </div>
@@ -105,7 +105,7 @@ export function FeaturesStep({ formData, onChange }: FeaturesStepProps) {
             type="number"
             value={formData.builtArea}
             onChange={(e) => onChange('builtArea', Number(e.target.value))}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
             placeholder="Ej: 110"
           />
         </div>
@@ -122,7 +122,7 @@ export function FeaturesStep({ formData, onChange }: FeaturesStepProps) {
               type="number"
               value={formData.floor}
               onChange={(e) => onChange('floor', Number(e.target.value))}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
               placeholder="Ej: 3"
             />
           </div>
@@ -134,7 +134,7 @@ export function FeaturesStep({ formData, onChange }: FeaturesStepProps) {
               type="number"
               value={formData.age}
               onChange={(e) => onChange('age', Number(e.target.value))}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
               placeholder="Ej: 5"
             />
           </div>
@@ -150,7 +150,7 @@ export function FeaturesStep({ formData, onChange }: FeaturesStepProps) {
           type="number"
           value={formData.maintenanceFee}
           onChange={(e) => onChange('maintenanceFee', Number(e.target.value))}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
           placeholder="Ej: 250"
         />
       </div>

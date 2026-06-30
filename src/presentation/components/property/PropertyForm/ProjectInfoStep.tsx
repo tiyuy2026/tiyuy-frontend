@@ -171,7 +171,7 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
           type="text"
           value={formData.name || formData.projectName || ''}
           onChange={(e) => handleChangeWithLog('name', e.target.value)}
-          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] outline-none ${
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] outline-none text-gray-900 bg-white ${
             validationErrors?.name ? 'border-red-300 bg-red-50/10' : 'border-gray-300'
           }`}
           placeholder="Ej: Residencial Las Flores"
@@ -201,7 +201,7 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
           value={formData.description || ''}
           onChange={(e) => handleChangeWithLog('description', e.target.value)}
           rows={4}
-          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] outline-none ${
+          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] outline-none text-gray-900 bg-white ${
             validationErrors?.description ? 'border-red-300 bg-red-50/10' : 'border-gray-300'
           }`}
           placeholder="Describe tu proyecto, características principales, amenities, ubicación privilegiada..."
@@ -228,25 +228,25 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
               <label className="block text-sm font-medium text-gray-700 mb-1">RUC (privado)</label>
               <input type="text" value={formData.ruc || ''} onChange={e => onChange('ruc', e.target.value)}
                 placeholder="20600000001" maxLength={11}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none bg-white text-gray-900" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Razon social</label>
               <input type="text" value={formData.socialReason || ''} onChange={e => onChange('socialReason', e.target.value)}
                 placeholder="Nombre de la empresa"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none bg-white text-gray-900" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Inicial desde (S/)</label>
               <input type="number" value={formData.initialFee || ''} onChange={e => onChange('initialFee', e.target.value ? Number(e.target.value) : '')}
                 placeholder="Ej: 5000" min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none bg-white text-gray-900" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Cuota mensual (S/)</label>
               <input type="number" value={formData.monthlyPayment || ''} onChange={e => onChange('monthlyPayment', e.target.value ? Number(e.target.value) : '')}
                 placeholder="Ej: 800" min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none bg-white text-gray-900" />
             </div>
           </div>
           
@@ -254,7 +254,7 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
             <label className="block text-sm font-medium text-gray-700 mb-1">Informacion de financiamiento</label>
             <input type="text" value={formData.financingInfo || ''} onChange={e => onChange('financingInfo', e.target.value)}
               placeholder="Ej: Financiamiento directo sin intereses a 24 meses"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none bg-white text-gray-900" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -262,13 +262,13 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
               <label className="block text-sm font-medium text-gray-700 mb-1">Total de manzanas</label>
               <input type="number" value={formData.totalBlocks || ''} onChange={e => onChange('totalBlocks', e.target.value ? Number(e.target.value) : '')}
                 placeholder="Ej: 8" min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none bg-white text-gray-900" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Sitio web</label>
               <input type="url" value={formData.websiteUrl || ''} onChange={e => onChange('websiteUrl', e.target.value)}
                 placeholder="https://"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none bg-white text-gray-900" />
             </div>
           </div>
           
@@ -276,7 +276,7 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
             <label className="block text-sm font-medium text-gray-700 mb-1">Red social</label>
             <input type="url" value={formData.socialMediaUrl || ''} onChange={e => onChange('socialMediaUrl', e.target.value)}
               placeholder="https://facebook.com/tuproyecto"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none" />
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none bg-white text-gray-900" />
           </div>
 
           {/* Habilitacion urbana */}
@@ -332,13 +332,13 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
                   <label className="block text-xs font-medium text-gray-600 mb-1">Nombre de urbanizacion</label>
                   <input type="text" value={formData.urbanizationName || ''} onChange={e => onChange('urbanizationName', e.target.value)}
                     placeholder="Ej: Los Olivos de Monterrico"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-teal-500 outline-none text-gray-900" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">Numero de partida registral</label>
                   <input type="text" value={formData.registryNumber || ''} onChange={e => onChange('registryNumber', e.target.value)}
                     placeholder="Ej: P03234567"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-teal-500 outline-none" />
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-2 focus:ring-teal-500 outline-none text-gray-900" />
                 </div>
               </div>
             )}

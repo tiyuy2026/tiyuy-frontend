@@ -40,7 +40,6 @@ export default function PlansPage() {
 
   // Check if user is agent and has available discount codes
   const userData = authStorage.getUser();
-  console.log('DEBUG: Datos completos del usuario:', userData);
   
   const userRole = userData?.role;
   const isAgent = userRole === 'AGENT';
@@ -49,19 +48,6 @@ export default function PlansPage() {
   const hasAgencyRole = isAgent || isDeveloper;
   const hasDiscountCodes = hasAgencyRole && availableDiscountCodes && availableDiscountCodes.length > 0;
   
-  console.log('DEBUG: Información de agencia:', {
-    userId: userData?.id,
-    agencyId: userData?.agencyId,
-    agencyName: userData?.agencyName,
-    role: userRole,
-    isAgent,
-    isDeveloper,
-    hasAgencyRole,
-    hasDiscountCodes,
-    availableDiscountCodes,
-    availableDiscountCodesLength: availableDiscountCodes?.length || 0
-  });
-
   // Función para determinar si un plan es empresarial
   const isEnterprisePlan = (plan: SubscriptionPlan): boolean => {
     // Consideramos empresariales los planes con precios altos o nombres que indican nivel empresarial

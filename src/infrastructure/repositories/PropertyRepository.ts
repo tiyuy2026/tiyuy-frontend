@@ -124,29 +124,16 @@ export class PropertyRepository implements IPropertyRepository {
     const response = await axiosClient.get(ENDPOINTS.PROPERTIES.BY_SLUG(slug));
     
     const dto = response.data?.property ? response.data.property : response.data;
-    console.log('DTO fields (slug):', Object.keys(dto));
-    console.log('Description field (slug):', dto.description);
-    console.log('Full DTO (slug):', dto);
     
-    const mappedProperty = PropertyMapper.toDomain(dto);
-    console.log('Mapped Property description (slug):', mappedProperty.description);
-    
+    const mappedProperty = PropertyMapper.toDomain(dto);    
     return mappedProperty;
   }
 
 // En PropertyRepository.ts, método getById
 async getById(id: number): Promise<Property> {
-  const response = await axiosClient.get(`${ENDPOINTS.PROPERTIES.BASE}/${id}`);
-  console.log('RAW response.data:', JSON.stringify(response.data, null, 2));
-  
+  const response = await axiosClient.get(`${ENDPOINTS.PROPERTIES.BASE}/${id}`);  
   const dto = response.data?.property ? response.data.property : response.data;
-  console.log('DTO fields:', Object.keys(dto));
-  console.log('Description field:', dto.description);
-  console.log('Full DTO:', dto);
-  
   const mappedProperty = PropertyMapper.toDomain(dto);
-  console.log('Mapped Property description:', mappedProperty.description);
-  
   return mappedProperty;
 }
   
@@ -177,10 +164,6 @@ async getById(id: number): Promise<Property> {
     });
 
     if (typeof window !== 'undefined') {
-      // eslint-disable-next-line no-console
-      console.debug('[my-properties] raw page keys:', Object.keys(response.data || {}));
-      // eslint-disable-next-line no-console
-      console.debug('[my-properties] first item:', response.data?.content?.[0]);
     }
 
     return {

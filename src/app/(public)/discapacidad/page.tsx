@@ -7,9 +7,27 @@ import { TicketCategory, TicketSeverity } from '@/core/domain/entities/Admin';
 import {
   X, Send, AlertCircle, CheckCircle2, Shield, Loader2, HelpCircle,
   Scale, Users, Eye, ChevronDown, ChevronUp, Heart, Accessibility,
-  DoorOpen, ChevronLeft, ChevronRight, Car, Volume2, Braces, Monitor
+  DoorOpen, ChevronLeft, ChevronRight, Car, Volume2, Braces, Monitor,
+  ArrowRight, FileText, Flag
 } from 'lucide-react';
 import Link from 'next/link';
+
+
+const AccessibilityIllustration = () => (
+  <svg viewBox="0 0 200 200" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="100" r="90" className="fill-[var(--brand-primary)]/5" />
+    <circle cx="100" cy="100" r="70" className="fill-[var(--brand-primary)]/10" />
+    <circle cx="100" cy="100" r="50" className="fill-[var(--brand-primary)]/15" />
+    <circle cx="100" cy="60" r="18" className="fill-[var(--brand-primary)]/30 stroke-[var(--brand-primary)]" strokeWidth="2" />
+    <path d="M85 85L115 85L120 130L105 130L100 105L95 130L80 130L85 85Z" className="fill-[var(--brand-primary)]" />
+    <path d="M75 95L125 95" className="stroke-[var(--brand-primary)]" strokeWidth="3" strokeLinecap="round" />
+    <circle cx="90" cy="155" r="12" className="fill-[var(--brand-primary)]/40 stroke-[var(--brand-primary)]" strokeWidth="2" />
+    <circle cx="110" cy="155" r="12" className="fill-[var(--brand-primary)]/40 stroke-[var(--brand-primary)]" strokeWidth="2" />
+    <path d="M90 155L90 143" className="stroke-[var(--brand-primary)]" strokeWidth="2" strokeLinecap="round" />
+    <path d="M110 155L110 143" className="stroke-[var(--brand-primary)]" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+
 
 const SUPPORT_TYPES: { value: TicketCategory; label: string; icon: React.ReactNode; desc: string }[] = [
   { value: 'PROPERTY_ISSUE', label: 'Información de accesibilidad', icon: <DoorOpen className="w-5 h-5" />, desc: 'Solicitar detalles sobre accesos, baños o rutas de una propiedad' },
@@ -111,131 +129,251 @@ export default function DiscapacidadPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-secondary)] antialiased text-[var(--text-primary)] selection:bg-[var(--brand-primary)]/10">
-      {/* Hero */}
-      <div className="bg-[var(--bg-primary)] border-b border-[var(--border-light)]">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16 py-16 sm:py-24 relative overflow-hidden">
-          <div className="absolute top-0 right-1/4 w-[600px] h-[300px] bg-gradient-to-r from-[var(--brand-primary)]/10 to-transparent blur-3xl pointer-events-none rounded-full" />
-          <div className="flex flex-col md:flex-row md:items-center gap-6 relative z-10 max-w-4xl">
-            <div className="w-16 h-16 rounded-2xl bg-[var(--brand-primary)]/10 flex items-center justify-center shrink-0 border border-[var(--border-light)]">
-              <Accessibility className="w-8 h-8 text-[var(--brand-primary)]" />
-            </div>
-            <div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-none text-[var(--text-primary)] text-balance">
+      {/* Hero Section */}
+      <div className="bg-[var(--bg-primary)] border-b border-[var(--border-light)] relative overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.08] dark:opacity-[0.06]"
+            style={{ backgroundImage: "url('/assets/images/hero/hero-3.jpg')" }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[var(--bg-primary)] via-[var(--bg-primary)]/95 to-[var(--bg-primary)]/80" />
+          <div className="absolute top-0 right-0 w-[800px] h-[400px] bg-gradient-to-l from-[var(--brand-primary)]/8 to-transparent blur-3xl rounded-full" />
+          <div className="absolute bottom-0 left-1/3 w-[400px] h-[200px] bg-gradient-to-r from-[var(--brand-primary)]/5 to-transparent blur-3xl rounded-full" />
+        </div>
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16 py-16 sm:py-24 relative z-10">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-16">
+            <div className="flex-1 max-w-3xl">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-[var(--brand-primary)]/10 flex items-center justify-center border border-[var(--border-light)]">
+                  <Accessibility className="w-6 h-6 text-[var(--brand-primary)]" />
+                </div>
+                <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-[0.2em]">Accesibilidad</span>
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none text-[var(--text-primary)]">
                 Apoyo a personas con <span className="text-[var(--brand-primary)]">discapacidad</span>
               </h1>
-              <p className="text-[var(--text-secondary)] mt-3 leading-relaxed font-medium text-lg sm:text-xl">
-                Accesibilidad, inclusión y acompañamiento para todos
+              <p className="text-lg sm:text-xl text-[var(--text-secondary)] mt-4 leading-relaxed font-medium max-w-2xl">
+                Accesibilidad, inclusión y acompañamiento para todos. Estamos aquí para garantizar
+                que todas las personas encuentren un hogar sin barreras.
               </p>
+              <div className="flex flex-wrap gap-3 mt-8">
+                <button
+                  onClick={() => setStep('form')}
+                  className="px-6 py-3.5 bg-[var(--brand-primary)] hover:opacity-90 text-white font-bold rounded-xl transition-all shadow-sm inline-flex items-center gap-2"
+                >
+                  <Send className="w-4 h-4" />
+                  Solicitar apoyo
+                </button>
+                <Link
+                  href="#faq"
+                  className="px-6 py-3.5 border border-[var(--border-color)] hover:border-[var(--brand-primary)]/30 text-[var(--text-primary)] font-bold rounded-xl transition-all inline-flex items-center gap-2 bg-[var(--bg-card)]"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  Ver preguntas frecuentes
+                </Link>
+              </div>
+            </div>
+            <div className="hidden lg:block w-72 h-72 shrink-0">
+              <AccessibilityIllustration />
             </div>
           </div>
         </div>
       </div>
 
+
       {step === 'info' && (
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16 py-12 space-y-8">
-          <div className="max-w-4xl mx-auto space-y-8">
+        <div className="max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16 py-12 space-y-10">
+          <div className="max-w-4xl mx-auto space-y-10">
             {/* Compromiso */}
-            <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10">
-              <div className="flex items-center gap-2 mb-6">
-                <Heart className="w-5 h-5 text-[var(--brand-primary)]" />
-                <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-widest">Nuestro compromiso</span>
+            <div className="group bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10 relative overflow-hidden hover:shadow-[0_8px_40px_rgba(74,154,62,0.06)] hover:-translate-y-0.5 transition-all duration-300">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[var(--brand-primary)]/5 to-transparent blur-3xl rounded-full pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-tr from-[var(--brand-primary)]/3 to-transparent blur-2xl rounded-full pointer-events-none" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--brand-primary)]/20 to-[var(--brand-primary)]/5 flex items-center justify-center">
+                    <Heart className="w-4 h-4 text-[var(--brand-primary)]" />
+                  </div>
+                  <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-widest">Nuestro compromiso</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-4">Una plataforma para todos</h2>
+                <div className="space-y-4">
+                  <p className="text-[var(--text-secondary)] leading-relaxed font-medium">
+                    En Tiyuy creemos que encontrar un hogar es un derecho, no un privilegio. Trabajamos para
+                    que nuestra plataforma sea accesible, inclusiva y útil para todas las personas,
+                    independientemente de sus capacidades.
+                  </p>
+                  <p className="text-[var(--text-secondary)] leading-relaxed font-medium">
+                    Nadie puede ser discriminado por su discapacidad en Tiyuy. Todos los anunciantes deben
+                    describir de forma honesta y clara las condiciones de accesibilidad de sus propiedades.
+                    Si necesitas información adicional o apoyo para realizar una visita, estamos aquí para ayudarte.
+                  </p>
+                </div>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-4">Una plataforma para todos</h2>
-              <div className="space-y-4">
-                <p className="text-[var(--text-secondary)] leading-relaxed font-medium">
-                  En Tiyuy creemos que encontrar un hogar es un derecho, no un privilegio. Trabajamos para
-                  que nuestra plataforma sea accesible, inclusiva y útil para todas las personas,
-                  independientemente de sus capacidades.
-                </p>
-                <p className="text-[var(--text-secondary)] leading-relaxed font-medium">
-                  Nadie puede ser discriminado por su discapacidad en Tiyuy. Todos los anunciantes deben
-                  describir de forma honesta y clara las condiciones de accesibilidad de sus propiedades.
-                  Si necesitas información adicional o apoyo para realizar una visita, estamos aquí para ayudarte.
-                </p>
-              </div>
+            </div>
+
+            {/* Decorative Divider */}
+            <div className="flex items-center gap-4">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--border-light)] to-transparent" />
+              <div className="w-2 h-2 rounded-full bg-[var(--brand-primary)]/30" />
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--border-light)] to-transparent" />
             </div>
 
             {/* Apoyo disponible */}
-            <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10">
-              <div className="flex items-center gap-2 mb-6">
-                <Shield className="w-5 h-5 text-[var(--brand-primary)]" />
-                <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-widest">Apoyo disponible</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-6">¿Qué tipo de apoyo puedes solicitar?</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[
-                  { icon: <DoorOpen className="w-5 h-5" />, title: 'Info de accesibilidad', desc: 'Detalles sobre accesos, baños, estacionamiento y rutas de una propiedad.' },
-                  { icon: <Users className="w-5 h-5" />, title: 'Acompañamiento en visita', desc: 'Solicita apoyo adicional para realizar una visita presencial.' },
-                  { icon: <Volume2 className="w-5 h-5" />, title: 'Comunicación accesible', desc: 'Información en braille, letra grande, audio o formato adaptado.' },
-                  { icon: <Monitor className="w-5 h-5" />, title: 'Apoyo en plataforma', desc: 'Asistencia para navegar, publicar o contactar en la web o app.' },
-                  { icon: <Eye className="w-5 h-5" />, title: 'Reportar incumplimiento', desc: 'Denunciar anuncios que no informan correctamente su accesibilidad.' },
-                  { icon: <HelpCircle className="w-5 h-5" />, title: 'Otro ajuste razonable', desc: 'Cualquier otra solicitud que necesites para participar en igualdad de condiciones.' },
-                ].map((item, idx) => (
-                  <div key={idx} className="bg-[var(--bg-secondary)] border border-[var(--border-light)] rounded-2xl p-5 hover:border-[var(--brand-primary)]/30 transition-colors group">
-                    <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 flex items-center justify-center text-[var(--brand-primary)] mb-4 border border-[var(--border-light)] group-hover:bg-[var(--brand-primary)]/20">
-                      {item.icon}
-                    </div>
-                    <h4 className="font-bold text-[var(--text-primary)] text-base mb-1">{item.title}</h4>
-                    <p className="text-sm text-[var(--text-secondary)] font-medium leading-relaxed">{item.desc}</p>
+            <div className="group bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10 relative overflow-hidden hover:shadow-[0_8px_40px_rgba(74,154,62,0.06)] transition-all duration-300">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-[var(--brand-primary)]/5 to-transparent blur-3xl rounded-full pointer-events-none" />
+              <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{
+                backgroundImage: `radial-gradient(circle at 25px 25px, var(--brand-primary) 1px, transparent 1px)`,
+                backgroundSize: '50px 50px'
+              }} />
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--brand-primary)]/20 to-[var(--brand-primary)]/5 flex items-center justify-center">
+                    <Shield className="w-4 h-4 text-[var(--brand-primary)]" />
                   </div>
-                ))}
+                  <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-widest">Apoyo disponible</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-6">¿Qué tipo de apoyo puedes solicitar?</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { icon: <DoorOpen className="w-5 h-5" />, title: 'Info de accesibilidad', desc: 'Detalles sobre accesos, baños, estacionamiento y rutas de una propiedad.' },
+                    { icon: <Users className="w-5 h-5" />, title: 'Acompañamiento en visita', desc: 'Solicita apoyo adicional para realizar una visita presencial.' },
+                    { icon: <Volume2 className="w-5 h-5" />, title: 'Comunicación accesible', desc: 'Información en braille, letra grande, audio o formato adaptado.' },
+                    { icon: <Monitor className="w-5 h-5" />, title: 'Apoyo en plataforma', desc: 'Asistencia para navegar, publicar o contactar en la web o app.' },
+                    { icon: <Eye className="w-5 h-5" />, title: 'Reportar incumplimiento', desc: 'Denunciar anuncios que no informan correctamente su accesibilidad.' },
+                    { icon: <HelpCircle className="w-5 h-5" />, title: 'Otro ajuste razonable', desc: 'Cualquier otra solicitud que necesites para participar en igualdad de condiciones.' },
+                  ].map((item, idx) => (
+                    <div key={idx} className="group/card bg-[var(--bg-secondary)] border border-[var(--border-light)] rounded-2xl p-5 hover:border-[var(--brand-primary)]/30 hover:shadow-[0_4px_20px_rgba(74,154,62,0.06)] hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[var(--brand-primary)]/5 to-transparent blur-2xl rounded-full pointer-events-none opacity-0 group-hover/card:opacity-100 transition-opacity" />
+                      <div className="relative z-10">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--brand-primary)]/15 to-[var(--brand-primary)]/5 flex items-center justify-center text-[var(--brand-primary)] mb-4 border border-[var(--border-light)] group-hover/card:bg-gradient-to-br group-hover/card:from-[var(--brand-primary)]/25 group-hover/card:to-[var(--brand-primary)]/10 group-hover/card:border-[var(--brand-primary)]/20 transition-all duration-200">
+                          {item.icon}
+                        </div>
+                        <h4 className="font-bold text-[var(--text-primary)] text-base mb-1">{item.title}</h4>
+                        <p className="text-sm text-[var(--text-secondary)] font-medium leading-relaxed">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
+            </div>
+
+            {/* Decorative Divider */}
+            <div className="flex items-center gap-4">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--border-light)] to-transparent" />
+              <div className="w-2 h-2 rounded-full bg-[var(--brand-primary)]/30" />
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--border-light)] to-transparent" />
             </div>
 
             {/* Accesibilidad en anuncios */}
-            <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10">
-              <div className="flex items-center gap-2 mb-6">
-                <Accessibility className="w-5 h-5 text-[var(--brand-primary)]" />
-                <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-widest">Anuncios accesibles</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-2">Características que un anuncio debería informar</h2>
-              <p className="text-sm text-[var(--text-secondary)] mb-8 font-medium">
-                Los anunciantes deben describir con claridad las condiciones de accesibilidad de sus
-                propiedades para que puedas tomar decisiones informadas.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {ACCESSIBILITY_FEATURES.map((feat, idx) => (
-                  <div key={idx} className="flex items-start gap-4 p-5 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-light)] hover:border-[var(--brand-primary)]/30 transition-colors">
-                    <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 flex items-center justify-center text-[var(--brand-primary)] flex-shrink-0 border border-[var(--border-light)]">{feat.icon}</div>
-                    <div>
-                      <h4 className="font-bold text-[var(--text-primary)] text-sm mb-1">{feat.title}</h4>
-                      <p className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed">{feat.desc}</p>
-                    </div>
+            <div className="group bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10 relative overflow-hidden hover:shadow-[0_8px_40px_rgba(74,154,62,0.06)] transition-all duration-300">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-[var(--brand-primary)]/5 to-transparent blur-3xl rounded-full pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-60 h-60 bg-gradient-to-tr from-[var(--brand-primary)]/3 to-transparent blur-3xl rounded-full pointer-events-none" />
+              <div className="absolute inset-0 opacity-[0.015] pointer-events-none" style={{
+                backgroundImage: `radial-gradient(circle at 25px 25px, var(--brand-primary) 1px, transparent 1px)`,
+                backgroundSize: '50px 50px'
+              }} />
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--brand-primary)]/20 to-[var(--brand-primary)]/5 flex items-center justify-center">
+                    <Accessibility className="w-4 h-4 text-[var(--brand-primary)]" />
                   </div>
-                ))}
+                  <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-widest">Anuncios accesibles</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-2">Características que un anuncio debería informar</h2>
+                <p className="text-sm text-[var(--text-secondary)] mb-8 font-medium">
+                  Los anunciantes deben describir con claridad las condiciones de accesibilidad de sus
+                  propiedades para que puedas tomar decisiones informadas.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {ACCESSIBILITY_FEATURES.map((feat, idx) => (
+                    <div key={idx} className="group/card flex items-start gap-4 p-5 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-light)] hover:border-[var(--brand-primary)]/30 hover:shadow-[0_4px_20px_rgba(74,154,62,0.06)] hover:-translate-y-0.5 transition-all duration-200">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--brand-primary)]/15 to-[var(--brand-primary)]/5 flex items-center justify-center text-[var(--brand-primary)] flex-shrink-0 border border-[var(--border-light)] group-hover/card:bg-gradient-to-br group-hover/card:from-[var(--brand-primary)]/25 group-hover/card:to-[var(--brand-primary)]/10 group-hover/card:border-[var(--brand-primary)]/20 transition-all duration-200">
+                        {feat.icon}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-[var(--text-primary)] text-sm mb-1">{feat.title}</h4>
+                        <p className="text-xs text-[var(--text-secondary)] font-medium leading-relaxed">{feat.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
+            </div>
+
+            {/* Decorative Divider */}
+            <div className="flex items-center gap-4">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--border-light)] to-transparent" />
+              <div className="w-2 h-2 rounded-full bg-[var(--brand-primary)]/30" />
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--border-light)] to-transparent" />
             </div>
 
             {/* FAQ */}
-            <div className="bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10">
-              <div className="flex items-center gap-2 mb-6">
-                <HelpCircle className="w-5 h-5 text-[var(--brand-primary)]" />
-                <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-widest">Preguntas</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-6">Preguntas frecuentes</h2>
-              <div className="space-y-4">
-                {FAQS.map((faq, index) => (
-                  <div key={index} className="border border-[var(--border-light)] rounded-2xl overflow-hidden transition-all hover:border-[var(--brand-primary)]/30 bg-[var(--bg-card)]">
-                    <button onClick={() => toggleFaq(index)}
-                      className="w-full flex items-center justify-between p-5 text-left hover:bg-[var(--bg-secondary)] transition-colors">
-                      <span className="font-bold text-[var(--text-primary)] pr-4">{faq.q}</span>
-                      {expandedFaq === index ? <ChevronUp className="w-5 h-5 text-[var(--brand-primary)] flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-[var(--text-muted)] flex-shrink-0" />}
-                    </button>
-                    {expandedFaq === index && (
-                      <div className="px-5 pb-5 border-t border-[var(--border-light)] pt-4 bg-[var(--bg-secondary)]">
-                        <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">{faq.a}</p>
-                      </div>
-                    )}
+            <div className="group bg-[var(--bg-card)] rounded-3xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-8 sm:p-10 relative overflow-hidden hover:shadow-[0_8px_40px_rgba(74,154,62,0.06)] transition-all duration-300" id="faq">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[var(--brand-primary)]/5 to-transparent blur-3xl rounded-full pointer-events-none" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--brand-primary)]/20 to-[var(--brand-primary)]/5 flex items-center justify-center">
+                    <HelpCircle className="w-4 h-4 text-[var(--brand-primary)]" />
                   </div>
-                ))}
+                  <span className="text-xs font-bold text-[var(--brand-primary)] uppercase tracking-widest">Preguntas</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-6">Preguntas frecuentes</h2>
+                <div className="space-y-4">
+                  {FAQS.map((faq, index) => (
+                    <div key={index} className={`border rounded-2xl overflow-hidden transition-all duration-200 ${
+                      expandedFaq === index
+                        ? 'border-[var(--brand-primary)]/40 shadow-[0_2px_12px_rgba(74,154,62,0.08)]'
+                        : 'border-[var(--border-light)] hover:border-[var(--brand-primary)]/30'
+                    } bg-[var(--bg-card)]`}>
+                      <button
+                        onClick={() => toggleFaq(index)}
+                        className="w-full flex items-center justify-between p-5 text-left hover:bg-[var(--bg-secondary)] transition-colors"
+                      >
+                        <span className={`font-bold pr-4 transition-colors ${
+                          expandedFaq === index ? 'text-[var(--brand-primary)]' : 'text-[var(--text-primary)]'
+                        }`}>{faq.q}</span>
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
+                          expandedFaq === index
+                            ? 'bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]'
+                            : 'bg-[var(--bg-secondary)] text-[var(--text-muted)]'
+                        }`}>
+                          {expandedFaq === index ? (
+                            <ChevronUp className="w-5 h-5" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5" />
+                          )}
+                        </div>
+                      </button>
+                      {expandedFaq === index && (
+                        <div className="px-5 pb-5 border-t border-[var(--border-light)] pt-4 bg-gradient-to-b from-[var(--bg-secondary)] to-[var(--bg-card)]">
+                          <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">{faq.a}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
+            {/* Decorative Divider */}
+            <div className="flex items-center gap-4">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--border-light)] to-transparent" />
+              <div className="w-2 h-2 rounded-full bg-[var(--brand-primary)]/30" />
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--border-light)] to-transparent" />
+            </div>
+
             {/* CTA */}
-            <div className="bg-[var(--bg-card)] rounded-3xl p-8 sm:p-12 text-center border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-80 h-80 bg-[var(--brand-primary)]/5 blur-3xl rounded-full" />
+            <div className="group bg-gradient-to-br from-[var(--bg-card)] via-[var(--bg-card)] to-[var(--bg-card)] rounded-3xl p-8 sm:p-12 text-center border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] relative overflow-hidden hover:shadow-[0_8px_40px_rgba(74,154,62,0.08)] transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand-primary)]/3 via-transparent to-[var(--brand-primary)]/3 pointer-events-none" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-gradient-to-b from-[var(--brand-primary)]/8 to-transparent blur-3xl rounded-full pointer-events-none" />
+              <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-tl from-[var(--brand-primary)]/5 to-transparent blur-3xl rounded-full pointer-events-none" />
+              <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{
+                backgroundImage: `radial-gradient(circle at 25px 25px, var(--brand-primary) 1px, transparent 1px)`,
+                backgroundSize: '50px 50px'
+              }} />
               <div className="relative z-10">
-                <div className="w-20 h-20 rounded-3xl bg-[var(--brand-primary)]/10 flex items-center justify-center mx-auto mb-6 border border-[var(--brand-primary)]/20">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[var(--brand-primary)]/15 to-[var(--brand-primary)]/5 flex items-center justify-center mx-auto mb-6 border border-[var(--brand-primary)]/20">
                   <Accessibility className="w-10 h-10 text-[var(--brand-primary)]" />
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] mb-4">¿Necesitas apoyo o información?</h2>
