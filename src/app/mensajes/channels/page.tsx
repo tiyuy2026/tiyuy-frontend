@@ -47,7 +47,7 @@ export default function CanalesPanel({ user }: { user: any }) {
             <div className="flex-1 overflow-y-auto">
                 {isLoading ? (
                     <div className="flex justify-center py-12">
-                        <div className="w-8 h-8 rounded-full border-4 border-brand border-t-transparent animate-spin" />
+                        <div className="w-8 h-8 rounded-full border-4 border-gray-300 border-t-transparent animate-spin" />
                     </div>
                 ) : !displayChannels?.length ? (
                     <div className="text-center py-16">
@@ -57,7 +57,7 @@ export default function CanalesPanel({ user }: { user: any }) {
                     displayChannels.map((channel: any) => (
                         <div key={channel.id}
                             className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 border-b border-gray-100 transition-colors">
-                            <div className="w-12 h-12 rounded-full bg-brand flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
+                            <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-2xl flex-shrink-0 shadow-sm">
                                 {cityEmojis[channel.city] ?? '️'}
                             </div>
                             <div className="flex-1 min-w-0">
@@ -75,13 +75,13 @@ export default function CanalesPanel({ user }: { user: any }) {
                                     disabled={subscribe.isPending || unsubscribe.isPending}
                                     className={`text-xs px-3 py-1 rounded-full font-medium transition-all disabled:opacity-50 ${channel.isSubscribed
                                         ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                        : 'bg-brand text-white hover:opacity-90 shadow-sm'
+                                        : 'bg-gray-800 text-white hover:bg-gray-700 shadow-sm'
                                         }`}>
                                     {channel.isSubscribed ? ' Suscrito' : 'Suscribirse'}
                                 </button>
                                 <button
                                     onClick={() => setShareTarget({ title: `Canal ${channel.city} en Tiyuy`, link: `https://tiyuy.com/channels/${channel.shareLink}` })}
-                                    className="text-[10px] text-gray-400 hover:text-brand transition-colors flex items-center gap-1">
+                                    className="text-[10px] text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1">
                                     <IC.Share /> Compartir
                                 </button>
                             </div>
@@ -94,7 +94,7 @@ export default function CanalesPanel({ user }: { user: any }) {
             <div className="p-3 border-t border-gray-100 space-y-2">
                 <button
                     onClick={() => setShowNewChannel(true)}
-                    className="w-full bg-brand text-white rounded-lg px-4 py-3 font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-sm"
+                    className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 font-medium hover:bg-gray-700 transition-opacity flex items-center justify-center gap-2 shadow-sm"
                 >
                     <IC.Plus />
                     Crear canal

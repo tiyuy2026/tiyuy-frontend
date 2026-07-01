@@ -18,7 +18,7 @@ export function GrupoDetailPanel({ group, user, onBack }: { group: any; user: an
     return (
         <div className="flex flex-col h-full bg-white dark:bg-gray-900">
             {/* Header del grupo */}
-            <div className="bg-gradient-to-r from-brand to-brand-dark p-4 text-white">
+            <div className="bg-gradient-to-r from-green-600 to-green-800 p-4 text-white">
                 <div className="flex items-center justify-between">
                     <button
                         onClick={onBack}

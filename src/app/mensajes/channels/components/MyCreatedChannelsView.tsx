@@ -132,7 +132,7 @@ export default function MisCanalesCreadosView({ user, onChannelSelect }: MisCana
             onClick={() => onChannelSelect(channel)}
           >
             {/* Header del canal */}
-            <div className="h-20 bg-gradient-to-r brand relative">
+            <div className="h-20 bg-brand relative">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-12 h-12 bg-white/90 dark:bg-gray-800/90 rounded-full flex items-center justify-center text-2xl">
                   {getChannelEmoji(channel.city)}

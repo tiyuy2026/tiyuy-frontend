@@ -256,7 +256,7 @@ export function MisContactosPageContent() {
             {!isAuthenticated && (
                 <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
                     <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
-                        <div className="w-14 h-14 bg-brand rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div className="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                             <MessageSquare className="w-7 h-7 fill-white" />
                         </div>
 
@@ -268,7 +268,7 @@ export function MisContactosPageContent() {
                         <div className="space-y-3">
                             <a
                                 href="/login"
-                                className="block w-full py-3 bg-brand text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
+                                className="block w-full py-3 bg-green-600 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
                             >
                                 Iniciar sesión
                             </a>
@@ -290,7 +290,7 @@ export function MisContactosPageContent() {
             {/*  Sidebar iconos estilo WhatsApp  */}
             <div className="hidden md:flex w-[76px] bg-white dark:bg-gray-800 flex-col items-center py-3 gap-1 flex-shrink-0">
                 {/* Logo Tiyuy */}
-                <div className="w-10 h-10 mb-6 rounded-full bg-brand flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 mb-6 rounded-full bg-green-600 flex items-center justify-center shadow-lg">
                     <span className="text-white font-bold text-sm">T</span>
                 </div>
 
@@ -322,7 +322,7 @@ export function MisContactosPageContent() {
                 {/*  Panel lista izquierdo  */}
                 <div className={`flex-initial w-[350px] md:w-[350px] flex flex-col bg-white dark:bg-gray-800 border-r border-[#e9edef] dark:border-gray-700 overflow-hidden ${isMobile && hasSelection ? 'hidden' : 'flex'} ${isMobile ? 'w-full' : ''}`}>
                     {/* Header del panel con gradiente Tiyuy */}
-                    <div className="bg-brand px-4 py-3 flex-shrink-0">
+                    <div className="bg-green-600 px-4 py-3 flex-shrink-0">
                         <div className="flex items-center justify-between">
                             <div>
                                 <h1 className="text-white font-bold text-base leading-tight">
@@ -372,7 +372,7 @@ export function MisContactosPageContent() {
                             <div className="flex flex-col h-full" onClick={() => setContextMenu(null)}>
 
                                 {/*  HEADER  */}
-                                <div className="flex items-center gap-3 px-4 py-3 bg-brand border-b border-[#054d44] flex-shrink-0">
+                                <div className="flex items-center gap-3 px-4 py-3 bg-green-600 border-b border-[#054d44] flex-shrink-0">
                                     <button onClick={() => {
                                         setSelectedChatId(null);
                                         setReplyToMessage(null);
@@ -405,7 +405,7 @@ export function MisContactosPageContent() {
                                 {/*  BANNER MENSAJE FIJADO  */}
                                 {pinnedMessage && (
                                     <div className="flex items-center gap-2 px-4 py-2 bg-white border-b border-gray-200 flex-shrink-0">
-                                        <div className="w-1 h-8 rounded-full bg-brand flex-shrink-0" />
+                                        <div className="w-1 h-8 rounded-full bg-green-500 flex-shrink-0" />
                                         <div className="flex-1 min-w-0">
                                             <p className="text-[11px] font-semibold text-[#075e54]">
                                                 {pinnedMessage.isOwn ? 'Tú' : pinnedMessage.senderName?.split(' ')[0]}
@@ -517,7 +517,7 @@ export function MisContactosPageContent() {
                                                             >
                                                                 {/* Mensaje respondido */}
                                                                 {(msg.replyToContent || msg.replyToSenderName) && (
-                                                                    <div className="mb-1 p-2 bg-gray-100 rounded-md border-l-2 border-brand">
+                                                                        <div className="mb-1 p-2 bg-gray-100 rounded-md border-l-2 border-blue-500">
                                                                         <p className="text-xs text-gray-600 font-medium">
                                                                             Respondiendo a {msg.replyToIsOwn ? 'ti mismo' : msg.replyToSenderName?.split(' ')[0] || 'alguien'}
                                                                         </p>
@@ -708,7 +708,7 @@ export function MisContactosPageContent() {
                                         <button
                                             onClick={handleSendMessage}
                                             disabled={!newMessage.trim() || sendMessage.isPending}
-                                            className="w-10 h-10 rounded-full bg-[#128c7e] text-white flex items-center justify-center hover:bg-brand transition-colors disabled:opacity-50 shadow-sm flex-shrink-0"
+                                            className="w-10 h-10 rounded-full bg-[#128c7e] text-white flex items-center justify-center hover:bg-green-600 transition-colors disabled:opacity-50 shadow-sm flex-shrink-0"
                                         >
                                             <IC.Send />
                                         </button>
@@ -743,7 +743,7 @@ export function MisContactosPageContent() {
                                 <div className="flex-1 overflow-y-auto bg-gray-50">
                                     {/* Mobile back button */}
                                     {isMobile && (
-                                        <div className="flex items-center gap-3 px-4 py-3 bg-brand">
+                                        <div className="flex items-center gap-3 px-4 py-3 bg-green-600">
                                             <button onClick={() => setGruposSection('mis-grupos')}
                                                 className="text-white/70 hover:text-white transition-colors">
                                                 <ArrowLeft className="w-5 h-5 fill-current" />
@@ -757,7 +757,7 @@ export function MisContactosPageContent() {
                                 <div className="flex-1 flex flex-col overflow-hidden">
                                     {/* Mobile back button */}
                                     {isMobile && (
-                                        <div className="flex items-center gap-3 px-4 py-3 bg-brand">
+                                        <div className="flex items-center gap-3 px-4 py-3 bg-green-600">
                                             <button onClick={() => setGruposSection('mis-grupos')}
                                                 className="text-white/70 hover:text-white transition-colors">
                                                 <ArrowLeft className="w-5 h-5 fill-current" />
@@ -777,7 +777,7 @@ export function MisContactosPageContent() {
                                 <div className="flex-1 flex flex-col overflow-hidden">
                                     {/* Mobile back button */}
                                     {isMobile && (
-                                        <div className="flex items-center gap-3 px-4 py-3 bg-brand">
+                                        <div className="flex items-center gap-3 px-4 py-3 bg-green-600">
                                             <button onClick={() => {
                                                 setGruposSection('mis-grupos');
                                                 setSelectedGroup(null);
@@ -809,7 +809,7 @@ export function MisContactosPageContent() {
                                 {/* Contenido que cambia según el tab seleccionado */}
                                 {activeTab === 'chats' && (
                                     <div className="text-center px-6 flex flex-col items-center">
-                                        <div className="w-20 h-20 rounded-full bg-brand flex items-center justify-center mb-6 shadow-2xl">
+                                        <div className="w-20 h-20 rounded-full bg-green-600 flex items-center justify-center mb-6 shadow-2xl">
                                             <span className="text-white font-bold text-3xl">T</span>
                                         </div>
                                         <h2 className="text-gray-800 dark:text-white text-2xl font-light mb-2">Tiyuy Mensajes</h2>
@@ -830,7 +830,7 @@ export function MisContactosPageContent() {
 
                                 {activeTab === 'estados' && (
                                     <div className="text-center px-6 flex flex-col items-center">
-                                        <div className="w-20 h-20 rounded-full bg-brand flex items-center justify-center mb-6 shadow-2xl">
+                                        <div className="w-20 h-20 rounded-full bg-green-600 flex items-center justify-center mb-6 shadow-2xl">
                                             <span className="text-white font-bold text-3xl">E</span>
                                         </div>
                                         <h2 className="text-gray-800 dark:text-white text-2xl font-light mb-2">Estados</h2>
@@ -859,7 +859,7 @@ export function MisContactosPageContent() {
                         // Vista detallada del canal seleccionado
                         <div className={`flex-1 flex flex-col bg-white dark:bg-gray-900 overflow-hidden ${isMobile ? 'w-full' : ''}`}>
                             {/* Header del canal */}
-                            <div className="flex-none flex items-center gap-3 px-4 py-3 bg-brand border-b border-[#054d44]">
+                            <div className="flex-none flex items-center gap-3 px-4 py-3 bg-green-600 border-b border-[#054d44]">
                                 <button onClick={() => setSelectedChannel(null)}
                                     className="text-white/70 hover:text-white transition-colors">
                                     <ArrowLeft className="w-5 h-5 fill-current" />
@@ -895,7 +895,7 @@ export function MisContactosPageContent() {
                         <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-900">
                             {/* Mobile back button for sub-sections */}
                             {isMobile && channelsSection !== 'mis-canales-creados' && channelsSection !== 'mis-canales-suscritos' && (
-                                <div className="flex items-center gap-3 px-4 py-3 bg-brand flex-shrink-0">
+                                <div className="flex items-center gap-3 px-4 py-3 bg-green-600 flex-shrink-0">
                                     <button onClick={() => setChannelsSection('mis-canales-creados')}
                                         className="text-white/70 hover:text-white transition-colors">
                                         <ArrowLeft className="w-5 h-5 fill-current" />
@@ -947,7 +947,7 @@ export function MisContactosPageContent() {
                             setSelectedGroup(null);
                             setSelectedChannel(null);
                         }}
-                            className={`relative flex flex-col items-center justify-center py-1 px-3 rounded-lg transition-all ${activeTab === key ? 'text-brand' : 'text-gray-500'}`}>
+                            className={`relative flex flex-col items-center justify-center py-1 px-3 rounded-lg transition-all ${activeTab === key ? 'text-green-600' : 'text-gray-500'}`}>
                             <div className="relative">
                                 <Icon a={activeTab === key} />
                                 {badge ? (
@@ -956,7 +956,7 @@ export function MisContactosPageContent() {
                                     </span>
                                 ) : null}
                             </div>
-                            <span className={`text-[9px] mt-0.5 font-medium ${activeTab === key ? 'text-brand' : 'text-gray-500'}`}>
+                            <span className={`text-[9px] mt-0.5 font-medium ${activeTab === key ? 'text-green-600' : 'text-gray-500'}`}>
                                 {label}
                             </span>
                         </button>

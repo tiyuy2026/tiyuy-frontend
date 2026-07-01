@@ -197,7 +197,7 @@ export function ShareModal({ title, link, onClose }: { title: string; link: stri
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
-        <div className="bg-brand p-5">
+        <div className="bg-green-600 p-5">
           <div className="flex items-center justify-between">
             <h3 className="text-white font-semibold text-base">Compartir</h3>
             <button onClick={onClose} className="text-white/70 hover:text-white w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-lg leading-none">×</button>
@@ -208,7 +208,7 @@ export function ShareModal({ title, link, onClose }: { title: string; link: stri
           <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-3 border border-gray-100">
             <span className="text-xs text-gray-500 truncate flex-1 font-mono">{link}</span>
             <button onClick={copy}
-              className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all flex-shrink-0 ${copied ? 'bg-green-500 text-white' : 'bg-brand text-white hover:bg-brand'}`}>
+              className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all flex-shrink-0 ${copied ? 'bg-green-500 text-white' : 'bg-green-600 text-white hover:bg-green-700'}`}>
               {copied ? ' Copiado' : 'Copiar'}
             </button>
           </div>
@@ -221,11 +221,11 @@ export function ShareModal({ title, link, onClose }: { title: string; link: stri
               <span className="text-xs text-green-700 font-medium">WhatsApp</span>
             </a>
             <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`} target="_blank" rel="noopener noreferrer"
-              className="flex flex-col items-center gap-2 p-3 bg-brand rounded-xl hover:bg-brand transition-colors">
-              <div className="w-10 h-10 bg-brand rounded-full flex items-center justify-center">
+              className="flex flex-col items-center gap-2 p-3 bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors">
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                 <Icon icon="mdi:facebook" className="w-5 h-5 fill-white" />
               </div>
-              <span className="text-xs text-brand font-medium">Facebook</span>
+              <span className="text-xs text-blue-600 font-medium">Facebook</span>
             </a>
             <a href={`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encoded}`} target="_blank" rel="noopener noreferrer"
               className="flex flex-col items-center gap-2 p-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition-colors">
@@ -299,7 +299,7 @@ export function SearchResultItem({ result, onCreateChat }: { result: any; onCrea
               <button onClick={() => handleAction('like')} className="px-3 py-1 bg-red-100 text-red-600 rounded-full text-xs hover:bg-red-200">
                 ️ Like
               </button>
-              <button onClick={() => handleAction('info')} className="px-3 py-1 bg-brand/10 text-brand rounded-full text-xs hover:bg-brand">
+              <button onClick={() => handleAction('info')} className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs hover:bg-blue-600 hover:text-white">
                 ️ Info
               </button>
               <button onClick={() => handleAction('contact')} className="px-3 py-1 bg-green-100 text-green-600 rounded-full text-xs hover:bg-green-200">
@@ -325,7 +325,7 @@ export function SearchResultItem({ result, onCreateChat }: { result: any; onCrea
               <p className="text-xs text-gray-500">{user.properties.length} propiedades</p>
             )}
           </div>
-          <button onClick={() => handleAction('chat')} className="px-3 py-1 bg-brand/10 text-brand rounded-full text-xs hover:bg-brand">
+          <button onClick={() => handleAction('chat')} className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs hover:bg-blue-600 hover:text-white">
             Chatear
           </button>
         </div>
@@ -338,7 +338,7 @@ export function SearchResultItem({ result, onCreateChat }: { result: any; onCrea
 
 export default function MisContactosPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand" /></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600" /></div>}>
       <MisContactosPageContent />
     </Suspense>
   );

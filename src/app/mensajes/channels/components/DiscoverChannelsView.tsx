@@ -85,7 +85,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
             {filteredChannels.map((channel: any) => (
               <div
                 key={channel.id}
-                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
+                className="bg-white dark:bg-gray-800 border border-brand/30 rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
                 onClick={(e) => {
                   if (!channel.isSubscribed) {
                     handleSubscribeChannel(channel.id, e);
@@ -94,8 +94,8 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                 }}
               >
                 {/* Banner del canal */}
-                <div className="h-24 bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center">
-                  <EntityIcon name={channel.name} className="w-14 h-14 text-white/90" />
+                <div className="h-24 bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                  <EntityIcon name={channel.name} className="w-14 h-14 text-brand" />
                 </div>
 
                 {/* Contenido */}
@@ -123,7 +123,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                   <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
                     <span className={`px-2 py-1 rounded-full ${
                       channel.isPublic 
-                        ? 'bg-[var(--brand-primary-light)] text-gray-900 dark:text-gray-100' 
+                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' 
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                     }`}>
                       {channel.isPublic ? ' Público' : ' Privado'}
@@ -132,7 +132,7 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                   </div>
 
                   {/* Boton de entrada */}
-                  <div className="w-full py-2 bg-brand text-white text-sm font-semibold rounded-lg text-center">
+                  <div className="w-full py-2 bg-gray-800 text-white text-sm font-semibold rounded-lg text-center">
                     {channel.isSubscribed ? 'Entrar al canal' : isSubscribing ? 'Suscribiendose...' : 'Entrar'}
                   </div>
                 </div>

@@ -82,7 +82,7 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
             {filteredGroups.map((group: any) => (
               <div
                 key={group.id}
-                className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
+                className="bg-white border border-brand/30 rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
                 onClick={(e) => {
                   if (!group.isMember) {
                     handleJoinGroup(group.id, e);
@@ -91,8 +91,8 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
                 }}
               >
                 {/* Banner del grupo */}
-                <div className="h-24 bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center">
-                  <EntityIcon name={group.name} className="w-12 h-12 text-white/90" />
+                <div className="h-24 bg-gray-100 flex items-center justify-center">
+                  <EntityIcon name={group.name} className="w-12 h-12 text-brand" />
                 </div>
 
                 {/* Contenido */}
@@ -117,7 +117,7 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
                   </div>
 
                   {/* Indicador de estado */}
-                  <div className="w-full py-2 bg-brand text-white text-sm font-semibold rounded-lg text-center">
+                  <div className="w-full py-2 bg-gray-800 text-white text-sm font-semibold rounded-lg text-center hover:bg-gray-700 transition-colors">
                     {group.isMember ? 'Entrar al grupo' : joinGroup.isPending ? 'Uniéndose...' : 'Entrar'}
                   </div>
                 </div>

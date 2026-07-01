@@ -373,7 +373,7 @@ export function ChannelPostsPanel({
               onClick={() => setActiveTab('posts')}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
                 activeTab === 'posts'
-                  ? 'bg-brand text-white'
+                  ? 'bg-gray-800 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -384,7 +384,7 @@ export function ChannelPostsPanel({
               onClick={() => setActiveTab('events')}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
                 activeTab === 'events'
-                  ? 'bg-brand text-white'
+                  ? 'bg-gray-800 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -397,7 +397,7 @@ export function ChannelPostsPanel({
                 onClick={() => setShowAccessManager(!showAccessManager)}
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
                   showAccessManager
-                    ? 'bg-brand text-white'
+                    ? 'bg-gray-800 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -441,7 +441,7 @@ export function ChannelPostsPanel({
                     <div className="flex gap-3">
                       <button
                         onClick={() => setShowCreateForm(true)}
-                        className="flex-1 py-2.5 bg-gradient-to-r brand text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
+                        className="flex-1 py-2.5 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors"
                       >
                         Escribir mi primera publicación
                       </button>
@@ -479,21 +479,21 @@ export function ChannelPostsPanel({
           <div className="p-4 space-y-4">
             {/* Welcome Message */}
             {showWelcome && posts && posts.length > 0 && (
-              <div className="bg-brand/10 border border-blue-200 rounded-lg p-4 mb-4">
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-brand/20 flex items-center justify-center">
-                    <MessageSquare className="w-5 h-5 text-brand" />
+                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                    <MessageSquare className="w-5 h-5 text-gray-500" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-blue-900">Bienvenido a {channelName}</h3>
-                    <p className="text-sm text-brand-dark">
+                    <h3 className="font-semibold text-gray-900">Bienvenido a {channelName}</h3>
+                    <p className="text-sm text-gray-600">
                       Este es el feed de posts del canal. Aquí verás todas las publicaciones.
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowWelcome(false)}
-                  className="mt-3 text-sm text-brand hover:text-brand-dark"
+                  className="mt-3 text-sm text-gray-600 hover:text-gray-900"
                 >
                   Entendido
                 </button>
@@ -697,7 +697,7 @@ export function ChannelPostsPanel({
                       <button
                         onClick={handleCreatePost}
                         disabled={(!newPost.trim() && selectedImages.length === 0 && selectedDocuments.length === 0) || isCreatingPost}
-                        className="px-6 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        className="px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                       >
                         {isCreatingPost ? (
                           <>
@@ -815,7 +815,7 @@ export function ChannelPostsPanel({
                             </button>
                             <button
                               onClick={() => handleSaveEdit(post)}
-                              className="px-3 py-1 text-sm bg-brand text-white rounded hover:bg-blue-700 transition-colors"
+                              className="px-3 py-1 text-sm bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors"
                             >
                               Guardar
                             </button>
@@ -971,7 +971,7 @@ export function ChannelPostsPanel({
                         <button
                           onClick={() => handleCommentSubmit(post.id)}
                           disabled={!commentInputs[post.id]?.trim()}
-                          className="px-3 py-2 bg-brand text-white rounded-lg hover:bg-blue-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-3 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Enviar
                         </button>

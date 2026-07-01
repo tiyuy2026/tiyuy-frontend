@@ -18,14 +18,14 @@ export function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGrou
                 <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     Todos los grupos a los que te uniste ({misGrupos.length})
                 </h2>
-                <button className="text-sm text-brand font-medium hover:underline">
+                <button className="text-sm text-blue-600 font-medium hover:underline">
                     Ordenar
                 </button>
             </div>
 
             {isLoading && (
                 <div className="flex justify-center py-16">
-                    <div className="w-8 h-8 rounded-full border-4 border-brand border-t-transparent animate-spin" />
+                    <div className="w-8 h-8 rounded-full border-4 border-blue-500 border-t-transparent animate-spin" />
                 </div>
             )}
 
@@ -42,16 +42,16 @@ export function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGrou
                 {misGrupos.map((group: any) => (
                     <div
                         key={group.id}
-                        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:shadow-md transition-all cursor-pointer"
+                        className="bg-white dark:bg-gray-800 border border-brand/30 rounded-xl overflow-hidden hover:shadow-md transition-all cursor-pointer"
                     >
                         {/* Banner del grupo */}
                         <div
-                            className="h-28 bg-gradient-to-br from-brand to-brand-dark flex items-center justify-center"
+                            className="h-28 bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center"
                             onClick={() => {
                                 onGroupSelect(group);
                             }}
                         >
-                            <EntityIcon name={group.name} className="w-14 h-14 text-white/90" />
+                            <EntityIcon name={group.name} className="w-14 h-14 text-brand" />
                         </div>
 
                         {/* Info */}
@@ -72,7 +72,7 @@ export function GruposMisGruposView({ user, onGroupSelect }: { user: any; onGrou
                                 onClick={() => {
                                     onGroupSelect(group);
                                 }}
-                                className="flex-1 py-1.5 bg-brand/10 text-brand text-xs font-semibold rounded-lg hover:bg-brand transition-colors"
+                                className="flex-1 py-1.5 bg-green-50 text-green-700 text-xs font-semibold rounded-lg hover:bg-green-500 hover:text-white transition-colors"
                             >
                                 Ver grupo
                             </button>

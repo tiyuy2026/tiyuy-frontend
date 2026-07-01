@@ -118,7 +118,7 @@ export default function MisCanalesSuscritosView({ user, onChannelSelect }: MisCa
         {filteredChannels.map((channel: any) => (
           <div
             key={channel.id}
-            className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+            className="bg-[var(--bg-card)] border border-brand/30 rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
             onClick={() => onChannelSelect(channel)}
           >
             {/* Header del canal */}

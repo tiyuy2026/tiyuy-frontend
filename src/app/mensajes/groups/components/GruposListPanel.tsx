@@ -41,24 +41,24 @@ export function GruposListPanel({
             <div className="px-3 py-2 space-y-1">
                 <button
                     onClick={() => onSectionChange('descubrir')}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${activeSection === 'descubrir' ? 'bg-brand/10 text-brand-dark' : 'text-gray-800 hover:bg-gray-100'
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${activeSection === 'descubrir' ? 'bg-green-50 text-green-700' : 'text-gray-800 hover:bg-gray-100'
                         }`}
                 >
-                    <span className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${activeSection === 'descubrir' ? 'bg-brand' : 'bg-gray-200'
+                    <span className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${activeSection === 'descubrir' ? 'bg-green-500' : 'bg-gray-200'
                         }`}>
-                        <Search className="" />
+                        <Search className="w-4 h-4 text-white" />
                     </span>
                     Descubrir
                 </button>
 
                 <button
                     onClick={() => onSectionChange('mis-grupos')}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${activeSection === 'mis-grupos' ? 'bg-brand/10 text-brand-dark' : 'text-gray-800 hover:bg-gray-100'
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${activeSection === 'mis-grupos' ? 'bg-green-50 text-green-700' : 'text-gray-800 hover:bg-gray-100'
                         }`}
                 >
-                    <span className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${activeSection === 'mis-grupos' ? 'bg-brand' : 'bg-gray-200'
+                    <span className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${activeSection === 'mis-grupos' ? 'bg-green-500' : 'bg-gray-200'
                         }`}>
-                        <Search className="w-4 h-4 text-gray-400" />
+                        <Search className="w-4 h-4 text-white" />
                     </span>
                     Tus grupos
                 </button>
@@ -70,13 +70,13 @@ export function GruposListPanel({
                     onClick={() => onSectionChange('crear')}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors relative ${hasGroup
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-brand/10 text-brand-dark hover:bg-brand/20'
+                        : 'bg-green-50 text-green-700 hover:bg-green-100'
                         }`}
                 >
                     {hasGroup && (
                         <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                     )}
-                    <span className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${hasGroup ? 'bg-gray-200' : 'bg-brand'
+                    <span className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${hasGroup ? 'bg-gray-200' : 'bg-green-500'
                         }`}>
                         <span className="text-lg font-bold leading-none text-white">
                             {hasGroup ? '' : '+'}
@@ -109,7 +109,7 @@ export function GruposListPanel({
                                 }}
                                 className="w-full flex items-center gap-3 p-2 hover:bg-gray-100 rounded-xl transition-colors text-left"
                             >
-                                <div className="w-10 h-10 rounded-xl bg-brand flex items-center justify-center flex-shrink-0">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center flex-shrink-0">
                                     <EntityIcon name={group.name} className="w-5 h-5 text-white" />
                                 </div>
                                 <div className="flex-1 min-w-0">

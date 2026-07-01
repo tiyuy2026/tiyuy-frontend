@@ -559,7 +559,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
       {showShareModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
-            <div className="bg-gradient-to-r brand p-5">
+            <div className="bg-brand p-5">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-white font-bold text-lg">Compartir Estado</h2>

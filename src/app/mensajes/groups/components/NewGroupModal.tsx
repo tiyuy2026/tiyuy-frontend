@@ -45,7 +45,7 @@ export function NewGroupModal({ onClose }: { onClose: () => void }) {
         return (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
-                    <div className="bg-brand p-5">
+                    <div className="bg-gradient-to-r from-green-600 to-green-800 p-5">
                         <div className="text-center">
                             <h2 className="text-white font-bold text-lg"> LIMITE ALCANZADO</h2>
                         </div>
@@ -70,7 +70,7 @@ export function NewGroupModal({ onClose }: { onClose: () => void }) {
                         </p>
                         <button
                             onClick={onClose}
-                            className="w-full py-2.5 bg-brand text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
+                            className="w-full py-2.5 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-colors"
                         >
                             ENTENDIDO - NO CREAR GRUPO
                         </button>
@@ -91,7 +91,7 @@ export function NewGroupModal({ onClose }: { onClose: () => void }) {
             />
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
-                    <div className="bg-brand p-5">
+                    <div className="bg-gradient-to-r from-green-600 to-green-800 p-5">
                         <div className="flex items-center justify-between">
                             <div>
                                 <h2 className="text-white font-bold text-lg">Crear Grupo</h2>
@@ -119,12 +119,12 @@ export function NewGroupModal({ onClose }: { onClose: () => void }) {
                                 <p className="text-xs text-gray-400 dark:text-gray-400 mt-0.5">Solo emails aprobados pueden unirse</p>
                             </div>
                             <button onClick={() => setIsRestricted(!isRestricted)}
-                                className={`w-12 h-6 rounded-full transition-colors relative flex-shrink-0 ${isRestricted ? 'bg-brand' : 'bg-gray-300 dark:bg-gray-600'}`}>
+                                className={`w-12 h-6 rounded-full transition-colors relative flex-shrink-0 ${isRestricted ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}>
                                 <span className={`absolute top-1 w-4 h-4 bg-white dark:bg-gray-200 rounded-full shadow-sm transition-all ${isRestricted ? 'left-7' : 'left-1'}`} />
                             </button>
                         </div>
-                        <div className="flex items-center gap-2 bg-brand rounded-xl p-3 border border-brand">
-                            <span className="text-brand"></span>
+                        <div className="flex items-center gap-2 bg-green-500 rounded-xl p-3 border border-green-600">
+                            <span className="text-green-200"></span>
                             <p className="text-xs text-white">Podrás compartir el link del grupo en WhatsApp, Telegram y otras redes para atraer miembros</p>
                         </div>
                         <div className="flex gap-3 pt-1">
@@ -133,7 +133,7 @@ export function NewGroupModal({ onClose }: { onClose: () => void }) {
                                 Cancelar
                             </button>
                             <button onClick={handleSubmit} disabled={!name.trim() || createGroup.isPending}
-                                className="flex-1 py-2.5 text-sm bg-brand text-white rounded-xl font-semibold hover:opacity-90 transition-opacity disabled:opacity-40">
+                                className="flex-1 py-2.5 text-sm bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-colors disabled:opacity-40">
                                 {createGroup.isPending ? 'Creando...' : 'Crear Grupo'}
                             </button>
                         </div>

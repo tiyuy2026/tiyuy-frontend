@@ -728,7 +728,7 @@ export default function ChannelEventsPanel({
                 if (onCreateEvent) onCreateEvent();
                 if (isMobile) setShowMobileSidebar(false);
               }}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r brand text-white rounded-lg font-medium hover:from-blue-700 hover:to-teal-700 transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-brand text-white rounded-lg font-medium hover:bg-brand-dark transition-colors"
             >
               <Plus className="w-4 h-4" />
               Crear nuevo evento
@@ -753,8 +753,8 @@ export default function ChannelEventsPanel({
                   }}
                   className="w-full flex items-start gap-2 p-2 hover:bg-gray-50 rounded-lg text-left"
                 >
-                  <div className="w-12 h-12 bg-gradient-to-br brand rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-5 h-5 text-brand" />
+                  <div className="w-12 h-12 bg-brand rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-brand mb-1">
@@ -1193,7 +1193,7 @@ export default function ChannelEventsPanel({
                 onClick={() => handleFilterChange('all', null)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeFilter === 'all'
-                    ? 'bg-gradient-to-r brand text-white'
+                    ? 'bg-brand text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -1204,7 +1204,7 @@ export default function ChannelEventsPanel({
                 onClick={() => handleFilterChange('featured', null)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeFilter === 'featured'
-                    ? 'bg-gradient-to-r brand text-white'
+                    ? 'bg-brand text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -1215,7 +1215,7 @@ export default function ChannelEventsPanel({
                 onClick={() => handleFilterChange('upcoming', null)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeFilter === 'upcoming'
-                    ? 'bg-gradient-to-r brand text-white'
+                    ? 'bg-brand text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -1227,7 +1227,7 @@ export default function ChannelEventsPanel({
                 onClick={() => setShowDatePicker(!showDatePicker)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeFilter === 'date'
-                    ? 'bg-gradient-to-r brand text-white'
+                    ? 'bg-brand text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -1243,7 +1243,7 @@ export default function ChannelEventsPanel({
                 }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeFilter === 'location'
-                    ? 'bg-gradient-to-r brand text-white'
+                    ? 'bg-brand text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >

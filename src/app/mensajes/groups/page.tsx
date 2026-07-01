@@ -75,7 +75,7 @@ export default function GruposPage() {
   if (groupsLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
       </div>
     );
   }
@@ -116,7 +116,7 @@ export default function GruposPage() {
         <div className="p-4 border-b border-gray-200">
           <div className="grid grid-cols-3 gap-2 text-center">
             <div>
-              <div className="text-lg font-bold text-brand">{groups.length}</div>
+              <div className="text-lg font-bold text-green-600">{groups.length}</div>
               <div className="text-xs text-gray-600">Total</div>
             </div>
             <div>
@@ -138,7 +138,7 @@ export default function GruposPage() {
         <div className="flex-1 overflow-y-auto">
           {groupsLoading ? (
             <div className="flex items-center justify-center h-32">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
             </div>
           ) : filteredGroups.length === 0 ? (
             <div className="text-center py-8">
@@ -154,13 +154,13 @@ export default function GruposPage() {
                   key={grupo.id}
                   className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
                     selectedGrupo?.id === grupo.id
-                      ? 'border-blue-500 bg-brand/10'
+                      ? 'border-green-500 bg-green-50'
                       : 'border-gray-200 hover:border-gray-300 bg-white'
                   }`}
                   onClick={() => setSelectedGrupo(grupo as Group)}
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center text-white font-bold">
                       {grupo.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -169,7 +169,7 @@ export default function GruposPage() {
                       <div className="flex items-center space-x-2 mt-1">
                         <span className="text-xs text-gray-500">{grupo.memberCount} miembros</span>
                         {grupo.postCount > 0 && (
-                          <span className="text-xs text-brand">{grupo.postCount} posts</span>
+                          <span className="text-xs text-green-600">{grupo.postCount} posts</span>
                         )}
                       </div>
                     </div>
@@ -195,7 +195,7 @@ export default function GruposPage() {
           <div className="bg-white border-b border-gray-200 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-700 rounded-full flex items-center justify-center text-white font-bold text-lg">
                   {selectedGrupo.name.charAt(0).toUpperCase()}
                 </div>
                 <div>

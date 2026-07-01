@@ -67,13 +67,13 @@ function CanalesListPanel({
         <button
           onClick={() => onSectionChange('mis-canales-creados')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'mis-canales-creados' ? 'bg-[var(--brand-primary-light)] text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+            activeSection === 'mis-canales-creados' ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
           <ArrowLeft className="w-5 h-5" />
           Mis canales creados
           {misCanalesCreados.length > 0 && (
-            <span className="ml-auto bg-brand/100 text-white text-xs px-2 py-1 rounded-full">
+            <span className="ml-auto bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
               {misCanalesCreados.length}
             </span>
           )}
@@ -82,13 +82,13 @@ function CanalesListPanel({
         <button
           onClick={() => onSectionChange('mis-canales-suscritos')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'mis-canales-suscritos' ? 'bg-[var(--brand-primary-light)] text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+            activeSection === 'mis-canales-suscritos' ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
           <Users className="w-5 h-5" />
           Mis canales suscritos
           {misCanalesSuscritos.length > 0 && (
-            <span className="ml-auto bg-teal-500 text-white text-xs px-2 py-1 rounded-full">
+            <span className="ml-auto bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
               {misCanalesSuscritos.length}
             </span>
           )}
@@ -97,7 +97,7 @@ function CanalesListPanel({
         <button
           onClick={() => onSectionChange('descubrir-canales')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'descubrir-canales' ? 'bg-[var(--brand-primary-light)] text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+            activeSection === 'descubrir-canales' ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
           <Search className="w-5 h-5" />
@@ -107,7 +107,7 @@ function CanalesListPanel({
         <button
           onClick={() => onSectionChange('crear-canal')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-            activeSection === 'crear-canal' ? 'bg-[var(--brand-primary-light)] text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+            activeSection === 'crear-canal' ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
           <Plus className="w-5 h-5" />
@@ -199,7 +199,7 @@ function CanalesListPanel({
             hasChannel 
               ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed' 
               : (user?.role === 'AGENT' || user?.role === 'INMOBILIARIA')
-                ? 'bg-[var(--brand-primary-light)] text-[var(--text-primary)] hover:bg-[var(--brand-primary-light-hover)]'
+                ? 'bg-gray-800 text-white hover:bg-gray-700'
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
           }`}
         >
