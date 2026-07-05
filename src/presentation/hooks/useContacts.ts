@@ -367,6 +367,36 @@ export function useGetChatMessages(chatId: number, options: { enabled?: boolean 
 
 }
 
+// Hook con scroll infinito para mensajes (carga tipo WhatsApp por bloques de 30)
+export function useGetChatMessagesInfinite(chatId: number, options: { enabled?: boolean } = {}) {
+
+  return useInfiniteQuery({
+    queryKey: ['chat-messages-infinite', chatId],
+    queryFn: async ({ pageParam = 0 }) => {
+      const data = await apiCallWithFallback(
+        `/contacts/extended/chats/${chatId}/messages?page=${pageParam}&size=30&sort=createdAt,desc`,
+        {},
+        { content: [], totalPages: 0, number: 0 }
+      );
+      return {
+        messages: Array.isArray(data) ? data : (data?.content ?? []),
+        totalPages: data?.totalPages ?? 1,
+        currentPage: data?.number ?? pageParam,
+        hasMore: data && !data.last
+      };
+    },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.hasMore) return undefined;
+      return lastPage.currentPage + 1;
+    },
+    initialPageParam: 0,
+    enabled: !!chatId && (options.enabled !== false),
+    staleTime: 1000 * 30,
+    retry: false,
+  });
+
+}
+
 
 
 export function useSendMessage() {
@@ -524,13 +554,13 @@ export function useGetActiveStatusPosts(params: { location?: string } = {}) {
 
     queryFn: ({ pageParam = 0 }) => 
 
-      apiCall(`/contacts/extended/status?page=${pageParam}&size=15${params.location ? `&location=${params.location}` : ''}`),
+      apiCall(`/contacts/extended/status?sort=popularity&page=${pageParam}&size=20${params.location ? `&location=${params.location}` : ''}`),
 
     getNextPageParam: (lastPage: any) => {
 
-      if (lastPage.last) return undefined;
+      if (lastPage?.last) return undefined;
 
-      return (lastPage.number || 0) + 1;
+      return (lastPage?.number || 0) + 1;
 
     },
 
@@ -2328,7 +2358,7 @@ export function useUnsubscribeFromChannel(userId?: number) {
 
 
 
-// Hook para obtener grupos
+// Hook para obtener grupos (paginación normal)
 
 export function useGetGroups(page = 0, size = 20) {
 
@@ -2343,6 +2373,42 @@ export function useGetGroups(page = 0, size = 20) {
       return response.data?.content || []; // Return array from Spring Page
 
     },
+
+    staleTime: 5 * 60 * 1000,
+
+  });
+
+}
+
+// Hook con scroll infinito para "Descubrir Grupos" (15 grupos por bloque)
+export function useGetGroupsInfinite(pageSize = 15) {
+
+  return useInfiniteQuery({
+
+    queryKey: ['groups-infinite', pageSize],
+
+    queryFn: async ({ pageParam = 0 }) => {
+
+      const response = await axiosClient.get(`/contacts/extended/groups?page=${pageParam}&size=${pageSize}`);
+
+      return {
+        groups: response.data?.content || [],
+        totalPages: response.data?.totalPages || 1,
+        currentPage: response.data?.number || pageParam,
+        hasMore: response.data && !response.data.last,
+      };
+
+    },
+
+    getNextPageParam: (lastPage) => {
+
+      if (!lastPage.hasMore) return undefined;
+
+      return lastPage.currentPage + 1;
+
+    },
+
+    initialPageParam: 0,
 
     staleTime: 5 * 60 * 1000,
 

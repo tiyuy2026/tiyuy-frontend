@@ -1,29 +1,72 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useChannels } from '@/presentation/hooks/useChannels';
+import { axiosClient } from '@/infrastructure/api/axios-client';
 import { formatCompactNumber } from '@/utils/formatters';
 import { Bell, BellOff, FileText, Search, Users } from 'lucide-react';
 import { EntityIcon } from '@/utils/entityIcons';
+import { useInfiniteQuery } from '@tanstack/react-query';
 
 export default function DiscoverChannelsView({ user, onChannelSelect }: { user: any; onChannelSelect: (channel: any) => void }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const { channels, channelsLoading: isLoading, subscribeToChannel, isSubscribing } = useChannels(user?.id);
-  
-  // Filtrar canales donde el usuario NO esta suscrito
-  const availableChannels = channels?.filter((c: any) => !c.isSubscribed) ?? [];
-  const filteredChannels = availableChannels.filter((channel: any) =>
-    channel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    channel.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    channel.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    channel.city.toLowerCase().includes(searchTerm.toLowerCase())
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Hook con scroll infinito (15 canales por bloque)
+  const {
+    data: channelsData,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['channels-discover', user?.id],
+    queryFn: async ({ pageParam = 0 }) => {
+      const response = await axiosClient.get(`/contacts/extended/channels?page=${pageParam}&size=15`);
+      return {
+        channels: response.data?.content || [],
+        totalPages: response.data?.totalPages || 1,
+        currentPage: response.data?.number || pageParam,
+        hasMore: response.data && !response.data.last,
+      };
+    },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.hasMore) return undefined;
+      return lastPage.currentPage + 1;
+    },
+    initialPageParam: 0,
+    staleTime: 1000 * 30,
+  });
+
+  // Scroll infinito
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) fetchNextPage(); },
+      { threshold: 0.1 }
+    );
+    const sentinel = sentinelRef.current;
+    if (sentinel) observer.observe(sentinel);
+    return () => { if (sentinel) observer.unobserve(sentinel); };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Juntar todas las páginas
+  const allChannels = channelsData?.pages?.flatMap((p: any) => p.channels) ?? [];
+
+  // Filtrar canales donde el usuario NO esta suscrito y que coincidan con búsqueda
+  const filteredChannels = allChannels.filter((channel: any) =>
+    !channel.isSubscribed &&
+    (channel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     channel.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     channel.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     channel.city?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  // Hook para suscripción (manteniendo optimismo visual)
+  const { subscribeToChannel, isSubscribing } = useChannels(user?.id);
 
   const handleSubscribeChannel = (channelId: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    // Marcar como suscrito localmente INMEDIATAMENTE para que desaparezca de la lista
-    // El hook useChannels también hace actualización optimista
     subscribeToChannel(channelId);
   };
 
@@ -138,6 +181,26 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Sentinel para scroll infinito */}
+        {hasNextPage && (
+          <div ref={sentinelRef} className="flex justify-center py-6 mt-4">
+            {isFetchingNextPage ? (
+              <div className="w-8 h-8 rounded-full border-3 border-brand border-t-transparent animate-spin" />
+            ) : (
+              <span className="text-xs text-gray-400">Desplaza para más canales...</span>
+            )}
+          </div>
+        )}
+
+        {/* Contador */}
+        {!isLoading && allChannels.length > 0 && (
+          <div className="text-center mt-4 pb-4">
+            <span className="text-xs text-gray-400">
+              Mostrando {allChannels.length} canales disponibles
+            </span>
           </div>
         )}
       </div>

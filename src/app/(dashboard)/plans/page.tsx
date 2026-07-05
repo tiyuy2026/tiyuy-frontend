@@ -61,17 +61,13 @@ export default function PlansPage() {
 
   // Función para detectar descuentos inteligentes basados en reglas de negocio - DINÁMICO DESDE BACKEND
   const detectIntelligentDiscount = (plan: SubscriptionPlan): { code: string; percentage: number } | null => {
-    console.log('Detectando descuento inteligente para plan:', plan.name, 'precio:', plan.price);
-    
     // Para Developers: solo aplicar descuentos en planes empresariales
     if (isDeveloper && !isEnterprisePlan(plan)) {
-      console.log('Developer solo puede tener descuentos en planes empresariales');
       return null;
     }
     
     // Para Agents: solo si tienen descuentos de agencia
     if (isAgent && !hasDiscountCodes) {
-      console.log('Agente no tiene descuentos de agencia disponibles');
       return null;
     }
     
@@ -83,7 +79,6 @@ export default function PlansPage() {
       );
       
       if (intelligentDiscount) {
-        console.log('Descuento inteligente encontrado desde backend:', intelligentDiscount.code, intelligentDiscount.discountPercentage + '%');
         return {
           code: intelligentDiscount.code,
           percentage: intelligentDiscount.discountPercentage
@@ -91,7 +86,6 @@ export default function PlansPage() {
       }
     }
     
-    console.log('No se encontraron descuentos inteligentes para este plan');
     return null;
   };
 
@@ -122,17 +116,8 @@ export default function PlansPage() {
 
   // Función para verificar si un descuento es válido para este usuario
   const isDiscountValidForUser = (discount: any) => {
-    console.log('DEBUG: Validando descuento para usuario:', {
-      userId: userData?.id,
-      agencyId: userData?.agencyId,
-      role: userData?.role,
-      discountId: discount.id,
-      discountCode: discount.code
-    });
-    
     // 1. Verificar que el descuento esté activo
     if (discount.status !== 'ACTIVE') {
-      console.log('Descuento inválido: No está activo');
       return false;
     }
     
@@ -141,68 +126,30 @@ export default function PlansPage() {
       const expiryDate = new Date(discount.validUntil);
       const now = new Date();
       if (now > expiryDate) {
-        console.log('Descuento inválido: Ha expirado', {
-          validUntil: discount.validUntil,
-          now: now.toISOString()
-        });
         return false;
       }
     }
     
     // 3. Verificar que no haya alcanzado el límite de uso
     if (discount.maxUses && discount.usedCount >= discount.maxUses) {
-      console.log('Descuento inválido: Ha alcanzado el límite de uso');
       return false;
     }
     
-    // 4. SEGURIDAD CRÍTICA: Verificar que el usuario pertenezca a la misma inmobiliaria
-    // NOTA: Esto es un parche temporal. El backend debería filtrar por agencyId.
-    if (userData?.role === 'AGENT' && userData?.agencyId) {
-      // El descuento debe estar asignado a un agente de la misma inmobiliaria
-      // Por ahora, como el backend no filtra correctamente, necesitamos validar en frontend
-      
-      // Si el descuento tiene userId, verificamos que pertenezca a un usuario de la misma agencia
-      // Esto es complicado porque el backend no devuelve la información de la agencia del descuento
-      console.log('SEGURIDAD: Verificando agencia del usuario');
-      console.log('Usuario agencyId:', userData?.agencyId);
-      console.log('Descuento asignado a userId:', discount.userId);
-      
-      // Por ahora, permitimos el descuento pero registramos la advertencia de seguridad
-      console.log('ADVERTENCIA: El backend debería filtrar descuentos por agencyId');
-      console.log('Actualmente todos los agentes ven todos los descuentos - PROBLEMA DE SEGURIDAD');
-    }
-    
-    console.log('Descuento válido para este usuario (con advertencias de seguridad)');
     return true;
   };
 
   // Auto-aplicar descuento de agencia SOLO si no hay descuento inteligente ni manual
   useEffect(() => {
-    console.log('DEBUG: useEffect de descuentos - availableDiscountCodes:', availableDiscountCodes);
-    
     // No aplicar descuento de agencia si ya hay descuento manual aplicado
     if (appliedManualDiscount?.valid) {
-      console.log('Saltando aplicación de descuento de agencia - ya hay descuento manual');
       return;
     }
     
     if (isAgent && hasDiscountCodes && availableDiscountCodes && availableDiscountCodes.length > 0) {
-      console.log('DEBUG: Analizando descuentos disponibles:');
-      availableDiscountCodes.forEach((discount, index) => {
-        console.log(`Descuento ${index + 1}:`, {
-          id: discount.id,
-          code: discount.code,
-          discountPercentage: discount.discountPercentage,
-          status: discount.status,
-          validUntil: discount.validUntil
-        });
-      });
-      
       // Filtrar descuentos válidos para este usuario
       const validDiscounts = availableDiscountCodes.filter(discount => isDiscountValidForUser(discount));
       
       if (validDiscounts.length === 0) {
-        console.log('No hay descuentos válidos para este usuario');
         setDiscountCode(''); // Limpiar descuento
         return;
       }
@@ -211,9 +158,7 @@ export default function PlansPage() {
       const validDiscount = validDiscounts[0];
       const discountCodeValue = validDiscount.code;
       
-      console.log(' Descuento válido encontrado y aplicado:', discountCodeValue);
       setDiscountCode(discountCodeValue);
-      console.log(' Descuento de agencia aplicado automáticamente:', discountCodeValue);
     }
   }, [isAgent, hasDiscountCodes, availableDiscountCodes, appliedManualDiscount?.valid]);
 
@@ -243,12 +188,10 @@ export default function PlansPage() {
     if (isAgentDiscountValid) {
       const agentDiscount = availableDiscountCodes[0];
       const discountPercent = (agentDiscount as any).discountPercentage || (agentDiscount as any).discountPercent || 0;
-      console.log('Calculando descuento:', { planPrice: plan.price, discountPercent, agentDiscount });
       return plan.price - (plan.price * discountPercent / 100);
     }
     
     // Si ningún descuento es válido, volver al precio normal
-    console.log('Ningún descuento válido, volviendo al precio normal');
     return plan.price;
   };
 
@@ -395,12 +338,6 @@ export default function PlansPage() {
     if (!selectedPlan) return;
 
     const finalPrice = getDiscountedPrice(selectedPlan);
-    console.log('MERCADOPAGO: Enviando precio final:', { 
-      planName: selectedPlan.name, 
-      originalPrice: selectedPlan.price, 
-      finalPrice,
-      discountCode: discountCode || 'Ninguno'
-    });
 
     subscribeMutation.mutate({
       planId: selectedPlan.id,
@@ -409,9 +346,7 @@ export default function PlansPage() {
     }, {
       onSuccess: async (subscription) => {
         try {
-          console.log('Suscripcion creada:', subscription);
           const token = authStorage.getToken();
-          console.log('Token:', token ? 'Presente' : 'Ausente');
           
           const response = await fetch(
             `/api/finance/mercadopago/create-preference`,
@@ -430,31 +365,23 @@ export default function PlansPage() {
             }
           );
 
-          console.log('Respuesta create-preference:', response.status);
-
           if (!response.ok) {
             const errorText = await response.text();
-            console.error('Error create-preference:', response.status, errorText);
             toast.error(`Error ${response.status} al crear preferencia`);
             return;
           }
 
           const data = await response.json();
-          console.log('Datos preferencia:', data);
           // Usar init_point (producción) primero. sandbox_init_point solo para pruebas.
           const url = data.init_point || data.initPoint ||
                       data.sandbox_init_point || data.sandboxInitPoint;
 
-          console.log('URL pago:', url);
-
           if (url) {
             window.location.href = url;
           } else {
-            console.error('Sin URL. Keys:', Object.keys(data));
             toast.error('No se recibio URL de pago');
           }
         } catch (error) {
-          console.error('Error pago:', error);
           toast.error('Error al iniciar pago: ' + (error as any).message);
         }
       },
@@ -500,8 +427,6 @@ export default function PlansPage() {
               </div>
             ) : plans ? (
               plans.map((plan) => {
-                console.log('🔍 DEBUG: Procesando plan en /plans:', plan.name, 'precio:', plan.price);
-                
                 const backendTier = activeSubscription
                   ? activeSubscription.plan?.id
                   : null;
@@ -517,7 +442,6 @@ export default function PlansPage() {
                 
                 // Detectar descuento inteligente para este plan específico
                 const intelligentDiscount = detectIntelligentDiscount(plan);
-                console.log('🤖 DEBUG: intelligentDiscount detectado:', intelligentDiscount);
                 
                 // Determinar qué descuento aplicar: manual, inteligente o de agente
                 let finalDiscountCode = '';
@@ -530,17 +454,14 @@ export default function PlansPage() {
                   finalDiscountCode = manualDiscountCode;
                   finalDiscountPercentage = appliedManualDiscount.discountPercentage || 0;
                   hasAnyDiscount = true;
-                  console.log('💳 Aplicando descuento manual:', finalDiscountCode, finalDiscountPercentage + '%');
                 } else if (intelligentDiscount) {
                   // Priorizar descuento inteligente
                   finalDiscountCode = intelligentDiscount.code;
                   finalDiscountPercentage = intelligentDiscount.percentage;
                   hasAnyDiscount = true;
-                  console.log('🤖 Aplicando descuento inteligente:', intelligentDiscount.code, intelligentDiscount.percentage + '%');
                 } else if (hasDiscountCodes && availableDiscountCodes && availableDiscountCodes.length > 0) {
                   // Aplicar descuento de agente
                   const agentDiscount = availableDiscountCodes[0];
-                  console.log('🔍 DEBUG agente discount structure completo:', agentDiscount);
                   
                   // Intentar diferentes estructuras posibles
                   const discountCodeObj = (agentDiscount as any).discountCode;
@@ -553,30 +474,7 @@ export default function PlansPage() {
                   }
                   
                   hasAnyDiscount = finalDiscountPercentage > 0;
-                  console.log('🎁 Aplicando descuento de agente:', finalDiscountCode, finalDiscountPercentage + '%');
-                  console.log('🔍 DEBUG valores extraídos:', {
-                    discountCodeObj,
-                    finalDiscountCode,
-                    finalDiscountPercentage,
-                    hasAnyDiscount
-                  });
-                } else {
-                  console.log('❌ No se aplica ningún descuento para', plan.name, {
-                    hasDiscountCodes,
-                    availableDiscountCodesLength: availableDiscountCodes?.length || 0,
-                    intelligentDiscount,
-                    appliedManualDiscountValid: appliedManualDiscount?.valid
-                  });
                 }
-                
-                console.log('🔍 DEBUG pasando a PlanCard:', {
-                  planName: plan.name,
-                  planPrice: plan.price,
-                  finalDiscountCode,
-                  finalDiscountPercentage,
-                  hasAnyDiscount,
-                  exhausted: isExhausted
-                });
 
                 return (
                   <PlanCard

@@ -107,26 +107,30 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
             >
               Mensual
             </button>
-            <button
-              onClick={() => onBillingCycleChange?.('QUARTERLY')}
-              className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
-                currentCycle === 'QUARTERLY'
-                  ? 'bg-[var(--brand-primary)] text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              Trimestral
-            </button>
-            <button
-              onClick={() => onBillingCycleChange?.('YEARLY')}
-              className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
-                currentCycle === 'YEARLY'
-                  ? 'bg-[var(--brand-primary)] text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              Anual
-            </button>
+            {(plan.priceQuarterly ?? 0) !== 0 && (
+              <button
+                onClick={() => onBillingCycleChange?.('QUARTERLY')}
+                className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
+                  currentCycle === 'QUARTERLY'
+                    ? 'bg-[var(--brand-primary)] text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Trimestral
+              </button>
+            )}
+            {(plan.priceYearly ?? 0) !== 0 && (
+              <button
+                onClick={() => onBillingCycleChange?.('YEARLY')}
+                className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
+                  currentCycle === 'YEARLY'
+                    ? 'bg-[var(--brand-primary)] text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Anual
+              </button>
+            )}
           </div>
           
           {currentCycle !== 'MONTHLY' && (

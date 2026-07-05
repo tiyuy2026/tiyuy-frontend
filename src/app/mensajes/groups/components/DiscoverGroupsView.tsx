@@ -1,20 +1,36 @@
 'use client';
 
-import { useState } from 'react';
-import { useGetGroups, useJoinGroup } from '@/presentation/hooks/useContacts';
+import { useState, useRef, useEffect } from 'react';
+import { useGetGroupsInfinite, useJoinGroup } from '@/presentation/hooks/useContacts';
 import { formatCompactNumber } from '@/utils/formatters';
 import { FileText, Search, Users } from 'lucide-react';
 import { EntityIcon } from '@/utils/entityIcons';
 
 export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any; onGroupSelect: (group: any) => void }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const { data: groups, isLoading } = useGetGroups(0, 50);
+  const { data: groupsData, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetGroupsInfinite(15);
   const joinGroup = useJoinGroup();
-  const availableGroups = groups?.filter((g: any) => !g.isMember) ?? [];
-  const filteredGroups = availableGroups.filter((group: any) =>
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Scroll infinito con IntersectionObserver
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) fetchNextPage();
+      },
+      { threshold: 0.1 }
+    );
+    const sentinel = sentinelRef.current;
+    if (sentinel) observer.observe(sentinel);
+    return () => { if (sentinel) observer.unobserve(sentinel); };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Juntar todos los grupos de todas las páginas
+  const allGroups = groupsData?.pages?.flatMap((p: any) => p.groups) ?? [];
+  const filteredGroups = allGroups.filter((group: any) =>
     group.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
 
   const handleJoinGroup = (groupId: number, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -76,7 +92,7 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
           </div>
         )}
 
-        {/* Grid de grupos disponibles */}
+        {/* Grid de grupos disponibles - 3 columnas en desktop, 2 en tablet, 1 en móvil */}
         {!isLoading && filteredGroups.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredGroups.map((group: any) => (
@@ -123,6 +139,26 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Sentinel para scroll infinito */}
+        {hasNextPage && (
+          <div ref={sentinelRef} className="flex justify-center py-6 mt-4">
+            {isFetchingNextPage ? (
+              <div className="w-8 h-8 rounded-full border-3 border-brand border-t-transparent animate-spin" />
+            ) : (
+              <span className="text-xs text-gray-400">Desplaza para más grupos...</span>
+            )}
+          </div>
+        )}
+
+        {/* Contador de grupos cargados */}
+        {!isLoading && allGroups.length > 0 && (
+          <div className="text-center mt-4 pb-4">
+            <span className="text-xs text-gray-400">
+              Mostrando {allGroups.length} grupos disponibles
+            </span>
           </div>
         )}
       </div>

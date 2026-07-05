@@ -71,10 +71,6 @@ export function PropertyDetailEditable({ property, onSave }: PropertyDetailEdita
 
   const handleSave = async () => {
     try {
-      console.log('🔄 Guardando cambios...', formData);
-      console.log('🔄 Property ID:', property.id);
-      console.log('🔄 User ID:', user?.id);
-      
       const updateData = {
         userId: user?.id || 0,
         title: formData.title,
@@ -88,21 +84,16 @@ export function PropertyDetailEditable({ property, onSave }: PropertyDetailEdita
         maintenanceFee: formData.maintenanceFee
       };
       
-      console.log('🔄 Datos que se enviarán:', updateData);
-      
-      const result = await updateMutation.mutateAsync({
+      await updateMutation.mutateAsync({
         id: property.id,
         data: updateData
       });
       
-      console.log('✅ Propiedad actualizada:', result);
       toast.success('Propiedad actualizada exitosamente');
       setIsEditing(false);
       
-      // Llamar a onSave después de que la actualización fue exitosa
       onSave?.();
     } catch (error) {
-      console.error('❌ Error al actualizar la propiedad:', error);
       toast.error('Error al actualizar la propiedad');
     }
   };

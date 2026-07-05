@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Icon } from '@iconify/react';
 import { MoreHorizontal, Plus } from 'lucide-react';
@@ -49,7 +49,24 @@ export function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: 
     const [filter, setFilter] = useState<ChatFilter>('all');
     const [newMessage, setNewMessage] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [searchType, setSearchType] = useState<'all' | 'name' | 'property' | 'district' | 'phone'>('all');
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Debounce: esperar 300ms después de que el usuario deje de escribir
+    useEffect(() => {
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+        }, 300);
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, [searchTerm]);
     const [district, setDistrict] = useState('');
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
     const [showContactMenu, setShowContactMenu] = useState(false);
@@ -74,40 +91,40 @@ export function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: 
             null;
     };
 
-    // Queries para búsqueda específica
+    // Queries para búsqueda específica (con debounce 300ms)
     const { data: searchResults = [], isLoading: loadingSearch } = useQuery({
-        queryKey: ['specific-search', searchTerm, searchType],
+        queryKey: ['specific-search', debouncedSearchTerm, searchType],
         queryFn: async () => {
-            if (!searchTerm) return [];
+            if (!debouncedSearchTerm) return [];
 
             const results: any[] = [];
+
+            // Usar el término con debounce para la búsqueda
+            const query = debouncedSearchTerm;
 
             // Construir parámetros según el tipo de búsqueda
             let params = new URLSearchParams();
 
             switch (searchType) {
                 case 'name':
-                    params.append('keyword', searchTerm);
+                    params.append('keyword', query);
                     break;
                 case 'property':
-                    params.append('keyword', searchTerm);
+                    params.append('keyword', query);
                     break;
                 case 'district':
-                    params.append('district', searchTerm);
+                    params.append('district', query);
                     break;
                 case 'phone':
-                    params.append('keyword', searchTerm);
+                    params.append('keyword', query);
                     break;
                 default: // 'all'
-                    params.append('keyword', searchTerm);
+                    params.append('keyword', query);
             }
-
-            params.append('sortBy', 'createdAt');
-            params.append('sortOrder', 'desc');
 
             try {
                 // Buscar propiedades
-                const propResponse = await apiCall(`/contacts/extended/search/properties?${params}`);
+                const propResponse = await apiCall(`/contacts/extended/search/properties?${params.toString()}`);
                 results.push(...propResponse.map((prop: any) => ({
                     type: 'property',
                     data: prop
@@ -117,9 +134,10 @@ export function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: 
             }
 
             try {
-                // Buscar usuarios
-                const userResponse = await apiCall(`/contacts/extended/search/users?${params}`);
-                results.push(...userResponse.map((user: any) => ({
+                // Buscar usuarios (paginado - primeros 20)
+                const userResponse = await apiCall(`/contacts/extended/search/users?${params.toString()}&size=20`);
+                const users = Array.isArray(userResponse) ? userResponse : (userResponse?.content ?? []);
+                results.push(...users.map((user: any) => ({
                     type: 'user',
                     data: user
                 })));
@@ -129,7 +147,7 @@ export function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: 
 
             return results;
         },
-        enabled: !!searchTerm
+        enabled: !!debouncedSearchTerm
     });
 
     const selectedChat = chats?.find((c: any) => c.id === selectedChatId);

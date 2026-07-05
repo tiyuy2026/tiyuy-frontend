@@ -16,7 +16,9 @@ import { PropertyRepository } from '@/infrastructure/repositories/PropertyReposi
 import { Eye, FolderOpen, History, Home, ImageIcon, ImageOff, MapPin, Plus, RefreshCw, Search, Star } from 'lucide-react';;
 
 export default function MyPropertiesPage() {
-  const { data, isLoading, refetch } = useMyProperties();
+  const [currentPage, setCurrentPage] = useState(0);
+  const pageSize = 12;
+  const { data, isLoading, refetch } = useMyProperties(currentPage, pageSize);
   const deleteMutation = useDeleteProperty();
   const publishMutation = usePublishProperty();
   const { data: activeSubscription, refetch: refetchSubscription } = useActiveSubscription();
@@ -90,6 +92,8 @@ export default function MyPropertiesPage() {
   }, [refetch, refetchSubscription]);
 
   const properties = data?.properties || [];
+  const totalPages = data?.pagination?.totalPages || 0;
+  const totalElements = data?.pagination?.totalElements || 0;
 
   const normalizedProperties = useMemo(() => {
     return (properties as any[]).map((p) => {
@@ -138,29 +142,7 @@ export default function MyPropertiesPage() {
   }, [normalizedProperties]);
 
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.debug('[mis-propiedades] Datos del backend:', {
-      data,
-      properties,
-      activeSubscription,
-      publishedCount,
-      maxPublications,
-      remainingPublications,
-      canPublish
-    });
-    
-    // eslint-disable-next-line no-console
-    console.debug('[mis-propiedades] Propiedades individuales:', 
-      properties.map((p: any) => ({
-        id: p.id,
-        title: p.title,
-        status: p.status,
-        normalizedStatus: normalizeStatus(p?.status)
-      }))
-    );
-    
-    // eslint-disable-next-line no-console
-    console.debug('[mis-propiedades] Conteos:', counts);
+    // Debug info removed - kept for future use if needed
   }, [data, properties, activeSubscription, publishedCount, maxPublications, remainingPublications, canPublish, counts]);
 
   const searchedProperties = useMemo(() => {
@@ -432,8 +414,8 @@ export default function MyPropertiesPage() {
         
         {/* Loading */}
         {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(3)].map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {[...Array(8)].map((_, i) => (
               <PropertyCardSkeleton key={i} />
             ))}
           </div>
@@ -496,11 +478,11 @@ export default function MyPropertiesPage() {
         {/* Properties Grid */}
         {!isLoading && properties.length > 0 && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {filteredProperties.map((property: any) => (
                 <div key={property.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col group">
                   {/* Imagen */}
-                  <div className="relative h-48 bg-gray-50 overflow-hidden">
+                  <div className="relative h-44 bg-gray-50 overflow-hidden">
                     {property.coverPhotoUrl ? (
                     <img
                       src={`/api/images/proxy?url=${encodeURIComponent(property.coverPhotoUrl)}`}
@@ -562,34 +544,34 @@ export default function MyPropertiesPage() {
                   </div>
 
                   {/* Content */}
-                  <div className="p-3 flex flex-col flex-grow">
-                    <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-2 leading-tight min-h-[2.5rem]">
+                  <div className="p-2.5 flex flex-col flex-grow">
+                    <h3 className="text-xs font-bold text-gray-900 mb-1 line-clamp-2 leading-tight min-h-[2.2rem]">
                       {property.title}
                     </h3>
                     
-                    <p className="text-[11px] text-gray-500 mb-2 flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                    <p className="text-[10px] text-gray-500 mb-1.5 flex items-center gap-1">
+                      <MapPin className="w-2.5 h-2.5 text-gray-400 flex-shrink-0" />
                       <span className="truncate">{property.district}, {property.province}</span>
                     </p>
                     
-                    <div className="flex items-center justify-between mb-3 bg-gray-50 p-2 rounded-md border border-gray-100">
-                      <span className="text-sm font-bold text-gray-900 tracking-tight">
+                    <div className="flex items-center justify-between mb-2 bg-gray-50 p-1.5 rounded-md border border-gray-100">
+                      <span className="text-xs font-bold text-gray-900 tracking-tight">
                         {property.currency === 'USD' ? 'US$' : 'S/'} {property.price.toLocaleString()}
                       </span>
-                      <span className="text-[11px] text-gray-500 flex items-center gap-1 font-medium">
-                        <Eye className="w-3 h-3 text-gray-400" />
+                      <span className="text-[10px] text-gray-500 flex items-center gap-1 font-medium">
+                        <Eye className="w-2.5 h-2.5 text-gray-400" />
                         {property.viewsCount}
                       </span>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex flex-col gap-1.5 mt-auto">
+                    <div className="flex flex-col gap-1 mt-auto">
                       {/* Publish / Reactivate Button */}
                       {(property.status === 'DRAFT' || property.status === 'PAUSED') && (
                         <button
                           onClick={() => handlePublish(property.id)}
                           disabled={publishMutation.isPending}
-                          className="w-full py-2 bg-[var(--brand-primary-light)] text-[var(--brand-primary)] text-xs font-semibold rounded-md hover:bg-[var(--brand-primary-light-hover)] disabled:opacity-50 transition-colors flex items-center justify-center gap-1"
+                          className="w-full py-1.5 bg-[var(--brand-primary-light)] text-[var(--brand-primary)] text-[11px] font-semibold rounded-md hover:bg-[var(--brand-primary-light-hover)] disabled:opacity-50 transition-colors flex items-center justify-center gap-1"
                         >
                           {publishMutation.isPending ? 'Procesando...' : (property.status === 'DRAFT' ? 'Publicar Ahora' : 'Reactivar')}
                         </button>
@@ -599,25 +581,25 @@ export default function MyPropertiesPage() {
                       {property.status === 'PUBLISHED' && !property.isFeatured && (
                         <button
                           onClick={() => handleFeatureProperty(property.id)}
-                          className="w-full py-2 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-semibold rounded-md hover:bg-amber-100 transition-colors flex items-center justify-center gap-1"
+                          className="w-full py-1.5 bg-amber-50 text-amber-700 border border-amber-200 text-[11px] font-semibold rounded-md hover:bg-amber-100 transition-colors flex items-center justify-center gap-1"
                         >
-                          <Star className="w-3 h-3" />
+                          <Star className="w-2.5 h-2.5" />
                           Destacar anuncio
                         </button>
                       )}
 
-                      <div className="flex gap-1.5">
+                      <div className="flex gap-1">
                         <Link
                           href={`/property/${property.id}`}
                           target="_blank"
-                          className="flex-1 py-2 bg-white text-gray-700 text-xs font-semibold rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center justify-center border border-gray-200"
+                          className="flex-1 py-1.5 bg-white text-gray-700 text-[11px] font-semibold rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center justify-center border border-gray-200"
                         >
                           Ver página
                         </Link>
                         
                         <Link
                           href={`/my-properties/${property.id}/edit`}
-                          className="flex-1 py-2 bg-blue-50 text-blue-700 border border-blue-100 text-xs font-semibold rounded-md hover:bg-blue-100 transition-colors flex items-center justify-center"
+                          className="flex-1 py-1.5 bg-blue-50 text-blue-700 border border-blue-100 text-[11px] font-semibold rounded-md hover:bg-blue-100 transition-colors flex items-center justify-center"
                         >
                           Editar
                         </Link>
@@ -626,7 +608,7 @@ export default function MyPropertiesPage() {
                           <button
                             onClick={() => handleDeleteClick(property.id, property.title, property.status)}
                             disabled={deleteMutation.isPending}
-                            className="py-2 px-3 bg-white text-red-600 border border-red-200 text-xs font-semibold rounded-md hover:bg-red-50 disabled:opacity-50 transition-colors whitespace-nowrap"
+                            className="py-1.5 px-2 bg-white text-red-600 border border-red-200 text-[11px] font-semibold rounded-md hover:bg-red-50 disabled:opacity-50 transition-colors whitespace-nowrap"
                           >
                             Eliminar
                           </button>
@@ -637,6 +619,56 @@ export default function MyPropertiesPage() {
                 </div>
               ))}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-8 mb-4">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                  disabled={currentPage === 0}
+                  className="px-3 py-2 text-sm font-semibold rounded-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 shadow-sm"
+                >
+                  Anterior
+                </button>
+                
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                    let pageNum: number;
+                    if (totalPages <= 7) {
+                      pageNum = i;
+                    } else if (currentPage <= 3) {
+                      pageNum = i;
+                    } else if (currentPage >= totalPages - 4) {
+                      pageNum = totalPages - 7 + i;
+                    } else {
+                      pageNum = currentPage - 3 + i;
+                    }
+                    
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`w-9 h-9 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                          currentPage === pageNum
+                            ? 'bg-blue-600 text-white shadow-md'
+                            : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 hover:text-gray-900'
+                        }`}
+                      >
+                        {pageNum + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                  disabled={currentPage >= totalPages - 1}
+                  className="px-3 py-2 text-sm font-semibold rounded-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 shadow-sm"
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>

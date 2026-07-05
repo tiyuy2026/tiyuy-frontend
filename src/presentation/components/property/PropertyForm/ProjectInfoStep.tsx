@@ -1,7 +1,7 @@
 'use client';
 
-import { AlertTriangle } from 'lucide-react';
-import React from 'react';
+import { AlertTriangle, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { PROJECT_PHASES, PROJECT_PHASES_LABELS, PROJECT_TYPES, PROJECT_TYPES_LABELS, CURRENCIES } from '@/config/constants';
 
@@ -21,10 +21,48 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
     'Área Infantil', 'BBQ', 'Terraza Panorámica'
   ];
 
-  const handleChangeWithLog = (field: string, value: any) => {
-    console.log(`ProjectInfoStep - Actualizando ${field}:`, value);
-    onChange(field, value);
-  };
+  // Custom dropdown component
+  function CustomSelect({ value, onChange, options, label }: { value: string; onChange: (v: string) => void; options: Record<string, string>; label?: string }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const entries = Object.entries(options);
+    const selected = entries.find(([k]) => k === value);
+
+    useEffect(() => {
+      const handler = (e: MouseEvent) => {
+        if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
+      };
+      document.addEventListener('mousedown', handler);
+      return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    return (
+      <div className="relative" ref={ref}>
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm text-gray-700 cursor-pointer transition-all hover:border-gray-400 focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] outline-none"
+        >
+          <span className={selected ? 'text-gray-900' : 'text-gray-400'}>{selected ? selected[1] : label || 'Seleccionar'}</span>
+          <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+        {isOpen && (
+          <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+            {entries.map(([key, lbl]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => { onChange(key); setIsOpen(false); }}
+                className={`w-full text-left px-3 py-2.5 text-sm transition-colors hover:bg-green-50 hover:text-green-700 ${value === key ? 'bg-green-50 text-green-700 font-semibold' : 'text-gray-700'}`}
+              >
+                {lbl}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -41,32 +79,24 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Tipo de Propiedad *
           </label>
-          <select
+          <CustomSelect
             value={formData.projectType || 'RESIDENTIAL'}
-            onChange={(e) => handleChangeWithLog('projectType', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] bg-white outline-none"
-            required
-          >
-            {Object.entries(PROJECT_TYPES_LABELS).map(([key, label]) => (
-              <option key={key} value={key}>{label}</option>
-            ))}
-          </select>
+            onChange={(v) => onChange('projectType', v)}
+            options={PROJECT_TYPES_LABELS}
+            label="Seleccionar tipo"
+          />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Fase Actual *
           </label>
-          <select
+          <CustomSelect
             value={formData.phase || 'PRE_SALE'}
-            onChange={(e) => handleChangeWithLog('phase', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] bg-white outline-none"
-            required
-          >
-            {Object.entries(PROJECT_PHASES_LABELS).map(([key, label]) => (
-              <option key={key} value={key}>{label}</option>
-            ))}
-          </select>
+            onChange={(v) => onChange('phase', v)}
+            options={PROJECT_PHASES_LABELS}
+            label="Seleccionar fase"
+          />
         </div>
       </div>
 
@@ -76,17 +106,12 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Moneda
           </label>
-          <select
+          <CustomSelect
             value={formData.currency || 'PEN'}
-            onChange={(e) => handleChangeWithLog('currency', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] bg-white outline-none"
-          >
-            {Object.entries(CURRENCIES).map(([key, value]) => (
-              <option key={key} value={key}>
-                {value.symbol} ({key})
-              </option>
-            ))}
-          </select>
+            onChange={(v) => onChange('currency', v)}
+            options={Object.fromEntries(Object.entries(CURRENCIES).map(([k, v]) => [k, `${v.symbol} (${k})`]))}
+            label="Seleccionar moneda"
+          />
         </div>
 
         {/* Precio Desde */}
@@ -99,7 +124,7 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
             value={formData.priceFrom ?? ''}
             onChange={(e) => {
               const raw = e.target.value;
-              handleChangeWithLog('priceFrom', raw === '' ? '' : parseFloat(raw));
+              onChange('priceFrom', raw === '' ? '' : parseFloat(raw));
             }}
             placeholder="Ej: 150000"
             min="0"
@@ -124,7 +149,7 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
             value={formData.priceTo ?? ''}
             onChange={(e) => {
               const raw = e.target.value;
-              handleChangeWithLog('priceTo', raw === '' ? '' : parseFloat(raw));
+              onChange('priceTo', raw === '' ? '' : parseFloat(raw));
             }}
             placeholder="Ej: 300000"
             min="0"
@@ -170,7 +195,7 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
         <input
           type="text"
           value={formData.name || formData.projectName || ''}
-          onChange={(e) => handleChangeWithLog('name', e.target.value)}
+          onChange={(e) => onChange('name', e.target.value)}
           className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] outline-none text-gray-900 bg-white ${
             validationErrors?.name ? 'border-red-300 bg-red-50/10' : 'border-gray-300'
           }`}
@@ -199,7 +224,7 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
         </div>
         <textarea
           value={formData.description || ''}
-          onChange={(e) => handleChangeWithLog('description', e.target.value)}
+          onChange={(e) => onChange('description', e.target.value)}
           rows={4}
           className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] outline-none text-gray-900 bg-white ${
             validationErrors?.description ? 'border-red-300 bg-red-50/10' : 'border-gray-300'
@@ -373,9 +398,9 @@ export function ProjectInfoStep({ formData, onChange, validationErrors }: Projec
                     onChange={(e) => {
                       const current = formData.amenities || [];
                       if (e.target.checked) {
-                        handleChangeWithLog('amenities', [...current, amenity]);
+                        onChange('amenities', [...current, amenity]);
                       } else {
-                        handleChangeWithLog('amenities', current.filter((a: string) => a !== amenity));
+                        onChange('amenities', current.filter((a: string) => a !== amenity));
                       }
                     }}
                     style={{ color: 'var(--brand-primary)' }}
