@@ -2381,41 +2381,24 @@ export function useCreateGroup() {
 
   const queryClient = useQueryClient();
 
-  
-
   return useMutation({
 
     mutationFn: async (data: {
-
       name: string;
-
       description: string;
-
+      type?: string;
       isRestrictedByEmail?: boolean;
-
     }) => {
-
       const response = await axiosClient.post('/contacts/extended/groups', data);
-
       return response.data;
-
     },
 
     onSuccess: () => {
-
       queryClient.invalidateQueries({ queryKey: ['groups'] });
-
       toast.success('Grupo creado correctamente');
-
     },
 
-    onError: (error) => {
-
-      console.error('Error al crear grupo:', error);
-
-      toast.error('Error al crear el grupo');
-
-    },
+    // El error lo maneja el componente que llama mutateAsync
 
   });
 

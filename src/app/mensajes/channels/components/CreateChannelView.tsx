@@ -88,18 +88,18 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
   };
 
   return (
-    <div className="h-full bg-white dark:bg-gray-900 p-6 overflow-y-auto">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Crear Nuevo Canal</h2>
-          <button 
-            onClick={onBack}
-            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
+    <div className="flex flex-col bg-white dark:bg-gray-900 h-full">
+      <div className="bg-green-600 px-4 py-3 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-white font-bold text-base leading-tight">Crear Nuevo Canal</h1>
+            <p className="text-white/70 text-xs">Completa los datos para crear tu canal</p>
+          </div>
+          <button onClick={onBack} className="text-white/70 hover:text-white transition-colors"><ChevronLeft className="w-5 h-5" /></button>
         </div>
+      </div>
+      <div className="flex-1 overflow-y-auto p-6">
+        <div className="max-w-2xl mx-auto">
 
         {!canCreateChannel ? (
           <div className="bg-gradient-to-r from-amber-50 dark:from-amber-900/30 to-orange-50 dark:to-orange-900/30 border border-amber-200 dark:border-amber-700 rounded-xl p-8 text-center">
@@ -337,6 +337,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
         </form>
         )}
       </div>
+    </div>
     </div>
   );
 }
