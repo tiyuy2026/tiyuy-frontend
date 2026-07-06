@@ -184,12 +184,6 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
   const propertyType = PROPERTY_TYPE_MAP[resolvedParams.propertyType];
   const district = toDistrictName(resolvedParams.district);
   
-  console.log('🏘️ District procesado:', {
-    original: resolvedParams.district,
-    procesado: district,
-    propertyType: resolvedParams.propertyType,
-    mappedType: propertyType
-  });
 
   const isFiltered = resolvedSearchParams.filtered === '1';
 
