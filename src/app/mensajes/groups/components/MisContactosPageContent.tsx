@@ -211,7 +211,7 @@ export function MisContactosPageContent() {
         { key: 'canales' as MainTab, Icon: IC.Channel, label: 'Comunidades' },
     ];
 
-    const hasGroupSubSection = activeTab === 'grupos' && (gruposSection !== 'mis-grupos' || selectedGroup !== null);
+    const hasGroupSubSection = activeTab === 'grupos' && (selectedGroup !== null || (isMobile && gruposSection !== 'mis-grupos'));
     const hasChannelSubSection = activeTab === 'canales' && (selectedChannel !== null || channelsSection !== 'mis-canales-creados');
     const hasSelection = selectedChatId || selectedStatusId || selectedGroup || selectedChannel || hasGroupSubSection || hasChannelSubSection;
 

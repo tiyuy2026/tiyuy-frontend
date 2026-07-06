@@ -47,15 +47,6 @@ export function GrupoPostsPanel({ groupId, groupName, currentUserId, currentUser
     isDeletingPost 
   } = useGroupPosts(groupId);
 
-  
-  posts?.forEach((post, index) => {
-    console.log(`Post ${index + 1} (ID: ${post.id}):`, {
-      content: post.content,
-      imageUrls: post.imageUrls,
-      imageUrlsLength: post.imageUrls?.length || 0
-    });
-  });
-
   // Smart derived state - after having posts and postsLoading
   const hasPosts = !postsLoading && posts.length > 0;
   const [newPost, setNewPost] = useState('');
