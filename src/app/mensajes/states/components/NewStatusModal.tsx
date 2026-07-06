@@ -10,8 +10,10 @@ export default function NewStatusModal({ onClose, userRole }: { onClose: () => v
     const handleSendStatus = (content: string, textStyle?: string, customColor?: string, location?: string, propertyType?: string) => {
         createStatus.mutate({
             content,
-            location: location || undefined,
-            propertyType: propertyType || undefined,
+            ...(location ? { location } : {}),
+            ...(propertyType ? { propertyType } : {}),
+            ...(textStyle && textStyle !== 'NORMAL' ? { textStyle } : {}),
+            ...(customColor ? { customColor } : {}),
             isPromoted: false
         });
 
@@ -19,7 +21,7 @@ export default function NewStatusModal({ onClose, userRole }: { onClose: () => v
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-hidden">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">

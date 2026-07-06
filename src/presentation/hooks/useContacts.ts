@@ -554,7 +554,7 @@ export function useGetActiveStatusPosts(params: { location?: string } = {}) {
 
     queryFn: ({ pageParam = 0 }) => 
 
-      apiCall(`/contacts/extended/status?sort=popularity&page=${pageParam}&size=20${params.location ? `&location=${params.location}` : ''}`),
+      apiCall(`/contacts/extended/status?sortBy=popularity&page=${pageParam}&size=20${params.location ? `&location=${params.location}` : ''}`),
 
     getNextPageParam: (lastPage: any) => {
 
@@ -578,66 +578,23 @@ export function useCreateStatusPost() {
 
   const queryClient = useQueryClient();
 
-  
-
   return useMutation({
 
-    mutationFn: (data: { content: string; location?: string; propertyType?: string; isPromoted?: boolean }) =>
-
-      apiCall('/contacts/extended/status', {
-
+    mutationFn: async (data: any) => {
+      const token = localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token') || '';
+      return apiCall('/contacts/extended/status', {
         method: 'POST',
-
+        headers: { 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(data),
-
-      }),
-
-    onSuccess: (data, postId) => {
-
-      queryClient.setQueriesData({ queryKey: ['status-posts'] }, (old: any) => {
-
-        if (!old?.pages) return old;
-
-        
-
-        return {
-
-          ...old,
-
-          pages: old.pages.map((page: any) =>
-
-            page.map((post: any) => {
-
-              if (post.id === postId) {
-
-                return {
-
-                  ...post,
-
-                  hasUserLiked: false,
-
-                  likeCount: Math.max((post.likeCount || 0) - 1, 0)
-
-                };
-
-              }
-
-              return post;
-
-            })
-
-          )
-
-        };
-
       });
-
     },
 
-    onError: () => {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['status-posts'] });
+    },
 
-      toast.error('Error al publicar estado');
-
+    onError: (error: any) => {
+      toast.error(error.message || 'Error al publicar estado');
     },
 
   });

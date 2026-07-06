@@ -154,10 +154,9 @@ export default function EstadosPanel({ user, onNewStatus, onStatusSelect, select
                                 <div key={post.id}
                                     className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 transition-colors cursor-pointer ${selectedStatusId === post.id ? 'bg-brand/10 dark:bg-gray-600' : ''}`}
                                     onClick={() => handleStatusClick(post.id)}>
-                                    <div className="relative flex-shrink-0 w-12 h-12">
-                                        <Icon icon="svg-spinners:ring-resize" className={`w-12 h-12 ${isUrgent ? 'text-red-400' : 'text-blue-500'}`} />
-                                        <div className="absolute inset-1.5">
-                                            <Avatar name={post.userName ?? 'U'} role={post.userRole} size="md" src={post.userAvatar} />
+                                    <div className="relative flex-shrink-0">
+                                        <div className={`w-12 h-12 rounded-full ring-2 ring-offset-1 ${isUrgent ? 'ring-red-400' : 'ring-green-400'} overflow-hidden`}>
+                                            <Avatar name={post.userName ?? 'U'} role={post.userRole} size="lg" src={post.userAvatar} />
                                         </div>
                                     </div>
 

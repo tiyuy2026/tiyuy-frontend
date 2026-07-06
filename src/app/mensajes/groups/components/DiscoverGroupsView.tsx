@@ -41,15 +41,17 @@ export default function DiscoverGroupsView({ user, onGroupSelect }: { user: any;
 
 
   return (
-    <div className="h-full bg-white p-6 overflow-y-auto">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Descubrir Grupos</h2>
-          <div className="text-sm text-gray-500">
-            {filteredGroups.length} grupos disponibles
+    <div className="h-full bg-white overflow-y-auto">
+      {/* Header con barra verde como en el chat */}
+      <div className="bg-green-600 px-4 py-3 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-white font-bold text-base leading-tight">Descubrir Grupos</h1>
+            <p className="text-white/70 text-xs">{filteredGroups.length} grupos disponibles</p>
           </div>
         </div>
+      </div>
+      <div className="max-w-6xl mx-auto p-6">
 
         {/* Barra de búsqueda */}
         <div className="mb-6">
