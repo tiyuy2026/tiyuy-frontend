@@ -218,85 +218,93 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-gray-800">
-      {/* Header con información del publicador */}
-      <div className="border-b border-gray-100 dark:border-gray-700 p-4">
-        <div className="flex items-center justify-between mb-3">
+      {/* Barra verde delgada solo para avatar + nombre */}
+      <div className="bg-green-600 px-4 py-3 flex-shrink-0">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <UserAvatar 
               user={status.user?.id === user?.id || status.userId === user?.id ? user : status.user} 
               size="sm" 
             />
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-white font-semibold text-sm">
                 {status.user?.id === user?.id || status.userId === user?.id
                   ? currentUserName
                   : status.userName || status.user?.name || 'Usuario'
                 }
               </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {formatDistanceToNow(new Date(status.createdAt), {
-                  addSuffix: true
-                })}
+              <p className="text-xs text-white/70">
+                {formatDistanceToNow(new Date(status.createdAt), { addSuffix: true })}
               </p>
             </div>
           </div>
           {onClose && (
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-            >
+            <button onClick={onClose} className="text-white/70 hover:text-white transition-colors">
               <X className="w-5 h-5" />
             </button>
           )}
         </div>
+      </div>
 
-        {/* Contenido del estado */}
+      {/* Contenido del estado + botones en fondo blanco */}
+      <div className="border-b border-gray-100 dark:border-gray-700 p-4">
         <div className="mb-4">
-          <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{status.content}</p>
-
-          {/* Tags si existen */}
+          <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap text-sm">{status.content}</p>
           {status.tags && status.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3">
+            <div className="flex flex-wrap gap-2 mt-2">
               {status.tags.map((tag: string, index: number) => (
-                <span
-                  key={index}
-                  className="px-2 py-1 bg-brand/10 text-brand text-xs rounded-full font-medium"
-                >
-                  #{tag}
-                </span>
+                <span key={index} className="px-2 py-0.5 bg-brand/10 text-brand text-[10px] rounded-full font-medium">#{tag}</span>
               ))}
             </div>
           )}
         </div>
 
-        {/* Botones de interacción */}
         <div className="flex items-center gap-6">
-          <button
-            onClick={handleLike}
-            className={`flex items-center gap-2 text-sm font-medium transition-colors ${isLiked ? 'text-red-600' : 'text-gray-600 dark:text-gray-400 hover:text-red-600'
-              }`}
-          >
+          <button onClick={handleLike} className={`flex items-center gap-2 text-sm font-medium transition-colors ${isLiked ? 'text-red-600' : 'text-gray-600 hover:text-red-600'}`}>
             <Heart className="w-5 h-5" fill={isLiked ? 'currentColor' : 'none'} />
             {likeCount > 0 && likeCount}
           </button>
-
-          <button className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-brand transition-colors">
-            <MessageCircle className="w-5 h-5" />
-            Comentar
+          <button className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-brand transition-colors">
+            <MessageCircle className="w-5 h-5" /> Comentar
           </button>
-
-          <button
-            onClick={handleShare}
-            className="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-green-600 transition-colors"
-          >
-            <Share2 className="w-5 h-5" />
-            Compartir
-            {shareCount > 0 && (
-              <span className="text-xs text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-400 px-2 py-0.5 rounded-full">
-                {shareCount}
-              </span>
+          <div className="relative">
+            <button onClick={handleShare} className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">
+              <Share2 className="w-5 h-5" /> Compartir
+              {shareCount > 0 && <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{shareCount}</span>}
+            </button>
+            {showShareModal && (
+              <div className="absolute left-[calc(100%+24px)] top-0 z-50 w-[255px]">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-600">
+                  <div className="bg-brand px-3 py-2">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-white font-semibold text-xs">Compartir</h3>
+                      <button onClick={() => setShowShareModal(false)} className="text-white/70 hover:text-white w-5 h-5 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-sm leading-none">×</button>
+                    </div>
+                  </div>
+                  <div className="p-2">
+                    <div className="flex gap-1.5">
+                      <button onClick={() => { navigator.clipboard.writeText(`${shareText} ${shareUrl}`); setShowShareModal(false); }}
+                        className="flex flex-col items-center gap-0.5 py-1.5 flex-1 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                        <div className="w-7 h-7 bg-gray-600 rounded-full flex items-center justify-center"><Copy className="w-3.5 h-3.5 fill-white" /></div>
+                        <span className="text-[9px] text-gray-700 dark:text-gray-300 font-medium">Copiar</span>
+                      </button>
+                      <a href={`https://wa.me/?text=${encoded}`} target="_blank" rel="noopener noreferrer"
+                        className="flex flex-col items-center gap-0.5 py-1.5 flex-1 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <div className="w-7 h-7 bg-green-500 rounded-full flex items-center justify-center"><MessageCircle className="w-3.5 h-3.5 fill-white" /></div>
+                        <span className="text-[9px] text-green-700 font-medium">WhatsApp</span>
+                      </a>
+                      <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`}
+                        target="_blank" rel="noopener noreferrer" onClick={() => setShowShareModal(false)}
+                        className="flex flex-col items-center gap-0.5 py-1.5 flex-1 bg-brand/10 rounded-lg hover:bg-brand/20 transition-colors border border-blue-100">
+                        <div className="w-7 h-7 bg-brand rounded-full flex items-center justify-center"><Icon icon="mdi:facebook" className="w-3.5 h-3.5 fill-white" /></div>
+                        <span className="text-[9px] text-brand-dark font-bold">Facebook</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
-          </button>
+          </div>
         </div>
       </div>
 
@@ -555,63 +563,6 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
         </div>
       </div>
 
-      {/* Modal de compartir */}
-      {showShareModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
-            <div className="bg-brand p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-white font-bold text-lg">Compartir Estado</h2>
-                  <p className="text-white/70 text-xs mt-0.5">Elige dónde quieres compartir</p>
-                </div>
-                <button onClick={() => setShowShareModal(false)} className="text-white/70 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-xl leading-none"><X className="w-5 h-5" /></button>
-              </div>
-            </div>
-
-            <div className="p-5">
-              <div className="grid grid-cols-3 gap-3"> {/* 3 columnas: Copiar, WhatsApp, Facebook */}
-                {/* Copiar Link */}
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
-                    setShowShareModal(false);
-                  }}
-                  className="flex flex-col items-center gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-                >
-                  <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
-                    <Copy className="w-5 h-5 fill-white" />
-                  </div>
-                  <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">Copiar</span>
-                </button>
-
-                {/* WhatsApp */}
-                <a href={`https://wa.me/?text=${encoded}`} target="_blank" rel="noopener noreferrer"
-                  className="flex flex-col items-center gap-2 p-3 bg-green-50 rounded-xl hover:bg-green-100 transition-colors">
-                  <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                    <MessageCircle className="w-5 h-5 fill-white" />
-                  </div>
-                  <span className="text-xs text-green-700 font-medium">WhatsApp</span>
-                </a>
-
-                {/* Facebook */}
-                <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setShowShareModal(false)}
-                  className="flex flex-col items-center gap-2 p-3 bg-brand/10 rounded-xl hover:bg-brand/20 transition-colors border-2 border-blue-200"
-                >
-                  <div className="w-10 h-10 bg-brand rounded-full flex items-center justify-center">
-                    <Icon icon="mdi:facebook" className="w-5 h-5 fill-white" />
-                  </div>
-                  <span className="text-xs text-brand-dark font-bold">Facebook</span>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

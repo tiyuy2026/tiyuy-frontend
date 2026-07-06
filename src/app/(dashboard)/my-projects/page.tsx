@@ -20,10 +20,11 @@ export default function MyProjectsPage() {
   const [activeTab, setActiveTab] = useState<'ALL' | 'DRAFT' | 'PUBLISHED' | 'PAUSED' | 'COMPLETED'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [showPlanExpiredModal, setShowPlanExpiredModal] = useState(false);
-
+  const [currentPage, setCurrentPage] = useState(0);
+  const pageSize = 12;
 
   // Query para obtener proyectos
-  const { data: projectsData, isLoading, refetch } = myProjects(0, 20);
+  const { data: projectsData, isLoading, refetch } = myProjects(currentPage, pageSize);
 
   // Mutations
   const publishMutation = publishProject();
@@ -87,6 +88,7 @@ export default function MyProjectsPage() {
   };
 
   const projects = projectsData?.content || [];
+  const totalPages = projectsData?.totalPages || 0;
   const filteredProjects = projects.filter((project: any) => {
     const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          project.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -299,7 +301,7 @@ export default function MyProjectsPage() {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {filteredProjects.map((project: any) => (
                 <div key={project.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                   {/* Project Image */}
@@ -465,6 +467,56 @@ export default function MyProjectsPage() {
               ))}
             </div>
           )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-8 mb-4">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                  disabled={currentPage === 0}
+                  className="px-3 py-2 text-sm font-semibold rounded-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 shadow-sm"
+                >
+                  Anterior
+                </button>
+                
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                    let pageNum: number;
+                    if (totalPages <= 7) {
+                      pageNum = i;
+                    } else if (currentPage <= 3) {
+                      pageNum = i;
+                    } else if (currentPage >= totalPages - 4) {
+                      pageNum = totalPages - 7 + i;
+                    } else {
+                      pageNum = currentPage - 3 + i;
+                    }
+                    
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`w-9 h-9 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                          currentPage === pageNum
+                            ? 'bg-purple-600 text-white shadow-md'
+                            : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200 hover:text-gray-900'
+                        }`}
+                      >
+                        {pageNum + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                  disabled={currentPage >= totalPages - 1}
+                  className="px-3 py-2 text-sm font-semibold rounded-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 shadow-sm"
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
         </div>
       </div>
       </TrialGuard>

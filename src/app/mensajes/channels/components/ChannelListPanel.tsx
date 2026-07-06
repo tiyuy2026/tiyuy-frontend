@@ -188,7 +188,7 @@ function CanalesListPanel({
       <div className="px-3 pb-3">
         <button
           onClick={() => {
-            const canCreate = user?.role === 'AGENT' || user?.role === 'INMOBILIARIA';
+            const canCreate = !!user && !!user.id;
             if (canCreate) {
               onSectionChange('crear-canal');
             } else {
@@ -198,20 +198,16 @@ function CanalesListPanel({
           className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-colors relative ${
             hasChannel 
               ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed' 
-              : (user?.role === 'AGENT' || user?.role === 'INMOBILIARIA')
-                ? 'bg-gray-800 text-white hover:bg-gray-700'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+              : 'bg-gray-800 text-white hover:bg-gray-700'
           }`}
         >
           {hasChannel && (
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           )}
           <span className="text-lg font-bold leading-none">
-            {hasChannel ? '' : 
-              (user?.role === 'AGENT' || user?.role === 'INMOBILIARIA') ? '+' : ''}
+            {hasChannel ? '' : '+'}
           </span>
-          {hasChannel ? 'Límite alcanzado' : 
-            (user?.role === 'AGENT' || user?.role === 'INMOBILIARIA') ? 'Crear nuevo canal' : 'No tienes permisos'}
+          {hasChannel ? 'Límite alcanzado' : 'Crear nuevo canal'}
         </button>
         {hasChannel && (
           <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-1">

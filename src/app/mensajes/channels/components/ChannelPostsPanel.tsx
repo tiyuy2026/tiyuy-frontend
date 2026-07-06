@@ -361,14 +361,46 @@ export function ChannelPostsPanel({
 
   return (
     <div className="h-full flex flex-col relative bg-white dark:bg-gray-900">
-      {/* Header */}
-      <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 z-10">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{channelName}</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Posts del canal</p>
+      {/* Header - Responsive: stack on mobile, row on desktop */}
+      <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3 md:p-4 z-10">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+          <div className="flex items-center justify-between md:block">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base md:text-xl font-bold text-gray-900 dark:text-gray-100 truncate">{channelName}</h2>
+              <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Posts del canal</p>
+            </div>
+            {/* Mobile: hamburger menu for extra actions */}
+            <div className="md:hidden flex gap-1">
+              <button
+                onClick={() => setActiveTab(activeTab === 'posts' ? 'events' : 'posts')}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                  activeTab === 'posts'
+                    ? 'bg-gray-800 text-white'
+                    : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                {activeTab === 'posts' ? 'Eventos' : 'Posts'}
+              </button>
+              {isChannelAdmin && (
+                <button
+                  onClick={() => setShowAccessManager(!showAccessManager)}
+                  className="px-2 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg"
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                </button>
+              )}
+              {canViewStatistics && (
+                <button
+                  onClick={() => setShowStatisticsModal(true)}
+                  className="px-2 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg"
+                >
+                  <BarChart3 className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           </div>
-          <div className="flex gap-2">
+          {/* Desktop: full button row */}
+          <div className="hidden md:flex gap-2 flex-shrink-0">
             <button
               onClick={() => setActiveTab('posts')}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
@@ -583,9 +615,9 @@ export function ChannelPostsPanel({
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700">Emojis:</label>
                         <div className="flex gap-2 flex-wrap">
-                          {['', '', '️', '', '', '', '', '', '', '', '', ''].map((emoji) => (
+                          {['', '', '️', '', '', '', '', '', '', '', '', ''].map((emoji, idx) => (
                             <button
-                              key={emoji}
+                              key={`emoji-${idx}-${emoji}`}
                               onClick={() => setNewPost(newPost + emoji)}
                               className="text-2xl hover:bg-gray-100 p-1 rounded transition-colors"
                             >

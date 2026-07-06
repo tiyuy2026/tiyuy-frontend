@@ -19,8 +19,6 @@ interface UpgradePlanModalProps {
 }
 
 export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
-  console.log('DEBUG: UpgradePlanModal se está ejecutando');
-  
   const { data: plans, isLoading } = useAvailablePlans();
   const { data: activeSubscription } = useActiveSubscription();
   const { data: availableDiscountCodes } = useAvailableDeveloperDiscountCodes();
@@ -63,17 +61,13 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   
   // Función para detectar descuentos inteligentes basados en reglas de negocio - PARA AGENTES Y DEVELOPERS CON DESCUENTOS DE AGENCIA
   const detectIntelligentDiscount = (planPrice: number): { code: string; percentage: number } | null => {
-    console.log('Detectando descuento inteligente para precio:', planPrice, 'usuario es agente:', isAgent, 'usuario es developer:', isDeveloper, 'tiene descuentos de agencia:', hasDiscountCodes);
-    
     // 🔒 CRÍTICO: Solo agentes y developers con descuentos de agencia pueden tener descuentos inteligentes
     if (!hasAgencyRole || !hasDiscountCodes) {
-      console.log('Usuario no es agente/developer o no tiene descuentos de agencia - no se aplican descuentos inteligentes');
       return null;
     }
     
     // Regla: Si el precio es 29, aplicar 20% de descuento
     if (planPrice === 29) {
-      console.log('Descuento inteligente detectado: 20% para precio 29 (agente/developer con descuentos)');
       return {
         code: 'AUTO20',
         percentage: 20
@@ -82,7 +76,6 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
     
     // Regla: Si el precio es 49, aplicar 15% de descuento
     if (planPrice === 49) {
-      console.log('Descuento inteligente detectado: 15% para precio 49 (agente/developer con descuentos)');
       return {
         code: 'AUTO15',
         percentage: 15
@@ -91,14 +84,12 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
     
     // Regla: Si el precio es 99, aplicar 10% de descuento
     if (planPrice === 99) {
-      console.log('Descuento inteligente detectado: 10% para precio 99 (agente/developer con descuentos)');
       return {
         code: 'AUTO10',
         percentage: 10
       };
     }
     
-    console.log('No se detectó descuento inteligente para precio:', planPrice);
     return null;
   };
 
@@ -129,29 +120,19 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   };
   
   useEffect(() => {
-    console.log('useEffect triggered:', {
-      isAgent,
-      hasDiscountCodes,
-      availableDiscountCodes,
-      availableDiscountCodesLength: availableDiscountCodes?.length || 0
-    });
-    
     if (isAgent && hasDiscountCodes && availableDiscountCodes && availableDiscountCodes.length > 0) {
       // Aplicar automáticamente el primer descuento disponible
       const firstDiscount = availableDiscountCodes[0];
-      console.log('firstDiscount structure:', firstDiscount);
       
       // El código está anidado en discountCode.code
       const discountCodeObj = (firstDiscount as any).discountCode;
       const discountCodeValue = discountCodeObj?.code || discountCodeObj;
       const discountPercentage = discountCodeObj?.discountPercentage || 0;
-      console.log('discountCodeValue:', discountCodeValue, 'percentage:', discountPercentage);
       
       setAutoDiscountCode(discountCodeValue);
       setAutoDiscountPercentage(discountPercentage);
       setDiscountCode(discountCodeValue);
       setIsIntelligentDiscount(false);
-      console.log('Descuento de agente aplicado automáticamente:', discountCodeValue, discountPercentage + '%');
     }
   }, [isAgent, hasDiscountCodes, availableDiscountCodes]);
 
@@ -163,17 +144,15 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
     const checkFreePlanUsage = async () => {
       if (isOpen) {
         try {
-          // Obtener userId del localStorage o contexto de autenticación
           const userData = localStorage.getItem('user');
           if (userData) {
             const user = JSON.parse(userData);
             const userId = user.id;
             const used = await financeRepository.hasUserUsedFreePlan(userId);
             setHasUsedFreePlan(used);
-            console.log('Usuario ya uso plan FREE:', used);
           }
         } catch (error) {
-          console.error('Error checking free plan usage:', error);
+          // Error checking free plan usage
         }
       }
     };
@@ -189,13 +168,9 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
       discountCode: discountCode || undefined,
     }, {
       onSuccess: (subscription) => {
-        // Suscripción creada, ahora abrir MercadoPago
-        console.log('Suscripcion pendiente creada:', subscription);
         openMercadoPagoPayment(plan, subscription.id);
       },
       onError: (error: any) => {
-        console.error('Error creando suscripcion:', error);
-        
         // Si es error 409 (ya tiene suscripción activa), mostrar modal bonito
         if (error?.response?.status === 409) {
           setShowActiveSubscriptionModal(true);
@@ -209,8 +184,6 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   };
 
   const openMercadoPagoPayment = (plan: SubscriptionPlan, subscriptionId: string) => {
-    console.log('Abriendo MercadoPago para plan:', plan.name);
-    
     // Cargar SDK dinámicamente si no está disponible
     if (!(window as any).MercadoPago) {
       const script = document.createElement('script');
@@ -227,11 +200,6 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   const createPreferenceAndCheckout = async (plan: SubscriptionPlan, subscriptionId: string) => {
     try {
       const token = authStorage.getToken();
-      
-      console.log('Creando preferencia de MercadoPago...');
-      console.log('Token JWT:', token ? 'Presente' : 'Ausente');
-      console.log('Subscription ID:', subscriptionId);
-      console.log('Plan:', plan.name, '- Precio:', plan.price);
       
       const response = await fetch(
         `/api/finance/mercadopago/create-preference`,
@@ -250,78 +218,26 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
         }
       );
 
-      console.log('Respuesta status:', response.status, response.statusText);
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Error creando preferencia:', response.status, errorText);
         toast.error(`Error ${response.status}: No se pudo crear preferencia de pago`);
         return;
       }
 
       const data = await response.json();
-      console.log('Datos recibidos:', data);
       
       // Usar init_point (producción) primero. sandbox_init_point solo para pruebas.
       const url = data.init_point || data.initPoint || 
                   data.sandbox_init_point || data.sandboxInitPoint;
-      
-      console.log('URL de pago:', url);
 
       if (url) {
         window.location.href = url;
       } else {
-        console.error('No se encontro URL. Keys disponibles:', Object.keys(data));
         toast.error('El servidor no devolvio URL de pago');
       }
 
     } catch (error) {
-      console.error('Error en createPreferenceAndCheckout:', error);
       toast.error('Error al iniciar pago: ' + (error as any).message);
-    }
-  };
-
-  const openCheckout = (mp: any, response: any) => {
-    try {
-      if (mp.checkout) {
-        mp.checkout({
-          preference: { id: response.id },
-          autoOpen: true
-        });
-      } else if (mp.checkout && mp.checkout.render) {
-        const checkoutButton = document.createElement('button');
-        checkoutButton.innerHTML = 'Pagar con MercadoPago';
-        checkoutButton.onclick = () => {
-          mp.checkout.render({
-            preference: { id: response.id },
-            container: '.mercadopago-button'
-          });
-        };
-        document.body.appendChild(checkoutButton);
-      } else {
-        // Último recurso: abrir manualmente
-        const checkoutUrl = `https://www.mercadopago.com/checkout/v1/redirect?preference_id=${response.id}`;
-        window.location.href = checkoutUrl;
-      }
-    } catch (error) {
-      console.error('Error abriendo checkout:', error);
-      toast.error('Error al abrir checkout de MercadoPago');
-    }
-  };
-
-  const tryAlternativeMethod = (mp: any, preference: any) => {
-    // Si create falla, intentar con el método antiguo
-    console.log('Intentando método alternativo...');
-    if (mp.checkout && mp.checkout.render) {
-      mp.checkout.render({
-        preference: preference,
-        container: '.mercadopago-button'
-      });
-    } else {
-      // Como último recurso, construir URL manual
-      console.log('Construyendo URL manual como fallback');
-      const manualUrl = `https://www.mercadopago.com/checkout/v1/redirect?preference_id=${Math.random().toString(36).substring(2, 9)}`;
-      window.location.href = manualUrl;
     }
   };
 
@@ -329,27 +245,18 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   const isPlanExhausted = (plan: SubscriptionPlan) => {
     if (plan.id !== 'FREE') return false;
     
-    console.log('Verificando plan FREE:', {
-      hasUsedFreePlan,
-      activeSubscription,
-      activeSubscriptionPlan: activeSubscription?.plan?.id
-    });
-    
     // Si tiene suscripción activa diferente de FREE, el FREE está agotado
     if (activeSubscription && (activeSubscription as any).tier !== 'FREE') {
-      console.log('Plan FREE agotado: Tiene suscripción activa diferente');
       return true;
     }
     
     // Si tiene suscripción FREE activa pero ya usó todas las publicaciones, está agotado
     if (activeSubscription && (activeSubscription as any).tier === 'FREE' && (activeSubscription as any).publicationsLimit - (activeSubscription as any).publicationsUsed <= 0) {
-      console.log('Plan FREE agotado: Sin publicaciones restantes');
       return true;
     }
     
     // Si el modal se abre, es porque el usuario intenta publicar otra propiedad
     // Esto significa que ya usó su plan gratuito de 1 propiedad
-    console.log('Plan FREE agotado: Modal abierto = usuario ya consumió su plan gratuito');
     return true;
   };
 
@@ -489,7 +396,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
           setShowInvalidUpgradeModal(false);
         }}
         currentPlan={activeSubscription?.plan?.name}
-        selectedPlan={undefined} // Podríamos pasar el plan seleccionado si lo guardamos
+        selectedPlan={undefined}
       />
     </>
   );

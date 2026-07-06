@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Icon } from '@iconify/react';
 import { Avatar } from '@/app/mensajes/chats/components/ChatsPanel';
 import { useShareStatusPost } from "@/presentation/hooks/useContacts";
@@ -33,11 +33,30 @@ export default function EstadosPanel({ user, onNewStatus, onStatusSelect, select
     const [locationFilter, setLocationFilter] = useState('');
     const shareStatus = useShareStatusPost();
 
-    const { data: statusData, isLoading, fetchNextPage, hasNextPage } = useGetActiveStatusPosts({
+    const { data: statusData, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetActiveStatusPosts({
         location: locationFilter || undefined,
     });
 
     const allPosts = statusData?.pages?.flatMap((p: any) => p.content) ?? [];
+    const sentinelRef = useRef<HTMLDivElement>(null);
+
+    // IntersectionObserver para scroll infinito
+    useEffect(() => {
+        if (!hasNextPage || isFetchingNextPage) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    fetchNextPage();
+                }
+            },
+            { threshold: 0.1 }
+        );
+        const sentinel = sentinelRef.current;
+        if (sentinel) observer.observe(sentinel);
+        return () => {
+            if (sentinel) observer.unobserve(sentinel);
+        };
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     const handleShare = async (postId: number, postTitle: string) => {
         // Mostrar feedback inmediato al usuario
@@ -135,10 +154,9 @@ export default function EstadosPanel({ user, onNewStatus, onStatusSelect, select
                                 <div key={post.id}
                                     className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 transition-colors cursor-pointer ${selectedStatusId === post.id ? 'bg-brand/10 dark:bg-gray-600' : ''}`}
                                     onClick={() => handleStatusClick(post.id)}>
-                                    <div className="relative flex-shrink-0 w-12 h-12">
-                                        <Icon icon="svg-spinners:ring-resize" className={`w-12 h-12 ${isUrgent ? 'text-red-400' : 'text-blue-500'}`} />
-                                        <div className="absolute inset-1.5">
-                                            <Avatar name={post.userName ?? 'U'} role={post.userRole} size="md" src={post.userAvatar} />
+                                    <div className="relative flex-shrink-0">
+                                        <div className={`w-12 h-12 rounded-full ring-2 ring-offset-1 ${isUrgent ? 'ring-red-400' : 'ring-green-400'} overflow-hidden`}>
+                                            <Avatar name={post.userName ?? 'U'} role={post.userRole} size="lg" src={post.userAvatar} />
                                         </div>
                                     </div>
 
@@ -173,11 +191,12 @@ export default function EstadosPanel({ user, onNewStatus, onStatusSelect, select
                             );
                         })}
                         {hasNextPage && (
-                            <div className="flex justify-center py-4">
-                                <button onClick={() => fetchNextPage()}
-                                    className="text-xs text-brand font-medium hover:underline">
-                                    Cargar más estados
-                                </button>
+                            <div ref={sentinelRef} className="flex justify-center py-4">
+                                {isFetchingNextPage ? (
+                                    <div className="w-6 h-6 rounded-full border-2 border-brand border-t-transparent animate-spin" />
+                                ) : (
+                                    <span className="text-xs text-gray-400">Desplaza para más estados...</span>
+                                )}
                             </div>
                         )}
                     </>

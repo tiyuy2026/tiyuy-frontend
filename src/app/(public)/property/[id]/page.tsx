@@ -80,29 +80,22 @@ export default async function PropertyPage({ params }: Props) {
 
   try {
     const { id } = await params;
-    console.log('ID/Slug recibido:', id);
 
     // Lógica dual: ID numérico o slug string
     const numId = Number(id);
-    console.log('¿Es numérico?:', !Number.isNaN(numId));
 
     if (!Number.isNaN(numId)) {
-      console.log('Buscando por ID numérico:', numId);
       property = await propertyRepo.getById(numId);  // ID numérico
     } else {
-      console.log('Buscando por slug:', id);
       property = await propertyRepo.getBySlug(id);  // Slug string
     }
 
-    console.log('Propiedad encontrada:', property);
   } catch (error) {
-    console.error('Error al buscar propiedad:', error);
     notFound();
   }
 
   // Si no se encontró la propiedad, mostrar 404
   if (!property) {
-    console.log('Propiedad no encontrada, mostrando 404');
     notFound();
   }
 

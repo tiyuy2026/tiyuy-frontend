@@ -50,9 +50,7 @@ const Counter = ({
           <input
             type="number"
             value={inputValue}
-            onChange={(e) => {
-              setInputValue(e.target.value);
-            }}
+            onChange={(e) => setInputValue(e.target.value)}
             onBlur={(e) => {
               if (e.target.value === '' || isNaN(parseInt(e.target.value, 10))) {
                 setInputValue(String(min));
@@ -97,15 +95,7 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
   const inputClass =
     'w-full px-4 py-3 rounded-lg border border-gray-200 text-sm text-gray-900 bg-gray-50 outline-none';
 
-  // Función para actualizar con logging
-  const handleChangeWithLog = (field: string, value: any) => {
-    console.log(` CharacteristicsStep - Actualizando ${field}:`, value);
-    onChange(field, value);
-  };
-
-  // Contadores para dormitorios, baños y estacionamientos
-
-  // Selector de opciones (para baño propio/compartido)
+  // Selector de opciones - modo chips cuando hay más de 4 opciones
   const OptionSelector = ({ 
     label, 
     value, 
@@ -116,33 +106,39 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
     value: string; 
     onChange: (value: string) => void; 
     options: { label: string; value: string }[]; 
-  }) => (
-    <div>
-      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-        {label}
-      </label>
-      <div className="flex gap-2">
-        {options.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => onChange(option.value)}
-            className={`flex-1 py-3 rounded-lg border-2 font-semibold transition-all ${
-              value === option.value
-                ? 'text-white border-blue-600'
-                : 'bg-white text-gray-700 border-gray-300 hover:border-blue-600'
-            }`}
-            style={{
-              backgroundColor: value === option.value ? '#00a63e' : undefined,
-              borderColor: value === option.value ? '#00a63e' : undefined,
-            }}
-          >
-            {option.label}
-          </button>
-        ))}
+  }) => {
+    const isChipMode = options.length > 4;
+    return (
+      <div>
+        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+          {label}
+        </label>
+        <div className={isChipMode ? 'flex flex-wrap gap-1.5' : 'flex gap-2'}>
+          {options.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => onChange(option.value)}
+              className={`
+                font-semibold transition-all border
+                ${isChipMode 
+                  ? 'px-3.5 py-1.5 text-[12px] rounded-lg' 
+                  : 'flex-1 py-2.5 rounded-lg text-sm'}
+                ${value === option.value
+                  ? 'text-white border-[#00a63e]'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-[#00a63e] hover:text-[#00a63e]'}
+              `}
+              style={{
+                backgroundColor: value === option.value ? '#00a63e' : undefined,
+              }}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const NumberInput = ({ 
     label, 
@@ -225,7 +221,6 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
       case 'ROOM':
         return (
           <>
-            {/* ── CARACTERÍSTICAS DE HABITACIÓN ── */}
             <section>
               <h2 className="text-lg font-bold text-gray-900 mb-1">
                 Características de la habitación
@@ -272,7 +267,6 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
       case 'LAND':
         return (
           <>
-            {/* ── CARACTERÍSTICAS DE TERRENO ── */}
             <section>
               <h2 className="text-lg font-bold text-gray-900 mb-1">
                 Características del terreno
@@ -290,7 +284,7 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
                       <NumberInput
                         label="Área total (m2) *"
                         value={formData.totalArea}
-                        onChange={(value) => handleChangeWithLog('totalArea', value)}
+                        onChange={(value) => onChange('totalArea', value)}
                         placeholder="0"
                         suffix="m²"
                       />
@@ -299,7 +293,7 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
                     <NumberInput
                       label="Área construida (opcional)"
                       value={formData.builtArea}
-                      onChange={(value) => handleChangeWithLog('builtArea', value)}
+                      onChange={(value) => onChange('builtArea', value)}
                       placeholder="0"
                       suffix="m²"
                       optional={true}
@@ -307,21 +301,21 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
                     <NumberInput
                       label="Frente"
                       value={formData.frontage}
-                      onChange={(value) => handleChangeWithLog('frontage', value)}
+                      onChange={(value) => onChange('frontage', value)}
                       placeholder="0"
                       suffix="ml"
                     />
                     <NumberInput
                       label="Fondo"
                       value={formData.depth}
-                      onChange={(value) => handleChangeWithLog('depth', value)}
+                      onChange={(value) => onChange('depth', value)}
                       placeholder="0"
                       suffix="ml"
                     />
                     <NumberInput
                       label="Perimetro"
                       value={formData.perimeter}
-                      onChange={(value) => handleChangeWithLog('perimeter', value)}
+                      onChange={(value) => onChange('perimeter', value)}
                       placeholder="0"
                       suffix="ml"
                     />
@@ -405,7 +399,6 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
       case 'OFFICE':
         return (
           <>
-            {/* ── CARACTERÍSTICAS DE OFICINA ── */}
             <section>
               <h2 className="text-lg font-bold text-gray-900 mb-1">
                 Características de la oficina
@@ -431,7 +424,7 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
                     max={50}
                   />
                   <Counter
-                    label="Pisos de oficina"
+                    label="Piso de la oficina"
                     value={formData.officeFloors || 1}
                     onChange={(value) => onChange('officeFloors', value)}
                     min={1}
@@ -474,10 +467,10 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
           </>
         );
 
-      default: // APARTMENT, HOUSE, etc.
+      default: // APARTMENT, HOUSE, COMMERCIAL, etc.
+        const isCommercial = formData.type === 'COMMERCIAL';
         return (
           <>
-            {/* ── CONTADORES ── */}
             <section>
               <h2 className="text-lg font-bold text-gray-900 mb-1">
                 Características principales
@@ -488,7 +481,7 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <Counter
-                  label="Dormitorios"
+                  label={isCommercial ? 'Ambientes' : 'Dormitorios'}
                   value={formData.bedrooms || 1}
                   onChange={(value) => onChange('bedrooms', value)}
                   min={0}
@@ -511,7 +504,6 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
               </div>
             </section>
 
-            {/* ── MEDIDAS ── */}
             <section>
               <h2 className="text-lg font-bold text-gray-900 mb-1">
                 Medidas del inmueble
@@ -544,7 +536,6 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
               </div>
             </section>
 
-            {/* ── PISO Y ANTIGÜEDAD (solo para departamentos) ── */}
             {formData.type === 'APARTMENT' && (
               <section>
                 <h2 className="text-lg font-bold text-gray-900 mb-1">
@@ -590,7 +581,6 @@ export function CharacteristicsStep({ formData, onChange, validationErrors }: Ch
       `}</style>
       {renderPropertyCharacteristics()}
 
-      {/* ── MANTENIMIENTO (no para terrenos) ── */}
       {formData.type !== 'LAND' && (
         <section>
           <NumberInput

@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect, useRef } from 'react';
 import { Briefcase, Building, Home, Info, Key, Move, ShoppingBag, Tag } from 'lucide-react';
 
 
@@ -25,6 +26,52 @@ export function BasicInfoStep({ formData, onChange, validationErrors }: BasicInf
     SALE: 'Venta',
     RENT: 'Alquiler',
   };
+
+  // Custom currency selector component
+  function CurrencySelector({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const options = [
+      { value: 'PEN', label: 'S/ PEN' },
+      { value: 'USD', label: '$ USD' },
+    ];
+    const selected = options.find(o => o.value === value);
+
+    useEffect(() => {
+      const handler = (e: MouseEvent) => {
+        if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
+      };
+      document.addEventListener('mousedown', handler);
+      return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    return (
+      <div className="relative sm:w-40" ref={ref}>
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full flex items-center justify-between px-4 py-3 border border-gray-200 rounded-lg bg-white text-sm text-gray-700 cursor-pointer transition-all hover:border-gray-300 shadow-sm font-medium"
+        >
+          <span>{selected?.label || 'S/ PEN'}</span>
+          <svg className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+        </button>
+        {isOpen && (
+          <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+            {options.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => { onChange(opt.value); setIsOpen(false); }}
+                className={`w-full text-left px-4 py-3 text-sm transition-colors hover:bg-green-50 hover:text-green-700 ${value === opt.value ? 'bg-green-50 text-green-700 font-semibold' : 'text-gray-700'}`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -207,17 +254,10 @@ export function BasicInfoStep({ formData, onChange, validationErrors }: BasicInf
           <div className="section-divider" />
           <label className="field-label">Precio</label>
           <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative sm:w-40">
-              <select
+              <CurrencySelector
                 value={formData.currency}
-                onChange={(e) => onChange('currency', e.target.value)}
-                className="form-select pr-8 w-full"
-                style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center', backgroundSize: '14px' }}
-              >
-                <option value="PEN">S/ PEN</option>
-                <option value="USD">$ USD</option>
-              </select>
-            </div>
+                onChange={(v) => onChange('currency', v)}
+              />
             <input
               type="number"
               value={formData.price || ''}

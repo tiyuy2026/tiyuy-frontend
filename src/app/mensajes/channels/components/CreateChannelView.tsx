@@ -18,8 +18,9 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
   
   const { createChannel, isCreatingChannel } = useChannels(user?.id);
 
-  // Evaluación inicial de permisos
-  const canCreateChannel = user?.role === 'AGENT' || user?.role === 'INMOBILIARIA';
+  // Evaluación inicial de permisos - cualquier usuario autenticado puede crear canales
+  // El backend no restringe por rol. Si se requiere restricción, se hará a nivel de negocio.
+  const canCreateChannel = !!user && !!user.id;
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -53,7 +54,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
     }
 
     if (!canCreateChannel) {
-      toast.error('¡Hola! Para crear canales necesitas ser Agente Inmobiliario o Empresa. Si quieres crear un canal, contacta a nuestro equipo para actualizar tu rol.');
+      toast.error('Debes iniciar sesión para crear un canal.');
       return;
     }
 
@@ -77,7 +78,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
       onBack();
     } catch (error: any) {
       if (error.message.includes('403')) {
-        toast.error('¡Ups! No tienes permisos para crear canales. Solo Agentes y Empresas pueden crear canales. Contacta a soporte si crees que esto es un error.');
+        toast.error('No tienes permisos para crear canales. Contacta a soporte.');
       } else {
         toast.error(error.message || 'Error al crear canal. Por favor intenta nuevamente.');
       }
@@ -87,58 +88,28 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
   };
 
   return (
-    <div className="h-full bg-white dark:bg-gray-900 p-6 overflow-y-auto">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Crear Nuevo Canal</h2>
-          <button 
-            onClick={onBack}
-            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
+    <div className="flex flex-col bg-white dark:bg-gray-900 h-full">
+      <div className="bg-green-600 px-4 py-3 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-white font-bold text-base leading-tight">Crear Nuevo Canal</h1>
+            <p className="text-white/70 text-xs">Completa los datos para crear tu canal</p>
+          </div>
+          <button onClick={onBack} className="text-white/70 hover:text-white transition-colors"><ChevronLeft className="w-5 h-5" /></button>
         </div>
+      </div>
+      <div className="flex-1 overflow-y-auto p-6">
+        <div className="max-w-2xl mx-auto">
 
         {!canCreateChannel ? (
           <div className="bg-gradient-to-r from-amber-50 dark:from-amber-900/30 to-orange-50 dark:to-orange-900/30 border border-amber-200 dark:border-amber-700 rounded-xl p-8 text-center">
             <div className="w-20 h-20 rounded-full bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center mx-auto mb-6">
               <AlertCircle className="w-10 h-10 text-amber-600 dark:text-amber-400" />
             </div>
-            <h3 className="text-xl font-bold text-amber-900 dark:text-amber-300 mb-4">¿Quieres crear un canal?</h3>
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-amber-200 dark:border-amber-700 mb-6">
-              <p className="text-amber-800 dark:text-amber-200 font-medium mb-4">
-                ¡Hola! Para crear canales necesitas ser <strong>Agente Inmobiliario</strong> o <strong>Empresa</strong>.
-              </p>
-              <div className="text-left space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-green-800 dark:text-green-300 mb-1">Agente Inmobiliario</h4>
-                    <p className="text-sm text-green-600 dark:text-green-400">Publica propiedades y crea canales</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-brand/20 flex items-center justify-center flex-shrink-0">
-                    <Building className="w-4 h-4 text-brand" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-1">Empresa</h4>
-                    <p className="text-sm text-brand">Gestiona múltiples agentes y propiedades</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-700">
-                <p className="text-xs text-amber-700 dark:text-amber-300 font-medium mb-2">¿Cómo obtener permisos?</p>
-                <ul className="text-xs text-amber-600 dark:text-amber-400 space-y-1 text-left">
-                  <li> Contacta a nuestro equipo de soporte</li>
-                  <li> Actualiza tu cuenta a rol Agente/Empresa</li>
-                  <li> Obtén acceso a todas las herramientas profesionales</li>
-                </ul>
-              </div>
-            </div>
+            <h3 className="text-xl font-bold text-amber-900 dark:text-amber-300 mb-4">Inicia sesión</h3>
+            <p className="text-amber-800 dark:text-amber-200 mb-4">
+              Debes iniciar sesión para poder crear un canal.
+            </p>
             <button
               onClick={onBack}
               className="px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
@@ -366,6 +337,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
         </form>
         )}
       </div>
+    </div>
     </div>
   );
 }
