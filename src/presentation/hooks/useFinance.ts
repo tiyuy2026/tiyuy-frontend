@@ -82,6 +82,17 @@ export function useSubscribeToPlan() {
   });
 }
 
+export function usePlanPrice(planId: string | number) {
+  const user = authStorage.getUser();
+  
+  return useQuery({
+    queryKey: ['plan', 'price', planId, user?.id],
+    queryFn: () => financeRepo.getPlanPriceForUser(Number(planId)),
+    enabled: !!planId && !!user?.id,
+    staleTime: 30000, // 30s cache
+  });
+}
+
 export function useAvailableDeveloperDiscountCodes() {
   return useQuery({
     queryKey: ['developer', 'discount-codes'],
