@@ -60,43 +60,40 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
   const isPopular = plan.isFeatured && !isExhausted && !isActive && !isExpired;
 
   return (
-    <div className={`relative rounded-3xl p-8 transition-all duration-300 ${
+    <div className={`relative rounded-2xl p-4 transition-all duration-300 h-full flex flex-col overflow-hidden ${
       isActive && !isExhausted && !isExpired
-        ? 'bg-blue-50 border-2 border-blue-400 shadow-lg'
+        ? 'bg-blue-50 border-2 border-blue-400 shadow-lg pt-6'
         : isExhausted || isExpired
-        ? 'bg-gray-100 border-2 border-orange-300 shadow-md'
+        ? 'bg-gray-100 border-2 border-orange-300 shadow-md pt-6'
         : isPopular 
-          ? 'bg-white border-2 border-[var(--brand-primary)] shadow-xl' 
-          : 'bg-white border border-gray-200 shadow-md hover:shadow-lg'
+          ? 'bg-white border-2 border-orange-400 shadow-xl pt-6' 
+          : 'bg-white border-2 border-[var(--brand-primary)] shadow-md hover:shadow-lg pt-6'
     }`}>
       
-      {isPopular && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-          <span className="bg-[var(--brand-primary)] text-white text-sm font-bold px-4 py-1.5 rounded-full">
-            POPULAR
-          </span>
-        </div>
-      )}
+      {/* Barra superior de color: naranja para popular, verde para normal */}
+      <div className={`absolute top-0 left-0 right-0 h-1.5 ${
+        isPopular ? 'bg-orange-400' : 'bg-[var(--brand-primary)]'
+      }`} />
 
-      <div className="mb-6">
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-        <p className="text-gray-500 text-sm">{plan.description}</p>
+      <div className="mb-2">
+        <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
+        <p className="text-gray-500 text-xs mt-1 leading-tight">{plan.description}</p>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-3">
         <div className="flex items-baseline gap-1">
-          <span className="text-5xl font-bold text-gray-900">
+          <span className="text-3xl font-bold text-gray-900">
             {formatPrice(finalPrice, plan.currency)}
           </span>
         </div>
-        <p className="text-gray-400 text-sm mt-1">/mes</p>
+        <p className="text-gray-400 text-xs mt-0.5">/mes</p>
         
         {hasPriceDiscount && (
-          <div className="flex items-center gap-2 mt-2">
-            <span className="text-gray-400 line-through text-sm">
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-gray-400 line-through text-xs">
               {formatPrice(agencyOriginalPrice ?? currentPrice, plan.currency)}
             </span>
-            <span className="bg-[var(--brand-primary-light)] text-[var(--brand-primary)] text-xs font-bold px-2 py-1 rounded-full">
+            <span className="bg-[var(--brand-primary-light)] text-[var(--brand-primary)] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
               {calcDiscountPct > 0 ? calcDiscountPct : discountPercentage}% OFF
             </span>
           </div>
@@ -104,11 +101,11 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
       </div>
 
       {!isActive && !isExhausted && !isExpired && plan.id !== 'FREE' && (
-        <div className="mb-6">
-          <div className="flex gap-2 mb-3">
+        <div className="mb-3">
+          <div className="flex gap-1.5 mb-2">
             <button
               onClick={() => onBillingCycleChange?.('MONTHLY')}
-              className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
+              className={`flex-1 px-2 py-1.5 text-[10px] font-medium rounded-lg transition-colors ${
                 currentCycle === 'MONTHLY'
                   ? 'bg-[var(--brand-primary)] text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -119,7 +116,7 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
             {(plan.priceQuarterly ?? 0) !== 0 && (
               <button
                 onClick={() => onBillingCycleChange?.('QUARTERLY')}
-                className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
+                className={`flex-1 px-2 py-1.5 text-[10px] font-medium rounded-lg transition-colors ${
                   currentCycle === 'QUARTERLY'
                     ? 'bg-[var(--brand-primary)] text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -131,7 +128,7 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
             {(plan.priceYearly ?? 0) !== 0 && (
               <button
                 onClick={() => onBillingCycleChange?.('YEARLY')}
-                className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
+                className={`flex-1 px-2 py-1.5 text-[10px] font-medium rounded-lg transition-colors ${
                   currentCycle === 'YEARLY'
                     ? 'bg-[var(--brand-primary)] text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -145,12 +142,12 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
           {currentCycle !== 'MONTHLY' && (
             <div className="flex justify-center gap-2">
               {currentCycle === 'QUARTERLY' && (
-                <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+                <span className="bg-green-100 text-green-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
                   10% OFF
                 </span>
               )}
               {currentCycle === 'YEARLY' && (
-                <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+                <span className="bg-green-100 text-green-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
                   20% OFF
                 </span>
               )}
@@ -160,23 +157,23 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
       )}
 
       {plan.id !== 'FREE' && (
-        <p className="text-gray-400 text-sm mb-4">
+        <p className="text-gray-400 text-xs mb-3">
           {currentCycle === 'MONTHLY' && '30 días'}
           {currentCycle === 'QUARTERLY' && '90 días (3 meses)'}
           {currentCycle === 'YEARLY' && '365 días (1 año)'}
         </p>
       )}
 
-      <div className="space-y-3 mb-8">
+      <div className="space-y-1.5 mb-3 flex-1">
         {plan.features.map((feature, index) => (
-          <div key={index} className="flex items-start gap-3">
+          <div key={index} className="flex items-start gap-2">
             <Icon 
               icon="material-symbols:check-circle-rounded" 
-              className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+              className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
                 isExhausted && !isActive ? 'text-gray-300' : 'text-[var(--brand-primary)]'
               }`}
             />
-            <span className={`text-sm ${
+            <span className={`text-xs ${
               isExhausted && !isActive ? 'text-gray-400 line-through' : 'text-gray-700'
             }`}>
               {feature}
@@ -185,8 +182,8 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
         ))}
       </div>
 
-      <div className="pt-4 border-t border-gray-100">
-        <p className="text-gray-500 text-sm mb-4 text-center">
+      <div className="pt-3 border-t border-gray-100">
+        <p className="text-gray-500 text-xs mb-2 text-center">
           {plan.maxPublications} publicaciones
         </p>
 

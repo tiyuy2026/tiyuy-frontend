@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
@@ -20,6 +20,8 @@ export default function PlansPage() {
   const { data: propertiesData } = useMyProperties();
   const { data: availableDiscountCodes } = useAvailableDeveloperDiscountCodes();
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
+  const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const subscribeMutation = useSubscribeToPlan();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [discountCode, setDiscountCode] = useState('');
@@ -422,85 +424,103 @@ export default function PlansPage() {
             <p className="text-lg text-gray-600">Precios transparentes, sin sorpresas. Escalable según tu crecimiento.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="relative">
             {isLoading ? (
-              <div className="col-span-full text-center py-16">
+              <div className="text-center py-16">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)]"></div>
                 <p className="mt-4 text-gray-600">Cargando planes...</p>
               </div>
-            ) : plans ? (
-              plans.map((plan) => {
-                const backendTier = activeSubscription
-                  ? activeSubscription.plan?.id
-                  : null;
-                const planIdToTier: Record<string, string> = {
-                  '1': 'FREE', '2': 'BASIC', '3': 'PREMIUM',
-                  '4': 'ENTERPRISE_TRIAL', '5': 'ENTERPRISE'
-                };
-                const planTierCode = planIdToTier[plan.id] || plan.id;
-                const isActive = !activeSubscription
-                  ? planTierCode === 'FREE'
-                  : backendTier === planTierCode;
-                const isExhausted = isPlanExhausted(plan);
-                
-                // Detectar descuento inteligente para este plan específico
-                const intelligentDiscount = detectIntelligentDiscount(plan);
-                
-                // Determinar qué descuento aplicar: manual, inteligente o de agente
-                let finalDiscountCode = '';
-                let finalDiscountPercentage = 0;
-                let hasAnyDiscount = false;
-                
-                // Prioridad: 1. Descuento manual (solo para el plan seleccionado), 2. Descuento inteligente, 3. Descuento de agente
-                if (appliedManualDiscount?.valid && plan.name === selectedPlan?.name) {
-                  // Aplicar descuento manual solo al plan seleccionado
-                  finalDiscountCode = manualDiscountCode;
-                  finalDiscountPercentage = appliedManualDiscount.discountPercentage || 0;
-                  hasAnyDiscount = true;
-                } else if (intelligentDiscount) {
-                  // Priorizar descuento inteligente
-                  finalDiscountCode = intelligentDiscount.code;
-                  finalDiscountPercentage = intelligentDiscount.percentage;
-                  hasAnyDiscount = true;
-                } else if (hasDiscountCodes && availableDiscountCodes && availableDiscountCodes.length > 0) {
-                  // Aplicar descuento de agente
-                  const agentDiscount = availableDiscountCodes[0];
-                  
-                  // Intentar diferentes estructuras posibles
-                  const discountCodeObj = (agentDiscount as any).discountCode;
-                  if (discountCodeObj) {
-                    finalDiscountCode = discountCodeObj.code || '';
-                    finalDiscountPercentage = discountCodeObj.discountPercentage || 0;
-                  } else {
-                    finalDiscountCode = (agentDiscount as any).code || '';
-                    finalDiscountPercentage = (agentDiscount as any).discountPercentage || 0;
-                  }
-                  
-                  hasAnyDiscount = finalDiscountPercentage > 0;
-                }
+            ) : plans && plans.length > 0 ? (
+              <div className="relative px-1 pb-4">
+                <button
+                  onClick={() => {
+                    if (scrollContainerRef.current) {
+                      const cardWidth = scrollContainerRef.current.clientWidth;
+                      scrollContainerRef.current.scrollBy({ left: -cardWidth, behavior: 'smooth' });
+                    }
+                  }}
+                  className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all cursor-pointer border border-gray-200"
+                >
+                  <Icon icon="material-symbols:chevron-left-rounded" className="w-6 h-6 text-gray-700" />
+                </button>
+                <button
+                  onClick={() => {
+                    if (scrollContainerRef.current) {
+                      const cardWidth = scrollContainerRef.current.clientWidth;
+                      scrollContainerRef.current.scrollBy({ left: cardWidth, behavior: 'smooth' });
+                    }
+                  }}
+                  className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all cursor-pointer border border-gray-200"
+                >
+                  <Icon icon="material-symbols:chevron-right-rounded" className="w-6 h-6 text-gray-700" />
+                </button>
 
-                return (
-                  <PlanCard
-                    key={plan.id}
-                    plan={plan}
-                    onSelectPlan={setSelectedPlan}
-                    isSelected={selectedPlan?.id === plan.id}
-                    isActive={isActive}
-                    isExhausted={isExhausted}
-                    isExpired={isPlanExpired(plan)}
-                    isExhaustedByLimit={isPlanExhaustedByLimit(plan)}
-                    canRenew={canRenewPlan(plan)}
-                    discountPercentage={finalDiscountPercentage}
-                    hasDiscount={hasAnyDiscount}
-                    selectedBillingCycle={selectedBillingCycles[plan.id] || 'MONTHLY'}
-                    onBillingCycleChange={(cycle) => handleBillingCycleChange(plan.id, cycle)}
-                    agencyDiscountPrice={plan.agencyDiscountedPrice}
-                    agencyOriginalPrice={plan.agencyDiscountedPrice ? plan.price : undefined}
-                  />
-                );
-              })
+                <div className="overflow-visible pt-8 pb-8 px-2">
+                  <div
+                    ref={scrollContainerRef}
+                    className="flex gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+                  >
+                    {plans.map((plan) => {
+                      const backendTier = activeSubscription ? activeSubscription.plan?.id : null;
+                      const planIdToTier: Record<string, string> = {
+                        '1': 'FREE', '2': 'BASIC', '3': 'PREMIUM',
+                        '4': 'ENTERPRISE_TRIAL', '5': 'ENTERPRISE'
+                      };
+                      const planTierCode = planIdToTier[plan.id] || plan.id;
+                      const isActive = !activeSubscription ? planTierCode === 'FREE' : backendTier === planTierCode;
+                      const isExhausted = isPlanExhausted(plan);
+                      const intelligentDiscount = detectIntelligentDiscount(plan);
+                      let finalDiscountCode = '';
+                      let finalDiscountPercentage = 0;
+                      let hasAnyDiscount = false;
+                      
+                      if (appliedManualDiscount?.valid && plan.name === selectedPlan?.name) {
+                        finalDiscountCode = manualDiscountCode;
+                        finalDiscountPercentage = appliedManualDiscount.discountPercentage || 0;
+                        hasAnyDiscount = true;
+                      } else if (intelligentDiscount) {
+                        finalDiscountCode = intelligentDiscount.code;
+                        finalDiscountPercentage = intelligentDiscount.percentage;
+                        hasAnyDiscount = true;
+                      } else if (hasDiscountCodes && availableDiscountCodes && availableDiscountCodes.length > 0) {
+                        const agentDiscount = availableDiscountCodes[0];
+                        const discountCodeObj = (agentDiscount as any).discountCode;
+                        if (discountCodeObj) {
+                          finalDiscountCode = discountCodeObj.code || '';
+                          finalDiscountPercentage = discountCodeObj.discountPercentage || 0;
+                        } else {
+                          finalDiscountCode = (agentDiscount as any).code || '';
+                          finalDiscountPercentage = (agentDiscount as any).discountPercentage || 0;
+                        }
+                        hasAnyDiscount = finalDiscountPercentage > 0;
+                      }
+
+                      return (
+                        <div key={plan.id} className="min-w-full sm:min-w-[50%] lg:min-w-[25%]">
+                          <PlanCard
+                            plan={plan}
+                            onSelectPlan={setSelectedPlan}
+                            isSelected={selectedPlan?.id === plan.id}
+                            isActive={isActive}
+                            isExhausted={isExhausted}
+                            isExpired={isPlanExpired(plan)}
+                            isExhaustedByLimit={isPlanExhaustedByLimit(plan)}
+                            canRenew={canRenewPlan(plan)}
+                            discountPercentage={finalDiscountPercentage}
+                            hasDiscount={hasAnyDiscount}
+                            selectedBillingCycle={selectedBillingCycles[plan.id] || 'MONTHLY'}
+                            onBillingCycleChange={(cycle) => handleBillingCycleChange(plan.id, cycle)}
+                            agencyDiscountPrice={plan.agencyDiscountedPrice}
+                            agencyOriginalPrice={plan.agencyDiscountedPrice ? plan.price : undefined}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             ) : (
-              <div className="col-span-full text-center py-16">
+              <div className="text-center py-16">
                 <p className="text-red-600">No se pudieron cargar los planes. Intenta nuevamente.</p>
               </div>
             )}
