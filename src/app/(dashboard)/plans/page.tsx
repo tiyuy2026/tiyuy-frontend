@@ -164,26 +164,30 @@ export default function PlansPage() {
 
   // Calcular precio con descuento para el plan seleccionado
   const getDiscountedPrice = (plan: SubscriptionPlan) => {
-    // Prioridad: 1. Descuento manual aplicado, 2. Descuento inteligente, 3. Descuento de agente
+    // #1 Prioridad MÁXIMA: Descuento de agencia desde backend (AgencyPlanDiscount)
+    if (plan.agencyDiscountedPrice != null && plan.agencyDiscountedPrice < plan.price) {
+      return plan.agencyDiscountedPrice;
+    }
     
-    // Verificar si los descuentos actuales siguen siendo válidos
+    // #2 Descuento manual aplicado por código
     const isManualDiscountValid = appliedManualDiscount?.valid && 
       plan.name === selectedPlan?.name && 
       appliedManualDiscount.discountedPrice !== undefined;
-    
-    const isAgentDiscountValid = hasDiscountCodes && 
-      availableDiscountCodes.length > 0 && 
-      (availableDiscountCodes[0] as any).status === 'ACTIVE';
     
     if (isManualDiscountValid) {
       return appliedManualDiscount.discountedPrice || plan.price;
     }
     
+    // #3 Descuento inteligente (códigos AUTO)
     const intelligentDiscount = detectIntelligentDiscount(plan);
-    
     if (intelligentDiscount) {
       return plan.price - (plan.price * intelligentDiscount.percentage / 100);
     }
+    
+    // #4 Descuento de agente por código
+    const isAgentDiscountValid = hasDiscountCodes && 
+      availableDiscountCodes.length > 0 && 
+      (availableDiscountCodes[0] as any).status === 'ACTIVE';
     
     if (isAgentDiscountValid) {
       const agentDiscount = availableDiscountCodes[0];
@@ -191,7 +195,6 @@ export default function PlansPage() {
       return plan.price - (plan.price * discountPercent / 100);
     }
     
-    // Si ningún descuento es válido, volver al precio normal
     return plan.price;
   };
 
@@ -491,6 +494,8 @@ export default function PlansPage() {
                     hasDiscount={hasAnyDiscount}
                     selectedBillingCycle={selectedBillingCycles[plan.id] || 'MONTHLY'}
                     onBillingCycleChange={(cycle) => handleBillingCycleChange(plan.id, cycle)}
+                    agencyDiscountPrice={plan.agencyDiscountedPrice}
+                    agencyOriginalPrice={plan.agencyDiscountedPrice ? plan.price : undefined}
                   />
                 );
               })

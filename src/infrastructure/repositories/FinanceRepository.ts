@@ -89,7 +89,11 @@ export class FinanceRepository implements IFinanceRepository {
 
   async getAvailablePlans(): Promise<SubscriptionPlan[]> {
     const response = await apiClient.get<SubscriptionPlanDTO[]>(ENDPOINTS.FINANCE.SUBSCRIPTIONS.PLANS);
-    return response.data;
+    return response.data.map(item => ({
+      ...item,
+      agencyDiscountedPrice: item.agencyDiscountedPrice,
+      hasAgencyDiscount: item.hasAgencyDiscount,
+    }));
   }
 
   async createMercadoPagoPreference(subscriptionId: string, frontendUrl?: string): Promise<any> {
@@ -148,6 +152,15 @@ export class FinanceRepository implements IFinanceRepository {
       startsAt: new Date(data.startsAt),
       expiresAt: new Date(data.expiresAt),
       remainingPublications: data.remainingPublications,
+    };
+  }
+
+  async getPlanPriceForUser(planId: number): Promise<{ finalPrice: number; originalPrice: number; currency: string }> {
+    const response = await apiClient.get(`/finance/subscriptions/plans/${planId}/price`);
+    return {
+      finalPrice: Number(response.data.finalPrice),
+      originalPrice: Number(response.data.originalPrice),
+      currency: response.data.currency || 'PEN',
     };
   }
 

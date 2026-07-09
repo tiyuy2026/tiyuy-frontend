@@ -16,37 +16,46 @@ interface PlanCardProps {
   isExhaustedByLimit?: boolean;
   selectedBillingCycle?: BillingCycle;
   onBillingCycleChange?: (cycle: BillingCycle) => void;
+  /**
+   * Precio personalizado con descuento de agencia (desde `AgencyPlanDiscount` del admin).
+   * Cuando se proporciona, anula `plan.price` y muestra el descuento automáticamente.
+   */
+  agencyDiscountPrice?: number;
+  /** Precio original del plan (para mostrar el tachado cuando hay descuento) */
+  agencyOriginalPrice?: number;
 }
 
-export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive, discountPercentage, hasDiscount, canRenew, isExpired, isExhaustedByLimit, selectedBillingCycle, onBillingCycleChange }: PlanCardProps) {
+export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive, discountPercentage, hasDiscount, canRenew, isExpired, isExhaustedByLimit, selectedBillingCycle, onBillingCycleChange, agencyDiscountPrice, agencyOriginalPrice }: PlanCardProps) {
   const formatPrice = (price: number, currency: string) => {
     const symbol = currency === 'USD' ? 'US$' : 'S/';
     return `${symbol} ${price.toLocaleString()}`;
   };
 
-  const calculateDiscountedPrice = () => {
-    if (!hasDiscount || !discountPercentage) return plan.price;
-    const discountAmount = plan.price * (discountPercentage / 100);
-    return plan.price - discountAmount;
-  };
-
-  const discountedPrice = calculateDiscountedPrice();
-  const hasPriceDiscount = hasDiscount && discountPercentage && discountPercentage > 0;
+  // Calcular el precio base: usar agencyDiscountPrice si existe, sino plan.price
+  const basePrice = agencyDiscountPrice ?? plan.price;
+  const hasAgencyDiscountApplied = agencyDiscountPrice != null && agencyOriginalPrice != null && agencyDiscountPrice < agencyOriginalPrice;
 
   const getPriceForCycle = (cycle: BillingCycle): number => {
+    const priceToUse = agencyDiscountPrice ?? plan.price;
     switch (cycle) {
       case 'QUARTERLY':
-        return plan.priceQuarterly || (plan.price * 3 * 0.9);
+        return plan.priceQuarterly || (priceToUse * 3 * 0.9);
       case 'YEARLY':
-        return plan.priceYearly || (plan.price * 12 * 0.8);
+        return plan.priceYearly || (priceToUse * 12 * 0.8);
       default:
-        return plan.price;
+        return priceToUse;
     }
   };
 
   const currentCycle = selectedBillingCycle || 'MONTHLY';
   const currentPrice = getPriceForCycle(currentCycle);
-  const finalPrice = hasPriceDiscount ? currentPrice * (1 - discountPercentage / 100) : currentPrice;
+  const calcDiscountPct = hasAgencyDiscountApplied && agencyOriginalPrice && agencyDiscountPrice
+    ? Math.round((1 - agencyDiscountPrice / agencyOriginalPrice) * 100)
+    : discountPercentage || 0;
+  const hasPriceDiscount = (hasAgencyDiscountApplied || (hasDiscount && discountPercentage != null && discountPercentage > 0));
+  const finalPrice = hasPriceDiscount && !hasAgencyDiscountApplied
+    ? currentPrice * (1 - (discountPercentage || 0) / 100)
+    : currentPrice;
 
   const isPopular = plan.isFeatured && !isExhausted && !isActive && !isExpired;
 
@@ -85,10 +94,10 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
         {hasPriceDiscount && (
           <div className="flex items-center gap-2 mt-2">
             <span className="text-gray-400 line-through text-sm">
-              {formatPrice(currentPrice, plan.currency)}
+              {formatPrice(agencyOriginalPrice ?? currentPrice, plan.currency)}
             </span>
             <span className="bg-[var(--brand-primary-light)] text-[var(--brand-primary)] text-xs font-bold px-2 py-1 rounded-full">
-              {discountPercentage}% OFF
+              {calcDiscountPct > 0 ? calcDiscountPct : discountPercentage}% OFF
             </span>
           </div>
         )}
@@ -206,10 +215,12 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
               : isActive
               ? 'bg-gray-100 text-gray-400 cursor-default'
+              : isSelected && !isExhausted && !isActive && !isExpired
+              ? 'bg-orange-500 text-white hover:bg-orange-600 shadow-lg'
               : plan.name.includes('PREMIUM') || plan.name.includes('ENTERPRISE')
               ? 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary-light-hover)]'
               : 'bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)]'
-          } ${isSelected && !isExhausted && !isActive && !isExpired ? 'ring-2 ring-[var(--brand-primary)] ring-opacity-50' : ''}`}
+          } ${isSelected && !isExhausted && !isActive && !isExpired ? 'ring-2 ring-orange-400 ring-offset-2' : ''}`}
         >
           {canRenew && isActive ? 'Renovar Plan' : 
            isExhaustedByLimit && !canRenew ? 'Plan Agotado' : 
