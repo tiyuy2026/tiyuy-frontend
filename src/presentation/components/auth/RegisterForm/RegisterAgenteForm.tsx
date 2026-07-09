@@ -140,7 +140,6 @@ export const RegisterAgenteForm: React.FC = () => {
           });
         } catch { /* no bloqueante */ }
       }
-      window.location.href = '/dashboard';
     } catch { /* expuesto via error */ }
   };
 
