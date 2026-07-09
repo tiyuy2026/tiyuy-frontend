@@ -132,7 +132,6 @@ export class FinanceRepository implements IFinanceRepository {
     const body: any = {
       tier: tier,
       paymentMethod,
-      activateImmediately: false, // No activar inmediatamente, esperar notificacion de MercadoPago
     };
     
     if (discountCode) {
