@@ -320,10 +320,10 @@ export default function HomePage() {
         </div>
 
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-full px-8 xl:px-16">
+          <div className="w-full px-4 sm:px-8 xl:px-16">
             <div className="max-w-[1920px] mx-auto flex justify-center items-center">
               <div className="max-w-[800px] w-full text-center">
-                <h1 className="text-5xl xl:text-6xl font-bold text-white mb-8 drop-shadow-lg">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-bold text-white mb-8 drop-shadow-lg">
                   Encuentra tu hogar
                 </h1>
 
@@ -438,7 +438,7 @@ export default function HomePage() {
       </section>
 
       <section className="bg-[var(--bg-primary)]">
-        <div className="w-full px-8 xl:px-16">
+        <div className="w-full px-4 sm:px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             <div className="flex gap-6 sm:gap-8 overflow-x-auto scrollbar-none">
               {links.map(({ href, label }) => {
@@ -463,7 +463,7 @@ export default function HomePage() {
       </section>
 
       <section className="py-2 sm:py-3 bg-[var(--bg-primary)]">
-        <div className="w-full px-8 xl:px-16">
+        <div className="w-full px-4 sm:px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
               {quickLinks.map(({ href, icon, title, description, actionText }) => (
@@ -553,7 +553,7 @@ export default function HomePage() {
       <FeaturedCampaigns />
 
       <section className="py-2 sm:py-3 bg-background">
-        <div className="w-full px-8 xl:px-16">
+        <div className="w-full px-4 sm:px-8 xl:px-16">
           <div className="max-w-[1920px] mx-auto">
             <h2 className="text-2xl font-bold text-foreground mb-6">
               Búsquedas populares en Perú

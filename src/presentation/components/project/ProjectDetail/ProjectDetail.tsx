@@ -134,7 +134,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
                     {TYPE_LABELS[currentProject.type] || currentProject.type} en {currentProject.district}
                   </p>
 
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                     <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">
                       {PHASE_LABELS[currentProject.phase] || currentProject.phase}
                       {deliveryDate && ` · Entrega ${deliveryDate}`}
@@ -147,7 +147,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
                     )}
                   </div>
 
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{currentProject.name}</h1>
+                  <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-2 break-words">{currentProject.name}</h1>
 
                   <p className="text-2xl font-bold text-gray-900 mb-1">
                     Venta desde {currency} {currentProject.priceFrom?.toLocaleString('en-US')}
@@ -588,7 +588,7 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
               </div>
 
               <div className="px-6 py-4 space-y-4">
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {[
                     { icon: <Building className="w-5 h-5 text-gray-400 mx-auto" />, label: 'Piso', value: selectedUnit.floor },
                     { icon: <Maximize className="w-5 h-5 text-gray-400 mx-auto" />, label: 'Área', value: `${selectedUnit.area} m²` },

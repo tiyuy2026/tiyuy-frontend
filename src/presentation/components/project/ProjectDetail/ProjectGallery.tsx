@@ -21,10 +21,10 @@ export function ProjectGallery({ project, galleryImagesOnly, blueprints, video }
   return (
     <>
       {/* ── GALERÍA ── */}
-      <div className="relative grid grid-cols-4 grid-rows-2 gap-2 h-[480px] rounded-2xl overflow-hidden mb-2">
+      <div className="relative grid grid-cols-1 sm:grid-cols-4 grid-rows-1 sm:grid-rows-2 gap-2 h-64 sm:h-[480px] rounded-2xl overflow-hidden mb-2">
         {/* ── IZQUIERDA: Video o imagen principal ── */}
         <div
-          className="col-span-3 row-span-2 relative bg-gray-900 cursor-pointer"
+          className="col-span-1 sm:col-span-3 row-span-1 sm:row-span-2 relative bg-gray-900 cursor-pointer"
           onClick={() => {
             if (video && videoRef.current) {
               if (isPlaying) {
@@ -85,7 +85,7 @@ export function ProjectGallery({ project, galleryImagesOnly, blueprints, video }
         {galleryImagesOnly.slice(1, 3).map((imageUrl, index) => (
           <div
             key={index + 1}
-            className="relative bg-gray-200 cursor-pointer group overflow-hidden"
+            className="hidden sm:block relative bg-gray-200 cursor-pointer group overflow-hidden"
             onClick={() => { setCurrentImageIndex(index + 1); setShowAllImages(true); }}
           >
             <Image
@@ -100,8 +100,8 @@ export function ProjectGallery({ project, galleryImagesOnly, blueprints, video }
 
         {galleryImagesOnly.length <= 1 && (
           <>
-            <div className="w-full h-full bg-gray-100" />
-            <div className="w-full h-full bg-gray-100" />
+            <div className="hidden sm:block w-full h-full bg-gray-100" />
+            <div className="hidden sm:block w-full h-full bg-gray-100" />
           </>
         )}
 
@@ -129,7 +129,7 @@ export function ProjectGallery({ project, galleryImagesOnly, blueprints, video }
             ✕
           </button>
 
-          <div className="w-full max-w-5xl">
+          <div className="w-full max-w-5xl px-2 sm:px-4">
             <div className="relative h-[60vh] mb-4">
               {galleryImagesOnly[currentImageIndex] && (
                 <Image src={galleryImagesOnly[currentImageIndex]} alt="Galería" fill className="object-contain" />
