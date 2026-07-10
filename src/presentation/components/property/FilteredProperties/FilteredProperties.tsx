@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { PropertyCard } from '../PropertyCard/PropertyCard';
 import { useFilteredProperties } from '@/presentation/hooks/useFilteredProperties';
@@ -24,19 +24,43 @@ export function FilteredProperties({
 }: FilteredPropertiesProps) {
   const { data: properties = [], isLoading, error } = useFilteredProperties(filter);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const canScrollLeft = false;
-  const canScrollRight = true;
+  const updateScrollButtons = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 10);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', updateScrollButtons);
+    updateScrollButtons();
+    return () => el.removeEventListener('scroll', updateScrollButtons);
+  }, [properties]);
+
+  const scrollByAmount = () => {
+    if (!scrollContainerRef.current) return 280;
+    // En mobile, mover 1 card; en desktop, mover el ancho del contenedor
+    if (window.innerWidth < 640) {
+      return scrollContainerRef.current.clientWidth / 2;
+    }
+    return scrollContainerRef.current.clientWidth;
+  };
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -scrollContainerRef.current.clientWidth, behavior: 'smooth' });
+      scrollContainerRef.current.scrollBy({ left: -scrollByAmount(), behavior: 'smooth' });
     }
   };
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: scrollContainerRef.current.clientWidth, behavior: 'smooth' });
+      scrollContainerRef.current.scrollBy({ left: scrollByAmount(), behavior: 'smooth' });
     }
   };
 
@@ -93,11 +117,39 @@ export function FilteredProperties({
           scrollbar-width: none;
         }
 
-        .carousel-card {
-          width: 85vw;
+        /* Mobile: 2 visibles, scroll horizontal */
+        @media (max-width: 639px) {
+          .filtered-grid-mobile {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding-bottom: 8px;
+            scroll-snap-type: x mandatory;
+          }
+          .filtered-grid-mobile .carousel-card {
+            min-width: calc(50% - 5px);
+            flex-shrink: 0;
+            scroll-snap-align: start;
+          }
+          .filtered-grid-mobile .view-all-card {
+            display: none;
+          }
         }
+
         @media (min-width: 640px) {
-          .carousel-card { width: calc((100% - 20px) / 2); }
+          .filtered-grid-mobile {
+            display: flex;
+            overflow-x: auto;
+            gap: 16px;
+            padding-bottom: 16px;
+          }
+          .carousel-card { 
+            width: calc((100% - 20px) / 2); 
+            flex-shrink: 0;
+          }
+          .filtered-grid-mobile .view-all-card {
+            display: flex;
+          }
         }
         @media (min-width: 768px) {
           .carousel-card { width: calc((100% - 2 * 24px) / 3); }
@@ -149,17 +201,17 @@ export function FilteredProperties({
         {/* Horizontal scroll container */}
         <div
           ref={scrollContainerRef}
-          className="flex overflow-x-auto gap-4 sm:gap-5 md:gap-6 hide-scrollbar snap-x snap-mandatory scroll-smooth pb-4"
+          className="filtered-grid-mobile"
         >
           {properties.map((property) => (
-            <div key={property.id} className="carousel-card flex-shrink-0 snap-start">
+            <div key={property.id} className="carousel-card">
               <PropertyCard property={property} />
             </div>
           ))}
 
           {/* Tarjeta de Ver Todos al final */}
           {!hideViewAll && (
-            <div className="carousel-card flex-shrink-0 snap-start">
+            <div className="carousel-card view-all-card">
               <Link href={viewAllLink} className="flex flex-col items-center justify-center h-full min-h-[320px] w-full bg-white hover:bg-gray-50 rounded-2xl border border-gray-200 transition-all hover:shadow-md group">
                 <div className="relative w-32 h-24 mb-6 group-hover:scale-105 transition-transform duration-300">
                   <div className="absolute top-0 left-0 w-20 h-20 bg-gray-200 rounded-xl border-2 border-white shadow-sm -rotate-6 transform origin-bottom-left z-10 overflow-hidden">

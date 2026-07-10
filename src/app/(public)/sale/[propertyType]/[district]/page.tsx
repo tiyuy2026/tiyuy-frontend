@@ -181,7 +181,7 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
 
   const propertyRepo = new PropertyRepository();
 
-  const propertyType = PROPERTY_TYPE_MAP[resolvedParams.propertyType];
+  const propertyType = PROPERTY_TYPE_MAP[resolvedParams.propertyType] || resolvedParams.propertyType;
   const district = toDistrictName(resolvedParams.district);
   
 
@@ -213,7 +213,7 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
 
   const siteUrl = env.siteUrl;
   const result = await propertyRepo.search(filters);
-  const propertyTypeLabel = PROPERTY_TYPE_LABELS[resolvedParams.propertyType];
+  const propertyTypeLabel = PROPERTY_TYPE_LABELS[resolvedParams.propertyType] || resolvedParams.propertyType;
 
   // Crear searchFn para el mapa (usa el repositorio de propiedades)
   const propertySearchFn = async (mapFilters: MapFilters) => {

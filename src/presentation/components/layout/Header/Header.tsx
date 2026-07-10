@@ -750,7 +750,7 @@ export function Header() {
                   <Bell className="w-5 h-5" />
                 </Link>
               )}
-              {/* CONTACTOS - Siempre visible */}
+              {/* CONTACTOS - Siempre visible (también en mobile) */}
               <button
                 onClick={() => {
                   if (isAuthenticated) {
@@ -760,14 +760,14 @@ export function Header() {
                     setShowAuthModal(true);
                   }
                 }}
-                className="hidden sm:inline-flex items-center gap-2 text-black hover:text-gray-800 text-sm font-medium"
+                className="inline-flex items-center gap-1 text-black hover:text-gray-800 text-sm font-medium"
               >
                 <Users className="w-4 h-4" />
-                Contactos
+                <span className="hidden sm:inline">Contactos</span>
               </button>
 
 
-              {/* BOTÓN PUBLICAR - Siempre visible */}
+              {/* BOTÓN PUBLICAR - Siempre visible (también en mobile) */}
               <button
                 onClick={() => {
                   if (isAuthenticated) {
@@ -777,10 +777,10 @@ export function Header() {
                     setShowAuthModal(true);
                   }
                 }}
-                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm font-medium"
+                className="inline-flex items-center gap-1 px-3 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm font-medium"
               >
                 <Building className="w-4 h-4" />
-                Publicar
+                <span className="hidden sm:inline">Publicar</span>
               </button>
 
               {/* INGRESAR - Solo si NO está autenticado */}
@@ -968,11 +968,14 @@ export function Header() {
                 )}
               </div>
 
-              <Link href="/servics" className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+              <Link href="/servics" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                 Servicios
               </Link>
-              <Link href="/agencies" className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+              <Link href="/agencies" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                 Buscar inmobiliarias
+              </Link>
+              <Link href="/agents" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                Buscar agentes
               </Link>
             </div>
             <div className="border-t border-gray-100 pt-4 space-y-3">
