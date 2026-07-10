@@ -10,11 +10,11 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://www.tiyuy.com';
 /**
  * Página de confirmación de pago con lógica completa de fallback:
  * 
- * 1. Al cargar, intenta forzar el procesamiento del pago consultando a MP directamente
- *    (endpoint POST /api/finance/mercadopago/process-payment)
- * 2. Hace polling cada 3 segundos a /api/finance/mercadopago/check-payment
- *    para verificar si el webhook ya activó la suscripción
- * 3. Si después de 30 segundos no se activa, muestra opciones al usuario
+ * REGLAS DE NEGOCIO:
+ * - status=failure  → mostrar rechazo inmediato, NO procesar nada
+ * - status=pending  → mostrar pendiente, NO procesar nada (YAPE/efectivo)
+ * - status=success o sin status + paymentId REAL → procesar + polling
+ * - paymentId="rejected" o "pending" o "unknown" → no son paymentId reales, no procesar
  */
 export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) {
   const router = useRouter();
@@ -25,7 +25,6 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
   const [subscriptionTier, setSubscriptionTier] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
   
   // Obtener parámetros de la URL
   const subscriptionId = searchParams.get('subscription_id');
@@ -33,8 +32,13 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
 
   /**
    * Llama al endpoint que fuerza el procesamiento del pago consultando a MP
+   * Solo debe llamarse cuando tenemos un paymentId REAL (no fake como "rejected")
    */
-  const forceProcessPayment = useCallback(async () => {
+  const forceProcessPayment = useCallback(async (): Promise<boolean> => {
+    const isFakeId = !paymentId || paymentId === 'unknown' || paymentId === 'undefined' 
+                   || paymentId === 'rejected' || paymentId === 'pending';
+    if (isFakeId) return false;
+
     try {
       setStatus('processing');
       
@@ -96,40 +100,46 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
   }, [subscriptionId]);
 
   /**
-   * Lógica principal al cargar el componente:
-   * 1. Si el status de la URL es "failure" -> mostrar error directamente
-   * 2. Si el pago ya se procesó (status=success) -> verificar suscripción
-   * 3. Sino -> forzar procesamiento y hacer polling
+   * Lógica principal - se ejecuta una vez al cargar la página.
+   * Decide qué hacer según el status que MP haya enviado en la URL.
    */
   useEffect(() => {
     let isCancelled = false;
     let pollInterval: NodeJS.Timeout | null = null;
     let timeoutId: NodeJS.Timeout | null = null;
     let pollCount = 0;
-    const MAX_POLLS = 15; // 45 segundos máximo de polling
+    const MAX_POLLS = 15;
 
     const init = async () => {
-      // Si MP ya dijo que fue failure, mostrar directamente
+      // Caso 1: MP dijo rechazo explícito
       if (urlStatus === 'failure') {
         setStatus('failure');
         setErrorMessage('El pago fue rechazado por MercadoPago. Puedes intentar con otro método de pago.');
         return;
       }
 
-      // Si el paymentId no es válido, verificar por subscriptionId
-      if (!paymentId || paymentId === 'unknown' || paymentId === 'undefined') {
-        if (subscriptionId && subscriptionId !== 'null') {
-          // Intentar verificar estado directamente
+      // Caso 2: MP dijo pendiente (YAPE, efectivo, etc.)
+      if (urlStatus === 'pending') {
+        setStatus('pending');
+        setSubscriptionStatus('PENDING');
+        return;
+      }
+
+      // Caso 3: paymentId no es real (viene de /failure o /pending sin payment)
+      const isFakePaymentId = !paymentId || paymentId === 'unknown' || paymentId === 'undefined' 
+                            || paymentId === 'rejected' || paymentId === 'pending';
+      
+      if (isFakePaymentId) {
+        // Solo polling de verificación si tenemos subscriptionId
+        if (subscriptionId && subscriptionId !== 'null' && subscriptionId !== 'undefined') {
           const activated = await checkSubscriptionStatus();
-          if (activated) return;
+          if (activated || isCancelled) return;
           
-          // Si no está activo, iniciar polling
           pollInterval = setInterval(async () => {
             if (isCancelled) return;
             pollCount++;
-            const activated = await checkSubscriptionStatus();
-            if (activated && pollInterval) {
-              clearInterval(pollInterval);
+            if (await checkSubscriptionStatus()) {
+              if (pollInterval) clearInterval(pollInterval);
             } else if (pollCount >= MAX_POLLS && pollInterval) {
               clearInterval(pollInterval);
               setStatus('pending');
@@ -142,25 +152,15 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
         return;
       }
 
-      // 1. Forzar procesamiento del pago
+      // Caso 4: paymentId REAL - procesar y hacer polling para confirmar activación
       const activated = await forceProcessPayment();
-      
-      if (isCancelled) return;
-      
-      if (activated) {
-        // Ya está activo, mostrar éxito
-        return;
-      }
+      if (isCancelled || activated) return;
 
-      // 2. Iniciar polling para esperar que el webhook active la suscripción
       pollInterval = setInterval(async () => {
         if (isCancelled) return;
         pollCount++;
-        
-        const nowActivated = await checkSubscriptionStatus();
-        
-        if (nowActivated && pollInterval) {
-          clearInterval(pollInterval);
+        if (await checkSubscriptionStatus()) {
+          if (pollInterval) clearInterval(pollInterval);
         } else if (pollCount >= MAX_POLLS && pollInterval) {
           clearInterval(pollInterval);
           setStatus('pending');
@@ -168,7 +168,6 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
         }
       }, 3000);
 
-      // 3. Timeout total de seguridad (más largo que el polling)
       timeoutId = setTimeout(() => {
         if (isCancelled) return;
         if (pollInterval) clearInterval(pollInterval);
@@ -200,37 +199,35 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
   }, [status, router]);
 
   /**
-   * Reintentar procesamiento manual
+   * Reintentar procesamiento manual (botón "Verificar Estado")
    */
   const handleRetry = async () => {
-    setRetryCount(prev => prev + 1);
     setStatus('processing');
     setErrorMessage('');
     
-    const activated = await forceProcessPayment();
+    const isFakePaymentId = !paymentId || paymentId === 'unknown' || paymentId === 'undefined' 
+                          || paymentId === 'rejected' || paymentId === 'pending';
     
-    if (activated) {
-      setStatus('success');
-    } else {
-      // Iniciar polling de nuevo
-      let pollCount = 0;
-      const interval = setInterval(async () => {
-        pollCount++;
-        const nowActivated = await checkSubscriptionStatus();
-        if (nowActivated) {
-          clearInterval(interval);
-          setStatus('success');
-        } else if (pollCount >= 10) {
-          clearInterval(interval);
-          setStatus('pending');
-        }
-      }, 3000);
+    if (!isFakePaymentId) {
+      const activated = await forceProcessPayment();
+      if (activated) return;
     }
+    
+    // Polling de verificación
+    let pollCount = 0;
+    const interval = setInterval(async () => {
+      pollCount++;
+      if (await checkSubscriptionStatus()) {
+        clearInterval(interval);
+      } else if (pollCount >= 10) {
+        clearInterval(interval);
+        setStatus('pending');
+      }
+    }, 3000);
   };
 
   // ── RENDERIZADO POR ESTADO ──
 
-  // Cargando/Procesando
   if (status === 'loading' || status === 'processing') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -258,7 +255,6 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
     );
   }
 
-  // Error - Payment not found or API error
   if (status === 'error') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -267,7 +263,7 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
             <XCircle className="w-10 h-10 text-red-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Error en la Confirmación</h1>
-          <p className="text-gray-600 mb-6">{errorMessage || 'No pudimos verificar tu pago. Por favor intenta de nuevo o contacta a soporte.'}</p>
+          <p className="text-gray-600 mb-6">{errorMessage || 'No pudimos verificar tu pago.'}</p>
           <div className="space-y-3">
             <button
               onClick={handleRetry}
@@ -288,7 +284,6 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
     );
   }
 
-  // Failure - Pago rechazado por MP
   if (status === 'failure') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -312,7 +307,6 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
     );
   }
 
-  // Pending - En espera de confirmación
   if (status === 'pending') {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -325,7 +319,7 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
             Tu pago está siendo procesado por MercadoPago.
           </p>
           <p className="text-sm text-gray-400 mb-6">
-            Esto puede tomar unos minutos. No cierres esta página o vuelve más tarde para verificar el estado.
+            Esto puede tomar unos minutos. Vuelve más tarde para verificar el estado.
           </p>
           <div className="space-y-3">
             <button
@@ -344,7 +338,7 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
           </div>
           {subscriptionId && (
             <p className="mt-4 text-xs text-gray-300">
-              Si el pago fue exitoso, tu plan se activará automáticamente en los próximos minutos.
+              Si el pago fue exitoso, tu plan se activará automáticamente.
               ID de referencia: {subscriptionId}
             </p>
           )}
@@ -353,14 +347,13 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
     );
   }
 
-  // Success - Pago exitoso
+  // Success
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-4xl mx-auto w-full">
           <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-              {/* Success Side */}
               <div className="bg-gradient-to-br from-green-500 to-green-600 p-12 text-white">
                 <div className="text-center">
                   <div className="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-8">
@@ -399,10 +392,8 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
                 </div>
               </div>
 
-              {/* Details Side */}
               <div className="p-12 bg-gray-50">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Resumen del Pago</h2>
-                
                 <div className="space-y-6">
                   <div className="bg-white p-6 rounded-lg shadow-sm">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">¿Qué sigue ahora?</h3>
@@ -439,7 +430,6 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="mt-8 flex gap-4">
                   <button
                     onClick={() => router.push('/dashboard')}
