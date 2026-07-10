@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, MapPin, ChevronLeft, ChevronRight, ArrowRight, Home, Users, User, Sparkles } from 'lucide-react';
+import { Search, MapPin, ChevronDown, ChevronLeft, ChevronRight, ArrowRight, Home, Users, User, Sparkles } from 'lucide-react';
 import { publicApiClient } from '@/infrastructure/api/axios-client';
 
 interface PublicAgent {
@@ -32,6 +32,7 @@ export default function AgentsPage() {
   const [search, setSearch] = useState('');
   const [city, setCity] = useState('');
   const [page, setPage] = useState(0);
+  const [cityOpen, setCityOpen] = useState(false);
 
   const fetchAgents = async () => {
     setLoading(true);
@@ -83,15 +84,27 @@ export default function AgentsPage() {
               <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Buscar agente..." className="w-full pl-10 pr-4 py-2.5 border border-[var(--border-color)] rounded-xl text-sm focus:ring-2 focus:ring-[#2d5a3d] focus:border-transparent outline-none bg-[var(--bg-secondary)] text-[var(--text-primary)]" />
             </div>
-            <select value={city} onChange={e => { setCity(e.target.value); setPage(0); }}
-              className="px-4 py-2.5 border border-[var(--border-color)] rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#2d5a3d] bg-[var(--bg-card)] text-[var(--text-primary)] min-w-[140px]">
-              <option value="">Todas las ciudades</option>
-              <option value="Lima">Lima</option>
-              <option value="Arequipa">Arequipa</option>
-              <option value="Cusco">Cusco</option>
-              <option value="Trujillo">Trujillo</option>
-              <option value="Piura">Piura</option>
-            </select>
+            <div className="relative min-w-[180px]">
+              <button type="button" onClick={() => setCityOpen(!cityOpen)}
+                className="w-full flex items-center justify-between px-4 py-2.5 border border-[var(--border-color)] rounded-xl text-sm bg-[var(--bg-card)] text-[var(--text-primary)] hover:border-gray-300 transition-colors">
+                <span className={city ? '' : 'text-[var(--text-tertiary)]'}>{city || 'Todas las ciudades'}</span>
+                <ChevronDown className={`w-4 h-4 text-[var(--text-tertiary)] transition-transform ${cityOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {cityOpen && (
+                <div className="absolute z-20 top-full mt-1 left-0 right-0 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl shadow-lg overflow-hidden">
+                  <button type="button" onClick={() => { setCity(''); setPage(0); setCityOpen(false); }}
+                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-[var(--bg-secondary)] ${!city ? 'text-[#2d5a3d] font-semibold bg-[var(--bg-secondary)]' : 'text-[var(--text-primary)]'}`}>
+                    Todas las ciudades
+                  </button>
+                  {['Lima','Arequipa','Cusco','Trujillo','Piura','Chiclayo','Huancayo','Iquitos','Pucallpa','Tacna','Ica','Cajamarca','Puno','Ayacucho','Moquegua'].map(c => (
+                    <button key={c} type="button" onClick={() => { setCity(c); setPage(0); setCityOpen(false); }}
+                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-[var(--bg-secondary)] ${city === c ? 'text-[#2d5a3d] font-semibold bg-[var(--bg-secondary)]' : 'text-[var(--text-primary)]'}`}>
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <button type="submit" className="px-6 py-2.5 bg-[#2d5a3d] hover:bg-[#1a3a2a] text-white text-sm font-semibold rounded-xl transition-all shadow-sm">
               Buscar
             </button>

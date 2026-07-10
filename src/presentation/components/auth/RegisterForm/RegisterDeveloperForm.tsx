@@ -421,15 +421,15 @@ export const RegisterDeveloperForm: React.FC = () => {
               placeholder="Nombre de tu empresa"
             />
 
-            <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center">
               {[
                 { value: '1', label: 'Proyecto' },
                 { value: '∞', label: 'Unidades' },
                 { value: '30', label: 'Días gratis' },
               ].map(({ value, label }) => (
-                <div key={label} className="bg-blue-50 rounded-xl p-3 border border-blue-100">
-                  <div className="text-blue-600 font-bold text-lg">{value}</div>
-                  <div className="text-xs text-gray-600">{label}</div>
+                <div key={label} className="bg-blue-50 rounded-xl p-2 sm:p-3 border border-blue-100">
+                  <div className="text-blue-600 font-bold text-base sm:text-lg">{value}</div>
+                  <div className="text-[11px] sm:text-xs text-gray-600">{label}</div>
                 </div>
               ))}
             </div>

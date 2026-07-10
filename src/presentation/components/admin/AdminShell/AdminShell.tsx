@@ -271,6 +271,22 @@ export function GitHubShell({ children }: GitHubShellProps) {
   const { adminProfile, isLoading, error } = useAdminProfile();
   const { setAdminProfile } = useAuthStore();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Cierra el drawer mobile al navegar a otra sección
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  const handleToggleSidebar = () => {
+    const isDesktop = typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches;
+    if (isDesktop) {
+      setCollapsed((v) => !v);
+    } else {
+      setMobileOpen((v) => !v);
+    }
+  };
 
   useEffect(() => {
     if (adminProfile) {
@@ -348,19 +364,30 @@ export function GitHubShell({ children }: GitHubShellProps) {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <AdminHeader onToggleSidebar={() => setCollapsed((v) => !v)} />
+      <AdminHeader onToggleSidebar={handleToggleSidebar} />
 
-      <div className="flex h-[calc(100vh-56px)] overflow-hidden">
+      <div className="flex h-[calc(100vh-56px)] overflow-hidden relative">
+        {mobileOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-black/50 md:hidden"
+            onClick={() => setMobileOpen(false)}
+          />
+        )}
+
         <aside
           className={`
-            h-full bg-[#1a2030] shrink-0 transition-all duration-200 ease-in-out overflow-y-auto
-            ${collapsed ? 'w-[60px]' : 'w-[240px]'}
+            fixed inset-y-0 left-0 top-14 z-40 h-[calc(100vh-56px)] w-[240px]
+            bg-[#1a2030] overflow-y-auto transition-transform duration-200 ease-in-out
+            ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
+            md:static md:top-0 md:z-auto md:h-full md:shrink-0 md:translate-x-0
+            md:transition-[width] md:duration-200 md:ease-in-out
+            ${collapsed ? 'md:w-[60px]' : 'md:w-[240px]'}
           `}
         >
           <Sidebar collapsed={collapsed} />
         </aside>
 
-        <main className="flex-1 h-full overflow-y-auto bg-gray-50 p-6">
+        <main className="flex-1 h-full overflow-y-auto bg-gray-50 p-3 sm:p-4 md:p-6">
           {children}
         </main>
       </div>

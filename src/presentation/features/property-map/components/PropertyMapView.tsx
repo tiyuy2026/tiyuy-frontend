@@ -53,7 +53,6 @@ export function PropertyMapView({
     // Forzar tamaño del contenedor antes de inicializar Leaflet
     container.style.width = '100%';
     container.style.height = '100%';
-    container.style.minHeight = '100vh';
 
     const center = searchResult?.items?.length
       ? calculateMapCenter(searchResult.items)

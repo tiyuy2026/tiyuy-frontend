@@ -268,19 +268,19 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
       <div className="fixed inset-0 bg-black/20 flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
           {/* Header */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">
+          <div className="p-4 sm:p-6 border-b border-gray-200">
+            <div className="flex items-start sm:items-center justify-between gap-3">
+              <div className="min-w-0">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                   Actualiza tu plan
                 </h2>
-                <p className="text-gray-600 mt-1">
+                <p className="text-sm sm:text-base text-gray-600 mt-1">
                   Elige el plan perfecto para publicar más propiedades y hacer crecer tu negocio inmobiliario.
                 </p>
               </div>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors text-2xl font-bold"
+                className="shrink-0 text-gray-400 hover:text-gray-600 transition-colors text-2xl font-bold"
               >
                 X
               </button>

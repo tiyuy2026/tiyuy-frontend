@@ -151,7 +151,7 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
                     )}
                   </div>
 
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight mb-4">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight mb-4 break-words">
                     {property.title}
                   </h1>
 

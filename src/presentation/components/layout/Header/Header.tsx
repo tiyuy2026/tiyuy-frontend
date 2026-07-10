@@ -45,6 +45,8 @@ export function Header() {
   const [stripeColor, setStripeColor] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileComprarOpen, setMobileComprarOpen] = useState(false);
+  const [mobileAlquilarOpen, setMobileAlquilarOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalAction, setAuthModalAction] = useState<'contactos' | 'publicar'>('contactos');
   const notificationsRef = useRef<HTMLDivElement>(null);
@@ -748,7 +750,7 @@ export function Header() {
                   <Bell className="w-5 h-5" />
                 </Link>
               )}
-              {/* CONTACTOS - Siempre visible */}
+              {/* CONTACTOS - Siempre visible (también en mobile) */}
               <button
                 onClick={() => {
                   if (isAuthenticated) {
@@ -758,14 +760,14 @@ export function Header() {
                     setShowAuthModal(true);
                   }
                 }}
-                className="hidden sm:inline-flex items-center gap-2 text-black hover:text-gray-800 text-sm font-medium"
+                className="inline-flex items-center gap-1 text-black hover:text-gray-800 text-sm font-medium"
               >
                 <Users className="w-4 h-4" />
-                Contactos
+                <span className="hidden sm:inline">Contactos</span>
               </button>
 
 
-              {/* BOTÓN PUBLICAR - Siempre visible */}
+              {/* BOTÓN PUBLICAR - Siempre visible (también en mobile) */}
               <button
                 onClick={() => {
                   if (isAuthenticated) {
@@ -775,10 +777,10 @@ export function Header() {
                     setShowAuthModal(true);
                   }
                 }}
-                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm font-medium"
+                className="inline-flex items-center gap-1 px-3 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm font-medium"
               >
                 <Building className="w-4 h-4" />
-                Publicar
+                <span className="hidden sm:inline">Publicar</span>
               </button>
 
               {/* INGRESAR - Solo si NO está autenticado */}
@@ -890,18 +892,90 @@ export function Header() {
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-gray-200 shadow-lg fixed top-16 left-0 right-0 z-40 max-h-[calc(100vh-4rem)] overflow-y-auto">
           <div className="px-4 py-4 space-y-4">
-            <div className="space-y-2">
-              <Link href="/sale" className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
-                Comprar
-              </Link>
-              <Link href="/rent" className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
-                Alquilar
-              </Link>
-              <Link href="/servics" className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+            <div className="space-y-1">
+              {/* COMPRAR - acordeón con tipos de propiedad */}
+              <div>
+                <button
+                  onClick={() => setMobileComprarOpen((v) => !v)}
+                  className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
+                >
+                  <span>Comprar</span>
+                  <ChevronDown
+                    className={`w-4 h-4 shrink-0 transition-transform ${mobileComprarOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {mobileComprarOpen && (
+                  <div className="pl-4 pb-1 space-y-1">
+                    {[
+                      { label: 'Departamento', slug: 'departamentos' },
+                      { label: 'Casa', slug: 'casas' },
+                      { label: 'Terreno / Lote', slug: 'terrenos' },
+                      { label: 'Oficina', slug: 'oficinas' },
+                      { label: 'Local Comercial', slug: 'locales' },
+                    ].map((item) => (
+                      <Link
+                        key={item.slug}
+                        href={`/sale/${item.slug}/lima`}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                    <Link
+                      href="/projects"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg"
+                    >
+                      Proyectos
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* ALQUILAR - acordeón con tipos de propiedad */}
+              <div>
+                <button
+                  onClick={() => setMobileAlquilarOpen((v) => !v)}
+                  className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
+                >
+                  <span>Alquilar</span>
+                  <ChevronDown
+                    className={`w-4 h-4 shrink-0 transition-transform ${mobileAlquilarOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {mobileAlquilarOpen && (
+                  <div className="pl-4 pb-1 space-y-1">
+                    {[
+                      { label: 'Departamento', slug: 'departamentos' },
+                      { label: 'Casa', slug: 'casas' },
+                      { label: 'Terreno / Lote', slug: 'terrenos' },
+                      { label: 'Oficina', slug: 'oficinas' },
+                      { label: 'Local Comercial', slug: 'locales' },
+                      { label: 'Habitación', slug: 'habitaciones' },
+                      { label: 'Minidepartamento', slug: 'minidepartamentos' },
+                    ].map((item) => (
+                      <Link
+                        key={item.slug}
+                        href={`/rent/${item.slug}/lima`}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <Link href="/servics" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                 Servicios
               </Link>
-              <Link href="/agencies" className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+              <Link href="/agencies" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
                 Buscar inmobiliarias
+              </Link>
+              <Link href="/agents" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                Buscar agentes
               </Link>
             </div>
             <div className="border-t border-gray-100 pt-4 space-y-3">
