@@ -61,7 +61,9 @@ export class AuthRepository implements IAuthRepository {
 
   async register(registerData: RegisterData): Promise<AuthResponse> {
     try {
-      const response = await axiosClient.post<AuthResponse>(
+      // Usamos publicApiClient para registro (sin token JWT) igual que en login
+      // axiosClient tiene un interceptor que puede bloquear si hay un token expirado en localStorage
+      const response = await publicApiClient.post<AuthResponse>(
         AUTH_ENDPOINTS.REGISTER,
         registerData
       );
