@@ -137,6 +137,19 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <script src="https://sdk.mercadopago.com/js/v2" async />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var s = document.createElement('script');
+                s.src = 'https://www.mercadopago.com/v2/security.js';
+                s.setAttribute('view', 'checkout');
+                s.async = true;
+                document.head.appendChild(s);
+              })();
+            `,
+          }}
+        />
       </head>
       <body className={hind.className} suppressHydrationWarning>
         <ClientLayout>{children}</ClientLayout>

@@ -47,25 +47,29 @@ export function PaymentForm({
   // Referencia compartida a la instancia de MP para usar en ambos flujos
   const mpRef = useRef<any>(null);
 
+  // Obtener deviceSessionId del security.js de MP
+  const getDeviceSessionId = (): string => {
+    if (typeof window !== 'undefined' && (window as any).MP_DEVICE_SESSION_ID) {
+      return (window as any).MP_DEVICE_SESSION_ID;
+    }
+    return '';
+  };
+
   // Botón "Pagar con MercadoPago" (Checkout Pro)
   const handleMercadoPagoCheckout = async () => {
     setIsProcessing(true);
     try {
-      // El SDK v2 (sdk.mercadopago.com/js/v2) ya está cargado desde layout.tsx
-      // Al cargarse, genera el device fingerprint automáticamente.
-      // Usamos la misma instancia de MP que ya creó cardForm para obtener el sessionId
-      let sessionId = '';
-      if (mpRef.current) {
-        sessionId = mpRef.current.getSessionId();
-        console.log('MP Checkout Pro Session ID:', sessionId);
-      }
+      // security.js (cargado desde layout.tsx) ya generó MP_DEVICE_SESSION_ID
+      // Este ID es el device fingerprint que MP necesita para evaluar riesgo
+      const deviceSessionId = getDeviceSessionId();
+      console.log('MP Device Session ID:', deviceSessionId);
       
       const response = await apiClient.post('/finance/mercadopago/create-preference', {
         subscriptionId: null,
         unitPrice: finalAmount,
         title: planName || description,
         frontendUrl: window.location.origin,
-        sessionId,
+        deviceSessionId,
       });
 
       const data = response.data;
@@ -145,13 +149,15 @@ export function PaymentForm({
               }
 
               const sessionId = mp.getSessionId();
-              console.log('MP Session ID (cardForm):', sessionId);
+              const deviceSessionId = getDeviceSessionId();
+              console.log('MP Session ID (cardForm):', sessionId, 'Device:', deviceSessionId);
 
               const result = await processPaymentMutation.mutateAsync({
                 token: cardData.token,
                 amount: finalAmount,
                 description,
                 sessionId,
+                deviceSessionId,
               });
 
               if (result.status === 'APPROVED') {

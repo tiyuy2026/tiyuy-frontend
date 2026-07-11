@@ -81,5 +81,6 @@ export interface PaymentRequest {
   token: string; // Token de MercadoPago
   amount: number;
   description: string;
-  sessionId?: string; // Session ID para device fingerprint antifraude (soluciona cc_rejected_high_risk)
+  sessionId?: string; // Session ID para device fingerprint antifraude
+  deviceSessionId?: string; // Device session ID de security.js (MP_DEVICE_SESSION_ID)
 }
