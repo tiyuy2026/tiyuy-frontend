@@ -187,16 +187,21 @@ export function PaymentConfirmationClient({ paymentId }: { paymentId: string }) 
 
   /**
    * Auto-redirección después de éxito
+   * Usa window.location.href para forzar recarga completa de la página
+   * y que React Query refetchee la suscripción activa desde el backend.
+   * Con router.push(), la caché stale de ['subscription', 'active']
+   * hace que el plan no se pinte como activo.
    */
   useEffect(() => {
     if (status === 'success') {
       const timer = setTimeout(() => {
         setIsRedirecting(true);
-        router.push('/dashboard?payment_success=true');
+        // Forzar recarga completa para que React Query refetchee la suscripción
+        window.location.href = '/dashboard?payment_success=true';
       }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [status, router]);
+  }, [status]);
 
   /**
    * Reintentar procesamiento manual (botón "Verificar Estado")
