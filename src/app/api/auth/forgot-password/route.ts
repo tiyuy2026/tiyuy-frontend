@@ -25,7 +25,8 @@ export async function POST(request: NextRequest) {
     // Conectar con el backend real
     try {
       const backendUrl = serverEnv.backendUrl;
-      const response = await fetch(`${backendUrl}/auth/forgot-password`, {
+      // El backend tiene context-path /api, por lo que la ruta completa es /api/auth/forgot-password
+      const response = await fetch(`${backendUrl}/api/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
