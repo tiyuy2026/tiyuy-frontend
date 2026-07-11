@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { PaymentRequest } from '@/core/domain/entities/Wallet';
 import { useProcessPayment } from '@/presentation/hooks/usePayments';
 import { useValidateDeveloperDiscountCode, useUseDeveloperDiscountCode } from '@/presentation/hooks/admin/useDevelopers';
+import { apiClient } from '@/infrastructure/api/axios-client';
 import { Icon } from '@iconify/react';
 import { Check, CreditCard, Crown, DollarSign, Globe, Loader, Shield } from 'lucide-react';
 
@@ -43,6 +44,37 @@ export function PaymentForm({
   const [isValidating, setIsValidating] = useState(false);
 
   const finalAmount = appliedDiscount?.discountedPrice ?? amount;
+  const mpInstanceRef = useRef<any>(null);
+
+  // Inicializar MercadoPago para Checkout Pro (botón "Pagar con MercadoPago")
+  const handleMercadoPagoCheckout = async () => {
+    setIsProcessing(true);
+    try {
+      // El SDK de MP (sdk.mercadopago.com/js/v2) ya está cargado desde layout.tsx
+      // Al cargarse, genera automáticamente el device fingerprint para antifraude
+      
+      const response = await apiClient.post('/finance/mercadopago/create-preference', {
+        subscriptionId: null,
+        unitPrice: finalAmount,
+        title: planName || description,
+        frontendUrl: window.location.origin,
+      });
+
+      const data = response.data;
+      
+      if (data.initPoint) {
+        window.location.href = data.initPoint;
+      } else if (data.sandboxInitPoint) {
+        window.location.href = data.sandboxInitPoint;
+      } else {
+        onPaymentError('Error al obtener el punto de pago');
+      }
+    } catch (error: any) {
+      onPaymentError(error.response?.data?.error || error.message || 'Error al iniciar el pago con MercadoPago');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const handleValidateDiscount = async () => {
     if (!discountCode.trim()) return;
@@ -104,10 +136,15 @@ export function PaymentForm({
                 await handleUseDiscount();
               }
 
+              // Obtener session_id de MercadoPago para el antifraude (soluciona cc_rejected_high_risk)
+              const sessionId = mp.getSessionId();
+              console.log('MP Session ID:', sessionId);
+
               const result = await processPaymentMutation.mutateAsync({
                 token: cardData.token,
                 amount: finalAmount,
                 description,
+                sessionId, // ← Enviar session_id para el device fingerprint
               });
 
               if (result.status === 'APPROVED') {
@@ -237,9 +274,15 @@ export function PaymentForm({
             Otros Métodos de Pago
           </h3>
           <div className="space-y-3">
-            <button className="w-full p-4 bg-white border-2 border-blue-600 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-3">
+            <button
+              onClick={handleMercadoPagoCheckout}
+              disabled={isProcessing}
+              className="w-full p-4 bg-white border-2 border-blue-600 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <Icon icon="simple-icons:mercadopago" className="w-8 h-8" />
-              <span className="font-semibold">Pagar con Mercado Pago</span>
+              <span className="font-semibold">
+                {isProcessing ? 'Redirigiendo...' : 'Pagar con Mercado Pago'}
+              </span>
             </button>
             
             <button className="w-full p-4 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
