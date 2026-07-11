@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
       {
         source: '/api/:path*',
         destination: `${process.env.BACKEND_URL ? `${process.env.BACKEND_URL.replace(/\/+$/, '')}/api` : 'http://94.72.122.190:8080/api'}/:path*`,
+       // BACKEND_URL debe configurarse como variable de entorno en el hosting.
+       // En Condabo, el backend corre en http://94.72.122.190:8080.
+       // En desarrollo local, se usa http://localhost:8080.
       },
       // Existing rewrites
       {
