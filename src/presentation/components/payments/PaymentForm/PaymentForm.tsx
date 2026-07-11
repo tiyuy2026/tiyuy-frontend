@@ -51,13 +51,23 @@ export function PaymentForm({
     setIsProcessing(true);
     try {
       // El SDK de MP (sdk.mercadopago.com/js/v2) ya está cargado desde layout.tsx
-      // Al cargarse, genera automáticamente el device fingerprint para antifraude
+      // Al instanciarlo, genera automáticamente el device fingerprint
+      let sessionId = '';
+      if (typeof window !== 'undefined' && (window as any).MercadoPago) {
+        const mp = new (window as any).MercadoPago(
+          process.env.NEXT_PUBLIC_MP_PUBLIC_KEY!,
+          { locale: 'es-PE' }
+        );
+        sessionId = mp.getSessionId();
+        console.log('MP Checkout Pro Session ID:', sessionId);
+      }
       
       const response = await apiClient.post('/finance/mercadopago/create-preference', {
         subscriptionId: null,
         unitPrice: finalAmount,
         title: planName || description,
         frontendUrl: window.location.origin,
+        sessionId, // ← Enviar sessionId para la metadata de la preferencia
       });
 
       const data = response.data;
