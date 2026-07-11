@@ -15,9 +15,9 @@
 // ============================================
 export const env = {
   // --- URLs ---
-  apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-  appUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  apiUrl: process.env.NEXT_PUBLIC_API_URL || 'https://api.tiyuy.com',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.tiyuy.com',
+  appUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://www.tiyuy.com',
   siteName: process.env.NEXT_PUBLIC_SITE_NAME || 'TIYUY',
 
   // --- WebSocket ---
@@ -38,6 +38,6 @@ export const env = {
 // SERVIDOR (API Routes de Next.js) - NO tienen NEXT_PUBLIC_
 // ============================================
 export const serverEnv = {
-  backendUrl: process.env.BACKEND_URL || 'http://localhost:8080',
+  backendUrl: process.env.BACKEND_URL || 'https://api.tiyuy.com',
   brevoApiKey: process.env.BREVO_API_KEY || '',
 } as const;
