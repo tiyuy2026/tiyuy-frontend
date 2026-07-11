@@ -34,7 +34,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   const userRole = authStorage.getUser()?.role;
   const isAgent = userRole === 'AGENT';
   const isDeveloper = userRole === 'DEVELOPER';
-  // 🔒 SEGURIDAD: Agentes y Developers (inmobiliarias) pueden tener descuentos si tienen agencyId
+  //  SEGURIDAD: Agentes y Developers (inmobiliarias) pueden tener descuentos si tienen agencyId
   const hasAgencyRole = isAgent || isDeveloper;
   const hasDiscountCodes = hasAgencyRole && availableDiscountCodes && availableDiscountCodes.length > 0;
   
@@ -61,7 +61,7 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   
   // Función para detectar descuentos inteligentes basados en reglas de negocio - PARA AGENTES Y DEVELOPERS CON DESCUENTOS DE AGENCIA
   const detectIntelligentDiscount = (planPrice: number): { code: string; percentage: number } | null => {
-    // 🔒 CRÍTICO: Solo agentes y developers con descuentos de agencia pueden tener descuentos inteligentes
+    //  CRÍTICO: Solo agentes y developers con descuentos de agencia pueden tener descuentos inteligentes
     if (!hasAgencyRole || !hasDiscountCodes) {
       return null;
     }
@@ -183,8 +183,60 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
     });
   };
 
+  /**
+   * Obtiene el deviceSessionId de MercadoPago esperando a que security.js termine de cargar.
+   * security.js se carga de forma async en layout.tsx, pero puede no haber terminado
+   * cuando el usuario hace clic en "Suscribirme". Esta función asegura esperar hasta que
+   * MP_DEVICE_SESSION_ID esté disponible.
+   */
+  const getDeviceSessionId = (): Promise<string> => {
+    return new Promise((resolve) => {
+      // Caso 1: Ya está disponible
+      if (typeof window !== 'undefined' && (window as any).MP_DEVICE_SESSION_ID) {
+        resolve((window as any).MP_DEVICE_SESSION_ID);
+        return;
+      }
+
+      // Caso 2: Esperar a que security.js termine de cargar y generar el ID
+      // El security.js de MP inyecta MP_DEVICE_SESSION_ID global cuando termina
+      let attempts = 0;
+      const maxAttempts = 50; // ~5 segundos máximo de espera (50 * 100ms)
+      
+      const checkInterval = setInterval(() => {
+        attempts++;
+        if (typeof window !== 'undefined' && (window as any).MP_DEVICE_SESSION_ID) {
+          clearInterval(checkInterval);
+          resolve((window as any).MP_DEVICE_SESSION_ID);
+          return;
+        }
+        // Si no aparece después de los intentos, inyectar security.js manualmente
+        if (attempts >= maxAttempts) {
+          clearInterval(checkInterval);
+          
+          // Inyectar security.js manualmente como fallback
+          const script = document.createElement('script');
+          script.src = 'https://www.mercadopago.com/v2/security.js';
+          script.setAttribute('view', 'checkout');
+          script.async = true;
+          script.onload = () => {
+            // Dar tiempo extra para que MP_DEVICE_SESSION_ID se genere
+            setTimeout(() => {
+              if ((window as any).MP_DEVICE_SESSION_ID) {
+                resolve((window as any).MP_DEVICE_SESSION_ID);
+              } else {
+                resolve(''); // Último recurso: vacío
+              }
+            }, 500);
+          };
+          script.onerror = () => resolve(''); // Si falla, continuar sin deviceSessionId
+          document.head.appendChild(script);
+        }
+      }, 100);
+    });
+  };
+
   const openMercadoPagoPayment = (plan: SubscriptionPlan, subscriptionId: string) => {
-    // Cargar SDK dinámicamente si no está disponible
+    // Cargar SDK v2 si no está disponible
     if (!(window as any).MercadoPago) {
       const script = document.createElement('script');
       script.src = 'https://sdk.mercadopago.com/js/v2';
@@ -201,6 +253,12 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
     try {
       const token = authStorage.getToken();
       
+      //  CRÍTICO: Esperar a que security.js genere el deviceSessionId para antifraude
+      // Sin esto, MP rechaza con cc_rejected_high_risk porque no puede asociar
+      // el dispositivo del comprador con la transacción.
+      const deviceSessionId = await getDeviceSessionId();
+      console.log('MP Device Session ID (UpgradePlanModal):', deviceSessionId || '(no disponible)');
+      
       const response = await fetch(
         `/api/finance/mercadopago/create-preference`,
         {
@@ -213,7 +271,8 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
             subscriptionId: subscriptionId.toString(),
             title: `Plan ${plan.name}`,
             unitPrice: plan.price,
-            frontendUrl: window.location.origin
+            frontendUrl: window.location.origin,
+            deviceSessionId  //  CRÍTICO: MP necesita el fingerprint del dispositivo para evaluar riesgo
           })
         }
       );
