@@ -338,6 +338,49 @@ export default function PlansPage() {
     return false;
   };
 
+  /**
+   * Obtiene el deviceSessionId de MercadoPago esperando a que security.js termine de cargar.
+   * Sin esto MP rechaza con cc_rejected_high_risk porque no puede asociar el dispositivo
+   * del comprador con la transacción.
+   */
+  const getDeviceSessionId = (): Promise<string> => {
+    return new Promise((resolve) => {
+      // Caso 1: Ya está disponible
+      if (typeof window !== 'undefined' && (window as any).MP_DEVICE_SESSION_ID) {
+        resolve((window as any).MP_DEVICE_SESSION_ID);
+        return;
+      }
+
+      // Caso 2: Esperar a que security.js termine de cargar (polling hasta 5s)
+      let attempts = 0;
+      const maxAttempts = 50;
+      
+      const checkInterval = setInterval(() => {
+        attempts++;
+        if (typeof window !== 'undefined' && (window as any).MP_DEVICE_SESSION_ID) {
+          clearInterval(checkInterval);
+          resolve((window as any).MP_DEVICE_SESSION_ID);
+          return;
+        }
+        // Fallback: inyectar security.js manualmente si no aparece
+        if (attempts >= maxAttempts) {
+          clearInterval(checkInterval);
+          const script = document.createElement('script');
+          script.src = 'https://www.mercadopago.com/v2/security.js';
+          script.setAttribute('view', 'checkout');
+          script.async = true;
+          script.onload = () => {
+            setTimeout(() => {
+              resolve((window as any).MP_DEVICE_SESSION_ID || '');
+            }, 500);
+          };
+          script.onerror = () => resolve('');
+          document.head.appendChild(script);
+        }
+      }, 100);
+    });
+  };
+
   // Misma lógica que el modal - abre MercadoPago
   const handleSubscribe = () => {
     if (!selectedPlan) return;
@@ -353,6 +396,10 @@ export default function PlansPage() {
         try {
           const token = authStorage.getToken();
           
+          // 🔴 CRÍTICO: Esperar a que security.js genere el deviceSessionId para antifraude
+          const deviceSessionId = await getDeviceSessionId();
+          console.log('MP Device Session ID (PlansPage):', deviceSessionId || '(no disponible)');
+          
           const response = await fetch(
             `/api/finance/mercadopago/create-preference`,
             {
@@ -365,7 +412,8 @@ export default function PlansPage() {
                 subscriptionId: subscription.id.toString(),
                 title: selectedPlan.name,
                 unitPrice: finalPrice,
-                frontendUrl: window.location.origin
+                frontendUrl: window.location.origin,
+                deviceSessionId  // 🔴 CRÍTICO: fingerprint del dispositivo para evitar rechazo
               })
             }
           );
