@@ -44,21 +44,19 @@ export function PaymentForm({
   const [isValidating, setIsValidating] = useState(false);
 
   const finalAmount = appliedDiscount?.discountedPrice ?? amount;
-  const mpInstanceRef = useRef<any>(null);
+  // Referencia compartida a la instancia de MP para usar en ambos flujos
+  const mpRef = useRef<any>(null);
 
-  // Inicializar MercadoPago para Checkout Pro (botón "Pagar con MercadoPago")
+  // Botón "Pagar con MercadoPago" (Checkout Pro)
   const handleMercadoPagoCheckout = async () => {
     setIsProcessing(true);
     try {
-      // El SDK de MP (sdk.mercadopago.com/js/v2) ya está cargado desde layout.tsx
-      // Al instanciarlo, genera automáticamente el device fingerprint
+      // El SDK v2 (sdk.mercadopago.com/js/v2) ya está cargado desde layout.tsx
+      // Al cargarse, genera el device fingerprint automáticamente.
+      // Usamos la misma instancia de MP que ya creó cardForm para obtener el sessionId
       let sessionId = '';
-      if (typeof window !== 'undefined' && (window as any).MercadoPago) {
-        const mp = new (window as any).MercadoPago(
-          process.env.NEXT_PUBLIC_MP_PUBLIC_KEY!,
-          { locale: 'es-PE' }
-        );
-        sessionId = mp.getSessionId();
+      if (mpRef.current) {
+        sessionId = mpRef.current.getSessionId();
         console.log('MP Checkout Pro Session ID:', sessionId);
       }
       
@@ -67,7 +65,7 @@ export function PaymentForm({
         unitPrice: finalAmount,
         title: planName || description,
         frontendUrl: window.location.origin,
-        sessionId, // ← Enviar sessionId para la metadata de la preferencia
+        sessionId,
       });
 
       const data = response.data;
@@ -128,6 +126,7 @@ export function PaymentForm({
         process.env.NEXT_PUBLIC_MP_PUBLIC_KEY!,
         { locale: 'es-PE' }
       );
+      mpRef.current = mp; // Guardar referencia para usarla en handleMercadoPagoCheckout
 
       const cardForm = mp.cardForm({
         amount: Number(finalAmount),
@@ -141,20 +140,18 @@ export function PaymentForm({
           onSubmit: async (cardData: any) => {
             setIsProcessing(true);
             try {
-              // Usar el descuento antes del pago si está aplicado
               if (appliedDiscount?.valid && userId) {
                 await handleUseDiscount();
               }
 
-              // Obtener session_id de MercadoPago para el antifraude (soluciona cc_rejected_high_risk)
               const sessionId = mp.getSessionId();
-              console.log('MP Session ID:', sessionId);
+              console.log('MP Session ID (cardForm):', sessionId);
 
               const result = await processPaymentMutation.mutateAsync({
                 token: cardData.token,
                 amount: finalAmount,
                 description,
-                sessionId, // ← Enviar session_id para el device fingerprint
+                sessionId,
               });
 
               if (result.status === 'APPROVED') {
