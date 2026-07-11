@@ -29,6 +29,7 @@ export function useActiveSubscription() {
     staleTime: 0, // Siempre considerar los datos como obsoletos
     refetchOnMount: true, // Siempre refrescar al montar
     refetchOnWindowFocus: true, // Refrescar cuando la ventana gana foco
+    refetchInterval: 15000, // Refrescar cada 15s mientras la página esté visible
   });
 }
 
