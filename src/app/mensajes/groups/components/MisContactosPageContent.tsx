@@ -16,10 +16,10 @@ import EstadosPanel from '../../states/page';
 import CanalesListPanel from '../../channels/components/ChannelListPanel';
 import { GruposListPanel } from './GruposListPanel';
 import { GrupoDetailPanel } from './GrupoDetailPanel';
-import { NewGroupModal } from './NewGroupModal';
+import CreateGroupView from './CreateGroupView';
 import DiscoverGroupsView from './DiscoverGroupsView';
 import { GruposMisGruposView } from './GruposMisGruposView';
-import NewStatusModal from '../../states/components/NewStatusModal';
+import CreateStatusView from '../../states/components/CreateStatusView';
 import StatusDetailPanel from '../../states/components/StatusDetailPanel';
 import { ChannelPostsPanel } from '../../channels/components/ChannelPostsPanel';
 import MisCanalesCreadosView from '../../channels/components/MyCreatedChannelsView';
@@ -39,7 +39,7 @@ export function MisContactosPageContent() {
     const [selectedChannel, setSelectedChannel] = useState<any>(null);
     const [channelsSection, setChannelsSection] = useState<'mis-canales-creados' | 'mis-canales-suscritos' | 'descubrir-canales' | 'crear-canal'>('mis-canales-creados');
     const [gruposSection, setGruposSection] = useState<'mis-grupos' | 'descubrir' | 'crear'>('mis-grupos');
-    const [showNewStatus, setShowNewStatus] = useState(false);
+    const [statusSection, setStatusSection] = useState<'lista' | 'crear'>('lista');
     const [newMessage, setNewMessage] = useState('');
     const [pinnedMessage, setPinnedMessage] = useState<any>(null);
     const [contextMenu, setContextMenu] = useState<{ msg: any; x: number; y: number } | null>(null);
@@ -211,9 +211,10 @@ export function MisContactosPageContent() {
         { key: 'canales' as MainTab, Icon: IC.Channel, label: 'Comunidades' },
     ];
 
-    const hasGroupSubSection = activeTab === 'grupos' && (selectedGroup !== null || (isMobile && gruposSection !== 'mis-grupos'));
+    const hasStatusSubSection = activeTab === 'estados' && (selectedStatusId !== null || (isMobile && statusSection !== 'lista'));
+    const hasGroupSubSection = activeTab === 'grupos' && (selectedGroup !== null || isMobile);
     const hasChannelSubSection = activeTab === 'canales' && (selectedChannel !== null || channelsSection !== 'mis-canales-creados');
-    const hasSelection = selectedChatId || selectedStatusId || selectedGroup || selectedChannel || hasGroupSubSection || hasChannelSubSection;
+    const hasSelection = selectedChatId || selectedStatusId || selectedGroup || selectedChannel || hasStatusSubSection || hasGroupSubSection || hasChannelSubSection;
 
     // ===== RENDER CHAT VIEW =====
     const renderChatView = () => {
@@ -346,15 +347,21 @@ export function MisContactosPageContent() {
                 </div>
             );
         }
+        if (activeTab === 'estados' && statusSection === 'crear') return (
+            <div className="flex-1 flex flex-col overflow-hidden">
+                {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600"><button onClick={() => setStatusSection('lista')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Crear Estado</span></div>)}
+                <div className="flex-1 overflow-y-auto"><CreateStatusView user={user} onBack={() => setStatusSection('lista')} /></div>
+            </div>
+        );
         if (activeTab === 'estados' && selectedStatusId) {
             return <StatusDetailPanel status={allPosts.find((post: any) => post.id === selectedStatusId) || { id: selectedStatusId, user: { name: 'Usuario' }, content: '', createdAt: new Date().toISOString(), tags: [], likes: 0, comments: [] }} user={user} onClose={() => setSelectedStatusId(null)} />;
         }
         if (activeTab === 'grupos') {
             if (selectedGroup) return <GrupoDetailPanel group={selectedGroup} user={user} onBack={() => setSelectedGroup(null)} />;
             if (gruposSection === 'crear') return (
-                <div className="flex-1 overflow-y-auto bg-gray-50">
-                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-green-600"><button onClick={() => setGruposSection('mis-grupos')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Crear Grupo</span></div>)}
-                    <NewGroupModal onClose={() => setGruposSection('mis-grupos')} />
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600"><button onClick={() => setGruposSection('mis-grupos')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Crear Grupo</span></div>)}
+                    <div className="flex-1 overflow-y-auto"><CreateGroupView user={user} onBack={() => setGruposSection('mis-grupos')} /></div>
                 </div>
             );
             if (gruposSection === 'descubrir') return (
@@ -435,12 +442,12 @@ export function MisContactosPageContent() {
                     <div className="bg-green-600 px-4 py-3 flex-shrink-0">
                         <div className="flex items-center justify-between">
                             <div><h1 className="text-white font-bold text-base leading-tight">{activeTab === 'chats' && 'Mis Contactos'}{activeTab === 'estados' && 'Estados'}{activeTab === 'canales' && 'Canales'}{activeTab === 'grupos' && 'Grupos'}</h1><p className="text-white/80 text-xs">Mensajería inmobiliaria</p></div>
-                            {activeTab === 'estados' && <button onClick={() => setShowNewStatus(true)} className="bg-white/15 hover:bg-white/25 text-white text-xs px-3 py-1.5 rounded-full transition-colors font-medium">+ Estado</button>}
+                            {activeTab === 'estados' && <button onClick={() => setStatusSection('crear')} className="bg-white/15 hover:bg-white/25 text-white text-xs px-3 py-1.5 rounded-full transition-colors font-medium">+ Estado</button>}
                         </div>
                     </div>
                     <div className="flex-1 overflow-hidden bg-white">
                         {activeTab === 'chats' && <ChatsPanel user={user} selectedChatId={selectedChatId} setSelectedChatId={setSelectedChatId} />}
-                        {activeTab === 'estados' && <EstadosPanel user={user} onNewStatus={() => setShowNewStatus(true)} onStatusSelect={setSelectedStatusId} selectedStatusId={selectedStatusId} />}
+                        {activeTab === 'estados' && <EstadosPanel user={user} onNewStatus={() => setStatusSection('crear')} onStatusSelect={setSelectedStatusId} selectedStatusId={selectedStatusId} />}
                         {activeTab === 'canales' && <CanalesListPanel user={user} onChannelSelect={setSelectedChannel} activeSection={channelsSection} onSectionChange={setChannelsSection} />}
                         {activeTab === 'grupos' && <GruposListPanel user={user} onGroupSelect={(group) => { setSelectedGroup(group); }} activeSection={gruposSection} onSectionChange={(s) => { setGruposSection(s); setSelectedGroup(null); }} />}
                     </div>
@@ -493,7 +500,6 @@ export function MisContactosPageContent() {
                     <img src={viewingImage} alt="" className="max-w-[92vw] max-h-[90vh] object-contain select-none shadow-2xl rounded-lg" onClick={(e) => e.stopPropagation()} />
                 </div>
             )}
-            {showNewStatus && <NewStatusModal onClose={() => setShowNewStatus(false)} userRole={user?.role} />}
         </div>
     );
 }

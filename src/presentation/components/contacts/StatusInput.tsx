@@ -214,17 +214,33 @@ export default function StatusInput({
         </div>
       </div>
 
-      {/* Preview */}
+      {/* Preview - Estilo Facebook */}
       {content.trim() && (
-        <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Vista previa:</p>
-          <div className={`p-3 rounded-lg text-sm leading-relaxed ${getTextStyleClass()}`}
-            style={{ backgroundColor: customColor + '15', borderLeft: `4px solid ${customColor}` }}>
-            {content}
+        <div className="mt-4 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-600 shadow-md">
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-4 pt-3 pb-1 bg-gray-50 dark:bg-gray-700">Vista previa:</p>
+          <div 
+            className="flex flex-col items-center justify-center min-h-[200px] p-8 text-center"
+            style={{ backgroundColor: customColor || '#14b8a6' }}
+          >
+            <div className={`
+              text-white leading-relaxed max-w-sm
+              ${textStyle === 'BOLD' ? 'font-bold' : ''}
+              ${textStyle === 'ITALIC' ? 'italic' : ''}
+              ${textStyle === 'COLORFUL' ? 'text-yellow-200' : ''}
+              ${textStyle === 'CODE' ? 'font-mono' : ''}
+              ${textStyle === 'HIGHLIGHT' ? 'bg-white/20 px-2 py-1 rounded-lg' : ''}
+              ${(!textStyle || textStyle === 'NORMAL') ? 'font-medium' : 'font-medium'}
+              ${content.length < 30 ? 'text-2xl sm:text-3xl' : ''}
+              ${content.length >= 30 && content.length < 80 ? 'text-xl sm:text-2xl' : ''}
+              ${content.length >= 80 && content.length < 150 ? 'text-lg sm:text-xl' : ''}
+              ${content.length >= 150 ? 'text-sm sm:text-base' : ''}
+            `}>
+              {content}
+            </div>
             {(location || propertyType) && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {location && <span className="text-xs bg-white px-2 py-1 rounded-full">{location}</span>}
-                {propertyType && <span className="text-xs bg-white px-2 py-1 rounded-full">{propertyType}</span>}
+              <div className="flex flex-wrap justify-center gap-2 mt-4">
+                {location && <span className="inline-flex items-center gap-1 text-xs bg-white/20 text-white px-3 py-1.5 rounded-full backdrop-blur-sm font-medium">📍 {location}</span>}
+                {propertyType && <span className="inline-flex items-center gap-1 text-xs bg-white/20 text-white px-3 py-1.5 rounded-full backdrop-blur-sm font-medium">🏠 {propertyType}</span>}
               </div>
             )}
           </div>

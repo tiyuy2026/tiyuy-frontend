@@ -86,7 +86,7 @@ export const metadata: Metadata = {
   category: 'bienes raíces',
   classification: 'Bienes Raíces, Inmobiliaria, Propiedades',
   icons: {
-    icon: '/tiyuy.svg',
+    icon: '/tiyuy.ico',
     apple: '/tiyuy.svg',
   },
   appleWebApp: {

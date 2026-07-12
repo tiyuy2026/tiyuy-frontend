@@ -31,10 +31,19 @@ export default function EstadosPanel({ user, onNewStatus, onStatusSelect, select
 }) {
     const [shareTarget, setShareTarget] = useState<{ title: string; link: string } | null>(null);
     const [locationFilter, setLocationFilter] = useState('');
+    const [debouncedLocation, setDebouncedLocation] = useState('');
     const shareStatus = useShareStatusPost();
 
+    // Debounce para el filtro de ubicación
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedLocation(locationFilter);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [locationFilter]);
+
     const { data: statusData, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetActiveStatusPosts({
-        location: locationFilter || undefined,
+        location: debouncedLocation || undefined,
     });
 
     const allPosts = statusData?.pages?.flatMap((p: any) => p.content) ?? [];

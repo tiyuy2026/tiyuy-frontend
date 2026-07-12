@@ -241,10 +241,9 @@ export function useCreateStatusPost() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: any) => {
-      const token = localStorage.getItem('tiyuy-auth-token') || localStorage.getItem('token') || '';
-      return apiCall('/contacts/extended/status', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: JSON.stringify(data) });
+      return apiCall('/contacts/extended/status', { method: 'POST', body: JSON.stringify(data) });
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['status-posts'] }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['status-posts'] }); toast.success('Estado publicado correctamente'); },
     onError: (error: any) => { toast.error(error.message || 'Error al publicar estado'); },
   });
 }
@@ -287,7 +286,7 @@ export function useCommentStatusPost(statusPostId: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ content, replyToCommentId }: { content: string; replyToCommentId?: number }) => apiCall(`/contacts/extended/status/${statusPostId}/comments`, { method: 'POST', body: JSON.stringify({ content, ...(replyToCommentId && { replyToCommentId }) }) }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['status-comments', statusPostId] }); queryClient.invalidateQueries({ queryKey: ['status-posts'] }); toast.success('Comentario publicado'); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['status-comments', statusPostId] }); queryClient.invalidateQueries({ queryKey: ['status-posts'] }); },
     onError: () => toast.error('Error al publicar comentario'),
   });
 }
@@ -313,7 +312,6 @@ export function useLikeComment() {
         return old.map((comment: any) => comment.id === commentId ? { ...comment, hasUserLiked: data.isCurrentlyActive, likeCount: data.isCurrentlyActive ? (comment.likeCount || 0) + 1 : Math.max((comment.likeCount || 0) - 1, 0) } : comment);
       });
       queryClient.invalidateQueries({ queryKey: ['status-comments'] });
-      toast.success(data.isCurrentlyActive ? 'Like!' : 'Like eliminado');
     },
     onError: () => toast.error('Error al dar like'),
   });
@@ -584,7 +582,7 @@ export function useCreateChannelComment() {
       if (replyToCommentId) body.replyToCommentId = replyToCommentId;
       return await apiCall(`/contacts/extended/channels/${channelId}/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify(body) });
     },
-    onSuccess: (_, variables) => { queryClient.invalidateQueries({ queryKey: ['channel-comments', variables.channelId, variables.postId] }); queryClient.invalidateQueries({ queryKey: ['channel-posts'] }); toast.success('Comentario agregado'); },
+    onSuccess: (_, variables) => { queryClient.invalidateQueries({ queryKey: ['channel-comments', variables.channelId, variables.postId] }); queryClient.invalidateQueries({ queryKey: ['channel-posts'] }); },
     onError: () => { toast.error('Error al agregar comentario'); },
   });
 }
@@ -599,7 +597,6 @@ export function useLikeChannelComment() {
         return old.map((comment: any) => comment.id === commentId ? { ...comment, likeCount: data.likeCount, hasUserLiked: data.isCurrentlyActive, isLiked: data.isCurrentlyActive } : comment);
       });
       queryClient.invalidateQueries({ queryKey: ['channel-comments'] });
-      toast.success(data.isCurrentlyActive ? 'Like!' : 'Like eliminado');
     },
     onError: () => { toast.error('Error al dar like'); }
   });

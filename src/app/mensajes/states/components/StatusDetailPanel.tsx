@@ -211,9 +211,9 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
   };
 
   const siteUrl = window.location.origin;
-  const shareLink = status.shareLink || `status-${status.id}`;
-  const shareUrl = `${siteUrl}/public/view/status/${shareLink}`;
-  const shareText = `Mira este estado de ${status.user?.name || status.userName || 'Usuario'}: ${status.content?.substring(0, 100)}...`;
+  const shareId = status.shareLink || status.id || '';
+  const shareUrl = `${siteUrl}/public/view/status/${shareId}`;
+  const shareText = `Mira este estado de ${status.userName || status.user?.name || 'Usuario'} en Tiyuy: ${status.content?.substring(0, 120)}...`;
   const encoded = encodeURIComponent(`${shareText} ${shareUrl}`);
 
   return (
@@ -246,18 +246,59 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
         </div>
       </div>
 
-      {/* Contenido del estado + botones en fondo blanco */}
-      <div className="border-b border-gray-100 dark:border-gray-700 p-4">
-        <div className="mb-4">
-          <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap text-sm">{status.content}</p>
+      {/* Contenido del estado - estilo Facebook */}
+      <div 
+        className="flex flex-col items-center justify-center min-h-[300px] sm:min-h-[400px] p-6 sm:p-10 text-center"
+        style={{ 
+          backgroundColor: status.customColor || '#14b8a6',
+        }}
+      >
+        <div className="max-w-md w-full mx-auto">
+          {/* Texto del estado con auto-sizing y estilo de texto */}
+          <div className={`
+            text-white leading-relaxed
+            ${status.textStyle === 'BOLD' ? 'font-bold' : ''}
+            ${status.textStyle === 'ITALIC' ? 'italic' : ''}
+            ${status.textStyle === 'COLORFUL' ? 'text-yellow-200' : ''}
+            ${status.textStyle === 'CODE' ? 'font-mono' : ''}
+            ${status.textStyle === 'HIGHLIGHT' ? 'bg-white/20 px-2 py-1 rounded-lg' : ''}
+            ${(!status.textStyle || status.textStyle === 'NORMAL') ? 'font-medium' : 'font-medium'}
+            ${status.content?.length < 30 ? 'text-3xl sm:text-4xl' : ''}
+            ${status.content?.length >= 30 && status.content?.length < 80 ? 'text-2xl sm:text-3xl' : ''}
+            ${status.content?.length >= 80 && status.content?.length < 150 ? 'text-xl sm:text-2xl' : ''}
+            ${status.content?.length >= 150 ? 'text-base sm:text-lg' : ''}
+          `}>
+            {status.content}
+          </div>
+          
+          {/* Metadatos del estado */}
+          <div className="flex items-center justify-center gap-3 mt-6 flex-wrap">
+            {status.location && (
+              <span className="inline-flex items-center gap-1.5 text-xs bg-white/20 text-white px-3 py-1.5 rounded-full backdrop-blur-sm font-medium">
+                📍 {status.location}
+              </span>
+            )}
+            {status.propertyType && (
+              <span className="inline-flex items-center gap-1.5 text-xs bg-white/20 text-white px-3 py-1.5 rounded-full backdrop-blur-sm font-medium">
+                🏠 {status.propertyType}
+              </span>
+            )}
+          </div>
+
           {status.tags && status.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="flex flex-wrap justify-center gap-2 mt-4">
               {status.tags.map((tag: string, index: number) => (
-                <span key={index} className="px-2 py-0.5 bg-brand/10 text-brand text-[10px] rounded-full font-medium">#{tag}</span>
+                <span key={index} className="px-2.5 py-1 bg-white/15 text-white/90 text-[11px] rounded-full font-medium backdrop-blur-sm">
+                  #{tag}
+                </span>
               ))}
             </div>
           )}
         </div>
+      </div>
+
+      {/* Acciones */}
+      <div className="border-b border-gray-100 dark:border-gray-700 p-4">
 
         <div className="flex items-center gap-6">
           <button onClick={handleLike} className={`flex items-center gap-2 text-sm font-medium transition-colors ${isLiked ? 'text-red-600' : 'text-gray-600 hover:text-red-600'}`}>
@@ -273,31 +314,37 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
               {shareCount > 0 && <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{shareCount}</span>}
             </button>
             {showShareModal && (
-              <div className="absolute left-[calc(100%+24px)] top-0 z-50 w-[255px]">
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-600">
-                  <div className="bg-brand px-3 py-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-white font-semibold text-xs">Compartir</h3>
-                      <button onClick={() => setShowShareModal(false)} className="text-white/70 hover:text-white w-5 h-5 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-sm leading-none">×</button>
-                    </div>
+              <div className="absolute left-[calc(100%+24px)] top-0 z-50 w-[220px]">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border-0">
+                  <div className="p-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-700">
+                    <h3 className="text-sm font-bold text-gray-800 dark:text-white">Compartir</h3>
+                    <button onClick={() => setShowShareModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
-                  <div className="p-2">
-                    <div className="flex gap-1.5">
+                  <div className="p-3">
+                    <div className="grid grid-cols-3 gap-2">
                       <button onClick={() => { navigator.clipboard.writeText(`${shareText} ${shareUrl}`); setShowShareModal(false); }}
-                        className="flex flex-col items-center gap-0.5 py-1.5 flex-1 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                        <div className="w-7 h-7 bg-gray-600 rounded-full flex items-center justify-center"><Copy className="w-3.5 h-3.5 fill-white" /></div>
-                        <span className="text-[9px] text-gray-700 dark:text-gray-300 font-medium">Copiar</span>
+                        className="flex flex-col items-center gap-2 py-3 px-2 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center shadow-sm">
+                          <Copy className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="text-[10px] font-semibold text-gray-600 dark:text-gray-300">Copiar</span>
                       </button>
                       <a href={`https://wa.me/?text=${encoded}`} target="_blank" rel="noopener noreferrer"
-                        className="flex flex-col items-center gap-0.5 py-1.5 flex-1 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                        <div className="w-7 h-7 bg-green-500 rounded-full flex items-center justify-center"><MessageCircle className="w-3.5 h-3.5 fill-white" /></div>
-                        <span className="text-[9px] text-green-700 font-medium">WhatsApp</span>
+                        className="flex flex-col items-center gap-2 py-3 px-2 bg-green-50 dark:bg-green-900/20 rounded-xl hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center shadow-sm">
+                          <Icon icon="fa6-brands:whatsapp" className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="text-[10px] font-semibold text-green-700 dark:text-green-400">WhatsApp</span>
                       </a>
                       <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`}
                         target="_blank" rel="noopener noreferrer" onClick={() => setShowShareModal(false)}
-                        className="flex flex-col items-center gap-0.5 py-1.5 flex-1 bg-brand/10 rounded-lg hover:bg-brand/20 transition-colors border border-blue-100">
-                        <div className="w-7 h-7 bg-brand rounded-full flex items-center justify-center"><Icon icon="mdi:facebook" className="w-3.5 h-3.5 fill-white" /></div>
-                        <span className="text-[9px] text-brand-dark font-bold">Facebook</span>
+                        className="flex flex-col items-center gap-2 py-3 px-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-sm">
+                          <Icon icon="fa6-brands:facebook" className="w-5 h-5 text-white" />
+                        </div>
+                        <span className="text-[10px] font-semibold text-blue-700 dark:text-blue-400">Facebook</span>
                       </a>
                     </div>
                   </div>
