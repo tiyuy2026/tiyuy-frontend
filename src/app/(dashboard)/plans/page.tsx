@@ -510,12 +510,18 @@ export default function PlansPage() {
                   >
                     {plans.map((plan) => {
                       const backendTier = activeSubscription ? activeSubscription.plan?.id : null;
+                      // El campo tier de la suscripción (ej: "CUSTOM", "BASIC", "PREMIUM")
+                      const subscriptionTier = activeSubscription ? ((activeSubscription as any).tier || activeSubscription.plan?.id) : null;
                       const planIdToTier: Record<string, string> = {
                         '1': 'FREE', '2': 'BASIC', '3': 'PREMIUM',
                         '4': 'ENTERPRISE_TRIAL', '5': 'ENTERPRISE'
                       };
                       const planTierCode = planIdToTier[plan.id] || plan.id;
-                      const isActive = !activeSubscription ? planTierCode === 'FREE' : backendTier === planTierCode;
+                      // Comparar contra subscriptionTier (que tiene el valor real de la BD como "CUSTOM", "BASIC", etc.)
+                      // y también contra backendTier por compatibilidad
+                      const isActive = activeSubscription 
+                        ? (subscriptionTier === planTierCode || backendTier === plan.id || backendTier === planTierCode)
+                        : planTierCode === 'FREE';
                       const isExhausted = isPlanExhausted(plan);
                       const intelligentDiscount = detectIntelligentDiscount(plan);
                       let finalDiscountCode = '';
