@@ -814,6 +814,7 @@ export function Header() {
                     <div className="py-1">
                       <Link
                         href="/dashboard"
+                        onClick={() => setShowUserMenu(false)}
                         className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
                       >
                         <Home className="w-4 h-4" />
@@ -821,6 +822,7 @@ export function Header() {
                       </Link>
                       <Link
                         href="/my-properties"
+                        onClick={() => setShowUserMenu(false)}
                         className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
                       >
                         <Building className="w-4 h-4" />
@@ -829,6 +831,7 @@ export function Header() {
                       {user?.role && !['USER', 'AGENT'].includes(user.role) && (
                         <Link
                           href="/my-projects"
+                          onClick={() => setShowUserMenu(false)}
                           className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
                         >
                           <FolderGit className="w-4 h-4" />
@@ -838,6 +841,7 @@ export function Header() {
 
                       <Link
                         href="/mensajes"
+                        onClick={() => setShowUserMenu(false)}
                         className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
                       >
                         <MessageSquare className="w-4 h-4" />
@@ -845,6 +849,7 @@ export function Header() {
                       </Link>
                       <Link
                         href="/notifications"
+                        onClick={() => setShowUserMenu(false)}
                         className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
                       >
                         <Bell className="w-4 h-4" />
@@ -854,6 +859,7 @@ export function Header() {
                       {adminRoleType && (
                         <Link
                           href="/admin"
+                          onClick={() => setShowUserMenu(false)}
                           className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg mt-1 border-t border-gray-100 pt-2"
                         >
                           <Shield className="w-4 h-4" />

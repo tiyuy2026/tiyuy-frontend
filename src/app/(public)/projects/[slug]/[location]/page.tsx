@@ -148,7 +148,7 @@ export default async function ProjectsCategoryPage({ params, searchParams }: Pro
   const filters: any = {
     sort: 'createdAt,desc',
     page: resolvedSearchParams.page ? Number(resolvedSearchParams.page) : 0,
-    size: 9,
+    size: 15,
     ...(projectType ? { type: projectType } : {}),
     ...(isAllPeru ? {} : isMainProvince ? { province: location } : { district: location }),
     ...(isFiltered

@@ -236,12 +236,16 @@ export function ChatsPanel({ user, selectedChatId, setSelectedChatId }: { user: 
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="bg-transparent text-sm text-gray-700 placeholder-gray-400 flex-1 focus:outline-none pr-20"
                             />
-                            {/* Botón de filtro dentro del input */}
+                            {/* Botón de filtro dentro del input - con texto visible */}
                             <button
                                 onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                                className="absolute right-2 top-1/2 transform -translate-y-1/2 px-2 py-1 bg-white rounded-full text-xs text-gray-600 hover:bg-gray-50 border border-gray-200"
+                                className={`absolute right-2 top-1/2 transform -translate-y-1/2 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+                                    searchType !== 'all' 
+                                        ? 'bg-brand text-white border-brand' 
+                                        : 'bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200'
+                                }`}
                             >
-                                ️
+                                {searchType !== 'all' ? searchType === 'name' ? 'Nombre' : searchType === 'property' ? 'Prop.' : searchType === 'district' ? 'Distrito' : 'Tel.' : 'Filtro'}
                             </button>
 
                             {/* Dropdown de filtros */}

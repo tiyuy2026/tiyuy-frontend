@@ -134,6 +134,76 @@ function useUpdateEmail() {
   });
 }
 
+// Dropdown personalizado para zona horaria
+function StyledTimezoneDropdown({ value, onChange, options }: {
+  value: string;
+  onChange: (val: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const selectedLabel = options.find(o => o.value === value)?.label || 'Seleccionar...';
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent flex items-center justify-between cursor-pointer transition-all"
+      >
+        <span>{selectedLabel}</span>
+        <svg className={`w-4 h-4 text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-60 overflow-y-auto">
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`w-full px-4 py-3 text-sm text-left transition-colors cursor-pointer flex items-center gap-3 ${
+                value === opt.value
+                  ? 'bg-teal-50 text-teal-700 font-semibold'
+                  : 'text-gray-700 hover:bg-teal-50/50 hover:text-teal-700'
+              }`}
+              onClick={() => {
+                onChange(opt.value);
+                setOpen(false);
+              }}
+            >
+              <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                value === opt.value
+                  ? 'border-teal-500 bg-teal-500'
+                  : 'border-gray-300 bg-white'
+              }`}>
+                {value === opt.value && (
+                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </span>
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const { user: authUser } = useAuthStore();
   const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser();
@@ -534,18 +604,14 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-4">Zona Horaria</h3>
-                  <div className="space-y-4">
+              <div className="space-y-4">
                     <div>
                       <label className="text-sm text-gray-600 mb-1 block font-medium">Zona Horaria</label>
-                      <select
+                      <StyledTimezoneDropdown
                         value={timezone}
-                        onChange={(e) => setTimezone(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all"
-                      >
-                        {timezones.map((tz) => (
-                          <option key={tz.value} value={tz.value}>{tz.label}</option>
-                        ))}
-                      </select>
+                        onChange={setTimezone}
+                        options={timezones}
+                      />
                     </div>
                     <p className="text-xs text-gray-500">Se usara para mostrar fechas y horas correctamente.</p>
                   </div>

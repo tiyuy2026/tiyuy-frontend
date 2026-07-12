@@ -643,39 +643,39 @@ export default function PlansPage() {
                            ¿Tienes un código de descuento personal?
                          </h3>
                        </div>
-                       <div className="flex gap-2">
-                         <input
-                           type="text"
-                           value={manualDiscountCode}
-                           onChange={(e) => setManualDiscountCode(e.target.value.toUpperCase())}
-                           placeholder="Ingresa tu código (ej: DESCUENTO20)"
-                           className="flex-1 px-4 py-2 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm uppercase"
-                           disabled={appliedManualDiscount?.valid || isValidatingManual}
-                         />
-                         <button
-                           onClick={handleValidateManualDiscount}
-                           disabled={!manualDiscountCode.trim() || isValidatingManual || appliedManualDiscount?.valid}
-                           className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-                             appliedManualDiscount?.valid
-                               ? 'bg-green-500 text-white cursor-default'
-                               : selectedPlan?.name === 'PREMIUM' ? 'bg-purple-100 text-purple-800' : 'bg-yellow-600 text-white hover:bg-yellow-700 disabled:bg-gray-300 disabled:cursor-not-allowed'
-                           }`}
-                         >
-                           {isValidatingManual ? (
-                             <span className="flex items-center gap-1">
-                               <Icon icon="line-md:loading-loop" className="w-4 h-4" />
-                               Validando...
-                             </span>
-                           ) : appliedManualDiscount?.valid ? (
-                             <span className="flex items-center gap-1">
-                               <Icon icon="material-symbols:check-rounded" className="w-4 h-4" />
-                               Aplicado
-                             </span>
-                           ) : (
-                             'Aplicar'
-                           )}
-                         </button>
-                       </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  value={manualDiscountCode}
+                  onChange={(e) => setManualDiscountCode(e.target.value.toUpperCase())}
+                  placeholder="Ingresa tu código (ej: DESCUENTO20)"
+                  className="w-full sm:flex-1 px-4 py-2 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm uppercase"
+                  disabled={appliedManualDiscount?.valid || isValidatingManual}
+                />
+                <button
+                  onClick={handleValidateManualDiscount}
+                  disabled={!manualDiscountCode.trim() || isValidatingManual || appliedManualDiscount?.valid}
+                  className={`w-full sm:w-auto px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${
+                    appliedManualDiscount?.valid
+                      ? 'bg-green-500 text-white cursor-default'
+                      : selectedPlan?.name === 'PREMIUM' ? 'bg-purple-100 text-purple-800' : 'bg-yellow-600 text-white hover:bg-yellow-700 disabled:bg-gray-300 disabled:cursor-not-allowed'
+                  }`}
+                >
+                  {isValidatingManual ? (
+                    <span className="flex items-center gap-1 justify-center">
+                      <Icon icon="line-md:loading-loop" className="w-4 h-4" />
+                      Validando...
+                    </span>
+                  ) : appliedManualDiscount?.valid ? (
+                    <span className="flex items-center gap-1 justify-center">
+                      <Icon icon="material-symbols:check-rounded" className="w-4 h-4" />
+                      Aplicado
+                    </span>
+                  ) : (
+                    'Aplicar'
+                  )}
+                </button>
+              </div>
                        {appliedManualDiscount?.valid && (
                          <p className="text-sm text-green-600 mt-2 flex items-center gap-1">
                            <Icon icon="material-symbols:info-rounded" className="w-4 h-4" />
@@ -698,12 +698,12 @@ export default function PlansPage() {
                <button
                  onClick={handleSubscribe}
                  disabled={subscribeMutation.isPending}
-                 className={`bg-[var(--brand-primary)] text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-[var(--brand-primary-hover)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg ${
+                 className={`bg-[var(--brand-primary)] text-white px-4 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-sm sm:text-lg hover:bg-[var(--brand-primary-hover)] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg w-full sm:w-auto ${
                    !subscribeMutation.isPending ? 'cursor-pointer' : ''
                  }`}
                >
                  {subscribeMutation.isPending ? (
-                   <span className="flex items-center gap-2">
+                   <span className="flex items-center gap-2 justify-center">
                      <Icon icon="line-md:loading-loop" className="w-5 h-5" />
                      Procesando...
                    </span>
@@ -716,17 +716,17 @@ export default function PlansPage() {
                      return (
                        <div className="flex flex-col items-center">
                          {hasDiscount && (
-                           <div className="text-sm line-through text-gray-300 mb-1">
+                           <div className="text-xs sm:text-sm line-through text-gray-300 mb-1">
                              S/ {originalPrice.toLocaleString('es-PE')}
                            </div>
                          )}
-                         <div className="flex items-center gap-2">
-                           <span>Suscribirse al Plan {selectedPlan.name}</span>
-                           <span className="font-bold">
-                             - S/ {discountedPrice.toLocaleString('es-PE')}
+                         <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
+                           <span className="text-xs sm:text-base whitespace-nowrap">Suscribirse al Plan {selectedPlan.name}</span>
+                           <span className="font-bold text-xs sm:text-base">
+                             S/ {discountedPrice.toLocaleString('es-PE')}
                            </span>
                            {hasDiscount && (
-                             <span className="bg-white text-[var(--brand-primary)] text-xs px-2 py-1 rounded-full font-bold">
+                             <span className="bg-white text-[var(--brand-primary)] text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
                                {Math.round((1 - discountedPrice / originalPrice) * 100)}% OFF
                              </span>
                            )}

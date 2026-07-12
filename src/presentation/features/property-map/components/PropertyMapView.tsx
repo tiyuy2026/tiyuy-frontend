@@ -175,6 +175,7 @@ export function PropertyMapView({
 
       const isProject = item.type === 'PROJECT';
       const detailSlug = item.metadata?.slug || item.slug || item.id;
+      // La ruta correcta es /property/{slug}
       const detailUrl = isProject ? `/projects/${detailSlug}` : `/property/${detailSlug}`;
       
       const marker = L.marker([item.latitude, item.longitude], {
@@ -186,33 +187,44 @@ export function PropertyMapView({
         }),
       });
 
-      // Popup con imagen de la propiedad y botón "Ver"
+      // Popup responsivo para mobile (imagen centrada sin desbordarse, botón compacto)
+      const fallbackIcon = isProject ? '&#x1F3D7;&#xFE0F;' : '&#x1F3E0;';
+      
+      // Contenedor de imagen: ancho completo del popup, alto fijo 120px, sin desbordamiento
+      // La imagen se escala para llenar el ancho pero limitada a 120px de alto
+      let imageSection: string;
+      if (item.imageUrl) {
+        const featuredHtml = item.isFeatured 
+          ? '<div style="position:absolute;top:4px;left:4px;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;font-size:8px;font-weight:700;padding:1px 6px;border-radius:20px;z-index:2;line-height:16px;">Destacado</div>'
+          : '';
+        imageSection = `
+          <div style="position:relative;width:100%;height:120px;background:#f3f4f6;overflow:hidden;flex-shrink:0;">
+            <img src="${item.imageUrl}" alt="" style="width:100%;height:120px;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:120px;font-size:36px\\'>${fallbackIcon}</div>'">
+            ${featuredHtml}
+          </div>`;
+      } else {
+        imageSection = `<div style="width:100%;height:120px;display:flex;align-items:center;justify-content:center;background:#f3f4f6;flex-shrink:0;"><span style="font-size:36px;line-height:120px">${fallbackIcon}</span></div>`;
+      }
+
       const popupHtml = `
-        <div class="map-property-popup" style="width: 220px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-radius: 12px; overflow: hidden;">
-          <a href="${detailUrl}" target="_self" style="text-decoration: none; color: inherit; display: block;">
-            <div style="position: relative; width: 100%; height: 130px; overflow: hidden; background: #f3f4f6;">
-              ${item.imageUrl 
-                ? `<img src="${item.imageUrl}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;" 
-                      onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;font-size:32px\\'>${isProject ? '🏗️' : '🏠'}</div>'" />`
-                : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:32px">${isProject ? '🏗️' : '🏠'}</div>`
-              }
-              ${item.isFeatured ? '<div style="position:absolute;top:6px;left:6px;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;">Destacado</div>' : ''}
-            </div>
-            <div style="padding: 10px 12px;">
-              <div style="font-size: 13px; font-weight: 700; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">
+        <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;border-radius:12px;overflow:hidden;max-width:100%;">
+          <a href="${detailUrl}" target="_self" style="text-decoration:none;color:inherit;display:block;">
+            ${imageSection}
+            <div style="padding:8px 10px;">
+              <div style="font-size:12px;font-weight:700;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;">
                 ${item.title || `${isProject ? 'Proyecto' : item.type} en ${item.district}`}
               </div>
-              <div style="font-size: 11px; color: #6b7280; margin-bottom: 6px;">
-                ${item.district}${item.province ? `, ${item.province}` : ''}
+              <div style="font-size:10px;color:#6b7280;margin-bottom:4px;">
+                ${item.district}${item.province ? ', ' + item.province : ''}
               </div>
-              <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: #6b7280; margin-bottom: 6px;">
+              <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#6b7280;margin-bottom:4px;flex-wrap:wrap;">
                 ${item.metadata?.bedrooms ? `<span>🛏️ ${item.metadata.bedrooms}</span>` : ''}
                 ${item.metadata?.bathrooms ? `<span>🚿 ${item.metadata.bathrooms}</span>` : ''}
                 ${item.metadata?.area ? `<span>📐 ${item.metadata.area}m²</span>` : ''}
               </div>
-              <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="font-size: 14px; font-weight: 800; color: #059669;">${formatPrice(item.price, item.currency)}</span>
-                <span style="font-size: 11px; font-weight: 600; color: white; background: #059669; padding: 4px 12px; border-radius: 6px;">Ver más</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding-top:3px;border-top:1px solid #f3f4f6;">
+                <span style="font-size:13px;font-weight:800;color:#059669;">${formatPrice(item.price, item.currency)}</span>
+                <span style="font-size:10px;font-weight:600;color:white;background:#059669;padding:4px 10px;border-radius:6px;white-space:nowrap;">Ver m&aacute;s</span>
               </div>
             </div>
           </a>
@@ -220,8 +232,8 @@ export function PropertyMapView({
       `;
 
       marker.bindPopup(popupHtml, {
-        maxWidth: 240,
-        minWidth: 220,
+        maxWidth: 260,
+        minWidth: 200,
         className: 'map-property-popup-container',
         closeButton: true,
       });
