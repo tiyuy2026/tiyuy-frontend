@@ -49,9 +49,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           height: 630,
           alt: property.title,
         }] : [{
-          url: '/assets/images/logo.png',
-          width: 512,
-          height: 512,
+          url: '/tiyuy.svg',
+          width: 443,
+          height: 433,
           alt: 'TIYUY',
         }],
       },
@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: property.coverPhotoUrl ? [{
           url: property.coverPhotoUrl,
           alt: property.title,
-        }] : ['/assets/images/logo.png'],
+        }] : ['/tiyuy.svg'],
       },
       alternates: {
         canonical: propertyUrl,

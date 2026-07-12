@@ -61,9 +61,9 @@ export const metadata: Metadata = {
       'Plataforma líder de bienes raíces en Perú. Departamentos, casas, terrenos y locales en venta y alquiler.',
     images: [
       {
-        url: '/assets/images/logo.png',
-        width: 512,
-        height: 512,
+        url: '/tiyuy.svg',
+        width: 443,
+        height: 433,
         alt: 'TIYUY - Bienes Raíces',
       },
     ],
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     title: 'TIYUY - Encuentra tu hogar ideal en Perú',
     description:
       'Plataforma líder de bienes raíces en Perú. Departamentos, casas, terrenos y locales en venta y alquiler.',
-    images: ['/assets/images/logo.png'],
+    images: ['/tiyuy.svg'],
     creator: '@tiyuy',
   },
   alternates: {
@@ -87,7 +87,7 @@ export const metadata: Metadata = {
   classification: 'Bienes Raíces, Inmobiliaria, Propiedades',
   icons: {
     icon: '/tiyuy.svg',
-    apple: '/assets/images/logo.png',
+    apple: '/tiyuy.svg',
   },
   appleWebApp: {
     capable: true,
@@ -108,7 +108,7 @@ const jsonLd = {
   '@type': 'RealEstateOrganization',
   name: 'TIYUY',
   url: baseUrl,
-  logo: `${baseUrl}/assets/images/logo.png`,
+  logo: `${baseUrl}/tiyuy.svg`,
   description:
     'Plataforma líder de bienes raíces en Perú. Encuentra y publica propiedades en venta y alquiler.',
   address: {

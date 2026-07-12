@@ -492,7 +492,7 @@ export function GitHubSidebar() {
           {isExpanded && (
             <div className="flex items-center gap-3">
               <img
-                src="/assets/images/logo.png"
+                src="/assets/images/logo.svg"
                 alt="TIYUY"
                 className="h-8 w-auto object-contain"
               />

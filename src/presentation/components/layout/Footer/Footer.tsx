@@ -121,7 +121,7 @@ export function Footer() {
                {/* Contenedor del logo */}
                <div className="relative bg-white p-1 rounded-lg shadow-xl flex items-center justify-center transform group-hover/logo:-translate-y-1 transition duration-300">
                  <img
-                   src="/assets/images/logo.png"
+                  src="/assets/images/logo.svg"
                    alt="TIYUY"
                    className="h-12 sm:h-14 w-auto object-contain"
                  />

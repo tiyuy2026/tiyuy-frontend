@@ -190,8 +190,8 @@ export function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
           {/* Tiyuy Logo - hidden on very small screens, visible on sm+ */}
           <Link href="/admin" className="hidden sm:flex items-center hover:opacity-80 transition shrink-0">
             <img 
-              src="/assets/images/logo_s.png" 
-              alt="Tiyuy Logo" 
+              src="/assets/images/logo_s.svg"
+              alt="Tiyuy Logo"
               className="h-10 sm:h-12 md:h-14 w-auto object-contain"
             />
           </Link>

@@ -77,7 +77,7 @@ export default function PublicViewPage() {
       <header className="bg-white border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/assets/images/logo.png" alt="TIYUY" className="h-8 w-auto" />
+            <img src="/assets/images/logo.svg" alt="TIYUY" className="h-8 w-auto" />
           </Link>
           {!isAuthenticated && (
             <button onClick={() => router.push('/profile-selector')}

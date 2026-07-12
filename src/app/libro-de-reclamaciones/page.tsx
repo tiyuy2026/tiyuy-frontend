@@ -139,7 +139,7 @@ export default function LibroReclamacionesPage() {
         <div className="bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-700 rounded-t-lg p-6 text-center relative">
           <div className="absolute right-6 top-1/2 -translate-y-1/2">
             <img 
-              src="/assets/images/logo_s.png" 
+              src="/assets/images/logo_s.svg"
               alt="TIYUY" 
               className="h-12 w-auto dark:brightness-110"
             />

@@ -234,10 +234,10 @@ export function Header() {
             {/* LOGO */}
             <Link href="/" className="flex items-center flex-shrink-0 -ml-2">
               <img
-                src="/assets/images/logo.png"
+                src="/assets/images/logo.svg"
                 alt="TIYUY"
-                className="h-16 w-auto object-contain sm:h-20"
-                style={{ maxWidth: '240px' }}
+                className="h-20 w-auto object-contain sm:h-24"
+                style={{ maxWidth: '280px' }}
               />
             </Link>
 
