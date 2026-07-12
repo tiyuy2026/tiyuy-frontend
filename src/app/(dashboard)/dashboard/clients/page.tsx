@@ -75,46 +75,46 @@ export default function CRMDashboardPage() {
               </div>
 
               {/* Tabs - scrollable en mobile */}
-              <div className="overflow-x-auto scrollbar-hide -mr-4 sm:mr-0">
+              <div className="overflow-x-auto overflow-y-hidden scrollbar-hide -mr-4 pr-4 sm:mr-0 sm:pr-0 ml-auto">
                 <div className="flex items-center gap-1 bg-[var(--bg-tertiary)] rounded-lg p-0.5 w-max">
                   <button
                     onClick={() => setActiveTab('principal')}
                     className={`
-                      flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 whitespace-nowrap
+                      flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all duration-200 whitespace-nowrap
                       ${activeTab === 'principal'
                         ? 'bg-[var(--bg-card)] text-teal-600 shadow-sm'
                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                       }
                     `}
                   >
-                    <Users className="w-3.5 h-3.5" />
-                    Principal
+                    <Users className="w-3 h-3" />
+                    Ppal
                   </button>
                   <button
                     onClick={() => setActiveTab('estadisticas')}
                     className={`
-                      flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 whitespace-nowrap
+                      flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all duration-200 whitespace-nowrap
                       ${activeTab === 'estadisticas'
                         ? 'bg-[var(--bg-card)] text-teal-600 shadow-sm'
                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                       }
                     `}
                   >
-                    <BarChart3 className="w-3.5 h-3.5" />
-                    Estadísticas
+                    <BarChart3 className="w-3 h-3" />
+                    Stats
                   </button>
                   <button
                     onClick={() => setActiveTab('avanzado')}
                     className={`
-                      flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 whitespace-nowrap
+                      flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[11px] font-medium transition-all duration-200 whitespace-nowrap
                       ${activeTab === 'avanzado'
                         ? 'bg-[var(--bg-card)] text-teal-600 shadow-sm'
                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                       }
                     `}
                   >
-                    <Zap className="w-3.5 h-3.5" />
-                      Avanzado
+                    <Zap className="w-3 h-3" />
+                    Avanz
                   </button>
                 </div>
               </div>

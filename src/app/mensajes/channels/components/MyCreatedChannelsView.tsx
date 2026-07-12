@@ -39,7 +39,24 @@ export default function MisCanalesCreadosView({ user, onChannelSelect }: MisCana
   }
 
   if (misCanalesCreados.length === 0) {
-    return <div className="flex-1 flex items-center justify-center"><div className="text-center max-w-md"><h3 className="text-lg font-semibold text-gray-900 mb-2">No tienes canales creados</h3><p className="text-gray-500 text-sm mb-4">Crea tu primer canal para empezar.</p></div></div>;
+    return (
+      <div className="flex flex-col bg-white dark:bg-gray-900 h-full">
+        <div className="bg-green-600 px-4 py-3 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-white font-bold text-base leading-tight">Mis Canales Creados</h1>
+              <p className="text-white/70 text-xs">Gestiona tus canales como administrador</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center p-6">
+          <div className="text-center max-w-md">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No tienes canales creados</h3>
+            <p className="text-gray-500 text-sm mb-4">Crea tu primer canal para empezar.</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -38,7 +38,7 @@ export function MisContactosPageContent() {
     const [selectedGroup, setSelectedGroup] = useState<any>(null);
     const [selectedChannel, setSelectedChannel] = useState<any>(null);
     const [channelsSection, setChannelsSection] = useState<'mis-canales-creados' | 'mis-canales-suscritos' | 'descubrir-canales' | 'crear-canal'>('mis-canales-creados');
-    const [gruposSection, setGruposSection] = useState<'mis-grupos' | 'descubrir' | 'crear'>('mis-grupos');
+    const [gruposSection, setGruposSection] = useState<'menu' | 'mis-grupos' | 'descubrir' | 'crear'>('menu');
     const [statusSection, setStatusSection] = useState<'lista' | 'crear'>('lista');
     const [newMessage, setNewMessage] = useState('');
     const [pinnedMessage, setPinnedMessage] = useState<any>(null);
@@ -212,7 +212,7 @@ export function MisContactosPageContent() {
     ];
 
     const hasStatusSubSection = activeTab === 'estados' && (selectedStatusId !== null || (isMobile && statusSection !== 'lista'));
-    const hasGroupSubSection = activeTab === 'grupos' && (selectedGroup !== null || isMobile);
+    const hasGroupSubSection = activeTab === 'grupos' && (selectedGroup !== null || (isMobile && gruposSection !== 'menu'));
     const hasChannelSubSection = activeTab === 'canales' && (selectedChannel !== null || channelsSection !== 'mis-canales-creados');
     const hasSelection = selectedChatId || selectedStatusId || selectedGroup || selectedChannel || hasStatusSubSection || hasGroupSubSection || hasChannelSubSection;
 
@@ -360,19 +360,19 @@ export function MisContactosPageContent() {
             if (selectedGroup) return <GrupoDetailPanel group={selectedGroup} user={user} onBack={() => setSelectedGroup(null)} />;
             if (gruposSection === 'crear') return (
                 <div className="flex-1 flex flex-col overflow-hidden">
-                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600"><button onClick={() => setGruposSection('mis-grupos')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Crear Grupo</span></div>)}
-                    <div className="flex-1 overflow-y-auto"><CreateGroupView user={user} onBack={() => setGruposSection('mis-grupos')} /></div>
+                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600"><button onClick={() => setGruposSection('menu')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Crear Grupo</span></div>)}
+                    <div className="flex-1 overflow-y-auto"><CreateGroupView user={user} onBack={() => setGruposSection('menu')} /></div>
                 </div>
             );
             if (gruposSection === 'descubrir') return (
                 <div className="flex-1 flex flex-col overflow-hidden">
-                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-green-600"><button onClick={() => setGruposSection('mis-grupos')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Descubrir Grupos</span></div>)}
+                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-green-600"><button onClick={() => setGruposSection('menu')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Descubrir Grupos</span></div>)}
                     <div className="flex-1 overflow-y-auto"><DiscoverGroupsView user={user} onGroupSelect={(group: any) => setSelectedGroup(group)} /></div>
                 </div>
             );
             return (
                 <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900">
-                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-green-600"><button onClick={() => { setGruposSection('mis-grupos'); setSelectedGroup(null); }} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Mis Grupos</span></div>)}
+                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-green-600"><button onClick={() => { setGruposSection('menu'); setSelectedGroup(null); }} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Mis Grupos</span></div>)}
                     <div className="flex-1 overflow-y-auto"><GruposMisGruposView user={user} onGroupSelect={(group: any) => setSelectedGroup(group)} /></div>
                 </div>
             );
@@ -449,7 +449,14 @@ export function MisContactosPageContent() {
                         {activeTab === 'chats' && <ChatsPanel user={user} selectedChatId={selectedChatId} setSelectedChatId={setSelectedChatId} />}
                         {activeTab === 'estados' && <EstadosPanel user={user} onNewStatus={() => setStatusSection('crear')} onStatusSelect={setSelectedStatusId} selectedStatusId={selectedStatusId} />}
                         {activeTab === 'canales' && <CanalesListPanel user={user} onChannelSelect={setSelectedChannel} activeSection={channelsSection} onSectionChange={setChannelsSection} />}
-                        {activeTab === 'grupos' && <GruposListPanel user={user} onGroupSelect={(group) => { setSelectedGroup(group); }} activeSection={gruposSection} onSectionChange={(s) => { setGruposSection(s); setSelectedGroup(null); }} />}
+                        {activeTab === 'grupos' && <GruposListPanel user={user} onGroupSelect={(group) => { setSelectedGroup(group); }} activeSection={gruposSection === 'menu' ? 'mis-grupos' : gruposSection} onSectionChange={(s) => { setGruposSection(s); setSelectedGroup(null); }} />}
+                        {activeTab === 'grupos' && gruposSection === 'menu' && (
+                            <div className="flex-1 flex items-center justify-center">
+                                <div className="text-center px-6">
+                                    <p className="text-gray-400 text-sm">Selecciona una opción del menú</p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     {!isMobile && (
                         <div onMouseDown={handleLeftMouseDown} className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-green-400/30 active:bg-green-400/50 transition-colors z-10 group">

@@ -376,91 +376,61 @@ export default function MyProjectsPage() {
                         DEBUG: status={project.status}, isFeatured={project.isFeatured}
                       </div>
                       
-                      {/* First row: View and Edit */}
-                      <div className="flex gap-2 mb-2">
+                      {/* Actions row - all buttons same size */}
+                      <div className="flex gap-2">
                         <Link
                           href={`/projects/detail/${project.slug}`}
                           target="_blank"
-                          className="flex-1 text-center px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm"
+                          className="flex-1 text-center px-2 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-xs font-medium min-h-[36px] flex items-center justify-center"
                         >
                           Ver
                         </Link>
                         <Link
                           href={`/dashboard/projects/${project.id}/edit`}
-                          className="flex-1 text-center px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+                          className="flex-1 text-center px-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-xs font-medium min-h-[36px] flex items-center justify-center"
                         >
                           Editar
                         </Link>
-                      </div>
-                      
-                      {/* Second row: Actions by status */}
-                      {project.status === 'DRAFT' && (
-                        <div className="flex gap-2">
+                        {project.status === 'DRAFT' && (
                           <button
                             onClick={() => handlePublish(project.id)}
                             disabled={publishMutation.isPending}
-                            className="flex-1 text-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 text-center px-2 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed min-h-[36px] flex items-center justify-center"
                           >
-                            {publishMutation.isPending ? 'Publicando...' : 'Publicar'}
+                            {publishMutation.isPending ? '...' : 'Publicar'}
                           </button>
-
-                          <button
-                            onClick={() => handleDelete(project.id)}
-                            disabled={deleteMutation.isPending}
-                            className="flex-1 text-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
-                          </button>
-                        </div>
-                      )}
-                      
-                      {project.status === 'PAUSED' && (
-                        <div className="flex gap-2">
+                        )}
+                        {project.status === 'PAUSED' && (
                           <button
                             onClick={() => handlePublish(project.id)}
                             disabled={publishMutation.isPending}
-                            className="flex-1 text-center px-3 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 text-center px-2 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed min-h-[36px] flex items-center justify-center"
                           >
-                            {publishMutation.isPending ? 'Reactivando...' : 'Reactivar'}
+                            {publishMutation.isPending ? '...' : 'Reactivar'}
                           </button>
-
-
-                          <button
-                            onClick={() => handleDelete(project.id)}
-                            disabled={deleteMutation.isPending}
-                            className="flex-1 text-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
-                          </button>
-                        </div>
-                      )}
-                      
-                      {project.status === 'PUBLISHED' && (
-                        <div className="flex gap-2">
+                        )}
+                        {project.status === 'PUBLISHED' && !project.isFeatured && (
                           <button
                             onClick={() => handleFeature(project.id)}
                             disabled={featureMutation.isPending}
-                            className="flex-1 text-center px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 text-center px-2 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed min-h-[36px] flex items-center justify-center"
                           >
-                            {featureMutation.isPending ? 'Destacando...' : 'Destacar'}
+                            {featureMutation.isPending ? '...' : 'Destacar'}
                           </button>
-                          <button
-                            onClick={() => handleDelete(project.id)}
-                            disabled={deleteMutation.isPending}
-                            className="flex-1 text-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
-                          </button>
-                        </div>
-                      )}
-                      
-                      {project.status === 'PUBLISHED' && project.isFeatured && (
-                        <div className="text-center">
-                          <span className="inline-flex items-center px-3 py-2 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-medium">
-                            Proyecto Destacado
+                        )}
+                        {project.status === 'PUBLISHED' && project.isFeatured && (
+                          <span className="flex-1 text-center px-2 py-2 bg-yellow-100 text-yellow-800 rounded-lg text-xs font-medium min-h-[36px] flex items-center justify-center">
+                            ⭐ Destacado
                           </span>
-                        </div>
-                      )}
+                        )}
+                        <button
+                          onClick={() => handleDelete(project.id)}
+                          disabled={deleteMutation.isPending}
+                          className="flex-1 text-center px-2 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed min-h-[36px] flex items-center justify-center"
+                        >
+                          {deleteMutation.isPending ? '...' : 'Eliminar'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

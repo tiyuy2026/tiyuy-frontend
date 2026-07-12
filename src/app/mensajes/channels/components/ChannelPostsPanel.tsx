@@ -372,14 +372,24 @@ export function ChannelPostsPanel({
             {/* Mobile: hamburger menu for extra actions */}
             <div className="md:hidden flex gap-1">
               <button
-                onClick={() => setActiveTab(activeTab === 'posts' ? 'events' : 'posts')}
+                onClick={() => setActiveTab('posts')}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
                   activeTab === 'posts'
                     ? 'bg-gray-800 text-white'
                     : 'bg-gray-100 text-gray-700'
                 }`}
               >
-                {activeTab === 'posts' ? 'Eventos' : 'Posts'}
+                Posts
+              </button>
+              <button
+                onClick={() => setActiveTab('events')}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                  activeTab === 'events'
+                    ? 'bg-gray-800 text-white'
+                    : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                Eventos
               </button>
               {isChannelAdmin && (
                 <button
