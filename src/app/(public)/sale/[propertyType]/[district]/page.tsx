@@ -195,7 +195,7 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
     transactionType: 'SALE' as const,
     sort: 'createdAt,desc',
     page: resolvedSearchParams.page ? Number(resolvedSearchParams.page) : 0,
-    size: 9,
+    size: 15,
     type: propertyType as any,
     ...(isAllPeru ? {} : isMainProvince ? { province: district } : { district }),
     ...(isFiltered

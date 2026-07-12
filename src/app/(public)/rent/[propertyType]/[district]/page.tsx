@@ -109,7 +109,7 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
     transactionType: 'RENT' as const,
     sort: 'createdAt,desc',
     page: resolvedSearchParams.page ? Number(resolvedSearchParams.page) : 0,
-    size: 9, // Cambiado de 20 a 9 para mostrar 3x3 grid
+    size: 15, // 5 columnas x 3 filas = 15 propiedades por página
     type: propertyType as any,
     ...(isAllPeru ? {} : isMainProvince ? { province: district } : { district }),
     ...(isFiltered

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { LocationSearch } from '@/presentation/components/forms/LocationSearch/LocationSearch';
 
 interface UrbaniaFiltersProps {
@@ -16,6 +16,80 @@ const FILTERS_BY_TYPE: Record<string, string[]> = {
   locales: ['PRECIO', 'ÁREA', 'FRONTIS'],
   habitaciones: ['PRECIO', 'TIPO_BAÑO'],
 };
+
+// Dropdown personalizado con opciones con diseño
+function StyledDropdown({ label, options, value, onChange }: {
+  label: string;
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const selectedLabel = options.find(o => o.value === value)?.label || 'Sin preferencia';
+
+  return (
+    <div className="relative" ref={ref}>
+      {/* Trigger con diseño consistente */}
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent flex items-center justify-between cursor-pointer transition-all"
+      >
+        <span>{selectedLabel}</span>
+        <svg className={`w-4 h-4 text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Opciones con diseño */}
+      {open && (
+        <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`w-full px-4 py-3 text-sm text-left transition-colors cursor-pointer flex items-center gap-3 ${
+                value === opt.value
+                  ? 'bg-green-50 text-green-700 font-semibold'
+                  : 'text-gray-700 hover:bg-green-50/50 hover:text-green-700'
+              }`}
+              onClick={() => {
+                onChange(opt.value);
+                setOpen(false);
+              }}
+            >
+              {/* Indicador circular tipo radio */}
+              <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                value === opt.value
+                  ? 'border-green-500 bg-green-500'
+                  : 'border-gray-300 bg-white'
+              }`}>
+                {value === opt.value && (
+                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </span>
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }: UrbaniaFiltersProps) {
   const [filters, setFilters] = useState(initialFilters);
@@ -118,16 +192,18 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
       {visibleFilters.includes('DORMITORIOS') && (
         <div>
           <label className="block text-sm font-semibold text-gray-800 mb-2">Dormitorios</label>
-          <select
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            onChange={(e) => setFilters({ ...filters, bedrooms: e.target.value })}
-          >
-            <option value="">Sin preferencia</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-          </select>
+          <StyledDropdown
+            label="Dormitorios"
+            value={filters.bedrooms || ''}
+            onChange={(val) => setFilters({ ...filters, bedrooms: val })}
+            options={[
+              { value: '', label: 'Sin preferencia' },
+              { value: '1', label: '1' },
+              { value: '2', label: '2' },
+              { value: '3', label: '3' },
+              { value: '4', label: '4' },
+            ]}
+          />
         </div>
       )}
 
@@ -135,15 +211,17 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
       {visibleFilters.includes('BAÑOS') && (
         <div>
           <label className="block text-sm font-semibold text-gray-800 mb-2">Baños</label>
-          <select
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            onChange={(e) => setFilters({ ...filters, bathrooms: e.target.value })}
-          >
-            <option value="">Sin preferencia</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
+          <StyledDropdown
+            label="Baños"
+            value={filters.bathrooms || ''}
+            onChange={(val) => setFilters({ ...filters, bathrooms: val })}
+            options={[
+              { value: '', label: 'Sin preferencia' },
+              { value: '1', label: '1' },
+              { value: '2', label: '2' },
+              { value: '3', label: '3' },
+            ]}
+          />
         </div>
       )}
 
@@ -203,15 +281,17 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
       {visibleFilters.includes('ESTACIONAMIENTO') && (
         <div>
           <label className="block text-sm font-semibold text-gray-800 mb-2">Estacionamiento</label>
-          <select
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            onChange={(e) => setFilters({ ...filters, parking: e.target.value })}
-          >
-            <option value="">Sin preferencia</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
+          <StyledDropdown
+            label="Estacionamiento"
+            value={filters.parking || ''}
+            onChange={(val) => setFilters({ ...filters, parking: val })}
+            options={[
+              { value: '', label: 'Sin preferencia' },
+              { value: '1', label: '1' },
+              { value: '2', label: '2' },
+              { value: '3', label: '3' },
+            ]}
+          />
         </div>
       )}
 

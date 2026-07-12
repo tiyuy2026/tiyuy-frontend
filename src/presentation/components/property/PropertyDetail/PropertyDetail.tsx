@@ -235,7 +235,100 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
               </div>
             </div>
 
-            {/* 6. COMENTARIOS DE LA ZONA */}
+            {/* 6. ANUNCIANTE + ESTADÍSTICAS + CALIFICAR — solo móvil (DEBE IR ANTES DE SIMILARES) */}
+            <div className="lg:hidden space-y-4">
+              {/* Anunciante */}
+              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Anunciante</h3>
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-2xl flex-shrink-0 shadow-inner">
+                    {property.owner.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-gray-900 text-base truncate">{property.owner.name}</p>
+                    <p className="text-sm text-gray-500">{property.owner.role}</p>
+                  </div>
+                  {(property.owner as any).phone && (
+                    <a
+                      href={`tel:${(property.owner as any).phone}`}
+                      className="text-xs text-blue-700 bg-blue-50 hover:bg-blue-100 font-bold rounded-lg px-3 py-2 whitespace-nowrap transition-colors"
+                    >
+                      Llamar
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Estadísticas */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <h3 className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-3">Estadísticas</h3>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  {[
+                    { v: property.viewsCount    ?? 0, l: 'Visitas'   },
+                    { v: property.favoritesCount ?? 0, l: 'Favoritos' },
+                    { v: property.contactsCount  ?? 0, l: 'Contactos' },
+                  ].map(({ v, l }) => (
+                    <div key={l} className="bg-gray-50 rounded-xl p-3">
+                      <div className="text-xl font-bold text-gray-900">{v}</div>
+                      <div className="text-xs text-gray-500 mt-0.5">{l}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {rating && rating.totalRatings > 0 && (
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="flex items-center gap-0.5">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 ${i < Math.round(rating.averageRating) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm font-bold text-gray-900">{rating.averageRating.toFixed(1)}</span>
+                      <span className="text-xs text-gray-400">({rating.totalRatings} {rating.totalRatings === 1 ? 'reseña' : 'reseñas'})</span>
+                    </div>
+                  </div>
+                )}
+
+                <p className="mt-3 text-xs text-gray-400 flex items-center gap-1">
+                  <Calendar className="w-3 h-3 flex-shrink-0" />
+                  Publicado el {new Date(property.createdAt).toLocaleDateString('es-PE', {
+                    day: 'numeric', month: 'long', year: 'numeric',
+                  })}
+                </p>
+              </div>
+
+              {/* Calificar propiedad */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <h3 className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-3">Calificar propiedad</h3>
+                <div className="flex flex-col items-center gap-2">
+                  <StarRating
+                    propertyId={property.id}
+                    size="md"
+                    showValue
+                    averageRating={rating?.averageRating || 0}
+                    totalRatings={rating?.totalRatings || 0}
+                    onRatingSaved={() => {
+                      fetch(`/api/properties/${property.id}/rating`).then(res => {
+                        if (res.ok) res.json().then(data => setRating(data));
+                      }).catch(() => {});
+                    }}
+                  />
+                  {rating && rating.totalRatings > 0 && (
+                    <p className="text-xs text-gray-400">
+                      Promedio: {rating.averageRating.toFixed(1)} ({rating.totalRatings} {rating.totalRatings === 1 ? 'voto' : 'votos'})
+                    </p>
+                  )}
+                  {(!rating || rating.totalRatings === 0) && (
+                    <p className="text-xs text-gray-400">Sé el primero en calificar</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 7. COMENTARIOS DE LA ZONA */}
             <PropertyComments propertyId={property.id} location={property.location} />
 
             {/* 7. SIMILARES */}
@@ -252,11 +345,12 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
               currentType={property.type}
             />
           </div>
-          <div className="lg:col-span-3">
+          {/* Sidebar — oculta en móvil (se muestra en columna principal con lg:hidden) */}
+          <div className="hidden lg:block lg:col-span-3">
             <div className="sticky top-4 space-y-4">
 
-              {/* Contactar — oculto en móvil (se muestra en columna principal) */}
-              <div className="hidden lg:block bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden">
+              {/* Contactar */}
+              <div className="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden">
                 <div className="px-6 pt-6 pb-4 border-b border-gray-50">
                   <h3 className="text-lg font-bold text-gray-900">Contacta al anunciante</h3>
                 </div>

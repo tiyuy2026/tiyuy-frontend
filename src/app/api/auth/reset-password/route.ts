@@ -37,6 +37,9 @@ export async function POST(request: NextRequest) {
     // Conectar con el backend real
     try {
       const backendUrl = serverEnv.backendUrl;
+      // El backend NO tiene context-path /api.
+      // El rewrite de Next.js ya agrega /api al destino.
+      // Llamada directa desde route handler: BACKEND_URL + /auth/reset-password
       const response = await fetch(`${backendUrl}/auth/reset-password`, {
         method: 'POST',
         headers: {

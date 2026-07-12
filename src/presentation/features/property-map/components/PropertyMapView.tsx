@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { MapItem, MapSearchResult, MapCoverageType } from '@/core/domain/entities/MapTypes';
-import { createPriceMarkerHtml, createClusterMarkerHtml, calculateMapCenter, calculateZoom } from '../utils/mapUtils';
+import { createPriceMarkerHtml, createClusterMarkerHtml, calculateMapCenter, calculateZoom, formatPrice } from '../utils/mapUtils';
 import '../styles/map.css';
 
 // Cargar Leaflet y MarkerCluster solo en cliente
@@ -173,6 +173,10 @@ export function PropertyMapView({
         isSelected
       );
 
+      const isProject = item.type === 'PROJECT';
+      const detailSlug = item.metadata?.slug || item.slug || item.id;
+      const detailUrl = isProject ? `/projects/${detailSlug}` : `/property/${detailSlug}`;
+      
       const marker = L.marker([item.latitude, item.longitude], {
         icon: L.divIcon({
           html: markerHtml,
@@ -182,16 +186,45 @@ export function PropertyMapView({
         }),
       });
 
-      marker.bindTooltip(
-        `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; font-weight: 600; padding: 2px 0;">
-          ${item.title || `${item.type} en ${item.district}`}
-        </div>`,
-        {
-          direction: 'top',
-          offset: L.point(0, -10),
-          className: 'property-map-tooltip',
-        }
-      );
+      // Popup con imagen de la propiedad y botón "Ver"
+      const popupHtml = `
+        <div class="map-property-popup" style="width: 220px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; border-radius: 12px; overflow: hidden;">
+          <a href="${detailUrl}" target="_self" style="text-decoration: none; color: inherit; display: block;">
+            <div style="position: relative; width: 100%; height: 130px; overflow: hidden; background: #f3f4f6;">
+              ${item.imageUrl 
+                ? `<img src="${item.imageUrl}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;" 
+                      onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;font-size:32px\\'>${isProject ? '🏗️' : '🏠'}</div>'" />`
+                : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:32px">${isProject ? '🏗️' : '🏠'}</div>`
+              }
+              ${item.isFeatured ? '<div style="position:absolute;top:6px;left:6px;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;">Destacado</div>' : ''}
+            </div>
+            <div style="padding: 10px 12px;">
+              <div style="font-size: 13px; font-weight: 700; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">
+                ${item.title || `${isProject ? 'Proyecto' : item.type} en ${item.district}`}
+              </div>
+              <div style="font-size: 11px; color: #6b7280; margin-bottom: 6px;">
+                ${item.district}${item.province ? `, ${item.province}` : ''}
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: #6b7280; margin-bottom: 6px;">
+                ${item.metadata?.bedrooms ? `<span>🛏️ ${item.metadata.bedrooms}</span>` : ''}
+                ${item.metadata?.bathrooms ? `<span>🚿 ${item.metadata.bathrooms}</span>` : ''}
+                ${item.metadata?.area ? `<span>📐 ${item.metadata.area}m²</span>` : ''}
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 14px; font-weight: 800; color: #059669;">${formatPrice(item.price, item.currency)}</span>
+                <span style="font-size: 11px; font-weight: 600; color: white; background: #059669; padding: 4px 12px; border-radius: 6px;">Ver más</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      `;
+
+      marker.bindPopup(popupHtml, {
+        maxWidth: 240,
+        minWidth: 220,
+        className: 'map-property-popup-container',
+        closeButton: true,
+      });
 
       marker.on('click', () => {
         onSelectItem(item.id);
