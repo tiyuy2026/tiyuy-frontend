@@ -45,7 +45,6 @@ export function FilteredProperties({
 
   const scrollByAmount = () => {
     if (!scrollContainerRef.current) return 280;
-    // En mobile, mover 1 card; en desktop, mover el ancho del contenedor
     if (window.innerWidth < 640) {
       return scrollContainerRef.current.clientWidth / 2;
     }
@@ -117,7 +116,6 @@ export function FilteredProperties({
           scrollbar-width: none;
         }
 
-        /* Mobile: 2 visibles, scroll horizontal */
         @media (max-width: 639px) {
           .filtered-grid-mobile {
             display: flex;
@@ -169,7 +167,6 @@ export function FilteredProperties({
       `}</style>
 
       <div className="w-full">
-        {/* Header and Navigation Controls */}
         <div className="flex justify-between items-end mb-4">
           <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
             {title}
@@ -198,7 +195,6 @@ export function FilteredProperties({
           </div>
         </div>
 
-        {/* Horizontal scroll container */}
         <div
           ref={scrollContainerRef}
           className="filtered-grid-mobile"
@@ -209,7 +205,6 @@ export function FilteredProperties({
             </div>
           ))}
 
-          {/* Tarjeta de Ver Todos al final */}
           {!hideViewAll && (
             <div className="carousel-card view-all-card">
               <Link href={viewAllLink} className="flex flex-col items-center justify-center h-full min-h-[320px] w-full bg-white hover:bg-gray-50 rounded-2xl border border-gray-200 transition-all hover:shadow-md group">

@@ -42,7 +42,6 @@ export function Header() {
   const [showServiciosMenu, setShowServiciosMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [pinnedMenu, setPinnedMenu] = useState<'comprar' | 'alquilar' | null>(null);
-  const [stripeColor, setStripeColor] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileComprarOpen, setMobileComprarOpen] = useState(false);
@@ -71,13 +70,6 @@ export function Header() {
   const serviciosTimerRef = useRef<NodeJS.Timeout | null>(null);
   const serviciosRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStripeColor((prev) => (prev + 1) % 5);
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
-
   // Cerrar dropdown de notificaciones al hacer click afuera
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -91,14 +83,6 @@ export function Header() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const colors = [
-    ['bg-red-600', 'bg-white', 'bg-red-600'],
-    ['bg-green-600', 'bg-yellow-400', 'bg-orange-500'],
-    ['bg-orange-500', 'bg-red-500', 'bg-white'],
-    ['bg-yellow-400', 'bg-green-500', 'bg-red-600'],
-    ['bg-white', 'bg-red-600', 'bg-green-600'],
-  ];
 
   // Función para navegar después de 1.3 segundos
   const startNavigationTimer = (type: 'comprar' | 'alquilar') => {

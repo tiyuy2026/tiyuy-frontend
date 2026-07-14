@@ -3,40 +3,35 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Icon } from '@iconify/react';
 
 export default function HeroSection() {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [mouseRelative, setMouseRelative] = useState({ x: 0, y: 0 });
     const [mousePercent, setMousePercent] = useState({ x: 0, y: 0 });
+    const rafRef = useRef<number | null>(null);
 
     useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
-
         const handleMouseMove = (e: MouseEvent) => {
-            const rect = container.getBoundingClientRect();
-            const xPx = e.clientX - rect.left;
-            const yPx = e.clientY - rect.top;
-            const xPct = (e.clientX / window.innerWidth) - 0.5;
-            const yPct = (e.clientY / window.innerHeight) - 0.5;
-
-            setMouseRelative({ x: xPx, y: yPx });
-            setMousePercent({ x: xPct, y: yPct });
+            if (rafRef.current) return;
+            rafRef.current = requestAnimationFrame(() => {
+                setMousePercent({
+                    x: (e.clientX / window.innerWidth) - 0.5,
+                    y: (e.clientY / window.innerHeight) - 0.5,
+                });
+                rafRef.current = null;
+            });
         };
 
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mousemove', handleMouseMove, { passive: true });
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        };
     }, []);
 
     const transformCard1 = `translate(${mousePercent.x * -35}px, ${mousePercent.y * -35}px)`;
     const transformCard2 = `translate(${mousePercent.x * 30}px, ${mousePercent.y * 30}px)`;
 
     return (
-        <section
-            ref={containerRef}
+        <main
             className="group relative overflow-hidden bg-white min-h-[640px] flex items-center select-none"
-            style={{
-                '--mouse-x': `${mouseRelative.x}px`,
-                '--mouse-y': `${mouseRelative.y}px`
-            } as React.CSSProperties}
+            style={{ willChange: 'transform' }}
         >
             <div
                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10"
@@ -46,8 +41,6 @@ export default function HeroSection() {
                         linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px)
                     `,
                     backgroundSize: '60px 60px',
-                    maskImage: 'radial-gradient(240px circle at var(--mouse-x) var(--mouse-y), black 20%, transparent 100%)',
-                    WebkitMaskImage: 'radial-gradient(240px circle at var(--mouse-x) var(--mouse-y), black 20%, transparent 100%)'
                 }}
             />
 
@@ -59,15 +52,6 @@ export default function HeroSection() {
                         linear-gradient(to bottom, #000 1px, transparent 1px)
                     `,
                     backgroundSize: '60px 60px'
-                }}
-            />
-
-            <div
-                className="absolute w-[240px] h-[240px] -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-[40px] z-0"
-                style={{
-                    left: 'var(--mouse-x)',
-                    top: 'var(--mouse-y)',
-                    backgroundImage: 'radial-gradient(circle, var(--brand-primary-light) 0%, transparent 80%)'
                 }}
             />
 
@@ -151,6 +135,6 @@ export default function HeroSection() {
 
                 </div>
             </div>
-        </section>
+        </main>
     );
 }

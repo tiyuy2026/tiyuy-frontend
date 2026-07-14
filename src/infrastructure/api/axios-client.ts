@@ -14,12 +14,12 @@ const baseURL =
 
 export const axiosClient = axios.create({
   baseURL,
-  timeout: 60000,
+  timeout: 30000,
 });
 
 export const publicApiClient = axios.create({
   baseURL,
-  timeout: 60000,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },

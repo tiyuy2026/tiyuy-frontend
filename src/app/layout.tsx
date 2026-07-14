@@ -1,14 +1,13 @@
 import type { Metadata } from 'next';
 import { Hind } from 'next/font/google';
 import './globals.css';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import { ClientLayout } from './ClientLayout';
 
 const hind = Hind({
-  weight: ['300', '400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700'],
   subsets: ['latin'],
+  display: 'swap',
+  preload: true,
 });
 
 const baseUrl = 'https://tiyuy.com';
@@ -136,19 +135,14 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <script src="https://sdk.mercadopago.com/js/v2" async />
+        {/* 
+          MercadoPago SDK se carga con 'async' y solo cuando se necesita.
+          remove-before-adding payment pages import dynamicly using next/dynamic 
+        */}
         <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                var s = document.createElement('script');
-                s.src = 'https://www.mercadopago.com/v2/security.js';
-                s.setAttribute('view', 'checkout');
-                s.async = true;
-                document.head.appendChild(s);
-              })();
-            `,
-          }}
+          defer
+          data-mercadopago="sdk"
+          src="https://sdk.mercadopago.com/js/v2"
         />
       </head>
       <body className={hind.className} suppressHydrationWarning>

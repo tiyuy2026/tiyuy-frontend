@@ -107,6 +107,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
           <LazyImage
             src={`/api/images/proxy?url=${encodeURIComponent(property.coverPhotoUrl)}`}
             alt={property.title || ''}
+            width={400}
+            height={400}
             className="w-full h-full group-hover:scale-105 transition-transform duration-500"
           />
         ) : (

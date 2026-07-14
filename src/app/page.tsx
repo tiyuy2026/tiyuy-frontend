@@ -1,16 +1,24 @@
- 'use client';
+'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Icon } from '@iconify/react';
-import { Footer } from '@/presentation/components/layout/Footer/Footer';
-import { FeaturedProperties } from '@/presentation/components/property/FeaturedProperties/FeaturedProperties';
-import { FeaturedProjects } from '@/presentation/components/project/FeaturedProjects/FeaturedProjects';
-import { FilteredProperties } from '@/presentation/components/property/FilteredProperties/FilteredProperties';
 import { LocationSearch } from '@/presentation/components/forms/LocationSearch/LocationSearch';
-import { FeaturedCampaigns } from '@/presentation/components/marketing/FeaturedCampaigns';
 import { usePublicBanners } from '@/presentation/hooks/usePublicBanners';
+
+// Componentes pesados con lazy loading + Splitting de código para reducir bundle inicial
+const FeaturedProperties = lazy(() => import('@/presentation/components/property/FeaturedProperties/FeaturedProperties').then(m => ({ default: m.FeaturedProperties })));
+const FeaturedProjects = lazy(() => import('@/presentation/components/project/FeaturedProjects/FeaturedProjects').then(m => ({ default: m.FeaturedProjects })));
+const FilteredProperties = lazy(() => import('@/presentation/components/property/FilteredProperties/FilteredProperties').then(m => ({ default: m.FilteredProperties })));
+const FeaturedCampaigns = lazy(() => import('@/presentation/components/marketing/FeaturedCampaigns').then(m => ({ default: m.FeaturedCampaigns })));
+const Footer = lazy(() => import('@/presentation/components/layout/Footer/Footer').then(m => ({ default: m.Footer })));
+
+// Fallback loading simple para secciones lazy
+const SectionFallback = ({ height = '200px' }: { height?: string }) => (
+  <div style={{ height, background: '#f9fafb', borderRadius: '8px', margin: '0.5rem 0' }} />
+);
 
 // Fallback images si no hay banners configurados en admin
 const FALLBACK_HERO_IMAGES = [
@@ -67,7 +75,6 @@ const quickLinks = [
 
 /**
  * Intercala imágenes de banners entre las imágenes estáticas del carrusel.
- * Ejemplo: [estática1, banner1, estática2, banner2, estática3, estática4]
  */
 function intercalateImages(staticImages: string[], bannerImages: string[]): string[] {
   const result: string[] = [];
@@ -77,7 +84,6 @@ function intercalateImages(staticImages: string[], bannerImages: string[]): stri
 
   for (let i = 0; i < staticImages.length; i++) {
     result.push(staticImages[i]);
-    // Insertar un banner después de cada imagen estática (si hay banners disponibles)
     if (bannerIndex < bannerImages.length) {
       bannerCountInSlot++;
       if (bannerCountInSlot >= maxBannersPerSlot || i === staticImages.length - 1) {
@@ -88,7 +94,6 @@ function intercalateImages(staticImages: string[], bannerImages: string[]): stri
     }
   }
 
-  // Si sobran banners, agregarlos al final
   while (bannerIndex < bannerImages.length) {
     result.push(bannerImages[bannerIndex]);
     bannerIndex++;
@@ -97,19 +102,55 @@ function intercalateImages(staticImages: string[], bannerImages: string[]): stri
   return result;
 }
 
+function CustomSelect({ options, value, onChange, placeholder }: { options: { value: string; label: string }[]; value: string; onChange: (v: string) => void; placeholder: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = options.find(o => o.value === value);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-5 py-3.5 border border-gray-200 rounded-xl bg-white text-base text-gray-700 cursor-pointer transition-all hover:border-gray-300 shadow-sm focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none"
+      >
+        <span className={selected ? 'text-gray-700' : 'text-gray-400'}>{selected ? selected.label : placeholder}</span>
+        <svg className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+      </button>
+      {isOpen && (
+        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => { onChange(opt.value); setIsOpen(false); }}
+              className={`w-full text-left px-5 py-3 text-sm transition-colors hover:bg-brand-light hover:text-brand-dark ${value === opt.value ? 'bg-brand-light text-brand-dark font-semibold' : 'text-gray-700'}`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function HomePage() {
-  // Cargar banners públicos con displayMode INTEGRATED para mezclar con imágenes estáticas
   const { data: sliderBanners = [] } = usePublicBanners('SLIDER');
   const { data: mainBanners = [] } = usePublicBanners('HOME_MAIN');
   const { data: homeBanners = [] } = usePublicBanners('HOME_BANNER');
-  
-  // Unir todos los banners encontrados
+
   const allBanners = [...sliderBanners, ...mainBanners, ...homeBanners];
-  
-  // Separar banners INTEGRATED (se mezclan con el carrusel) de SOLO_BANNER (no se muestran en carrusel)
   const integratedBanners = allBanners.filter(b => b.displayMode === 'INTEGRATED' || !b.displayMode);
-  
-  // Mezclar banners integrados con imágenes estáticas: intercalar
+
   const heroImages = integratedBanners.length > 0
     ? intercalateImages(FALLBACK_HERO_IMAGES, integratedBanners.map(b => b.imageUrl))
     : FALLBACK_HERO_IMAGES;
@@ -124,7 +165,6 @@ export default function HomePage() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Slider automático del Hero
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
@@ -132,12 +172,11 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [heroImages.length]);
 
-  // Control e hidratación segura de rutas e historial (Previene errores de servidor en Next.js)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const referrer = document.referrer;
       const currentPath = window.location.pathname;
-      
+
       if (currentPath.includes('/rent/') || referrer.includes('/rent/')) {
         setActiveTab('rent');
       } else if (currentPath.includes('/sale/') || referrer.includes('/sale/')) {
@@ -152,8 +191,6 @@ export default function HomePage() {
       }
     }
   }, [pathname]);
-
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const getPropertyTypes = (tab = activeTab) => {
     switch (tab) {
@@ -176,57 +213,12 @@ export default function HomePage() {
     }
   };
 
-  // Custom dropdown component
-  const CustomSelect = ({ options, value, onChange, placeholder }: { options: { value: string; label: string }[]; value: string; onChange: (v: string) => void; placeholder: string }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const ref = useRef<HTMLDivElement>(null);
-    const selected = options.find(o => o.value === value);
-    
-    useEffect(() => {
-      const handler = (e: MouseEvent) => {
-        if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
-      };
-      document.addEventListener('mousedown', handler);
-      return () => document.removeEventListener('mousedown', handler);
-    }, []);
-
-    return (
-      <div className="relative" ref={ref}>
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full flex items-center justify-between px-5 py-3.5 border border-gray-200 rounded-xl bg-white text-base text-gray-700 cursor-pointer transition-all hover:border-gray-300 shadow-sm focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none"
-        >
-          <span className={selected ? 'text-gray-700' : 'text-gray-400'}>{selected ? selected.label : placeholder}</span>
-          <svg className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-        </button>
-        {isOpen && (
-          <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
-            {options.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => { onChange(opt.value); setIsOpen(false); }}
-                className={`w-full text-left px-5 py-3 text-sm transition-colors hover:bg-brand-light hover:text-brand-dark ${value === opt.value ? 'bg-brand-light text-brand-dark font-semibold' : 'text-gray-700'}`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
-
   const handleTabClick = (tab: 'rent' | 'sale' | 'projects') => {
     setActiveTab(tab);
-    
-    // Auto-ajuste para evitar tipos de propiedad huérfanos entre pestañas
     const availableTypes = getPropertyTypes(tab);
     if (!availableTypes.some(t => t.value === selectedPropertyType)) {
       setSelectedPropertyType(availableTypes[0].value);
     }
-
     localStorage.setItem('selectedTab', tab);
     sessionStorage.setItem('lastActiveTab', tab);
   };
@@ -239,28 +231,25 @@ export default function HomePage() {
     const baseUrl = activeTab === 'rent' ? '/rent' : activeTab === 'sale' ? '/sale' : '/projects';
     const location = selectedLocation || 'lima';
     let url = `${baseUrl}/${selectedPropertyType}/${location}`;
-    
+
     const params = new URLSearchParams();
-    
+
     if (activeTab !== 'projects') {
       if ((selectedPropertyType === 'departamentos' || selectedPropertyType === 'casas') && selectedBedrooms) {
         params.append('bedrooms', selectedBedrooms);
       }
-      
       if (selectedPropertyType === 'habitaciones' && selectedBathrooms) {
         params.append('bathrooms', selectedBathrooms);
       }
-      
       if (['oficinas', 'terrenos', 'lotes', 'locales'].includes(selectedPropertyType) && selectedMinArea) {
         params.append('minArea', selectedMinArea);
       }
     }
-    
+
     if (params.toString()) {
       url += `?${params.toString()}`;
     }
-    
-    // Guardar búsqueda para recomendaciones
+
     if (activeTab !== 'projects') {
       localStorage.setItem('lastSearch', JSON.stringify({
         transactionType: activeTab === 'rent' ? 'rent' : 'sale',
@@ -271,7 +260,7 @@ export default function HomePage() {
         minArea: selectedMinArea || '',
       }));
     }
-    
+
     router.push(url);
   };
 
@@ -279,32 +268,6 @@ export default function HomePage() {
     <div className="min-h-screen bg-background text-foreground">
       {/* HERO */}
       <section className="relative">
-        <style>{`
-          .hero-select {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-            background-size: 12px 8px;
-            padding-right: 38px;
-          }
-          .hero-select::-ms-expand { display: none; }
-          .hero-select option {
-            padding: 8px 12px;
-            background: white;
-            color: #374151;
-          }
-          .hero-input-number::-webkit-inner-spin-button,
-          .hero-input-number::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-          }
-          .hero-input-number[type=number] {
-            -moz-appearance: textfield;
-          }
-        `}</style>
         <div className="relative h-[540px] overflow-hidden">
           {heroImages.map((image, index) => (
             <div
@@ -313,7 +276,18 @@ export default function HomePage() {
                 index === currentImageIndex ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <img src={image} alt="" className="w-full h-full object-cover" />
+              {/* Solo cargar la imagen actual y precargar solo la siguiente */}
+              {index === currentImageIndex || index === (currentImageIndex + 1) % heroImages.length ? (
+                <Image
+                  src={image}
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  priority={index === 0}
+                  loading={index === 0 ? undefined : 'lazy'}
+                  className="object-cover"
+                />
+              ) : null}
             </div>
           ))}
           <div className="absolute inset-0 bg-black/40"></div>
@@ -494,63 +468,71 @@ export default function HomePage() {
 
       <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16">
-          <FeaturedProperties />
+          <Suspense fallback={<SectionFallback height="300px" />}>
+            <FeaturedProperties />
+          </Suspense>
         </div>
       </section>
 
-      {/* DEPARTAMENTOS EN ALQUILER */}
       <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16">
-          <FilteredProperties 
-            title="Departamentos para alquilar" 
-            viewAllLink="/rent/departamentos/lima" 
-            filter={{ type: 'APARTMENT', transactionType: 'RENT' }} 
-          />
+          <Suspense fallback={<SectionFallback height="200px" />}>
+            <FilteredProperties 
+              title="Departamentos para alquilar" 
+              viewAllLink="/rent/departamentos/lima" 
+              filter={{ type: 'APARTMENT', transactionType: 'RENT' }} 
+            />
+          </Suspense>
         </div>
       </section>
 
-      {/* CASAS EN VENTA */}
       <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16">
-          <FilteredProperties 
-            title="Casas disponibles para compra" 
-            viewAllLink="/sale/casas/lima" 
-            filter={{ type: 'HOUSE', transactionType: 'SALE' }} 
-          />
+          <Suspense fallback={<SectionFallback height="200px" />}>
+            <FilteredProperties 
+              title="Casas disponibles para compra" 
+              viewAllLink="/sale/casas/lima" 
+              filter={{ type: 'HOUSE', transactionType: 'SALE' }} 
+            />
+          </Suspense>
         </div>
       </section>
 
-      {/* PROYECTOS INMOBILIARIOS */}
       <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16">
-          <FeaturedProjects />
+          <Suspense fallback={<SectionFallback height="300px" />}>
+            <FeaturedProjects />
+          </Suspense>
         </div>
       </section>
 
-      {/* OFICINAS Y LOCALES */}
       <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16">
-          <FilteredProperties 
-            title="Espacios para tu negocio" 
-            viewAllLink="/sale/oficinas/lima" 
-            filter={{ type: 'COMMERCIAL' }} 
-          />
+          <Suspense fallback={<SectionFallback height="200px" />}>
+            <FilteredProperties 
+              title="Espacios para tu negocio" 
+              viewAllLink="/sale/oficinas/lima" 
+              filter={{ type: 'COMMERCIAL' }} 
+            />
+          </Suspense>
         </div>
       </section>
 
-      {/* TERRENOS */}
       <section className="py-2 sm:py-3 bg-background">
         <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-8 xl:px-16">
-          <FilteredProperties 
-            title="Terrenos y lotes de inversión" 
-            viewAllLink="/sale/terrenos/lima" 
-            filter={{ type: 'LAND' }} 
-          />
+          <Suspense fallback={<SectionFallback height="200px" />}>
+            <FilteredProperties 
+              title="Terrenos y lotes de inversión" 
+              viewAllLink="/sale/terrenos/lima" 
+              filter={{ type: 'LAND' }} 
+            />
+          </Suspense>
         </div>
       </section>
 
-      {/* CAMPAÑAS DE MARKETING DESTACADAS */}
-      <FeaturedCampaigns />
+      <Suspense fallback={<SectionFallback height="200px" />}>
+        <FeaturedCampaigns />
+      </Suspense>
 
       <section className="py-2 sm:py-3 bg-background">
         <div className="w-full px-4 sm:px-8 xl:px-16">
@@ -575,7 +557,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      <Footer />
+      <Suspense fallback={<div style={{ height: '200px' }} />}>
+        <Footer />
+      </Suspense>
     </div>
   );
 }

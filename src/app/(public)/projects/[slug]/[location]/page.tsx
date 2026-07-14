@@ -5,9 +5,9 @@ import { ProjectSearchBar } from './ProjectSearchBar';
 import { ProjectFiltersClient } from './ProjectFiltersClient';
 import { ProjectGrid } from './ProjectGrid';
 import { Pagination } from './Pagination';
-import { PropertyMapWrapper } from '@/presentation/features/property-map/components/PropertyMapWrapper';
 import { projectMapResultToGeneric } from '@/core/domain/adapters/MapItemAdapters';
 import { MapFilters } from '@/core/domain/entities/MapTypes';
+import PropertyMapWrapper from './DynamicMapWrapper';
 
 interface Props {
   params: Promise<{
