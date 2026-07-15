@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import { ProtectedRoute } from '@/presentation/components/auth/ProtectedRoute';
@@ -15,7 +15,7 @@ import { authStorage } from '@/infrastructure/storage/auth-storage';
 import { useSearchParams } from 'next/navigation';
 import HeroSection from './HeroSection';
 
-export default function PlansPage() {
+function PlansPageContent() {
   const searchParams = useSearchParams();
   const isPaymentSuccess = searchParams.get('payment') === 'success';
   const { data: plans, isLoading } = useAvailablePlans();
@@ -544,11 +544,13 @@ export default function PlansPage() {
                       };
                       const normalizedSubTier = (subscriptionTier && oldToNew[subscriptionTier]) || subscriptionTier;
                       const normalizedBackendTier = (backendTier && oldToNew[backendTier]) || backendTier;
+                      // El FREE plan siempre está "activo" para nuevos usuarios o cuando la suscripción activa es FREE
+                      const isFreeActive = planTierCode === 'FREE' && (!activeSubscription || normalizedSubTier === 'FREE');
                       // Comparar contra subscriptionTier (que tiene el valor real de la BD como "CUSTOM", "BASIC", etc.)
                       // y también contra backendTier por compatibilidad
-                      const isActive = activeSubscription 
+                      const isActive = isFreeActive || (activeSubscription 
                         ? (normalizedSubTier === planTierCode || normalizedBackendTier === plan.id || normalizedBackendTier === planTierCode)
-                        : planTierCode === 'FREE';
+                        : false);
                       const isExhausted = isPlanExhausted(plan);
                       const intelligentDiscount = detectIntelligentDiscount(plan);
                       let finalDiscountCode = '';
@@ -774,5 +776,18 @@ export default function PlansPage() {
         onClose={() => setShowUpgradeModal(false)}
       />
     </ProtectedRoute>
+  );
+}
+
+export default function PlansPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)]"></div>
+        <p className="mt-4 text-gray-600 ml-3">Cargando planes...</p>
+      </div>
+    }>
+      <PlansPageContent />
+    </Suspense>
   );
 }
