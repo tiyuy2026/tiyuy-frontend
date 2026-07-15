@@ -128,6 +128,7 @@ export function BrickCheckout({ amount, subscriptionId }: Props) {
         setError(j.status_detail || 'El pago fue rechazado.');
       }
     } catch (e: any) {
+      console.error('Error completo en BrickCheckout:', e);
       setError(e?.message || 'Error al procesar el pago.');
     }
     setProcessing(false);
