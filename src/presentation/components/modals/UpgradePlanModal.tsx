@@ -236,68 +236,8 @@ export function UpgradePlanModal({ isOpen, onClose }: UpgradePlanModalProps) {
   };
 
   const openMercadoPagoPayment = (plan: SubscriptionPlan, subscriptionId: string) => {
-    // Cargar SDK v2 si no está disponible
-    if (!(window as any).MercadoPago) {
-      const script = document.createElement('script');
-      script.src = 'https://sdk.mercadopago.com/js/v2';
-      script.onload = () => {
-        createPreferenceAndCheckout(plan, subscriptionId);
-      };
-      document.head.appendChild(script);
-    } else {
-      createPreferenceAndCheckout(plan, subscriptionId);
-    }
-  };
-
-  const createPreferenceAndCheckout = async (plan: SubscriptionPlan, subscriptionId: string) => {
-    try {
-      const token = authStorage.getToken();
-      
-      //  CRÍTICO: Esperar a que security.js genere el deviceSessionId para antifraude
-      // Sin esto, MP rechaza con cc_rejected_high_risk porque no puede asociar
-      // el dispositivo del comprador con la transacción.
-      const deviceSessionId = await getDeviceSessionId();
-      console.log('MP Device Session ID (UpgradePlanModal):', deviceSessionId || '(no disponible)');
-      
-      const response = await fetch(
-        `/api/finance/mercadopago/create-preference`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            subscriptionId: subscriptionId.toString(),
-            title: `Plan ${plan.name}`,
-            unitPrice: plan.price,
-            frontendUrl: window.location.origin,
-            deviceSessionId  //  CRÍTICO: MP necesita el fingerprint del dispositivo para evaluar riesgo
-          })
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        toast.error(`Error ${response.status}: No se pudo crear preferencia de pago`);
-        return;
-      }
-
-      const data = await response.json();
-      
-      // Usar init_point (producción) primero. sandbox_init_point solo para pruebas.
-      const url = data.init_point || data.initPoint || 
-                  data.sandbox_init_point || data.sandboxInitPoint;
-
-      if (url) {
-        window.location.href = url;
-      } else {
-        toast.error('El servidor no devolvio URL de pago');
-      }
-
-    } catch (error) {
-      toast.error('Error al iniciar pago: ' + (error as any).message);
-    }
+    const finalPrice = plan.agencyDiscountedPrice || plan.price;
+    window.location.href = `/checkout/${subscriptionId}?amount=${finalPrice}&plan=${encodeURIComponent(plan.name)}`;
   };
 
   // Determinar si el plan FREE está agotado (si el usuario ya lo usó)

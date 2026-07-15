@@ -12,13 +12,17 @@ import { PlanCard } from '@/presentation/components/finance';
 import { SubscriptionPlan, BillingCycle } from '@/core/domain/entities/Wallet';
 import { UpgradePlanModal } from '@/presentation/components/modals/UpgradePlanModal';
 import { authStorage } from '@/infrastructure/storage/auth-storage';
+import { useSearchParams } from 'next/navigation';
 import HeroSection from './HeroSection';
 
 export default function PlansPage() {
+  const searchParams = useSearchParams();
+  const isPaymentSuccess = searchParams.get('payment') === 'success';
   const { data: plans, isLoading } = useAvailablePlans();
   const { data: activeSubscription, refetch: refetchSubscription } = useActiveSubscription();
   const { data: propertiesData } = useMyProperties();
   const { data: availableDiscountCodes } = useAvailableDeveloperDiscountCodes();
+  const [forceRefetchDone, setForceRefetchDone] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -213,6 +217,18 @@ export default function PlansPage() {
     }));
   };
 
+  // Forzar refetch inmediato cuando se viene de un pago exitoso
+  useEffect(() => {
+    if (isPaymentSuccess && !forceRefetchDone) {
+      setForceRefetchDone(true);
+      // Refetchear inmediatamente y luego otra vez después de 1s y 2s
+      // para asegurar que los datos del backend ya se actualizaron
+      refetchSubscription();
+      setTimeout(() => refetchSubscription(), 1000);
+      setTimeout(() => refetchSubscription(), 2500);
+    }
+  }, [isPaymentSuccess, forceRefetchDone, refetchSubscription]);
+
   useEffect(() => {
     refetchSubscription();
   }, [refetchSubscription]);
@@ -226,8 +242,8 @@ export default function PlansPage() {
   // Enhanced plan exhaustion detection with expiration date validation
   // Mapeo ID numerico a codigo tier (mismo que FinanceRepository)
   const planIdToTier: Record<string, string> = {
-    '1': 'FREE', '2': 'BASIC', '3': 'PREMIUM',
-    '4': 'ENTERPRISE_TRIAL', '5': 'ENTERPRISE'
+    '1': 'FREE', '2': 'BASIC', '3': 'PRO',
+    '4': 'ENTERPRISE_TRIAL', '5': 'ENTERPRISE', '10': 'PLAN LANZAMIENTO'
   };
   const getPlanTierCode = (planId: string): string => planIdToTier[planId] || planId;
 
@@ -381,62 +397,18 @@ export default function PlansPage() {
     });
   };
 
-  // Misma lógica que el modal - abre MercadoPago
+  // Redirigir a Checkout Bricks en lugar de Checkout Pro (redirect a MP)
   const handleSubscribe = () => {
     if (!selectedPlan) return;
-
-    const finalPrice = getDiscountedPrice(selectedPlan);
 
     subscribeMutation.mutate({
       planId: selectedPlan.id,
       paymentMethod: 'MERCADOPAGO',
       discountCode: discountCode || undefined,
     }, {
-      onSuccess: async (subscription) => {
-        try {
-          const token = authStorage.getToken();
-          
-          // 🔴 CRÍTICO: Esperar a que security.js genere el deviceSessionId para antifraude
-          const deviceSessionId = await getDeviceSessionId();
-          console.log('MP Device Session ID (PlansPage):', deviceSessionId || '(no disponible)');
-          
-          const response = await fetch(
-            `/api/finance/mercadopago/create-preference`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                subscriptionId: subscription.id.toString(),
-                title: selectedPlan.name,
-                unitPrice: finalPrice,
-                frontendUrl: window.location.origin,
-                deviceSessionId  // 🔴 CRÍTICO: fingerprint del dispositivo para evitar rechazo
-              })
-            }
-          );
-
-          if (!response.ok) {
-            const errorText = await response.text();
-            toast.error(`Error ${response.status} al crear preferencia`);
-            return;
-          }
-
-          const data = await response.json();
-          // Usar init_point (producción) primero. sandbox_init_point solo para pruebas.
-          const url = data.init_point || data.initPoint ||
-                      data.sandbox_init_point || data.sandboxInitPoint;
-
-          if (url) {
-            window.location.href = url;
-          } else {
-            toast.error('No se recibio URL de pago');
-          }
-        } catch (error) {
-          toast.error('Error al iniciar pago: ' + (error as any).message);
-        }
+      onSuccess: (subscription) => {
+        const finalPrice = getDiscountedPrice(selectedPlan);
+        window.location.href = `/checkout/${subscription.id}?amount=${finalPrice}&plan=${encodeURIComponent(selectedPlan.name)}`;
       },
       onError: (error: any) => {
         if (error?.response?.status === 409) {
@@ -457,6 +429,33 @@ export default function PlansPage() {
     'Contacto directo con clientes'
   ];
 
+  // Obtener el nombre real del plan desde la lista de planes (display_name de la BD)
+  const activePlanName = (() => {
+    if (!activeSubscription || !plans) return null;
+    let subTier = (activeSubscription as any).tier || activeSubscription.plan?.id;
+    // Normalizar: mapear valores antiguos a los nuevos códigos de la BD
+    const oldToNew: Record<string, string> = {
+      'PREMIUM': 'PRO',
+      'CUSTOM': 'PLAN LANZAMIENTO'
+    };
+    if (oldToNew[subTier]) subTier = oldToNew[subTier];
+    // Buscar por ID, code o display_name
+    const matchedPlan = plans.find(p => 
+      p.id === subTier || 
+      p.id === String(subTier) ||
+      (p as any).code === subTier ||
+      (p as any).code?.toUpperCase() === subTier?.toUpperCase() ||
+      p.name?.toUpperCase() === subTier?.toUpperCase()
+    );
+    return matchedPlan?.name || subTier;
+  })();
+
+  // Determinar si el usuario tiene un plan activo pagado (no FREE)
+  const hasActivePaidPlan = activeSubscription && 
+    activeSubscription.plan?.id !== 'FREE' && 
+    activeSubscription.expiresAt && new Date(activeSubscription.expiresAt) > new Date() &&
+    (activeSubscription.remainingPublications ?? 1) > 0;
+
   return (
     <ProtectedRoute>
       <AdminRestrictionGuard feature="plans">
@@ -471,6 +470,27 @@ export default function PlansPage() {
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Elige tu Plan Ideal</h2>
             <p className="text-lg text-gray-600">Precios transparentes, sin sorpresas. Escalable según tu crecimiento.</p>
           </div>
+
+          {/* Mensaje si ya tiene un plan activo pagado */}
+          {hasActivePaidPlan && (
+            <div className="max-w-2xl mx-auto mb-8 bg-amber-50 border border-amber-300 rounded-xl p-5 text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 className="text-sm font-bold text-amber-800">Ya tienes un plan activo</h3>
+              </div>
+              <p className="text-sm text-amber-700">
+                Actualmente cuentas con el plan <strong>{activePlanName || activeSubscription?.plan?.name || 'activo'}</strong>. 
+                Podrás adquirir un nuevo plan cuando el actual esté próximo a vencer o haya vencido.
+              </p>
+              {activeSubscription?.expiresAt && (
+                <p className="text-xs text-amber-600 mt-2">
+                  Tu plan vence el {new Date(activeSubscription.expiresAt).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="relative">
             {isLoading ? (
@@ -513,14 +533,21 @@ export default function PlansPage() {
                       // El campo tier de la suscripción (ej: "CUSTOM", "BASIC", "PREMIUM")
                       const subscriptionTier = activeSubscription ? ((activeSubscription as any).tier || activeSubscription.plan?.id) : null;
                       const planIdToTier: Record<string, string> = {
-                        '1': 'FREE', '2': 'BASIC', '3': 'PREMIUM',
-                        '4': 'ENTERPRISE_TRIAL', '5': 'ENTERPRISE'
+                        '1': 'FREE', '2': 'BASIC', '3': 'PRO',
+                        '4': 'ENTERPRISE_TRIAL', '5': 'ENTERPRISE', '10': 'PLAN LANZAMIENTO'
                       };
                       const planTierCode = planIdToTier[plan.id] || plan.id;
+                      // Normalizar valores antiguos de la BD a los códigos actuales
+                      const oldToNew: Record<string, string> = {
+                        'PREMIUM': 'PRO',
+                        'CUSTOM': 'PLAN LANZAMIENTO'
+                      };
+                      const normalizedSubTier = (subscriptionTier && oldToNew[subscriptionTier]) || subscriptionTier;
+                      const normalizedBackendTier = (backendTier && oldToNew[backendTier]) || backendTier;
                       // Comparar contra subscriptionTier (que tiene el valor real de la BD como "CUSTOM", "BASIC", etc.)
                       // y también contra backendTier por compatibilidad
                       const isActive = activeSubscription 
-                        ? (subscriptionTier === planTierCode || backendTier === plan.id || backendTier === planTierCode)
+                        ? (normalizedSubTier === planTierCode || normalizedBackendTier === plan.id || normalizedBackendTier === planTierCode)
                         : planTierCode === 'FREE';
                       const isExhausted = isPlanExhausted(plan);
                       const intelligentDiscount = detectIntelligentDiscount(plan);

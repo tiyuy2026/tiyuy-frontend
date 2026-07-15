@@ -62,7 +62,7 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
   return (
     <div className={`relative rounded-2xl p-4 transition-all duration-300 h-full flex flex-col overflow-hidden ${
       isActive && !isExhausted && !isExpired
-        ? 'bg-blue-50 border-2 border-blue-400 shadow-lg pt-6'
+        ? 'bg-yellow-50 border-2 border-yellow-400 shadow-lg pt-6'
         : isExhausted || isExpired
         ? 'bg-gray-100 border-2 border-orange-300 shadow-md pt-6'
         : isPopular 
@@ -230,8 +230,9 @@ export function PlanCard({ plan, onSelectPlan, isSelected, isExhausted, isActive
       </div>
 
       {isActive && !isExhausted && !isExpired && (
-        <div className="absolute top-4 right-4 ">
-          <Icon icon="material-symbols:check-circle" className="w-6 h-6 text-[var(--brand-primary)]" />
+        <div className="absolute top-4 right-4 flex items-center gap-1.5">
+          <span className="bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Plan Activo</span>
+          <Icon icon="material-symbols:check-circle" className="w-6 h-6 text-yellow-500" />
         </div>
       )}
     </div>

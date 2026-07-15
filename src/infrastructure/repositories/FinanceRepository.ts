@@ -117,13 +117,14 @@ export class FinanceRepository implements IFinanceRepository {
     const planIdToTier: Record<string, string> = {
       '1': 'FREE',
       '2': 'BASIC',
-      '3': 'PREMIUM',
+      '3': 'PRO',
       '4': 'ENTERPRISE_TRIAL',
-      '5': 'ENTERPRISE'
+      '5': 'ENTERPRISE',
+      '10': 'PLAN LANZAMIENTO'
     };
     
     // Si planId ya es un tier válido, usarlo directamente
-    if (['FREE', 'BASIC', 'PREMIUM', 'ENTERPRISE_TRIAL', 'ENTERPRISE'].includes(planIdStr.toUpperCase())) {
+    if (['FREE', 'BASIC', 'PRO', 'ENTERPRISE_TRIAL', 'ENTERPRISE', 'PLAN LANZAMIENTO'].includes(planIdStr.toUpperCase())) {
       tier = planIdStr.toUpperCase();
     } else if (planIdToTier[planIdStr]) {
       // Si es un ID numérico, convertir al tier correspondiente
