@@ -6,6 +6,9 @@ import { MapItem, MapSearchResult, MapCoverageType } from '@/core/domain/entitie
 import { createPriceMarkerHtml, createClusterMarkerHtml, calculateMapCenter, calculateZoom, formatPrice } from '../utils/mapUtils';
 import '../styles/map.css';
 
+// Importar estilos CSS de Leaflet (necesario para que los tiles se rendericen correctamente)
+import 'leaflet/dist/leaflet.css';
+
 // Cargar Leaflet y MarkerCluster solo en cliente
 const L = typeof window !== 'undefined' ? require('leaflet') : null;
 

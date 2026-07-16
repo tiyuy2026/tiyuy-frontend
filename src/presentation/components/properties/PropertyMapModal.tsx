@@ -44,13 +44,9 @@ export function PropertyMapModal({ filters, onClose }: PropertyMapModalProps) {
     setPage(0);
   }, [searchResult?.properties?.length]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      reset();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Al cerrar el modal NO reseteamos el store porque comparte el estado
+  // con el mini mapa del padre. Si reseteamos, el mini mapa se queda sin datos.
+  // En su lugar, el padre se encarga de refrescar cuando sea necesario.
 
   const allProperties = searchResult?.properties || [];
   const totalPages = Math.max(1, Math.ceil(allProperties.length / itemsPerPage));

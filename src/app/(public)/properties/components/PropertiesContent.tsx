@@ -24,10 +24,21 @@ export default function PropertiesContent() {
   const [miniLoading, setMiniLoading] = useState(true);
 
   const propertyRepo = new PropertyRepository();
-  const { searchResult: mapResult, search: searchMap, selectProperty: selectMapProperty, selectedPropertyId: selectedMapPropertyId } = usePropertyMap();
+  const { searchResult: mapResult, search: searchMap, selectProperty: selectMapProperty, selectedPropertyId: selectedMapPropertyId, reset: resetPropertyMap } = usePropertyMap();
 
+  // Resetear el store al montar para evitar datos zombies de navegación SPA
   useEffect(() => {
+    resetPropertyMap();
+    setMiniLoading(true);
     searchMap({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Resetear el store al desmontar para que al volver no haya datos zombies
+  useEffect(() => {
+    return () => {
+      resetPropertyMap();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

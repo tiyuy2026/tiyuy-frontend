@@ -181,7 +181,14 @@ export function Footer() {
                       href={link.href}
                       className="text-[14px] text-gray-400 hover:text-white hover:translate-x-1 inline-block transition-all duration-200"
                     >
-                      {link.label}
+                      {link.label === 'Libro de Reclamaciones' ? (
+                        <span className="flex items-center gap-2">
+                          <Icon icon="material-symbols:book-2" width="16" className="text-[#4A9A3E] shrink-0" />
+                          {link.label}
+                        </span>
+                      ) : (
+                        link.label
+                      )}
                     </Link>
                   </li>
                 ))}

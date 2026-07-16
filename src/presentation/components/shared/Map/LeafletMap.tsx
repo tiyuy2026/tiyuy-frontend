@@ -4,6 +4,9 @@ import { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
+// Importar estilos CSS de Leaflet (necesario para que los tiles se rendericen correctamente)
+import 'leaflet/dist/leaflet.css';
+
 // Fix Leaflet default icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({

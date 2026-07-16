@@ -41,11 +41,22 @@ export default function ProjectsContent() {
   });
 
   const projectRepo = new ProjectRepository();
-  const { searchResult: mapResult, search: searchMap, selectProject: selectMapProject, selectedProjectId: selectedMapId } = useProjectMap();
+  const { searchResult: mapResult, search: searchMap, selectProject: selectMapProject, selectedProjectId: selectedMapId, reset: resetProjectMap } = useProjectMap();
 
-  // Cargar proyectos para el mini mapa (usa el mismo search del modal)
+  // Resetear el store al montar para evitar datos zombies de navegación SPA
+  // y forzar que el mini mapa siempre cargue desde cero
   useEffect(() => {
+    resetProjectMap();
+    setMiniLoading(true);
     searchMap({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Resetear el store al desmontar para que al volver no haya datos zombies
+  useEffect(() => {
+    return () => {
+      resetProjectMap();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
