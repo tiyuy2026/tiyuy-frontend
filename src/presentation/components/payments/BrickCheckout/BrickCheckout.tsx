@@ -12,6 +12,35 @@ interface Props {
 
 const PUBLIC_KEY = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || '';
 
+// Mapa de traducción de errores de MercadoPago (fallback para el frontend)
+const MP_ERROR_TRANSLATIONS: Record<string, string> = {
+  'cc_rejected_insufficient_amount': 'Fondos insuficientes en la tarjeta.',
+  'cc_rejected_bad_filled_security_code': 'Código de seguridad incorrecto. Verifica el CVV.',
+  'cc_rejected_bad_filled_card_number': 'Número de tarjeta incorrecto. Verifica el número.',
+  'cc_rejected_bad_filled_date': 'Fecha de vencimiento incorrecta. Verifica la fecha.',
+  'cc_rejected_call_for_authorize': 'Debes autorizar el pago llamando a tu banco.',
+  'cc_rejected_card_disabled': 'Tarjeta deshabilitada. Contacta a tu banco.',
+  'cc_rejected_duplicated_payment': 'Pago duplicado. Ya realizaste este pago antes.',
+  'cc_rejected_high_risk': 'Pago rechazado por prevención de fraude. Intenta con otra tarjeta o contacta a tu banco.',
+  'cc_rejected_max_attempts': 'Alcanzaste el máximo de intentos. Espera unos minutos e intenta de nuevo.',
+  'cc_rejected_blacklist': 'Pago rechazado por prevención de fraude. Contacta a tu banco.',
+  'rejected_high_risk': 'Pago rechazado por prevención de fraude. Intenta con otra tarjeta.',
+};
+
+/**
+ * Traduce un status_detail de MercadoPago a un mensaje legible.
+ * Si no está en el mapa, intenta limpiar el código raw.
+ */
+function translateMpError(statusDetail: string): string {
+  if (!statusDetail) return 'El pago fue rechazado. Intenta con otra tarjeta.';
+  const cleaned = statusDetail.replace(/^Pago rechazado: /, '');
+  if (MP_ERROR_TRANSLATIONS[cleaned]) return MP_ERROR_TRANSLATIONS[cleaned];
+  // Si el backend ya tradujo (empieza con mayúscula o es español), devolverlo tal cual
+  if (!cleaned.startsWith('cc_rejected') && !cleaned.startsWith('rejected')) return statusDetail;
+  // Fallback: limpiar underscores y mostrar en minúsculas
+  return 'Pago rechazado: ' + cleaned.replace(/_/g, ' ').toLowerCase();
+}
+
 export function BrickCheckout({ amount, subscriptionId }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -125,7 +154,7 @@ export function BrickCheckout({ amount, subscriptionId }: Props) {
       } else if (j.status === 'pending') {
         window.location.href = `/plans?payment=pending&subscription_id=${subscriptionId}`;
       } else {
-        setError(j.status_detail || 'El pago fue rechazado.');
+        setError(translateMpError(j.status_detail || '') || 'El pago fue rechazado.');
       }
     } catch (e: any) {
       console.error('Error completo en BrickCheckout:', e);
