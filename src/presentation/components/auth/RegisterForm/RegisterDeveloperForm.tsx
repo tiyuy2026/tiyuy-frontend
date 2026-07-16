@@ -136,11 +136,14 @@ export const RegisterDeveloperForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateStep(3)) return;
+    
     const email = googleData ? googleData.email : formData.email;
     const password = googleData ? crypto.randomUUID() : formData.password;
     const firstName = googleData ? (formData.firstName || googleData.firstName) : formData.firstName;
     const lastName = googleData ? (formData.lastName || googleData.lastName) : formData.lastName;
 
+    // Intentar registrar. Si falla, el error se muestra en el banner (manejado internamente por useAuth).
+    // No se cierra el formulario ni se redirige. El usuario puede corregir datos y reintentar.
     await register({
       email,
       password,
