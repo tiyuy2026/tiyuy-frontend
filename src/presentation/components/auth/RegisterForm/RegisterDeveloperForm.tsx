@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
-import { Eye, EyeOff, Mail, User, Phone, Lock, Hash, Building2, Star, MapPin } from 'lucide-react';
+import { Eye, EyeOff, Mail, User, Phone, Lock, Hash, Building2, Star, MapPin, XCircle } from 'lucide-react';
 import { useAuth } from '@/presentation/hooks';
 import { useGoogleAuth, GoogleUserData } from '@/presentation/hooks/useGoogleAuth';
 import { AuthRepository } from '@/infrastructure/repositories/AuthRepository';
@@ -23,6 +23,16 @@ export const RegisterDeveloperForm: React.FC = () => {
   const { validateEmail, isValidating: validatingEmail } = useUserValidation();
 
   const [currentStep, setCurrentStep] = useState(1);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorModalMessage, setErrorModalMessage] = useState('');
+
+  // Mostrar modal cuando hay error de registro (en vez de solo el banner)
+  useEffect(() => {
+    if (error) {
+      setErrorModalMessage(error);
+      setShowErrorModal(true);
+    }
+  }, [error]);
   const [googleData, setGoogleData] = useState<GoogleUserData | null>(null);
   const [formData, setFormData] = useState({
     email: '',
@@ -142,21 +152,25 @@ export const RegisterDeveloperForm: React.FC = () => {
     const firstName = googleData ? (formData.firstName || googleData.firstName) : formData.firstName;
     const lastName = googleData ? (formData.lastName || googleData.lastName) : formData.lastName;
 
-    // Intentar registrar. Si falla, el error se muestra en el banner (manejado internamente por useAuth).
-    // No se cierra el formulario ni se redirige. El usuario puede corregir datos y reintentar.
-    await register({
-      email,
-      password,
-      phone: formData.phone,
-      firstName,
-      lastName,
-      dni: formData.dni,
-      ruc: formData.ruc,
-      fullName: formData.companyName,
-      city: formData.city,
-      address: formData.address,
-      role: 'DEVELOPER',
-    });
+    try {
+      // Intentar registrar. Si falla, el error se muestra en el banner (manejado internamente por useAuth).
+      // No se cierra el formulario ni se redirige. El usuario puede corregir datos y reintentar.
+      await register({
+        email,
+        password,
+        phone: formData.phone,
+        firstName,
+        lastName,
+        dni: formData.dni,
+        ruc: formData.ruc,
+        fullName: formData.companyName,
+        city: formData.city,
+        address: formData.address,
+        role: 'DEVELOPER',
+      });
+    } catch (_err: any) {
+      // Error inesperado - ya debería estar capturado en useAuth, pero por seguridad
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -474,6 +488,29 @@ export const RegisterDeveloperForm: React.FC = () => {
           </div>
         )}
       </form>
+      {/* Modal de error de registro */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <XCircle className="w-8 h-8 text-red-500" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Error al registrar</h3>
+            <p className="text-gray-600 mb-6">{errorModalMessage}</p>
+            <p className="text-sm text-gray-500 mb-4">Puedes corregir los datos y volver a intentarlo.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setShowErrorModal(false);
+                clearError();
+              }}
+              className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition-colors"
+            >
+              Entendido, corregir datos
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
