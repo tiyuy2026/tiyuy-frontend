@@ -36,6 +36,7 @@ const FOOTER_COLUMNS = [
       { label: 'Apoyo a personas con discapacidad', href: '/discapacidad' },
       { label: 'Opciones de cancelación', href: '/cancelacion' },
       { label: 'Libro de Reclamaciones', href: '/libro-de-reclamaciones' },
+      { label: 'Políticas de Cambio o Devoluciones', href: '/politicas-de-cambio' },
 
       { label: 'Centro de Soporte', href: '/soporte' },
     ],
@@ -183,8 +184,12 @@ export function Footer() {
                     >
                       {link.label === 'Libro de Reclamaciones' ? (
                         <span className="flex items-center gap-2">
-                          <Icon icon="material-symbols:book-2" width="16" className="text-[#4A9A3E] shrink-0" />
                           {link.label}
+                          <img
+                            src="/assets/images/libro_reclamaciones/libro_reclamaciones.png"
+                            alt=""
+                            className="w-10 h-10 object-contain shrink-0"
+                          />
                         </span>
                       ) : (
                         link.label
@@ -252,7 +257,7 @@ export function Footer() {
             <span className="hidden sm:inline text-gray-700">|</span>
             <Link href="/privacy" className="hover:text-white transition-colors">Privacidad</Link>
             <span className="hidden sm:inline text-gray-700">|</span>
-            <Link href="/terms" className="hover:text-white transition-colors">Términos legales</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Términos y Condiciones</Link>
             <span className="hidden sm:inline text-gray-700">|</span>
             <Link href="/#mapa" className="hover:text-white transition-colors">Mapa del sitio</Link>
           </div>
@@ -269,6 +274,7 @@ export function Footer() {
           </div>
         </div>
       </div>
+
     </footer>
   );
 }
