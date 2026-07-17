@@ -4,7 +4,7 @@ import { useState } from 'react';
 import {
   Shield, User, Building2, BarChart3, CreditCard,
   CheckCircle, Zap, Mail, ShieldCheck, Sliders,
-  Check, Menu, X
+  Check, Menu, X, BookOpen
 } from 'lucide-react';
 
 const privacyData = {
@@ -394,18 +394,32 @@ export default function PrivacyPage() {
                       Si tienes preguntas, dudas o solicitudes sobre esta Política de Privacidad o el tratamiento de tus datos, puedes contactarnos:
                     </p>
                     <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl p-6 text-white">
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                           <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Email</p>
-                          <a href="mailto:privacidad@tiyuy.com" className="font-semibold hover:underline">privacidad@tiyuy.com</a>
+                          <a href="mailto:tiyuy@saberoconsulting.com" className="font-semibold hover:underline">tiyuy@saberoconsulting.com</a>
                         </div>
                         <div>
-                          <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Dirección</p>
-                          <p className="font-semibold">Lima, Perú</p>
+                          <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Teléfono</p>
+                          <a href="tel:+51923327532" className="font-semibold hover:underline">+51 923 327 532</a>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <BookOpen className="w-4 h-4" strokeWidth={2} />
                         </div>
                         <div>
-                          <p className="text-green-100 text-xs uppercase tracking-wider mb-1">Horario de atención</p>
-                          <p className="font-semibold">Lun - Vie, 9:00 - 18:00</p>
+                          <p className="text-sm text-amber-800 leading-relaxed mb-2">
+                            Si tu solicitud no fue atendida satisfactoriamente, puedes registrar tu reclamo en nuestro <strong>Libro de Reclamaciones</strong>.
+                          </p>
+                          <a
+                            href="/libro-de-reclamaciones"
+                            className="inline-flex items-center gap-2 text-sm font-semibold text-amber-700 hover:text-amber-800 bg-amber-100/50 hover:bg-amber-100 px-4 py-2 rounded-lg transition-colors"
+                          >
+                            Ir al Libro de Reclamaciones →
+                          </a>
                         </div>
                       </div>
                     </div>

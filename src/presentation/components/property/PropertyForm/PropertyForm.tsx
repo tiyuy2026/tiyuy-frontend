@@ -11,6 +11,7 @@ import { Project } from '@/core/domain/entities/Project';
 import { BasicInfoStep } from './BasicInfoStep';
 import { LocationStep } from './LocationStep';
 import { CharacteristicsStep } from './CharacteristicsStep';
+import { PhotosStep } from './PhotosStep';
 import { ProjectMultimediaStep } from './ProjectMultimediaStep';
 import { ProjectMultimediaStep as ProjectMediaStep } from '@/presentation/components/project/ProjectMultimediaStep';
 import { ProjectInfoStep } from './ProjectInfoStep';
@@ -50,7 +51,7 @@ const PropertyStepComponents: Record<number, React.ComponentType<any>> = {
   1: BasicInfoStep,
   2: LocationStep,
   3: CharacteristicsStep,
-  4: ProjectMultimediaStep,
+  4: PhotosStep,
 };
 
 const ProjectStepComponents: Record<number, React.ComponentType<any>> = {
