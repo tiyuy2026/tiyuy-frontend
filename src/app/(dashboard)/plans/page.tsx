@@ -472,25 +472,98 @@ function PlansPageContent() {
           </div>
 
           {/* Mensaje si ya tiene un plan activo pagado */}
-          {hasActivePaidPlan && (
-            <div className="max-w-2xl mx-auto mb-8 bg-amber-50 border border-amber-300 rounded-xl p-5 text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <h3 className="text-sm font-bold text-amber-800">Ya tienes un plan activo</h3>
+          {hasActivePaidPlan && (() => {
+            const expiresAt = activeSubscription.expiresAt ? new Date(activeSubscription.expiresAt) : null;
+            const now = new Date();
+            const diasRestantes = expiresAt ? Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) : 0;
+            const estaVencido = expiresAt && expiresAt <= now;
+            
+            // Determinar colores según días restantes
+            let bgColor, borderColor, textColor, badgeColor, iconColor;
+            let estadoTexto = '';
+            
+            if (estaVencido) {
+              bgColor = 'bg-red-50';
+              borderColor = 'border-red-400';
+              textColor = 'text-red-800';
+              badgeColor = 'bg-red-100 text-red-800';
+              iconColor = 'text-red-500';
+              estadoTexto = 'VENCIDO';
+            } else if (diasRestantes <= 5) {
+              bgColor = 'bg-red-50';
+              borderColor = 'border-red-300';
+              textColor = 'text-red-700';
+              badgeColor = 'bg-red-100 text-red-700';
+              iconColor = 'text-red-500';
+              estadoTexto = 'Por vencer';
+            } else if (diasRestantes <= 15) {
+              bgColor = 'bg-amber-50';
+              borderColor = 'border-amber-300';
+              textColor = 'text-amber-800';
+              badgeColor = 'bg-amber-100 text-amber-800';
+              iconColor = 'text-amber-500';
+              estadoTexto = 'Próximo a vencer';
+            } else {
+              bgColor = 'bg-emerald-50';
+              borderColor = 'border-emerald-300';
+              textColor = 'text-emerald-800';
+              badgeColor = 'bg-emerald-100 text-emerald-800';
+              iconColor = 'text-emerald-600';
+              estadoTexto = 'Activo';
+            }
+
+            return (
+            <div className={`max-w-2xl mx-auto mb-8 ${bgColor} border ${borderColor} rounded-xl p-5 text-center`}>
+              <div className="flex items-center justify-center gap-2 mb-3">
+                {/* Icono dinámico */}
+                {estaVencido ? (
+                  <svg className={`w-5 h-5 ${iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                ) : (
+                  <svg className={`w-5 h-5 ${iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                )}
+                <h3 className={`text-sm font-bold ${textColor}`}>
+                  {estaVencido ? 'Tu plan ha vencido' : 'Ya tienes un plan activo'}
+                </h3>
+                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${badgeColor}`}>
+                  {estadoTexto}
+                </span>
               </div>
-              <p className="text-sm text-amber-700">
-                Actualmente cuentas con el plan <strong>{activePlanName || activeSubscription?.plan?.name || 'activo'}</strong>. 
-                Podrás adquirir un nuevo plan cuando el actual esté próximo a vencer o haya vencido.
+              
+              <p className={`text-sm ${textColor}`}>
+                Actualmente cuentas con el plan <strong>{activePlanName || activeSubscription?.plan?.name || 'activo'}</strong>.
+                {estaVencido 
+                  ? ' Renueva tu plan para seguir disfrutando de los beneficios.'
+                  : ' Podrás adquirir un nuevo plan cuando el actual esté próximo a vencer o haya vencido.'
+                }
               </p>
-              {activeSubscription?.expiresAt && (
-                <p className="text-xs text-amber-600 mt-2">
-                  Tu plan vence el {new Date(activeSubscription.expiresAt).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' })}
+
+              {/* Indicador de días restantes */}
+              {expiresAt && !estaVencido && (
+                <div className="mt-3 flex items-center justify-center gap-3">
+                  <div className={`text-2xl font-bold ${diasRestantes <= 5 ? 'text-red-600' : diasRestantes <= 15 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                    {diasRestantes}
+                    <span className="text-sm font-normal ml-1">días</span>
+                  </div>
+                  <div className="h-8 w-px bg-gray-300"></div>
+                  <p className={`text-xs ${textColor}`}>
+                    Vence el {expiresAt.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </p>
+                </div>
+              )}
+
+              {/* Mensaje si está vencido */}
+              {estaVencido && expiresAt && (
+                <p className={`text-xs ${textColor} mt-2`}>
+                  Vencido el {expiresAt.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </p>
               )}
             </div>
-          )}
+            );
+          })()}
 
           <div className="relative">
             {isLoading ? (

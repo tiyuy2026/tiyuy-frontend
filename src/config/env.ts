@@ -27,6 +27,7 @@ export const env = {
   // --- APIs Externas ---
   googlePlacesKey: process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY || '',
   mpPublicKey: process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || '',
+  culqiPublicKey: process.env.NEXT_PUBLIC_CULQI_PUBLIC_KEY || '',
   vapidPublicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
 
   // --- Entorno ---
