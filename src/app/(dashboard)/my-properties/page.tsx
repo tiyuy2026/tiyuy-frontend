@@ -589,13 +589,15 @@ export default function MyPropertiesPage() {
                       )}
 
                       <div className="flex gap-1">
-                        <Link
-                          href={`/property/${property.id}`}
-                          target="_blank"
-                          className="flex-1 py-1.5 bg-white text-gray-700 text-[11px] font-semibold rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center justify-center border border-gray-200"
-                        >
-                          Ver página
-                        </Link>
+                        {property.status === 'PUBLISHED' && (
+                          <Link
+                            href={`/property/${property.id}`}
+                            target="_blank"
+                            className="flex-1 py-1.5 bg-white text-gray-700 text-[11px] font-semibold rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center justify-center border border-gray-200"
+                          >
+                            Ver página
+                          </Link>
+                        )}
                         
                         <Link
                           href={`/my-properties/${property.id}/edit`}
