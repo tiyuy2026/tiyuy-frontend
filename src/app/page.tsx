@@ -73,35 +73,6 @@ const quickLinks = [
   },
 ];
 
-/**
- * Intercala imágenes de banners entre las imágenes estáticas del carrusel.
- */
-function intercalateImages(staticImages: string[], bannerImages: string[]): string[] {
-  const result: string[] = [];
-  const maxBannersPerSlot = Math.max(1, Math.floor(staticImages.length / bannerImages.length));
-  let bannerIndex = 0;
-  let bannerCountInSlot = 0;
-
-  for (let i = 0; i < staticImages.length; i++) {
-    result.push(staticImages[i]);
-    if (bannerIndex < bannerImages.length) {
-      bannerCountInSlot++;
-      if (bannerCountInSlot >= maxBannersPerSlot || i === staticImages.length - 1) {
-        result.push(bannerImages[bannerIndex]);
-        bannerIndex++;
-        bannerCountInSlot = 0;
-      }
-    }
-  }
-
-  while (bannerIndex < bannerImages.length) {
-    result.push(bannerImages[bannerIndex]);
-    bannerIndex++;
-  }
-
-  return result;
-}
-
 function CustomSelect({ options, value, onChange, placeholder }: { options: { value: string; label: string }[]; value: string; onChange: (v: string) => void; placeholder: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -151,8 +122,10 @@ export default function HomePage() {
   const allBanners = [...sliderBanners, ...mainBanners, ...homeBanners];
   const integratedBanners = allBanners.filter(b => b.displayMode === 'INTEGRATED' || !b.displayMode);
 
+  // Si hay banners del admin, SOLO se muestran esos (sin imágenes estáticas de fallback)
+  // Si no hay banners del admin, se usan las imágenes estáticas por defecto
   const heroImages = integratedBanners.length > 0
-    ? intercalateImages(FALLBACK_HERO_IMAGES, integratedBanners.map(b => b.imageUrl))
+    ? integratedBanners.map(b => b.imageUrl)
     : FALLBACK_HERO_IMAGES;
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
