@@ -16,7 +16,7 @@ import { authStorage } from '@/infrastructure/storage/auth-storage';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminHeader } from '@/presentation/components/admin/AdminHeader/AdminHeader';
-import { Activity, Bell, Building, Building2, DollarSign, FileText, Layers, LayoutDashboard, LogOut, Megaphone, MessageSquare, Package, ShieldAlert, ShieldCheck, Tag, TriangleAlert, UserCircle, Users } from 'lucide-react';
+import { Activity, Bell, Building, Building2, DollarSign, FileText, Image as ImageIcon, Layers, LayoutDashboard, LogOut, Megaphone, MessageSquare, Package, ShieldAlert, ShieldCheck, Tag, TriangleAlert, UserCircle, Users } from 'lucide-react';
 
 
 interface GitHubShellProps {
@@ -81,6 +81,7 @@ const NAV_SECTIONS: NavSectionWithPermission[] = [
       { label: 'Planes', href: '/admin/plans', icon: Layers, requiredPermission: 'FINANCE_VIEW' },
       { label: 'Descuentos', href: '/admin/discounts', icon: Tag, requiredPermission: 'DISCOUNTS_CREATE' },
       { label: 'Campanas', href: '/admin/campaigns', icon: Megaphone, requiredPermission: 'COMMUNICATIONS_MANAGE' },
+      { label: 'Banners', href: '/admin/campaigns/banners', icon: ImageIcon, requiredPermission: 'COMMUNICATIONS_MANAGE' },
       { label: 'Finanzas', href: '/admin/finance', icon: DollarSign, requiredPermission: 'FINANCE_VIEW' },
     ],
   },

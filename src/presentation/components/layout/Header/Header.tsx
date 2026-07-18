@@ -770,7 +770,7 @@ export function Header() {
               {/* INGRESAR - Solo si NO está autenticado */}
               {!isAuthenticated && (
                 <Link
-                  href="/profile-selector"
+                  href="/login"
                   className="hidden sm:inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium"
                 >
                   Ingresar
@@ -1045,7 +1045,7 @@ export function Header() {
               <button
                 onClick={() => {
                   setShowAuthModal(false);
-                  router.push('/profile-selector');
+                  router.push('/login');
                 }}
                 className="w-full flex items-center justify-center gap-2 bg-teal-600 text-white font-semibold py-3 px-4 rounded-xl hover:bg-teal-700 transition-colors"
               >
