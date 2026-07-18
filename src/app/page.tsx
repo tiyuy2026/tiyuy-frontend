@@ -156,6 +156,22 @@ export default function HomePage() {
     : FALLBACK_HERO_IMAGES;
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
+
+  // Precargar todas las imágenes del carrusel al inicio
+  useEffect(() => {
+    heroImages.forEach((src, index) => {
+      const img = new window.Image();
+      img.onload = () => {
+        setLoadedImages(prev => new Set(prev).add(index));
+      };
+      img.onerror = () => {
+        // Si falla la carga, igual marcar como cargada para no bloquear
+        setLoadedImages(prev => new Set(prev).add(index));
+      };
+      img.src = src;
+    });
+  }, [heroImages]);
   const [activeTab, setActiveTab] = useState<'rent' | 'sale' | 'projects'>('sale');
   const [selectedPropertyType, setSelectedPropertyType] = useState('departamentos');
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -272,25 +288,22 @@ export default function HomePage() {
           {heroImages.map((image, index) => (
             <div
               key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
+              className={`absolute inset-0 transition-opacity duration-1000 pointer-events-none ${
                 index === currentImageIndex ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              {/* Solo cargar la imagen actual y precargar solo la siguiente */}
-              {index === currentImageIndex || index === (currentImageIndex + 1) % heroImages.length ? (
-                <Image
-                  src={image}
-                  alt=""
-                  fill
-                  sizes="100vw"
-                  priority={index === 0}
-                  loading={index === 0 ? undefined : 'lazy'}
-                  className="object-cover"
-                />
-              ) : null}
+              <Image
+                src={image}
+                alt=""
+                fill
+                sizes="100vw"
+                priority={index < 2}
+                loading={index < 2 ? undefined : 'lazy'}
+                className="object-cover"
+              />
             </div>
           ))}
-          <div className="absolute inset-0 bg-black/40"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
         </div>
 
         <div className="absolute inset-0 flex items-center justify-center">
