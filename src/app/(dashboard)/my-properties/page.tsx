@@ -573,6 +573,27 @@ export default function MyPropertiesPage() {
                         </button>
                       )}
 
+                      {/* Pause button for published properties - changes to DRAFT */}
+                      {property.status === 'PUBLISHED' && (
+                        <button
+                          onClick={async () => {
+                            if (confirm('¿Pausar esta propiedad? Pasará a borrador y podrás eliminarla desde ahí.')) {
+                              try {
+                                await publishMutation.mutateAsync(property.id);
+                                toast.success('Propiedad pausada (pasó a borrador)');
+                                refetch();
+                              } catch (e) {
+                                toast.error('Error al pausar');
+                              }
+                            }
+                          }}
+                          disabled={publishMutation.isPending}
+                          className="w-full py-1.5 bg-orange-50 text-orange-700 border border-orange-200 text-[11px] font-semibold rounded-md hover:bg-orange-100 transition-colors flex items-center justify-center gap-1"
+                        >
+                          Pausar
+                        </button>
+                      )}
+
                       {/* Featured button */}
                       {property.status === 'PUBLISHED' && !property.isFeatured && (
                         <button
@@ -587,7 +608,7 @@ export default function MyPropertiesPage() {
                       <div className="flex gap-1">
                         {property.status === 'PUBLISHED' && (
                           <Link
-                            href={`/property/${property.id}`}
+                            href={`/property/${property.slug || property.id}`}
                             target="_blank"
                             className="flex-1 py-1.5 bg-white text-gray-700 text-[11px] font-semibold rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center justify-center border border-gray-200"
                           >

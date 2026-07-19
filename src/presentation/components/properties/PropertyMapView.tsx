@@ -112,7 +112,7 @@ export function PropertyMapView({
             <Popup>
               <div 
                 className="w-[220px] cursor-pointer"
-                onClick={() => window.location.href = `/property/${property.id}`}
+                onClick={() => window.location.href = `/property/${property.slug || property.id}`}
               >
                 {/* Imagen */}
                 {property.mainPhotoUrl && (
@@ -140,8 +140,8 @@ export function PropertyMapView({
                   S/ {property.price?.toLocaleString('es-PE')}
                 </p>
 
-                {/* Título */}
-                <p className="text-xs text-gray-600 mt-0.5 line-clamp-1">{property.title}</p>
+                {/* Título (sin "| Wasyn") */}
+                <p className="text-xs text-gray-600 mt-0.5 line-clamp-1">{property.title?.replace(/\s*\|\s*Wasyn\s*$/i, '').trim() || property.title}</p>
 
                 {/* Ubicación */}
                 <p className="text-[11px] text-gray-400 mt-0.5">

@@ -16,6 +16,9 @@ interface PropertyMapCardProps {
 export function PropertyMapCard({ property, isSelected, onClick }: PropertyMapCardProps) {
   const [imgError, setImgError] = useState(false);
 
+  // Limpiar "| Wasyn" del título si existe
+  const cleanTitle = property.title?.replace(/\s*\|\s*Wasyn\s*$/i, '').trim() || property.title || '';
+
   const formatPrice = (price: number, currency: string) => {
     return new Intl.NumberFormat('es-PE', {
       style: 'currency',
@@ -40,7 +43,7 @@ export function PropertyMapCard({ property, isSelected, onClick }: PropertyMapCa
   };
 
   return (
-    <Link href={`/property/${property.id}`} className="block w-full">
+    <Link href={`/property/${property.slug || property.id}`} className="block w-full">
       <div className={`w-full bg-white rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md border ${
         isSelected ? 'border-brand ring-1 ring-brand shadow-md' : 'border-gray-100 shadow-sm hover:border-brand/40'
       }`}>
@@ -61,7 +64,7 @@ export function PropertyMapCard({ property, isSelected, onClick }: PropertyMapCa
                 {property.transactionType && <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-brand-light text-brand-dark">{transactionLabels[property.transactionType] || property.transactionType}</span>}
                 {property.type && <span className="text-[10px] text-gray-400 font-medium">{typeLabels[property.type] || property.type}</span>}
               </div>
-              <h3 className="text-sm font-semibold text-gray-900 leading-tight line-clamp-1">{property.title}</h3>
+              <h3 className="text-sm font-semibold text-gray-900 leading-tight line-clamp-1">{cleanTitle}</h3>
               <p className="text-[11px] text-gray-500 mt-0.5 truncate">{property.district}{property.province ? `, ${property.province}` : ''}</p>
               <div className="flex items-center gap-2 mt-1 text-[11px] text-gray-500 flex-wrap">
                 {property.bedrooms && <span>{property.bedrooms} dorm</span>}
