@@ -172,10 +172,6 @@ export default function MyPropertiesPage() {
   };
 
   const handleDeleteClick = (id: number, title: string, status: string) => {
-    if (status !== 'DRAFT') {
-      toast.error('Solo se pueden eliminar propiedades en estado borrador');
-      return;
-    }
     setDeleteModal({ isOpen: true, id, title });
   };
 
@@ -606,15 +602,13 @@ export default function MyPropertiesPage() {
                           Editar
                         </Link>
                         
-                        {property.status === 'DRAFT' && (
-                          <button
-                            onClick={() => handleDeleteClick(property.id, property.title, property.status)}
-                            disabled={deleteMutation.isPending}
-                            className="py-1.5 px-2 bg-white text-red-600 border border-red-200 text-[11px] font-semibold rounded-md hover:bg-red-50 disabled:opacity-50 transition-colors whitespace-nowrap"
-                          >
-                            Eliminar
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleDeleteClick(property.id, property.title, property.status)}
+                          disabled={deleteMutation.isPending}
+                          className="py-1.5 px-2 bg-white text-red-600 border border-red-200 text-[11px] font-semibold rounded-md hover:bg-red-50 disabled:opacity-50 transition-colors whitespace-nowrap"
+                        >
+                          Eliminar
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -691,7 +685,7 @@ export default function MyPropertiesPage() {
       {deleteModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Eliminar borrador</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Eliminar propiedad</h3>
             <p className="text-sm text-gray-500 mb-6">
               ¿Estás seguro de eliminar la propiedad <span className="font-semibold text-gray-700">"{deleteModal.title}"</span>? Esta acción no se puede deshacer.
             </p>

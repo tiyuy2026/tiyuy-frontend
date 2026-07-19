@@ -30,7 +30,7 @@ export class PropertyRepository implements IPropertyRepository {
     const properties: MapPropertySummary[] = (data.properties || []).map((p: any) => ({
       id: p.id,
       title: p.title || '',
-      slug: p.slug || '',
+      slug: p.slug || String(p.id),
       price: p.price ? Number(p.price) : 0,
       currency: (p.currency || 'PEN') as Currency,
       type: (p.type || 'APARTMENT') as PropertyType,

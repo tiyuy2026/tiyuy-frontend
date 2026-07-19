@@ -177,7 +177,8 @@ export function PropertyMapView({
       );
 
       const isProject = item.type === 'PROJECT';
-      const detailSlug = item.metadata?.slug || item.slug || item.id;
+      // Para propiedades: slug está en item.slug. Para proyectos: slug está en item.metadata?.slug o item.slug
+      const detailSlug = String(isProject ? (item.metadata?.slug || item.slug || item.id) : (item.slug || item.id));
       // La ruta correcta es /projects/detail/{slug} para proyectos y /property/{slug} para propiedades
       const detailUrl = isProject ? `/projects/detail/${detailSlug}` : `/property/${detailSlug}`;
       
