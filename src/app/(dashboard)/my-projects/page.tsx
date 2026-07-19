@@ -379,18 +379,20 @@ export default function MyProjectsPage() {
                       {/* Actions row - all buttons same size */}
                       <div className="flex gap-2">
                         <Link
-                          href={`/projects/detail/${project.slug}`}
-                          target="_blank"
+                          href={project.status === 'DRAFT' ? `/dashboard/projects/${project.id}/edit` : `/projects/detail/${project.slug}`}
+                          target={project.status === 'DRAFT' ? '_self' : '_blank'}
                           className="flex-1 text-center px-2 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-xs font-medium min-h-[36px] flex items-center justify-center"
                         >
-                          Ver
+                          {project.status === 'DRAFT' ? 'Editar' : 'Ver'}
                         </Link>
+                        {project.status !== 'DRAFT' && (
                         <Link
                           href={`/dashboard/projects/${project.id}/edit`}
                           className="flex-1 text-center px-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-xs font-medium min-h-[36px] flex items-center justify-center"
                         >
                           Editar
                         </Link>
+                        )}
                         {project.status === 'DRAFT' && (
                           <button
                             onClick={() => handlePublish(project.id)}
