@@ -990,12 +990,14 @@ export function Header() {
                 <>
                   <Link
                     href="/login"
+                    onClick={() => setMobileMenuOpen(false)}
                     className="block w-full text-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm font-medium"
                   >
                     Iniciar sesión
                   </Link>
                   <Link
                     href="/register"
+                    onClick={() => setMobileMenuOpen(false)}
                     className="block w-full text-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium"
                   >
                     Registrarse

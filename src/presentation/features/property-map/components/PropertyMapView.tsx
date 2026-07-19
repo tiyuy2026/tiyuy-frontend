@@ -178,8 +178,8 @@ export function PropertyMapView({
 
       const isProject = item.type === 'PROJECT';
       const detailSlug = item.metadata?.slug || item.slug || item.id;
-      // La ruta correcta es /property/{slug}
-      const detailUrl = isProject ? `/projects/${detailSlug}` : `/property/${detailSlug}`;
+      // La ruta correcta es /projects/detail/{slug} para proyectos y /property/{slug} para propiedades
+      const detailUrl = isProject ? `/projects/detail/${detailSlug}` : `/property/${detailSlug}`;
       
       const marker = L.marker([item.latitude, item.longitude], {
         icon: L.divIcon({
