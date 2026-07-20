@@ -308,7 +308,7 @@ export default function EventDetailView({
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                         isRsvped
                           ? 'bg-green-100 text-green-700 border border-green-300'
-                          : 'bg-brand text-white hover:bg-blue-700'
+                          : 'bg-brand text-white hover:opacity-90'
                       }`}
                     >
                       {isRsvped ? <Check className="w-4 h-4" /> : <Calendar className="w-4 h-4" />}

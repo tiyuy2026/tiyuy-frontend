@@ -712,7 +712,7 @@ export default function CreateEventModal({ isOpen, onClose, channelId, onSuccess
           Cancelar
         </button>
         <button type="submit"
-          className="flex-1 px-2 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 px-2 py-2 text-sm bg-blue-600 text-white rounded-lg hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={createEventMutation.isPending || uploadEventImagesMutation.isPending}>
           {createEventMutation.isPending || uploadEventImagesMutation.isPending ? (
             <div className="flex items-center justify-center gap-1"><div className="w-3 h-3 border-2 border-white border-t-transparent animate-spin" /> {uploadEventImagesMutation.isPending ? 'Subiendo...' : 'Creando...'}</div>

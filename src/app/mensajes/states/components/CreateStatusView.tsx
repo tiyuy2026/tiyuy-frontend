@@ -35,7 +35,7 @@ export default function CreateStatusView({ user, onBack }: { user: any; onBack: 
     };
 
     return (
-        <div className="h-full bg-white dark:bg-gray-900 flex flex-col">
+        <div className="h-full bg-[var(--bg-primary)] flex flex-col">
             {/* Header */}
             <div className="flex-none flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600">
                 <button onClick={onBack} className="text-white/70 hover:text-white transition-colors">

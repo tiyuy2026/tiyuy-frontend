@@ -176,9 +176,9 @@ export default async function PropertyCategoryPage({ params, searchParams }: Pro
 
             <div className="lg:col-span-3">
               <div className="mb-4 flex items-center justify-between">
-                <h1 className="text-lg font-semibold text-gray-900">
+                <h1 className="text-lg font-semibold text-[var(--text-primary)]">
                   {propertyTypeLabel} en {district}
-                  <span className="ml-2 text-sm font-normal text-gray-500">
+                  <span className="ml-2 text-sm font-normal text-[var(--text-muted)]">
                     ({result.pagination.totalElements} propiedades)
                   </span>
                 </h1>

@@ -303,7 +303,7 @@ export default function ChannelEventsPanel({
       {isMobile && showMobileSidebar && <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowMobileSidebar(false)} />}
       {isMobile && (
         <button onClick={() => setShowMobileSidebar(!showMobileSidebar)}
-          className="fixed bottom-20 left-4 z-50 w-12 h-12 bg-brand text-white rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition-colors">
+          className="fixed bottom-20 left-4 z-50 w-12 h-12 bg-brand text-white rounded-full shadow-lg flex items-center justify-center hover:opacity-90 transition-colors">
           <Filter className="w-5 h-5" />
         </button>
       )}
@@ -399,7 +399,7 @@ export default function ChannelEventsPanel({
                 <div className="text-center py-12">
                   <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4"><Bell className="w-8 h-8 text-red-500" /></div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">Error al cargar notificaciones</h3>
-                  <button onClick={() => refetchNotifications()} className="px-4 py-2 bg-brand text-white rounded-lg hover:bg-blue-700">Reintentar</button>
+                  <button onClick={() => refetchNotifications()} className="px-4 py-2 bg-brand text-white rounded-lg hover:opacity-90">Reintentar</button>
                 </div>
               )}
               {!notificationsLoading && !notificationsError && notifications.length === 0 && (
@@ -491,7 +491,7 @@ export default function ChannelEventsPanel({
                       <label className="block text-sm font-medium text-gray-700 mb-2">Seleccionar fecha</label>
                       <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                       <div className="flex gap-2 mt-2">
-                        <button onClick={() => { if (selectedDate) { handleFilterChange('date', selectedDate); setShowDatePicker(false); } }} className="px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-700">Filtrar</button>
+                        <button onClick={() => { if (selectedDate) { handleFilterChange('date', selectedDate); setShowDatePicker(false); } }} className="px-4 py-2 bg-brand text-white rounded-md hover:opacity-90">Filtrar</button>
                         <button onClick={() => setShowDatePicker(false)} className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Cancelar</button>
                       </div>
                     </div>

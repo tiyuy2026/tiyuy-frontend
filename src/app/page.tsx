@@ -17,7 +17,7 @@ const Footer = lazy(() => import('@/presentation/components/layout/Footer/Footer
 
 // Fallback loading simple para secciones lazy
 const SectionFallback = ({ height = '200px' }: { height?: string }) => (
-  <div style={{ height, background: '#f9fafb', borderRadius: '8px', margin: '0.5rem 0' }} />
+  <div style={{ height, background: 'var(--bg-secondary)', borderRadius: '8px', margin: '0.5rem 0' }} />
 );
 
 // Fallback images si no hay banners configurados en admin
@@ -120,19 +120,19 @@ function CustomSelect({ options, value, onChange, placeholder }: { options: { va
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-5 py-3.5 border border-gray-200 rounded-xl bg-white text-base text-gray-700 cursor-pointer transition-all hover:border-gray-300 shadow-sm focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none"
+        className="w-full flex items-center justify-between px-5 py-3.5 border border-[var(--border-color)] rounded-xl bg-[var(--bg-card)] text-base text-[var(--text-primary)] cursor-pointer transition-all hover:border-[var(--border-color)] shadow-sm focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none"
       >
-        <span className={selected ? 'text-gray-700' : 'text-gray-400'}>{selected ? selected.label : placeholder}</span>
-        <svg className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+        <span className={selected ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}>{selected ? selected.label : placeholder}</span>
+        <svg className={`w-4 h-4 text-[var(--text-muted)] transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
       </button>
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+        <div className="absolute z-50 mt-1 w-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl shadow-lg overflow-hidden">
           {options.map((opt) => (
             <button
               key={opt.value}
               type="button"
               onClick={() => { onChange(opt.value); setIsOpen(false); }}
-              className={`w-full text-left px-5 py-3 text-sm transition-colors hover:bg-brand-light hover:text-brand-dark ${value === opt.value ? 'bg-brand-light text-brand-dark font-semibold' : 'text-gray-700'}`}
+              className={`w-full text-left px-5 py-3 text-sm transition-colors hover:bg-brand-light hover:text-brand-dark ${value === opt.value ? 'bg-brand-light text-brand-dark font-semibold' : 'text-[var(--text-primary)]'}`}
             >
               {opt.label}
             </button>
@@ -314,35 +314,35 @@ export default function HomePage() {
                   Encuentra tu hogar
                 </h1>
 
-                <div className="bg-white rounded-2xl shadow-xl border border-gray-200/80 dark:border-gray-700/80">
-                  <div className="border-b border-gray-200 rounded-t-2xl bg-white overflow-hidden">
+                <div className="bg-[var(--bg-card)] rounded-2xl shadow-xl border border-[var(--border-color)]">
+                  <div className="border-b border-[var(--border-color)] rounded-t-2xl bg-[var(--bg-card)] overflow-hidden">
                     <div className="flex">
                       <button
                         onClick={() => handleTabClick('rent')}
-                        className={`flex-1 py-4 text-base font-semibold transition-colors bg-white ${
+                        className={`flex-1 py-4 text-base font-semibold transition-colors bg-[var(--bg-card)] ${
                           activeTab === 'rent'
                             ? 'text-brand border-b-2 border-brand'
-                            : 'text-gray-500 hover:text-brand hover:bg-gray-50/50'
+                            : 'text-[var(--text-muted)] hover:text-brand hover:bg-[var(--bg-secondary)]/50'
                         }`}
                       >
                         Alquilar
                       </button>
                       <button
                         onClick={() => handleTabClick('sale')}
-                        className={`flex-1 py-4 text-base font-semibold transition-colors bg-white ${
+                        className={`flex-1 py-4 text-base font-semibold transition-colors bg-[var(--bg-card)] ${
                           activeTab === 'sale'
                             ? 'text-brand border-b-2 border-brand'
-                            : 'text-gray-500 hover:text-brand hover:bg-gray-50/50'
+                            : 'text-[var(--text-muted)] hover:text-brand hover:bg-[var(--bg-secondary)]/50'
                         }`}
                       >
                         Comprar
                       </button>
                       <button
                         onClick={() => handleTabClick('projects')}
-                        className={`flex-1 py-4 text-base font-semibold transition-colors bg-white ${
+                        className={`flex-1 py-4 text-base font-semibold transition-colors bg-[var(--bg-card)] ${
                           activeTab === 'projects'
                             ? 'text-brand border-b-2 border-brand'
-                            : 'text-gray-500 hover:text-brand hover:bg-gray-50/50'
+                            : 'text-[var(--text-muted)] hover:text-brand hover:bg-[var(--bg-secondary)]/50'
                         }`}
                       >
                         Proyectos
@@ -350,7 +350,7 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  <div className="p-6 bg-white rounded-b-2xl">
+                  <div className="p-6 bg-[var(--bg-card)] rounded-b-2xl">
                     <div className="flex flex-col lg:flex-row gap-3 relative z-10">
                       <div className="flex-1">
                         <CustomSelect 
@@ -397,7 +397,7 @@ export default function HomePage() {
                             placeholder="Área mínima (m²)"
                             value={selectedMinArea}
                             onChange={(e) => setSelectedMinArea(e.target.value)}
-                            className="w-full hero-input-number px-5 py-3.5 border border-gray-200 rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-gray-700 bg-white transition-all hover:border-gray-300 shadow-sm"
+                            className="w-full hero-input-number px-5 py-3.5 border border-[var(--border-color)] rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none text-base text-[var(--text-primary)] bg-[var(--bg-card)] transition-all hover:border-[var(--border-color)] shadow-sm"
                           />
                         </div>
                       ) : null}
@@ -455,7 +455,7 @@ export default function HomePage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
               {quickLinks.map(({ href, icon, title, description, actionText }) => (
                 <Link key={href} href={href} className="block group h-full">
-                  <div className="flex flex-col h-full bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-200 hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
+                  <div className="flex flex-col h-full bg-[var(--bg-card)] rounded-xl p-4 sm:p-5 shadow-sm border border-[var(--border-color)] hover:border-brand/30 group-hover:scale-[1.02] transition-all duration-300">
                     <div className="flex-grow">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[var(--brand-primary-light)] rounded-xl flex items-center justify-center mb-3 group-hover:bg-[var(--brand-primary-light-hover)] transition-colors">
                         <Icon icon={icon} className="w-5 h-5 sm:w-6 sm:h-6 text-brand" />

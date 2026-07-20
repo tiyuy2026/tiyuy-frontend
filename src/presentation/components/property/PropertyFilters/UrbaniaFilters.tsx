@@ -45,17 +45,17 @@ function StyledDropdown({ label, options, value, onChange }: {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent flex items-center justify-between cursor-pointer transition-all"
+        className="w-full px-4 py-3 border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-secondary)] bg-[var(--bg-tertiary)] focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent flex items-center justify-between cursor-pointer transition-all"
       >
         <span>{selectedLabel}</span>
-        <svg className={`w-4 h-4 text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className={`w-4 h-4 text-[var(--text-muted)] transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       {/* Opciones con diseño */}
       {open && (
-        <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+        <div className="absolute z-20 mt-1 w-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl shadow-lg overflow-hidden">
           {options.map((opt) => (
             <button
               key={opt.value}
@@ -63,7 +63,7 @@ function StyledDropdown({ label, options, value, onChange }: {
               className={`w-full px-4 py-3 text-sm text-left transition-colors cursor-pointer flex items-center gap-3 ${
                 value === opt.value
                   ? 'bg-green-50 text-green-700 font-semibold'
-                  : 'text-gray-700 hover:bg-green-50/50 hover:text-green-700'
+                  : 'text-[var(--text-secondary)] hover:bg-green-50/50 hover:text-green-700'
               }`}
               onClick={() => {
                 onChange(opt.value);
@@ -74,7 +74,7 @@ function StyledDropdown({ label, options, value, onChange }: {
               <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
                 value === opt.value
                   ? 'border-green-500 bg-green-500'
-                  : 'border-gray-300 bg-white'
+                  : 'border-[var(--border-color)] bg-[var(--bg-card)]'
               }`}>
                 {value === opt.value && (
                   <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,12 +122,12 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 space-y-5">
+    <div className="bg-[var(--bg-card)] rounded-lg shadow-sm border border-[var(--border-color)] p-4 space-y-5">
 
       {/* PRECIO */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <span className="font-semibold text-gray-900">Precio</span>
+          <span className="font-semibold text-[var(--text-primary)]">Precio</span>
           <div className="flex items-center gap-3">
             <button
               className="text-sm text-green-600 hover:text-green-700 font-medium"
@@ -144,7 +144,7 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
         <div className="flex gap-2 mb-3">
           <button
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              currency === 'PEN' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              currency === 'PEN' ? 'bg-green-600 text-white' : 'bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]'
             }`}
             onClick={() => setCurrency('PEN')}
           >
@@ -152,7 +152,7 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
           </button>
           <button
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              currency === 'USD' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              currency === 'USD' ? 'bg-green-600 text-white' : 'bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]'
             }`}
             onClick={() => setCurrency('USD')}
           >
@@ -164,13 +164,13 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
           <input
             type="number"
             placeholder="Desde"
-            className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="px-4 py-3 border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-secondary)] placeholder:text-[var(--text-muted)] bg-[var(--bg-tertiary)] focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
           />
           <input
             type="number"
             placeholder="Hasta"
-            className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="px-4 py-3 border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-secondary)] placeholder:text-[var(--text-muted)] bg-[var(--bg-tertiary)] focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
           />
         </div>
@@ -182,16 +182,16 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
             checked={includeMaintenance}
             onChange={(e) => setIncludeMaintenance(e.target.checked)}
           />
-          <span className="text-sm text-gray-600">Incluir Mantenimiento en el precio final.</span>
+          <span className="text-sm text-[var(--text-secondary)]">Incluir Mantenimiento en el precio final.</span>
         </label>
       </div>
 
-      <hr className="border-gray-100" />
+      <hr className="border-[var(--border-light)]" />
 
       {/* DORMITORIOS */}
       {visibleFilters.includes('DORMITORIOS') && (
         <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">Dormitorios</label>
+          <label className="block text-sm font-semibold text-[var(--text-primary)] mb-2">Dormitorios</label>
           <StyledDropdown
             label="Dormitorios"
             value={filters.bedrooms || ''}
@@ -210,7 +210,7 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
       {/* BAÑOS */}
       {visibleFilters.includes('BAÑOS') && (
         <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">Baños</label>
+          <label className="block text-sm font-semibold text-[var(--text-primary)] mb-2">Baños</label>
           <StyledDropdown
             label="Baños"
             value={filters.bathrooms || ''}
@@ -228,9 +228,9 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
       {/* TIPO_BAÑO - Solo para habitaciones */}
       {visibleFilters.includes('TIPO_BAÑO') && (
         <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">Tipo de baño</label>
+          <label className="block text-sm font-semibold text-[var(--text-primary)] mb-2">Tipo de baño</label>
           <div className="space-y-2">
-            <label className="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg">
+            <label className="flex items-center cursor-pointer hover:bg-[var(--bg-tertiary)] p-2 rounded-lg">
               <input
                 type="radio"
                 name="tipoBano"
@@ -239,9 +239,9 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
                 onChange={(e) => setFilters({ ...filters, hasPrivateBathroom: true })}
                 checked={filters.hasPrivateBathroom === true}
               />
-              <span className="text-sm text-gray-700">Baño propio</span>
+              <span className="text-sm text-[var(--text-secondary)]">Baño propio</span>
             </label>
-            <label className="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg">
+            <label className="flex items-center cursor-pointer hover:bg-[var(--bg-tertiary)] p-2 rounded-lg">
               <input
                 type="radio"
                 name="tipoBano"
@@ -250,7 +250,7 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
                 onChange={(e) => setFilters({ ...filters, hasPrivateBathroom: false })}
                 checked={filters.hasPrivateBathroom === false}
               />
-              <span className="text-sm text-gray-700">Baño compartido</span>
+              <span className="text-sm text-[var(--text-secondary)]">Baño compartido</span>
             </label>
           </div>
         </div>
@@ -259,18 +259,18 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
       {/* ÁREA */}
       {visibleFilters.includes('ÁREA') && (
         <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">Área m²</label>
+          <label className="block text-sm font-semibold text-[var(--text-primary)] mb-2">Área m²</label>
           <div className="grid grid-cols-2 gap-3">
             <input
               type="number"
               placeholder="Desde"
-              className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-3 border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-secondary)] placeholder:text-[var(--text-muted)] bg-[var(--bg-tertiary)] focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               onChange={(e) => setFilters({ ...filters, minArea: e.target.value })}
             />
             <input
               type="number"
               placeholder="Hasta"
-              className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-3 border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-secondary)] placeholder:text-[var(--text-muted)] bg-[var(--bg-tertiary)] focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               onChange={(e) => setFilters({ ...filters, maxArea: e.target.value })}
             />
           </div>
@@ -280,7 +280,7 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
       {/* ESTACIONAMIENTO */}
       {visibleFilters.includes('ESTACIONAMIENTO') && (
         <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">Estacionamiento</label>
+          <label className="block text-sm font-semibold text-[var(--text-primary)] mb-2">Estacionamiento</label>
           <StyledDropdown
             label="Estacionamiento"
             value={filters.parking || ''}
@@ -298,18 +298,18 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
       {/* TERRENO */}
       {visibleFilters.includes('TERRENO') && (
         <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">Terreno m²</label>
+          <label className="block text-sm font-semibold text-[var(--text-primary)] mb-2">Terreno m²</label>
           <div className="grid grid-cols-2 gap-3">
             <input
               type="number"
               placeholder="Desde"
-              className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-3 border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-secondary)] placeholder:text-[var(--text-muted)] bg-[var(--bg-tertiary)] focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               onChange={(e) => setFilters({ ...filters, minLand: e.target.value })}
             />
             <input
               type="number"
               placeholder="Hasta"
-              className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-3 border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-secondary)] placeholder:text-[var(--text-muted)] bg-[var(--bg-tertiary)] focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               onChange={(e) => setFilters({ ...filters, maxLand: e.target.value })}
             />
           </div>
@@ -319,20 +319,20 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
       {/* MÁS FILTROS - FRONTIS */}
       {showMoreFilters && visibleFilters.includes('FRONTIS') && (
         <>
-          <hr className="border-gray-100" />
+          <hr className="border-[var(--border-light)]" />
           <div>
-            <label className="block text-sm font-semibold text-gray-800 mb-2">Frontis (m)</label>
+            <label className="block text-sm font-semibold text-[var(--text-primary)] mb-2">Frontis (m)</label>
             <div className="grid grid-cols-2 gap-3">
               <input
                 type="number"
                 placeholder="Desde"
-                className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="px-4 py-3 border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-secondary)] placeholder:text-[var(--text-muted)] bg-[var(--bg-tertiary)] focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 onChange={(e) => setFilters({ ...filters, minFrontis: e.target.value })}
               />
               <input
                 type="number"
                 placeholder="Hasta"
-                className="px-4 py-3 border border-gray-300 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="px-4 py-3 border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-secondary)] placeholder:text-[var(--text-muted)] bg-[var(--bg-tertiary)] focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 onChange={(e) => setFilters({ ...filters, maxFrontis: e.target.value })}
               />
             </div>
@@ -340,12 +340,12 @@ export function UrbaniaFilters({ initialFilters, onFilterChange, propertyType }:
         </>
       )}
 
-      <hr className="border-gray-100" />
+      <hr className="border-[var(--border-light)]" />
 
       {/* BOTONES */}
       <div className="flex gap-3">
         <button
-          className="flex-1 bg-gray-100 hover:bg-gray-200 px-4 py-3 rounded-lg font-medium text-gray-800 text-sm transition-colors"
+          className="flex-1 bg-[var(--bg-tertiary)] hover:bg-[var(--border-color)] px-4 py-3 rounded-lg font-medium text-[var(--text-primary)] text-sm transition-colors"
           onClick={handleClear}
         >
           Limpiar

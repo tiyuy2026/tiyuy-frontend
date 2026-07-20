@@ -68,24 +68,24 @@ export function expiresPercent(createdAt: Date | string, expiresAt: Date | strin
 
 export const IC = {
   Chat: () => <MessageSquare className="" />,
-  Status: (p: { a?: boolean }) => <Play className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`} />,
-  Channel: (p: { a?: boolean }) => <User className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`} />,
-  Groups: (p: { a?: boolean }) => <Users className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[#111b21]' : 'fill-[#667781]'}`} />,
-  Search: () => <Search className="w-4 h-4 fill-gray-400" />,
-  Send: () => <Send className="w-5 h-5 fill-white" />,
+  Status: (p: { a?: boolean }) => <Play className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[var(--text-primary)]' : 'fill-[var(--text-muted)]'}`} />,
+  Channel: (p: { a?: boolean }) => <User className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[var(--text-primary)]' : 'fill-[var(--text-muted)]'}`} />,
+  Groups: (p: { a?: boolean }) => <Users className={`w-[22px] h-[22px] transition-all ${p.a ? 'fill-[var(--text-primary)]' : 'fill-[var(--text-muted)]'}`} />,
+  Search: () => <Search className="w-4 h-4 fill-[var(--text-muted)]" />,
+  Send: () => <Send className="w-5 h-5 fill-[var(--bg-primary)]" />,
   Check: () => <Icon icon="mdi:check-all" className="w-4 h-4 inline ml-1 text-[#53bdeb]" />,
-  Plus: () => <PlusSquare className="w-5 h-5 fill-white" />,
+  Plus: () => <PlusSquare className="w-5 h-5 fill-[var(--bg-primary)]" />,
   Share: () => <Share2 className="w-4 h-4 fill-current" />,
   Lock: () => <Lock className="w-3.5 h-3.5 fill-red-400" />,
-  Emoji: () => <Globe className="w-5 h-5 fill-gray-400" />,
-  Attach: () => <Paperclip className="w-5 h-5 fill-gray-400" />,
-  Mic: () => <Mic className="w-5 h-5 fill-gray-400" />,
-  ArrowBack: () => <ArrowLeft className="w-5 h-5 fill-gray-500" />,
+  Emoji: () => <Globe className="w-5 h-5 fill-[var(--text-muted)]" />,
+  Attach: () => <Paperclip className="w-5 h-5 fill-[var(--text-muted)]" />,
+  Mic: () => <Mic className="w-5 h-5 fill-[var(--text-muted)]" />,
+  ArrowBack: () => <ArrowLeft className="w-5 h-5 fill-[var(--text-secondary)]" />,
 };
 
 function ChatBackground({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex-1 overflow-y-auto relative" style={{ backgroundColor: '#e5ddd5', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M0 0h80v80H0z' fill='%23e5ddd5'/%3E%3Cpath d='M40 0v80M0 40h80' stroke='%23d4c9bf' stroke-width='0.5' opacity='0.4'/%3E%3C/svg%3E")` }}>
+    <div className="flex-1 overflow-y-auto relative bg-[var(--bg-secondary)]">
       <div className="px-4 py-3 space-y-1">{children}</div>
     </div>
   );
@@ -106,8 +106,8 @@ export function ShareModal({ title, link, onClose }: { title: string; link: stri
   const copy = () => { navigator.clipboard.writeText(link); setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
   return (
-    <div className="bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-sm mx-auto my-2">
-      <div className="bg-green-600 p-5">
+    <div className="bg-[var(--bg-card)] rounded-2xl shadow-2xl overflow-hidden w-full max-w-sm mx-auto my-2">
+      <div className="bg-[var(--brand-primary)] p-5">
         <div className="flex items-center justify-between">
           <h3 className="text-white font-semibold text-base">Compartir</h3>
           <button onClick={onClose} className="text-white/70 hover:text-white w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors text-lg leading-none">×</button>
@@ -115,27 +115,27 @@ export function ShareModal({ title, link, onClose }: { title: string; link: stri
         <p className="text-white/70 text-xs mt-1 truncate">{title}</p>
       </div>
       <div className="p-5 space-y-4">
-        <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-3 border border-gray-100">
-          <span className="text-xs text-gray-500 truncate flex-1 font-mono">{link}</span>
-          <button onClick={copy} className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all flex-shrink-0 ${copied ? 'bg-green-500 text-white' : 'bg-green-600 text-white hover:bg-green-700'}`}>
+        <div className="flex items-center gap-2 bg-[var(--bg-tertiary)] rounded-xl p-3 border border-[var(--border-light)]">
+          <span className="text-xs text-[var(--text-secondary)] truncate flex-1 font-mono">{link}</span>
+          <button onClick={copy} className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all flex-shrink-0 ${copied ? 'bg-[var(--brand-primary)] text-white' : 'bg-[var(--brand-primary)] text-white hover:opacity-90'}`}>
             {copied ? '✔ Copiado' : 'Copiar'}
           </button>
         </div>
         <div className="grid grid-cols-3 gap-3">
           <a href={`https://wa.me/?text=${encoded}`} target="_blank" rel="noopener noreferrer" onClick={() => shareTo('whatsapp')}
-            className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+            className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-[var(--bg-tertiary)] transition-colors">
             <div className="w-10 h-10 rounded-full flex items-center justify-center"><MessageCircle className="w-6 h-6 text-green-500" /></div>
-            <span className="text-xs text-gray-700 font-medium">WhatsApp</span>
+            <span className="text-xs text-[var(--text-primary)] font-medium">WhatsApp</span>
           </a>
           <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`} target="_blank" rel="noopener noreferrer" onClick={() => shareTo('facebook')}
-            className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+            className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-[var(--bg-tertiary)] transition-colors">
             <div className="w-10 h-10 rounded-full flex items-center justify-center"><Icon icon="mdi:facebook" className="w-6 h-6 text-blue-600" /></div>
-            <span className="text-xs text-gray-700 font-medium">Facebook</span>
+            <span className="text-xs text-[var(--text-primary)] font-medium">Facebook</span>
           </a>
           <a href={`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encoded}`} target="_blank" rel="noopener noreferrer" onClick={() => shareTo('telegram')}
-            className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+            className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-[var(--bg-tertiary)] transition-colors">
             <div className="w-10 h-10 rounded-full flex items-center justify-center"><Icon icon="ic:baseline-telegram" className="w-6 h-6 text-sky-500" /></div>
-            <span className="text-xs text-gray-700 font-medium">Telegram</span>
+            <span className="text-xs text-[var(--text-primary)] font-medium">Telegram</span>
           </a>
         </div>
       </div>
@@ -162,13 +162,13 @@ export function SearchResultItem({ result, onCreateChat }: { result: any; onCrea
   if (result.type === 'property') {
     const property = result.data;
     return (
-      <div className="px-4 py-3 border-b border-gray-100">
+      <div className="px-4 py-3 border-b border-[var(--border-color)]">
         <div className="flex items-start gap-3">
-          <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center text-lg"></div>
+          <div className="w-12 h-12 bg-[var(--bg-tertiary)] rounded-lg flex items-center justify-center text-lg"></div>
           <div className="flex-1 min-w-0">
-            <h4 className="text-sm font-semibold text-gray-900 truncate">{property.title}</h4>
-            <p className="text-xs text-gray-600">{property.city} {property.price} {property.currency}</p>
-            <p className="text-xs text-gray-500">Dueño: {property.owner.name} {property.owner.phone}</p>
+            <h4 className="text-sm font-semibold text-[var(--text-primary)] truncate">{property.title}</h4>
+            <p className="text-xs text-[var(--text-secondary)]">{property.city} {property.price} {property.currency}</p>
+            <p className="text-xs text-[var(--text-muted)]">Dueño: {property.owner.name} {property.owner.phone}</p>
             <div className="flex gap-2 mt-2">
               <button onClick={() => handleAction('like')} className="px-3 py-1 bg-red-100 text-red-600 rounded-full text-xs hover:bg-red-200">Like</button>
               <button onClick={() => handleAction('info')} className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs hover:bg-blue-600 hover:text-white">Info</button>
@@ -183,13 +183,13 @@ export function SearchResultItem({ result, onCreateChat }: { result: any; onCrea
   if (result.type === 'user') {
     const user = result.data;
     return (
-      <div className="px-4 py-3 border-b border-gray-100">
+      <div className="px-4 py-3 border-b border-[var(--border-color)]">
         <div className="flex items-center gap-3">
           <Avatar name={user.name} role={user.role} size="md" src={user.avatar} />
           <div className="flex-1 min-w-0">
-            <h4 className="text-sm font-semibold text-gray-900 truncate">{user.name}</h4>
-            <p className="text-xs text-gray-600">{user.role} {user.phone}</p>
-            {user.properties && user.properties.length > 0 && <p className="text-xs text-gray-500">{user.properties.length} propiedades</p>}
+            <h4 className="text-sm font-semibold text-[var(--text-primary)] truncate">{user.name}</h4>
+            <p className="text-xs text-[var(--text-secondary)]">{user.role} {user.phone}</p>
+            {user.properties && user.properties.length > 0 && <p className="text-xs text-[var(--text-muted)]">{user.properties.length} propiedades</p>}
           </div>
           <button onClick={() => handleAction('chat')} className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs hover:bg-blue-600 hover:text-white">Chatear</button>
         </div>

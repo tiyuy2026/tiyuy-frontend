@@ -48,13 +48,13 @@ export default function NuevaPropiedadPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#0f172a]">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)]">
         <div className="text-center">
           <div
             className="animate-spin rounded-full h-10 w-10 border-2 border-t-transparent mx-auto mb-3"
             style={{ borderColor: '#61BF53', borderTopColor: 'transparent' }}
           />
-          <p className="text-sm text-gray-400 dark:text-gray-500">Verificando autenticación...</p>
+          <p className="text-sm text-[var(--text-muted)]">Verificando autenticación...</p>
         </div>
       </div>
     );
@@ -62,23 +62,23 @@ export default function NuevaPropiedadPage() {
 
   return (
     <AdminRestrictionGuard feature="publish">
-    <div className="min-h-screen bg-gray-100 dark:bg-[#0f172a] transition-colors duration-200">
+    <div className="min-h-screen bg-[var(--bg-secondary)] transition-colors duration-200">
 
       {/* ── TOP NAV ── */}
-      <header className="bg-white dark:bg-[#1a2332] border-b border-gray-200 dark:border-gray-700/50 sticky top-0 z-20">
+      <header className="bg-[var(--bg-card)] border-b border-[var(--border-color)] sticky top-0 z-20">
         <div className="max-w-9xl mx-auto px-8 xl:px-16 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/dashboard')}
-              className="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Volver</span>
             </button>
-            <span className="text-gray-300 dark:text-gray-600 select-none hidden sm:block">|</span>
+            <span className="text-[var(--border-color)] select-none hidden sm:block">|</span>
             <button
               onClick={() => router.push('/my-properties')}
-              className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors hidden sm:block cursor-pointer"
+              className="text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors hidden sm:block cursor-pointer"
             >
               Ir a historial
             </button>
@@ -107,7 +107,7 @@ export default function NuevaPropiedadPage() {
       </header>
 
       {/* ── MOBILE STEPPER ── */}
-      <div className="lg:hidden bg-white dark:bg-[#1a2332] border-b border-gray-200 dark:border-gray-700/50">
+      <div className="lg:hidden bg-[var(--bg-card)] border-b border-[var(--border-color)]">
         <div className="max-w-9xl mx-auto px-8 xl:px-16 py-3">
           <div className="flex items-center justify-between">
             {STEPS.map((step, index) => {
@@ -129,7 +129,7 @@ export default function NuevaPropiedadPage() {
                       ) : step.number}
                     </div>
                     <p className={`text-[10px] font-medium mt-1 text-center ${
-                      isActive ? 'text-gray-900 dark:text-white' : isDone ? 'text-brand dark:text-brand-light' : 'text-gray-400 dark:text-gray-500'
+                      isActive ? 'text-[var(--text-primary)]' : isDone ? 'text-brand dark:text-brand-light' : 'text-[var(--text-muted)]'
                     }`}>
                       {step.title.split(' ')[0]}
                     </p>
@@ -152,9 +152,9 @@ export default function NuevaPropiedadPage() {
 
         {/* ── SIDEBAR: STEPPER ── */}
         <aside className="w-64 flex-shrink-0 hidden lg:block">
-          <div className="bg-white dark:bg-[#1a2332] rounded-xl border border-gray-200 dark:border-gray-700/50 overflow-hidden sticky top-20 shadow-sm">
-            <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-700/50">
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+          <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)] overflow-hidden sticky top-20 shadow-sm">
+            <div className="px-5 py-4 border-b border-[var(--border-light)]">
+              <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)]">
                 Publicar propiedad
               </p>
             </div>
@@ -187,11 +187,11 @@ export default function NuevaPropiedadPage() {
                     </div>
                     <div className="pb-10">
                       <p className={`text-sm font-semibold leading-none mt-1.5 ${
-                        isActive ? 'text-gray-900 dark:text-white' : isDone ? 'text-brand dark:text-brand-light' : 'text-gray-400 dark:text-gray-500'
+                        isActive ? 'text-[var(--text-primary)]' : isDone ? 'text-brand dark:text-brand-light' : 'text-[var(--text-muted)]'
                       }`}>
                         {step.title}
                       </p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{step.description}</p>
+                      <p className="text-xs text-[var(--text-muted)] mt-1">{step.description}</p>
                     </div>
                   </div>
                 );
@@ -199,9 +199,9 @@ export default function NuevaPropiedadPage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-[#1a2332] rounded-xl border border-gray-200 dark:border-gray-700/50 mt-4 overflow-hidden sticky top-[380px] shadow-sm">
-            <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-700/50">
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+          <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)] mt-4 overflow-hidden sticky top-[380px] shadow-sm">
+            <div className="px-5 py-4 border-b border-[var(--border-light)]">
+              <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)]">
                 ¿Necesitas ayuda?
               </p>
             </div>
@@ -226,7 +226,7 @@ export default function NuevaPropiedadPage() {
 
         {/* ── MAIN: FORM ── */}
         <main className="flex-1 min-w-0">
-          <div className="bg-white dark:bg-[#1a2332] rounded-xl border border-gray-200 dark:border-gray-700/50 p-4 sm:p-6 lg:p-8 min-h-[600px] shadow-sm">
+          <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)] p-4 sm:p-6 lg:p-8 min-h-[600px] shadow-sm">
             <PropertyForm
               mode="create"
               onStepChange={setCurrentStep}
@@ -236,17 +236,17 @@ export default function NuevaPropiedadPage() {
       </div>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-white dark:bg-[#1a2332] border-t border-gray-200 dark:border-gray-700/50 mt-6">
+      <footer className="bg-[var(--bg-card)] border-t border-[var(--border-color)] mt-6">
         <div className="max-w-9xl mx-auto px-8 xl:px-16 py-6 sm:py-8 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">¿Por qué publicar con nosotros?</h4>
+            <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-3">¿Por qué publicar con nosotros?</h4>
             <ul className="space-y-2">
               {[
                 'Alcance nacional a miles de compradores',
                 'Publicación gratuita sin comisiones',
                 'Soporte personalizado 24/7',
               ].map((item) => (
-                <li key={item} className="flex items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <li key={item} className="flex items-start gap-2 text-sm text-[var(--text-muted)]">
                   <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-brand dark:text-brand-light" />
                   {item}
                 </li>
@@ -254,8 +254,8 @@ export default function NuevaPropiedadPage() {
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Consejos para una buena publicación</h4>
-            <ul className="space-y-1.5 text-sm text-gray-500 dark:text-gray-400">
+            <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-3">Consejos para una buena publicación</h4>
+            <ul className="space-y-1.5 text-sm text-[var(--text-muted)]">
               {[
                 'Toma fotos de alta calidad y buena iluminación',
                 'Describe detalladamente las características',

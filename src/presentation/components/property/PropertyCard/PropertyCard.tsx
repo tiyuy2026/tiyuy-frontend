@@ -112,8 +112,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
             className="w-full h-full group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100">
-            <span className="text-gray-400 text-5xl">🏠</span>
+          <div className="w-full h-full flex items-center justify-center bg-[var(--bg-tertiary)]">
+            <span className="text-[var(--text-muted)] text-5xl">🏠</span>
           </div>
         )}
 
@@ -121,12 +121,12 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
         <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
           {property.isFeatured && (
-            <div className="bg-white text-gray-900 text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
+            <div className="bg-[var(--bg-card)] text-[var(--text-primary)] text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
               Destacado
             </div>
           )}
           {property.isVerified && (
-            <div className="bg-white text-gray-900 text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1">
+            <div className="bg-[var(--bg-card)] text-[var(--text-primary)] text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1">
               <BadgeCheck className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-500" />
               Verificado
             </div>
@@ -144,10 +144,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
       <Link href={`/property/${getPropertySlug(property)}`} className="flex flex-col flex-grow mt-0.5 w-full min-w-0 overflow-hidden">
         <div className="flex justify-between items-start gap-1.5 w-full min-w-0">
-          <h3 className="text-[14px] sm:text-[15px] font-semibold text-gray-900 truncate flex-1 min-w-0">
+          <h3 className="text-[14px] sm:text-[15px] font-semibold text-[var(--text-primary)] truncate flex-1 min-w-0">
             {PROPERTY_TYPE_LABELS[property.type] || 'Propiedad'} en {'location' in property ? property.location?.district : property.district || 'Ubicación'}
           </h3>
-          <div className="flex items-center gap-0.5 sm:gap-1 text-[13px] sm:text-[14px] text-gray-900 flex-shrink-0 min-w-fit pl-0.5">
+          <div className="flex items-center gap-0.5 sm:gap-1 text-[13px] sm:text-[14px] text-[var(--text-primary)] flex-shrink-0 min-w-fit pl-0.5">
             <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0 text-amber-400 fill-amber-400" />
             <span className="whitespace-nowrap select-none">
               {rating && rating.averageRating > 0 ? rating.averageRating.toFixed(1) : 'Nuevo'}
@@ -155,7 +155,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
           </div>
         </div>
 
-        <p className="text-[13px] sm:text-[14px] text-gray-500 truncate mt-0.5 w-full">
+        <p className="text-[13px] sm:text-[14px] text-[var(--text-secondary)] truncate mt-0.5 w-full">
           {[
             property.bedrooms && `${property.bedrooms} camas`,
             property.bathrooms && `${property.bathrooms} baños`,
@@ -165,10 +165,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
         <div className="mt-0.5 flex items-center justify-between w-full">
           <div className="flex items-center gap-1 min-w-0">
-            <span className="text-[14px] sm:text-[15px] font-semibold text-gray-900 truncate">
+            <span className="text-[14px] sm:text-[15px] font-semibold text-[var(--text-primary)] truncate">
               {formatPrice(property.price, property.currency)}
             </span>
-            <span className="text-[14px] sm:text-[15px] text-gray-900 whitespace-nowrap">
+            <span className="text-[14px] sm:text-[15px] text-[var(--text-primary)] whitespace-nowrap">
               {property.transactionType === 'RENT' ? ' / mes' : ''}
             </span>
           </div>
@@ -181,7 +181,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
             </span>
 
             {commentCount !== null && commentCount > 0 && (
-              <div className="flex items-center gap-1 text-[11px] text-gray-400">
+              <div className="flex items-center gap-1 text-[11px] text-[var(--text-muted)]">
                 <MessageCircle className="w-2.5 h-2.5" />
                 <span>{commentCount}</span>
               </div>

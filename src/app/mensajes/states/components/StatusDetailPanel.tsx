@@ -217,7 +217,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
   const encoded = encodeURIComponent(`${shareText} ${shareUrl}`);
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-800">
+    <div className="flex flex-col h-full bg-[var(--bg-primary)]">
       {/* Barra verde delgada solo para avatar + nombre */}
       <div className="bg-green-600 px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
@@ -298,38 +298,38 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
       </div>
 
       {/* Acciones */}
-      <div className="border-b border-gray-100 dark:border-gray-700 p-4">
+      <div className="border-b border-[var(--border-light)] p-4">
 
         <div className="flex items-center gap-6">
-          <button onClick={handleLike} className={`flex items-center gap-2 text-sm font-medium transition-colors ${isLiked ? 'text-red-600' : 'text-gray-600 hover:text-red-600'}`}>
+          <button onClick={handleLike} className={`flex items-center gap-2 text-sm font-medium transition-colors ${isLiked ? 'text-red-600' : 'text-[var(--text-secondary)] hover:text-red-600'}`}>
             <Heart className="w-5 h-5" fill={isLiked ? 'currentColor' : 'none'} />
             {likeCount > 0 && likeCount}
           </button>
-          <button className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-brand transition-colors">
+          <button className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-brand transition-colors">
             <MessageCircle className="w-5 h-5" /> Comentar
           </button>
           <div className="relative">
-            <button onClick={handleShare} className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-green-600 transition-colors">
+            <button onClick={handleShare} className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)] hover:text-green-600 transition-colors">
               <Share2 className="w-5 h-5" /> Compartir
-              {shareCount > 0 && <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{shareCount}</span>}
+              {shareCount > 0 && <span className="text-xs text-[var(--text-muted)] bg-[var(--bg-tertiary)] px-2 py-0.5 rounded-full">{shareCount}</span>}
             </button>
             {showShareModal && (
               <div className="absolute left-[calc(100%+24px)] top-0 z-50 w-[220px]">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border-0">
-                  <div className="p-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-700">
-                    <h3 className="text-sm font-bold text-gray-800 dark:text-white">Compartir</h3>
-                    <button onClick={() => setShowShareModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1">
+                <div className="bg-[var(--bg-card)] rounded-2xl shadow-2xl overflow-hidden border-0">
+                  <div className="p-3 flex items-center justify-between border-b border-[var(--border-light)]">
+                    <h3 className="text-sm font-bold text-[var(--text-primary)]">Compartir</h3>
+                    <button onClick={() => setShowShareModal(false)} className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors p-1">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
                   <div className="p-3">
                     <div className="grid grid-cols-3 gap-2">
                       <button onClick={() => { navigator.clipboard.writeText(`${shareText} ${shareUrl}`); setShowShareModal(false); }}
-                        className="flex flex-col items-center gap-2 py-3 px-2 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                        className="flex flex-col items-center gap-2 py-3 px-2 bg-[var(--bg-tertiary)] rounded-xl hover:bg-[var(--border-color)] transition-colors">
                         <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center shadow-sm">
                           <Copy className="w-5 h-5 text-white" />
                         </div>
-                        <span className="text-[10px] font-semibold text-gray-600 dark:text-gray-300">Copiar</span>
+                        <span className="text-[10px] font-semibold text-[var(--text-secondary)]">Copiar</span>
                       </button>
                       <a href={`https://wa.me/?text=${encoded}`} target="_blank" rel="noopener noreferrer"
                         className="flex flex-col items-center gap-2 py-3 px-2 bg-green-50 dark:bg-green-900/20 rounded-xl hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors">
@@ -357,13 +357,13 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
 
       {/* Sección de comentarios */}
       <div className="flex-1 overflow-y-auto p-4">
-        <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Comentarios ({updatedStatus.commentCount || 0})</h4>
+        <h4 className="font-semibold text-[var(--text-primary)] mb-4">Comentarios ({updatedStatus.commentCount || 0})</h4>
 
         {/* Lista de comentarios */}
         <div className="space-y-4">
           {isLoading ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Cargando comentarios...</p>
+              <p className="text-[var(--text-muted)] text-sm">Cargando comentarios...</p>
             </div>
           ) : localComments && Array.isArray(localComments) && localComments.length > 0 ? (
             // Mostrar comentarios locales (con estado de likes actualizado)
@@ -376,30 +376,30 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                     size="sm" 
                   />
                   <div className="flex-1">
-                    <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4 shadow-sm dark:shadow-none">
+                    <div className="bg-[var(--bg-tertiary)] rounded-2xl p-4 shadow-sm">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-gray-900 dark:text-white text-sm">
+                          <span className="font-semibold text-[var(--text-primary)] text-sm">
                             {isCurrentUserComment(comment)
                               ? currentUserName
                               : comment.userName || comment.user?.name || 'Usuario'
                             }
                           </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="text-xs text-[var(--text-muted)]">
                             {comment.timeAgo || formatDistanceToNow(new Date(comment.createdAt), {
                               addSuffix: true
                             })}
                           </span>
                         </div>
                       </div>
-                      <p className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed">{comment.content}</p>
+                      <p className="text-[var(--text-primary)] text-sm leading-relaxed">{comment.content}</p>
                     </div>
 
                     {/* Botones de interacción */}
                     <div className="flex items-center gap-4 mt-2 ml-2">
                       <button
                         onClick={() => handleLikeComment(comment.id, comment.hasUserLiked)}
-                        className={`text-xs flex items-center gap-1 transition-colors ${comment.hasUserLiked ? 'text-brand' : 'text-gray-500 hover:text-brand'
+                        className={`text-xs flex items-center gap-1 transition-colors ${comment.hasUserLiked ? 'text-brand' : 'text-[var(--text-muted)] hover:text-brand'
                           }`}
                       >
                         <ThumbsUp className="w-4 h-4" fill={comment.hasUserLiked ? 'currentColor' : 'none'} />
@@ -407,7 +407,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                       </button>
                       <button
                         onClick={() => handleReply(comment)}
-                        className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                        className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                       >
                         Responder
                       </button>
@@ -425,27 +425,27 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                           size="xs" 
                         />
                         <div className="flex-1">
-                          <div className="bg-gray-100 dark:bg-gray-600 rounded-xl p-3">
+                          <div className="bg-[var(--bg-tertiary)] rounded-xl p-3">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="font-medium text-gray-900 dark:text-white text-xs">
+                              <span className="font-medium text-[var(--text-primary)] text-xs">
                                 {isCurrentUserComment(reply)
                                   ? currentUserName
                                   : reply.userName || reply.user?.name || 'Usuario'
                                 }
                               </span>
-                              <span className="text-xs text-gray-400">
+                              <span className="text-xs text-[var(--text-muted)]">
                                 {reply.timeAgo || formatDistanceToNow(new Date(reply.createdAt), {
                                   addSuffix: true
                                 })}
                               </span>
                             </div>
-                            <p className="text-gray-700 dark:text-gray-300 text-xs">{reply.content}</p>
+                            <p className="text-[var(--text-secondary)] text-xs">{reply.content}</p>
 
                             {/* Botón de like para respuestas */}
                             <div className="flex items-center gap-3 mt-2">
                               <button
                                 onClick={() => handleLikeComment(reply.id, reply.hasUserLiked)}
-                                className={`text-xs flex items-center gap-1 transition-colors ${reply.hasUserLiked ? 'text-brand' : 'text-gray-400 hover:text-brand'
+                                className={`text-xs flex items-center gap-1 transition-colors ${reply.hasUserLiked ? 'text-brand' : 'text-[var(--text-muted)] hover:text-brand'
                                   }`}
                               >
                                 <ThumbsUp className="w-3 h-3" fill={reply.hasUserLiked ? 'currentColor' : 'none'} />
@@ -469,26 +469,26 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                   size="xs" 
                 />
                 <div className="flex-1">
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                  <div className="bg-[var(--bg-tertiary)] rounded-lg p-3">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-sm text-gray-900 dark:text-white">
+                      <span className="font-medium text-sm text-[var(--text-primary)]">
                         {isCurrentUserComment(comment)
                           ? currentUserName
                           : comment.userName || 'Usuario'
                         }
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-[var(--text-muted)]">
                         {comment.timeAgo || formatDistanceToNow(new Date(comment.createdAt), {
                           addSuffix: true
                         })}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-800">{comment.content}</p>
+                    <p className="text-sm text-[var(--text-primary)]">{comment.content}</p>
                   </div>
                   <div className="flex items-center gap-4 mt-2 ml-3">
                     <button
                       onClick={() => handleLikeComment(comment.id, comment.hasUserLiked)}
-                      className={`text-xs flex items-center gap-1 ${comment.hasUserLiked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
+                      className={`text-xs flex items-center gap-1 ${comment.hasUserLiked ? 'text-red-600' : 'text-[var(--text-muted)] hover:text-red-600'
                         }`}
                     >
                       <Heart className="w-3 h-3" />
@@ -496,7 +496,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                     </button>
                     <button
                       onClick={() => handleReply(comment)}
-                      className="text-xs text-gray-500 hover:text-gray-700"
+                      className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                     >
                       Responder
                     </button>
@@ -513,23 +513,23 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                   size="xs" 
                 />
                 <div className="flex-1">
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                  <div className="bg-[var(--bg-tertiary)] rounded-lg p-3">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-sm text-gray-900 dark:text-white">
-                        {comment.user?.name || 'Usuario'}
+                      <span className="font-medium text-sm text-[var(--text-primary)]">
+                        {comment.userName || 'Usuario'}
                       </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {formatDistanceToNow(new Date(comment.createdAt), {
+                      <span className="text-xs text-[var(--text-muted)]">
+                        {comment.timeAgo || formatDistanceToNow(new Date(comment.createdAt), {
                           addSuffix: true
                         })}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-800 dark:text-gray-200">{comment.content}</p>
+                    <p className="text-sm text-[var(--text-primary)]">{comment.content}</p>
                   </div>
                   <div className="flex items-center gap-4 mt-2 ml-3">
                     <button
                       onClick={() => handleLikeComment(comment.id, comment.hasUserLiked)}
-                      className={`text-xs flex items-center gap-1 ${comment.hasUserLiked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
+                      className={`text-xs flex items-center gap-1 ${comment.hasUserLiked ? 'text-red-600' : 'text-[var(--text-muted)] hover:text-red-600'
                         }`}
                     >
                       <Heart className="w-3 h-3" />
@@ -537,7 +537,7 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
                     </button>
                     <button
                       onClick={() => handleReply(comment)}
-                      className="text-xs text-gray-500 hover:text-gray-700"
+                      className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                     >
                       Responder
                     </button>
@@ -547,69 +547,11 @@ export default function StatusDetailPanel({ status, user, onClose }: StatusDetai
             ))
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400 text-sm">No hay comentarios aún</p>
-              <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">Sé el primero en comentar</p>
+              <p className="text-[var(--text-muted)] text-sm">No hay comentarios aún</p>
             </div>
           )}
         </div>
       </div>
-
-      {/* Input para nuevo comentario */}
-      <div className="border-t border-gray-100 dark:border-gray-700 p-4">
-        {/* Mostrar respuesta seleccionada */}
-        {replyingTo && (
-          <div className="mb-3 p-3 bg-brand/10 border-l-4 border-blue-500 rounded-lg">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <Zap className="w-4 h-4 text-brand" />
-                  <span className="text-brand-dark font-semibold text-sm">Respondiendo a</span>
-                  <span className="text-brand font-medium text-sm">
-                    {replyingTo.userName || replyingTo.user?.name || 'Usuario'}
-                  </span>
-                </div>
-                <div className="bg-white rounded p-2 border border-blue-200">
-                  <p className="text-gray-700 text-xs italic">
-                    "{replyingTo.content?.substring(0, 80)}{replyingTo.content?.length > 80 ? '...' : ''}"
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={handleCancelReply}
-                className="ml-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
-
-        <div className="flex gap-3">
-          <UserAvatar size="sm" />
-          <div className="flex-1">
-            <div className="relative">
-              <input
-                id="comment-input"
-                type="text"
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder={replyingTo ? `Escribe una respuesta a ${replyingTo.userName || replyingTo.user?.name || 'Usuario'}...` : `Escribe un comentario como ${currentUserName}...`}
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all dark:text-white dark:placeholder-gray-400"
-                onKeyPress={(e) => e.key === "Enter" && handleComment()}
-              />
-              {commentText && (
-                <button
-                  onClick={handleComment}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 bg-brand text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors"
-                >
-                  <Navigation className="w-3 h-3" />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
   );
 }

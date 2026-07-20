@@ -36,11 +36,11 @@ export function FeaturedProjects() {
               className="w-[160px] sm:w-[280px] md:w-[320px] lg:w-[240px] xl:w-[190px] 2xl:w-[220px] flex-shrink-0"
             >
               <div className="bg-transparent rounded-none border-none overflow-hidden animate-pulse">
-                <div className="w-full aspect-square bg-gray-200 rounded-[14px]" />
+                <div className="w-full aspect-square bg-[var(--bg-tertiary)] rounded-[14px]" />
                 <div className="pt-2 space-y-1.5">
-                  <div className="h-3.5 bg-gray-200 rounded w-full" />
-                  <div className="h-3 bg-gray-200 rounded w-2/3" />
-                  <div className="h-3 bg-gray-200 rounded w-16" />
+                  <div className="h-3.5 bg-[var(--bg-tertiary)] rounded w-full" />
+                  <div className="h-3 bg-[var(--bg-tertiary)] rounded w-2/3" />
+                  <div className="h-3 bg-[var(--bg-tertiary)] rounded w-16" />
                 </div>
               </div>
             </div>
@@ -54,10 +54,10 @@ export function FeaturedProjects() {
     return (
       <div className="text-center py-20 bg-gradient-to-br from-red-50 to-orange-100 rounded-2xl mx-4">
         <div className="text-8xl mb-6">🏢</div>
-        <h3 className="text-2xl font-bold text-gray-800 mb-3">
+        <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-3">
           Error al cargar proyectos
         </h3>
-        <p className="text-gray-600 text-lg mb-6 max-w-md mx-auto">
+        <p className="text-[var(--text-secondary)] text-lg mb-6 max-w-md mx-auto">
           {error instanceof Error ? error.message : 'No se pudieron cargar los proyectos'}
         </p>
         <button
@@ -74,10 +74,10 @@ export function FeaturedProjects() {
     return (
       <div className="text-center py-20 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl mx-4">
         <div className="text-8xl mb-6">🏢</div>
-        <h3 className="text-2xl font-bold text-gray-800 mb-3">
+        <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-3">
           No tenemos recomendaciones disponibles
         </h3>
-        <p className="text-gray-600 text-lg mb-6 max-w-md mx-auto">
+        <p className="text-[var(--text-secondary)] text-lg mb-6 max-w-md mx-auto">
           Sé el primero en destacar un proyecto o vuelve más tarde para descubrir nuevas oportunidades
         </p>
         <div className="flex gap-4 justify-center">
@@ -121,8 +121,8 @@ export function FeaturedProjects() {
         <div className="flex justify-between items-end mb-4">
           <h2 className="text-lg sm:text-2xl font-semibold text-foreground flex items-center gap-2 capitalize">
             Proyectos destacados
-            <Link href="/projects" className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors ml-1">
-              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-700" />
+            <Link href="/projects" className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[var(--bg-tertiary)] hover:bg-[var(--bg-tertiary)] transition-colors ml-1">
+              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--text-primary)]" />
             </Link>
           </h2>
 
@@ -130,7 +130,7 @@ export function FeaturedProjects() {
             <button
               onClick={scrollLeft}
               disabled={!canScrollLeft}
-              className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:shadow-md transition-all bg-white text-gray-600 hover:text-gray-900 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+              className="w-8 h-8 flex items-center justify-center rounded-full border border-[var(--border-color)] hover:shadow-md transition-all bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
               aria-label="Scroll izquierda"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -138,7 +138,7 @@ export function FeaturedProjects() {
             <button
               onClick={scrollRight}
               disabled={!canScrollRight}
-              className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:shadow-md transition-all bg-white text-gray-600 hover:text-gray-900 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
+              className="w-8 h-8 flex items-center justify-center rounded-full border border-[var(--border-color)] hover:shadow-md transition-all bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
               aria-label="Scroll derecha"
             >
               <ChevronRight className="w-4 h-4" />
