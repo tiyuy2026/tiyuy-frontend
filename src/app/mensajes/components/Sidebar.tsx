@@ -127,7 +127,7 @@ export function Sidebar({
   return (
     <div
       ref={sidebarRef}
-      className="relative flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-hidden flex-shrink-0"
+      className="relative flex flex-col bg-[var(--bg-card)] border-r border-[var(--border-color)] overflow-hidden flex-shrink-0"
       style={{
         width: sidebarWidth,
         transition: isDragging ? 'none' : 'width 250ms ease',
@@ -147,8 +147,8 @@ export function Sidebar({
                 title={isCollapsed ? label : undefined}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative
                   ${isActive 
-                    ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' 
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-gray-200'
+                    ? 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)]' 
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)]'
                   }
                   ${isCollapsed ? 'justify-center px-0' : ''}
                 `}
@@ -158,7 +158,7 @@ export function Sidebar({
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-green-500 rounded-r-full" />
                 )}
                 
-                <div className={`flex-shrink-0 ${isActive ? 'text-green-600 dark:text-green-400' : ''}`}>
+                <div className={`flex-shrink-0 ${isActive ? 'text-[var(--brand-primary)]' : ''}`}>
                   {icon}
                 </div>
                 
@@ -190,7 +190,7 @@ export function Sidebar({
       </nav>
 
       {/* Avatar usuario al fondo */}
-      <div className={`p-3 border-t border-gray-100 dark:border-gray-700 ${isCollapsed ? 'flex justify-center' : ''}`}>
+      <div className={`p-3 border-t border-[var(--border-color)] ${isCollapsed ? 'flex justify-center' : ''}`}>
         <div className="group relative">
           <Avatar name={user?.firstName ?? 'U'} role={user?.role} size={isCollapsed ? 'sm' : 'sm'} src={user?.avatar ?? undefined} />
           {isCollapsed && (
@@ -204,13 +204,13 @@ export function Sidebar({
       {/* Botón toggle colapsar/expandir */}
       <button
         onClick={toggleCollapse}
-        className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 z-10 hover:bg-gray-50 dark:hover:bg-gray-600"
+        className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 z-10 hover:bg-[var(--bg-tertiary)]"
         style={{ transition: 'box-shadow 200ms' }}
       >
         {isCollapsed ? (
-          <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
+          <ChevronRight className="w-3.5 h-3.5 text-[var(--text-muted)]" />
         ) : (
-          <ChevronLeft className="w-3.5 h-3.5 text-gray-500" />
+          <ChevronLeft className="w-3.5 h-3.5 text-[var(--text-muted)]" />
         )}
       </button>
 

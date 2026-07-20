@@ -189,7 +189,7 @@ export default function EventDetailView({
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-colors ${
                 isRsvped
                   ? 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'
-                  : 'bg-brand text-white hover:bg-blue-700'
+                  : 'bg-brand text-white hover:opacity-90'
               } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {rsvpMutation.isPending || cancelRsvpMutation.isPending ? (

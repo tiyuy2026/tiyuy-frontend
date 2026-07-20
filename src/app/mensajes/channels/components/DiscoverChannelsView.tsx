@@ -47,8 +47,8 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
   };
 
   return (
-    <div className="flex flex-col bg-white dark:bg-gray-900 h-full">
-      <div className="bg-green-600 px-4 py-3 flex-shrink-0">
+    <div className="flex flex-col bg-[var(--bg-primary)] h-full">
+      <div className="bg-[var(--brand-primary)] px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-white font-bold text-base leading-tight">Descubrir Canales</h1>
@@ -61,52 +61,52 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
           <div className="mb-6">
             <div className="relative max-w-md">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                <Search className="h-5 w-5 text-[var(--text-muted)]" />
               </div>
               <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar canales por nombre, descripción, categoría o ciudad..."
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-sm placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                className="block w-full pl-10 pr-3 py-2 border border-[var(--border-color)] rounded-lg bg-[var(--bg-tertiary)] text-sm placeholder-[var(--text-muted)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
             </div>
           </div>
 
           {isLoading && (
             <div className="flex justify-center py-16">
-              <div className="w-8 h-8 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
+              <div className="w-8 h-8 rounded-full border-4 border-[var(--brand-primary)] border-t-transparent animate-spin" />
             </div>
           )}
 
           {!isLoading && filteredChannels.length === 0 && (
             <div className="text-center py-16">
-              <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center mx-auto mb-6">
                 <span className="text-3xl"></span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
                 {searchTerm ? 'No se encontraron canales' : 'No hay canales disponibles'}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">{searchTerm ? 'Intenta con otros términos de búsqueda' : 'No hay canales disponibles para suscribirse en este momento'}</p>
+              <p className="text-[var(--text-secondary)] text-sm">{searchTerm ? 'Intenta con otros términos de búsqueda' : 'No hay canales disponibles para suscribirse en este momento'}</p>
             </div>
           )}
 
           {!isLoading && filteredChannels.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredChannels.map((channel: any) => (
-                <div key={channel.id} className="bg-white dark:bg-gray-800 border border-brand/30 rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
+                <div key={channel.id} className="bg-[var(--bg-card)] border border-[var(--border-light)] rounded-xl overflow-hidden hover:shadow-lg transition-all cursor-pointer"
                   onClick={(e) => { if (!channel.isSubscribed) handleSubscribeChannel(channel.id, e); setTimeout(() => onChannelSelect(channel), 300); }}>
-                  <div className="h-24 bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                  <div className="h-24 bg-[var(--bg-tertiary)] flex items-center justify-center">
                     <EntityIcon name={channel.name} className="w-14 h-14 text-brand" />
                   </div>
                   <div className="p-4">
-                    <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm mb-2 line-clamp-2">{channel.name}</h3>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">{channel.description || 'Sin descripción disponible'}</p>
-                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3 pb-2 border-b border-gray-100 dark:border-gray-700">
+                    <h3 className="font-bold text-[var(--text-primary)] text-sm mb-2 line-clamp-2">{channel.name}</h3>
+                    <p className="text-xs text-[var(--text-secondary)] line-clamp-2 mb-3">{channel.description || 'Sin descripción disponible'}</p>
+                    <div className="flex items-center justify-between text-xs text-[var(--text-muted)] mb-3 pb-2 border-b border-[var(--border-color)]">
                       <span className="flex items-center gap-1"><Users className="w-3 h-3" />{formatCompactNumber(channel.subscriberCount)} suscriptores</span>
                       <span className="flex items-center gap-1"><FileText className="w-3 h-3" />{channel.postsPerDay || 0} posts/día</span>
                     </div>
-                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
-                      <span className={`px-2 py-1 rounded-full ${channel.isPublic ? 'bg-gray-100 dark:bg-gray-700 text-gray-700' : 'bg-gray-100 dark:bg-gray-700 text-gray-700'}`}>{channel.isPublic ? '🔓 Público' : '🔒 Privado'}</span>
+                    <div className="flex items-center justify-between text-xs text-[var(--text-muted)] mb-3">
+                      <span className={`px-2 py-1 rounded-full ${channel.isPublic ? 'bg-[var(--bg-tertiary)] text-[var(--text-secondary)]' : 'bg-[var(--bg-tertiary)] text-[var(--text-secondary)]'}`}>{channel.isPublic ? '🔓 Público' : '🔒 Privado'}</span>
                       <span>{channel.city}</span>
                     </div>
-                    <div className="w-full py-2 bg-gray-800 text-white text-sm font-semibold rounded-lg text-center">
+                    <div className="w-full py-2 bg-[var(--text-primary)] text-[var(--bg-primary)] text-sm font-semibold rounded-lg text-center">
                       {channel.isSubscribed ? 'Entrar al canal' : isSubscribing ? 'Suscribiéndose...' : 'Entrar'}
                     </div>
                   </div>
@@ -120,14 +120,14 @@ export default function DiscoverChannelsView({ user, onChannelSelect }: { user: 
               {isFetchingNextPage ? (
                 <div className="w-8 h-8 rounded-full border-3 border-brand border-t-transparent animate-spin" />
               ) : (
-                <span className="text-xs text-gray-400">Desplaza para más canales...</span>
+                <span className="text-xs text-[var(--text-muted)]">Desplaza para más canales...</span>
               )}
             </div>
           )}
 
           {!isLoading && allChannels.length > 0 && (
             <div className="text-center mt-4 pb-4">
-              <span className="text-xs text-gray-400">Mostrando {allChannels.length} canales disponibles</span>
+              <span className="text-xs text-[var(--text-muted)]">Mostrando {allChannels.length} canales disponibles</span>
             </div>
           )}
         </div>

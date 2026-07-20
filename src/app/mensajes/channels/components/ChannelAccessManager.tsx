@@ -259,7 +259,7 @@ export function ChannelAccessManager({
                     <button
                       onClick={() => handleGrantPermission(user.id)}
                       disabled={grantPermission.isPending}
-                      className="p-2 bg-brand text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="p-2 bg-brand text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       title="Dar permiso de publicación"
                     >
                       {grantPermission.isPending ? (

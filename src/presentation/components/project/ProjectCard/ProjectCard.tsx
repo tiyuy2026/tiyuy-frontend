@@ -104,8 +104,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
             className="w-full h-full group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100">
-            <span className="text-gray-400 text-6xl">🏗️</span>
+          <div className="w-full h-full flex items-center justify-center bg-[var(--bg-tertiary)]">
+            <span className="text-[var(--text-muted)] text-6xl">🏗️</span>
           </div>
         )}
 
@@ -115,12 +115,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
           {project.isFeatured && (
-            <div className="bg-white text-gray-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
+            <div className="bg-[var(--bg-card)] text-[var(--text-primary)] text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
               Destacado
             </div>
           )}
           {project.isVerified && (
-            <div className="bg-white text-gray-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1">
+            <div className="bg-[var(--bg-card)] text-[var(--text-primary)] text-xs font-bold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1">
               <BadgeCheck className="w-3.5 h-3.5 text-blue-500" />
               Verificado
             </div>
@@ -134,20 +134,20 @@ export function ProjectCard({ project }: ProjectCardProps) {
       {/* Contenido Minimalista estilo Airbnb */}
       <Link href={`/projects/${getProjectSlug(project)}`} className="flex flex-col flex-grow mt-1">
         <div className="flex justify-between items-start gap-2">
-          <h3 className="text-[15px] font-semibold text-gray-900 line-clamp-1">
+          <h3 className="text-[15px] font-semibold text-[var(--text-primary)] line-clamp-1">
             {project.name}
           </h3>
-          <div className="flex items-center gap-1 text-[14px] text-gray-900 flex-shrink-0">
+          <div className="flex items-center gap-1 text-[14px] text-[var(--text-primary)] flex-shrink-0">
             <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
             <span>{rating && rating.averageRating > 0 ? rating.averageRating.toFixed(2) : 'Nuevo'}</span>
           </div>
         </div>
 
-        <p className="text-[14px] text-gray-500 line-clamp-1 mt-0.5">
+        <p className="text-[14px] text-[var(--text-secondary)] line-clamp-1 mt-0.5">
           {PROJECT_TYPE_LABELS[project.type] || 'Proyecto'} en {project.district}
         </p>
 
-        <p className="text-[14px] text-gray-500 truncate mt-0.5">
+        <p className="text-[14px] text-[var(--text-secondary)] truncate mt-0.5">
           {PHASE_LABELS[project.phase] || project.phase}
           {' · '}
           {project.availableUnits} unid. disponibles
@@ -155,7 +155,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
         <div className="mt-1 flex items-center justify-between">
           <div className="flex items-center gap-1">
-            <span className="text-[15px] font-semibold text-gray-900">
+            <span className="text-[15px] font-semibold text-[var(--text-primary)]">
               {formatPrice(project.priceFrom, project.currency)}
             </span>
           </div>
@@ -169,7 +169,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
             {/* Contador de comentarios pequeño */}
             {commentCount !== null && commentCount > 0 && (
-              <div className="flex items-center gap-1 text-xs text-gray-400">
+              <div className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
                 <MessageCircle className="w-3 h-3" />
                 <span>{commentCount}</span>
               </div>

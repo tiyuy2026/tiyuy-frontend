@@ -222,7 +222,7 @@ export function MisContactosPageContent() {
             const chat = chats.find((c: any) => c.id === selectedChatId);
             return (
                 <div className="flex flex-col h-full" onClick={() => setContextMenu(null)}>
-                    <div className="flex items-center gap-3 px-4 py-3 bg-green-600 border-b border-[#054d44] flex-shrink-0">
+                    <div className="flex items-center gap-3 px-4 py-3 bg-[var(--brand-primary)] border-b border-[var(--border-color)] flex-shrink-0">
                         <button onClick={() => { setSelectedChatId(null); setReplyToMessage(null); }} className="text-white/70 hover:text-white transition-colors"><IC.ArrowBack /></button>
                         <div className="flex-1 min-w-0">
                             <p className="text-white font-semibold text-sm">{chat?.participantName}</p>
@@ -231,17 +231,16 @@ export function MisContactosPageContent() {
                         <button onClick={() => toggleFavorite.mutate(selectedChatId)} className={`text-sm transition-colors ${chat?.isFavorite ? 'text-yellow-400' : 'text-white/40 hover:text-white/70'}`}>⭐</button>
                     </div>
                     {pinnedMessage && (
-                        <div className="flex items-center gap-2 px-4 py-2 bg-white border-b border-gray-200 flex-shrink-0">
-                            <div className="w-1 h-8 rounded-full bg-green-500 flex-shrink-0" />
+                        <div className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-card)] border-b border-[var(--border-color)] flex-shrink-0">
+                            <div className="w-1 h-8 rounded-full bg-[var(--brand-primary)] flex-shrink-0" />
                             <div className="flex-1 min-w-0">
-                                <p className="text-[11px] font-semibold text-[#075e54]">{pinnedMessage.isOwn ? 'Tú' : pinnedMessage.senderName?.split(' ')[0]}</p>
-                                <p className="text-xs text-gray-600 truncate">{pinnedMessage.content}</p>
+                                <p className="text-[11px] font-semibold text-[var(--brand-primary)]">{pinnedMessage.isOwn ? 'Tú' : pinnedMessage.senderName?.split(' ')[0]}</p>
+                                <p className="text-xs text-[var(--text-secondary)] truncate">{pinnedMessage.content}</p>
                             </div>
-                            <button onClick={(e) => { e.stopPropagation(); setPinnedMessage(null); }} className="text-gray-400 hover:text-gray-600 text-xl leading-none flex-shrink-0 ml-2">×</button>
+                            <button onClick={(e) => { e.stopPropagation(); setPinnedMessage(null); }} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-xl leading-none flex-shrink-0 ml-2">×</button>
                         </div>
                     )}
-                    <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1" data-chat-area
-                        style={{ backgroundColor: '#e5ddd5', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M0 0h80v80H0z' fill='%23e5ddd5'/%3E%3Cpath d='M40 0v80M0 40h80' stroke='%23d4c9bf' stroke-width='0.5' opacity='0.4'/%3E%3C/svg%3E")` }}>
+                    <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1 bg-[var(--bg-secondary)]" data-chat-area>
                         {messagesError ? (
                             <div className="flex flex-col items-center justify-center h-full gap-4 text-red-600 p-4">
                                 <p className="font-semibold">Error al cargar mensajes</p>
@@ -250,7 +249,7 @@ export function MisContactosPageContent() {
                         ) : loadingMessages ? (
                             <div className="flex justify-center py-8"><div className="w-6 h-6 rounded-full border-2 border-[#075e54] border-t-transparent animate-spin" /></div>
                         ) : !messages?.length ? (
-                            <div className="flex flex-col items-center justify-center h-full gap-2 text-gray-500"><p className="text-sm">Sin mensajes aún</p></div>
+                            <div className="flex flex-col items-center justify-center h-full gap-2 text-[var(--text-muted)]"><p className="text-sm">Sin mensajes aún</p></div>
                         ) : (
                             messages.slice().sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()).map((msg: any, index: number, arr: any[]) => {
                                 const isMe = msg.isOwn === true;
@@ -263,7 +262,7 @@ export function MisContactosPageContent() {
                                         <div className={`flex mb-0.5 ${isMe ? 'justify-end' : 'justify-start'}`} onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); setContextMenu({ msg, x: e.clientX, y: e.clientY }); }}>
                                             <div className={`relative max-w-[70%] px-3 py-2 shadow-sm text-sm leading-relaxed cursor-pointer ${isMe ? 'rounded-tl-2xl rounded-tr-sm rounded-bl-2xl rounded-br-2xl' : 'rounded-tl-sm rounded-tr-2xl rounded-bl-2xl rounded-br-2xl'} ${isPinned ? 'ring-2 ring-[#075e54]' : ''}`}
                                                 style={{ background: isMe ? '#dcf8c6' : '#ffffff', color: '#111b21', wordBreak: 'break-word', minWidth: '80px', paddingBottom: '20px' }}>
-                                                {(msg.replyToContent || msg.replyToSenderName) && (<div className="mb-1 p-2 bg-gray-100 rounded-md border-l-2 border-blue-500"><p className="text-xs text-gray-600 font-medium">Respondiendo a {msg.replyToIsOwn ? 'ti mismo' : msg.replyToSenderName?.split(' ')[0] || 'alguien'}</p><p className="text-xs text-gray-800 truncate">{msg.replyToContent}</p></div>)}
+                                                {(msg.replyToContent || msg.replyToSenderName) && (<div className="mb-1 p-2 bg-[var(--bg-tertiary)] rounded-md border-l-2 border-blue-500"><p className="text-xs text-[var(--text-secondary)] font-medium">Respondiendo a {msg.replyToIsOwn ? 'ti mismo' : msg.replyToSenderName?.split(' ')[0] || 'alguien'}</p><p className="text-xs text-[var(--text-primary)] truncate">{msg.replyToContent}</p></div>)}
                                                 {msg.mediaUrl && msg.type === 'IMAGE' && (
                                                     <img src={msg.mediaUrl} alt="" className="max-w-full rounded-lg mb-1 cursor-pointer hover:opacity-90 transition-opacity"
                                                         style={{ maxHeight: '200px' }}
@@ -285,40 +284,40 @@ export function MisContactosPageContent() {
                         <div ref={messagesEndRef} />
                     </div>
                     {contextMenu && (
-                        <div className="fixed z-[9999] bg-white rounded-xl shadow-2xl border border-gray-100 py-1 min-w-[180px] overflow-hidden" style={{ top: contextMenu.y, left: Math.min(contextMenu.x, window.innerWidth - 200) }} onClick={(e) => e.stopPropagation()}>
-                            <button className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors" onClick={() => { setReplyToMessage(contextMenu.msg); setContextMenu(null); }}><span>️</span> Responder</button>
-                            <button className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors" onClick={() => { navigator.clipboard.writeText(contextMenu.msg.content ?? ''); setContextMenu(null); }}><span></span> Copiar</button>
-                            <button className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors" onClick={() => { setContextMenu(null); setTimeout(() => setShowReactionPicker({ msg: contextMenu.msg, x: contextMenu.x, y: contextMenu.y - 60 }), 100); }}><span></span> Reaccionar</button>
-                            <button className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors" onClick={() => { setPinnedMessage(contextMenu.msg); setContextMenu(null); }}><span></span> {pinnedMessage?.id === contextMenu.msg.id ? 'Ya está fijado' : 'Fijar mensaje'}</button>
+                        <div className="fixed z-[9999] bg-[var(--bg-card)] rounded-xl shadow-2xl border border-[var(--border-light)] py-1 min-w-[180px] overflow-hidden" style={{ top: contextMenu.y, left: Math.min(contextMenu.x, window.innerWidth - 200) }} onClick={(e) => e.stopPropagation()}>
+                            <button className="w-full px-4 py-2.5 text-left text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] flex items-center gap-3 transition-colors" onClick={() => { setReplyToMessage(contextMenu.msg); setContextMenu(null); }}><span>️</span> Responder</button>
+                            <button className="w-full px-4 py-2.5 text-left text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] flex items-center gap-3 transition-colors" onClick={() => { navigator.clipboard.writeText(contextMenu.msg.content ?? ''); setContextMenu(null); }}><span></span> Copiar</button>
+                            <button className="w-full px-4 py-2.5 text-left text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] flex items-center gap-3 transition-colors" onClick={() => { setContextMenu(null); setTimeout(() => setShowReactionPicker({ msg: contextMenu.msg, x: contextMenu.x, y: contextMenu.y - 60 }), 100); }}><span></span> Reaccionar</button>
+                            <button className="w-full px-4 py-2.5 text-left text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] flex items-center gap-3 transition-colors" onClick={() => { setPinnedMessage(contextMenu.msg); setContextMenu(null); }}><span></span> {pinnedMessage?.id === contextMenu.msg.id ? 'Ya está fijado' : 'Fijar mensaje'}</button>
                         </div>
                     )}
                     {/* Input con emojis y subida de imágenes */}
-                    <div className="px-3 py-2 bg-[#f0f2f5] flex-shrink-0 relative">
+                    <div className="px-3 py-2 bg-[var(--bg-tertiary)] flex-shrink-0 relative">
                         {replyToMessage && (
-                            <div className="mb-2 p-2 bg-white rounded-lg border border-gray-200 flex items-center justify-between">
-                                <div className="flex-1 min-w-0"><p className="text-xs text-gray-600 font-medium">Respondiendo a {replyToMessage.isOwn ? 'ti mismo' : replyToMessage.senderName?.split(' ')[0] || 'alguien'}</p><p className="text-sm text-gray-800 truncate">{replyToMessage.content}</p></div>
-                                <button onClick={() => setReplyToMessage(null)} className="ml-2 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+                            <div className="mb-2 p-2 bg-[var(--bg-card)] rounded-lg border border-[var(--border-color)] flex items-center justify-between">
+                                <div className="flex-1 min-w-0"><p className="text-xs text-[var(--text-secondary)] font-medium">Respondiendo a {replyToMessage.isOwn ? 'ti mismo' : replyToMessage.senderName?.split(' ')[0] || 'alguien'}</p><p className="text-sm text-[var(--text-primary)] truncate">{replyToMessage.content}</p></div>
+                                <button onClick={() => setReplyToMessage(null)} className="ml-2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] text-xl leading-none">×</button>
                             </div>
                         )}
                         {/* Preview de imagen seleccionada (como WhatsApp) */}
                         {selectedImagePreview && (
-                            <div className="mb-2 p-2 bg-white rounded-lg border border-gray-200 flex items-center justify-between">
+                            <div className="mb-2 p-2 bg-[var(--bg-card)] rounded-lg border border-[var(--border-color)] flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <img src={selectedImagePreview} alt="Preview" className="w-12 h-12 object-cover rounded" />
                                     <div>
-                                        <p className="text-xs font-medium text-gray-700">{selectedImageFile?.name}</p>
-                                        <p className="text-[10px] text-gray-400">Se eliminará en 48h</p>
+                                        <p className="text-xs font-medium text-[var(--text-secondary)]">{selectedImageFile?.name}</p>
+                                        <p className="text-[10px] text-[var(--text-muted)]">Se eliminará en 48h</p>
                                     </div>
                                 </div>
-                                <button onClick={() => { setSelectedImageFile(null); setSelectedImagePreview(null); }} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+                                <button onClick={() => { setSelectedImageFile(null); setSelectedImagePreview(null); }} className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] text-xl leading-none">×</button>
                             </div>
                         )}
                         <div className="flex items-center gap-1.5">
                             <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                                className="w-9 h-9 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-full transition-colors flex-shrink-0" title="Emojis">
+                                className="w-9 h-9 flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-full transition-colors flex-shrink-0" title="Emojis">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
                             </button>
-                            <label className="w-9 h-9 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-full transition-colors cursor-pointer flex-shrink-0" title="Adjuntar imagen">
+                            <label className="w-9 h-9 flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] rounded-full transition-colors cursor-pointer flex-shrink-0" title="Adjuntar imagen">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                                 <input type="file" accept="image/*" className="hidden" onChange={(e) => {
                                     const file = e.target.files?.[0];
@@ -332,13 +331,13 @@ export function MisContactosPageContent() {
                             <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                                 placeholder={replyToMessage ? "Escribe una respuesta..." : "Escribe un mensaje..."}
-                                className="flex-1 px-4 py-2.5 bg-white rounded-full text-sm focus:outline-none shadow-sm border-0" />
+                                className="flex-1 px-4 py-2.5 bg-[var(--bg-card)] rounded-full text-sm focus:outline-none shadow-sm border-0" />
                             <button onClick={handleSendMessage} disabled={(!newMessage.trim() && !selectedImageFile) || sendMessage.isPending || isUploadingImage}
-                                className="w-9 h-9 rounded-full bg-[#128c7e] text-white flex items-center justify-center hover:bg-green-600 transition-colors disabled:opacity-50 shadow-sm flex-shrink-0">
+                                className="w-9 h-9 rounded-full bg-[var(--brand-primary)] text-white flex items-center justify-center hover:opacity-90 transition-colors disabled:opacity-50 shadow-sm flex-shrink-0">
                                 {isUploadingImage ? <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full" /> : <IC.Send />}</button>
                         </div>
                         {showEmojiPicker && (
-                            <div className="absolute bottom-full left-0 mb-1 z-50 shadow-xl rounded-xl overflow-hidden border border-gray-200" onClick={(e) => e.stopPropagation()}>
+                            <div className="absolute bottom-full left-0 mb-1 z-50 shadow-xl rounded-xl overflow-hidden border border-[var(--border-color)]" onClick={(e) => e.stopPropagation()}>
                                 <EmojiPicker onEmojiClick={(emojiData: any) => { setNewMessage(prev => prev + (emojiData.emoji || '')); }}
                                     searchDisabled={false} skinTonesDisabled={true} previewConfig={{ showPreview: false }} width={320} height={350} />
                             </div>
@@ -349,7 +348,7 @@ export function MisContactosPageContent() {
         }
         if (activeTab === 'estados' && statusSection === 'crear') return (
             <div className="flex-1 flex flex-col overflow-hidden">
-                {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600"><button onClick={() => setStatusSection('lista')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Crear Estado</span></div>)}
+                {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-[var(--brand-primary)]"><button onClick={() => setStatusSection('lista')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Crear Estado</span></div>)}
                 <div className="flex-1 overflow-y-auto"><CreateStatusView user={user} onBack={() => setStatusSection('lista')} /></div>
             </div>
         );
@@ -360,19 +359,19 @@ export function MisContactosPageContent() {
             if (selectedGroup) return <GrupoDetailPanel group={selectedGroup} user={user} onBack={() => setSelectedGroup(null)} />;
             if (gruposSection === 'crear') return (
                 <div className="flex-1 flex flex-col overflow-hidden">
-                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600"><button onClick={() => setGruposSection('menu')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Crear Grupo</span></div>)}
+                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-[var(--brand-primary)]"><button onClick={() => setGruposSection('menu')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Crear Grupo</span></div>)}
                     <div className="flex-1 overflow-y-auto"><CreateGroupView user={user} onBack={() => setGruposSection('menu')} /></div>
                 </div>
             );
             if (gruposSection === 'descubrir') return (
                 <div className="flex-1 flex flex-col overflow-hidden">
-                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-green-600"><button onClick={() => setGruposSection('menu')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Descubrir Grupos</span></div>)}
+                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-[var(--brand-primary)]"><button onClick={() => setGruposSection('menu')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Descubrir Grupos</span></div>)}
                     <div className="flex-1 overflow-y-auto"><DiscoverGroupsView user={user} onGroupSelect={(group: any) => setSelectedGroup(group)} /></div>
                 </div>
             );
             return (
-                <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900">
-                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-green-600"><button onClick={() => { setGruposSection('menu'); setSelectedGroup(null); }} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Mis Grupos</span></div>)}
+                <div className="flex-1 flex flex-col overflow-hidden bg-[var(--bg-primary)]">
+                    {isMobile && (<div className="flex items-center gap-3 px-4 py-3 bg-[var(--brand-primary)]"><button onClick={() => { setGruposSection('menu'); setSelectedGroup(null); }} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button><span className="text-white font-semibold text-sm">Mis Grupos</span></div>)}
                     <div className="flex-1 overflow-y-auto"><GruposMisGruposView user={user} onGroupSelect={(group: any) => setSelectedGroup(group)} /></div>
                 </div>
             );
@@ -380,9 +379,9 @@ export function MisContactosPageContent() {
         return (
             <div className="flex-1 flex items-center justify-center" data-msg-bg="true" style={{ backgroundColor: '#e5ddd5', backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0)`, backgroundSize: '24px 24px' }}>
                 <div className="text-center px-6 flex flex-col items-center">
-                    <div className="w-20 h-20 rounded-full bg-green-600 flex items-center justify-center mb-6 shadow-2xl"><span className="text-white font-bold text-3xl">{activeTab === 'chats' ? 'T' : 'E'}</span></div>
-                    <h2 className="text-gray-800 dark:text-white text-2xl font-light mb-2">{activeTab === 'chats' ? 'Tiyuy Mensajes' : 'Estados'}</h2>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm text-center max-w-xs leading-relaxed mb-6">{activeTab === 'chats' ? 'Selecciona un chat para comenzar a conversar con clientes' : 'Comparte tu estado con otros profesionales'}</p>
+                    <div className="w-20 h-20 rounded-full bg-[var(--brand-primary)] flex items-center justify-center mb-6 shadow-2xl"><span className="text-white font-bold text-3xl">{activeTab === 'chats' ? 'T' : 'E'}</span></div>
+                    <h2 className="text-[var(--text-primary)] text-2xl font-light mb-2">{activeTab === 'chats' ? 'Tiyuy Mensajes' : 'Estados'}</h2>
+                    <p className="text-[var(--text-secondary)] text-sm text-center max-w-xs leading-relaxed mb-6">{activeTab === 'chats' ? 'Selecciona un chat para comenzar a conversar con clientes' : 'Comparte tu estado con otros profesionales'}</p>
                 </div>
             </div>
         );
@@ -392,8 +391,8 @@ export function MisContactosPageContent() {
     const renderChannelsView = () => {
         if (selectedChannel) {
             return (
-                <div className={`flex-1 flex flex-col bg-white dark:bg-gray-900 overflow-hidden ${isMobile ? 'w-full' : ''}`}>
-                    <div className="flex-none flex items-center gap-3 px-4 py-3 bg-green-600 border-b border-[#054d44]">
+                <div className={`flex-1 flex flex-col bg-[var(--bg-primary)] overflow-hidden ${isMobile ? 'w-full' : ''}`}>
+                    <div className="flex-none flex items-center gap-3 px-4 py-3 bg-[var(--brand-primary)] border-b border-[var(--border-color)]">
                         <button onClick={() => setSelectedChannel(null)} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button>
                         <div className="flex-1 min-w-0"><p className="text-white font-semibold text-sm">{selectedChannel.name}</p><p className="text-white/60 text-xs">{selectedChannel.subscriberCount?.toLocaleString('es-PE') || 0} suscriptores</p></div>
                     </div>
@@ -406,9 +405,10 @@ export function MisContactosPageContent() {
             );
         }
         return (
-            <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-900">
+            <div className="flex-1 flex flex-col overflow-hidden bg-[var(--bg-primary)]">
+
                 {isMobile && channelsSection !== 'mis-canales-creados' && (
-                    <div className="flex items-center gap-3 px-4 py-3 bg-green-600 flex-shrink-0">
+                    <div className="flex items-center gap-3 px-4 py-3 bg-[var(--brand-primary)] flex-shrink-0">
                         <button onClick={() => setChannelsSection('mis-canales-creados')} className="text-white/70 hover:text-white transition-colors"><ArrowLeft className="w-5 h-5 fill-current" /></button>
                         <span className="text-white font-semibold text-sm">{channelsSection === 'descubrir-canales' ? 'Descubrir Canales' : channelsSection === 'crear-canal' ? 'Crear Canal' : channelsSection === 'mis-canales-suscritos' ? 'Mis Canales Suscritos' : 'Canales'}</span>
                     </div>
@@ -424,28 +424,29 @@ export function MisContactosPageContent() {
     };
 
     return (
-        <div className={`flex ${isMobile ? 'h-[calc(100vh-64px)] pb-14' : 'h-[calc(100vh-64px)]'} bg-[#efebe2] dark:bg-gray-900 overflow-hidden`}>
+        <div className={`flex ${isMobile ? 'h-[calc(100vh-64px)] pb-14' : 'h-[calc(100vh-64px)]'} bg-[var(--bg-secondary)] overflow-hidden`}>
             {!isAuthenticated && (
                 <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
-                        <div className="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4"><MessageSquare className="w-7 h-7 fill-white" /></div>
-                        <h2 className="text-xl font-bold text-gray-900 mb-2">Inicia sesión para chatear</h2>
-                        <a href="/login" className="block w-full py-3 bg-green-600 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity mb-3">Iniciar sesión</a>
-                        <a href="/" className="block text-gray-400 text-sm hover:text-gray-600">Volver</a>
+                    <div className="bg-[var(--bg-card)] rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
+                        <div className="w-14 h-14 bg-[var(--brand-primary)] rounded-full flex items-center justify-center mx-auto mb-4"><MessageSquare className="w-7 h-7 fill-white" /></div>
+                        <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2">Inicia sesión para chatear</h2>
+                        <a href="/login" className="block w-full py-3 bg-[var(--brand-primary)] text-white rounded-xl font-semibold hover:opacity-90 transition-opacity mb-3">Iniciar sesión</a>
+                        <a href="/" className="block text-[var(--text-muted)] text-sm hover:text-[var(--text-secondary)]">Volver</a>
                     </div>
                 </div>
             )}
             <Sidebar activeTab={activeTab} onTabChange={setActiveTab} unreadCount={unreadCount} user={user} isMobile={isMobile} />
             <div className="flex-1 flex overflow-hidden">
-                <div ref={leftPanelRef} className={`flex-initial flex flex-col bg-white dark:bg-gray-800 border-r border-[#e9edef] dark:border-gray-700 overflow-hidden ${isMobile && hasSelection ? 'hidden' : 'flex'} ${isMobile ? 'w-full' : ''}`}
+                <div ref={leftPanelRef} className={`flex-initial flex flex-col bg-[var(--bg-card)] border-r border-[var(--border-color)] overflow-hidden ${isMobile && hasSelection ? 'hidden' : 'flex'} ${isMobile ? 'w-full' : ''}`}
+
                     style={{ width: isMobile ? '100%' : leftPanelWidth, transition: isDraggingLeft ? 'none' : 'width 200ms ease' }}>
-                    <div className="bg-green-600 px-4 py-3 flex-shrink-0">
+                    <div className="bg-[var(--brand-primary)] px-4 py-3 flex-shrink-0">
                         <div className="flex items-center justify-between">
                             <div><h1 className="text-white font-bold text-base leading-tight">{activeTab === 'chats' && 'Mis Contactos'}{activeTab === 'estados' && 'Estados'}{activeTab === 'canales' && 'Canales'}{activeTab === 'grupos' && 'Grupos'}</h1><p className="text-white/80 text-xs">Mensajería inmobiliaria</p></div>
-                            {activeTab === 'estados' && <button onClick={() => setStatusSection('crear')} className="bg-white/15 hover:bg-white/25 text-white text-xs px-3 py-1.5 rounded-full transition-colors font-medium">+ Estado</button>}
+                            {activeTab === 'estados' && <button onClick={() => setStatusSection('crear')} className="bg-[var(--bg-tertiary)] hover:bg-[var(--border-color)] text-[var(--text-primary)] text-xs px-3 py-1.5 rounded-full transition-colors font-medium">+ Estado</button>}
                         </div>
                     </div>
-                    <div className="flex-1 overflow-hidden bg-white">
+                    <div className="flex-1 overflow-hidden bg-[var(--bg-card)]">
                         {activeTab === 'chats' && <ChatsPanel user={user} selectedChatId={selectedChatId} setSelectedChatId={setSelectedChatId} />}
                         {activeTab === 'estados' && <EstadosPanel user={user} onNewStatus={() => setStatusSection('crear')} onStatusSelect={setSelectedStatusId} selectedStatusId={selectedStatusId} />}
                         {activeTab === 'canales' && <CanalesListPanel user={user} onChannelSelect={setSelectedChannel} activeSection={channelsSection} onSectionChange={setChannelsSection} />}
@@ -453,7 +454,7 @@ export function MisContactosPageContent() {
                         {activeTab === 'grupos' && gruposSection === 'menu' && (
                             <div className="flex-1 flex items-center justify-center">
                                 <div className="text-center px-6">
-                                    <p className="text-gray-400 text-sm">Selecciona una opción del menú</p>
+                                    <p className="text-[var(--text-muted)] text-sm">Selecciona una opción del menú</p>
                                 </div>
                             </div>
                         )}
@@ -464,26 +465,26 @@ export function MisContactosPageContent() {
                         </div>
                     )}
                 </div>
-                <div className={`flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900 ${isMobile ? (hasSelection ? 'w-full flex' : 'hidden') : ''}`}>
+                <div className={`flex-1 flex flex-col overflow-hidden bg-[var(--bg-primary)] ${isMobile ? (hasSelection ? 'w-full flex' : 'hidden') : ''}`}>
                     {activeTab === 'canales' ? renderChannelsView() : renderChatView()}
                 </div>
             </div>
             {isMobile && (
-                <div className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex items-center justify-around px-2 py-1 safe-area-bottom">
+                <div className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--bg-card)] border-t border-[var(--border-color)] flex items-center justify-around px-2 py-1 safe-area-bottom">
                     {NAV.map(({ key, Icon, label, badge }) => (
                         <button key={key} onClick={() => { setActiveTab(key); setSelectedChatId(null); setSelectedStatusId(null); setSelectedGroup(null); setSelectedChannel(null); }}
-                            className={`relative flex flex-col items-center justify-center py-1 px-3 rounded-lg transition-all ${activeTab === key ? 'text-green-600' : 'text-gray-500'}`}>
-                            <div className="relative"><Icon a={activeTab === key} />{badge ? <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-3.5 bg-[#25d366] rounded-full flex items-center justify-center text-white text-[8px] font-bold px-0.5">{badge > 99 ? '99+' : badge}</span> : null}</div>
-                            <span className={`text-[9px] mt-0.5 font-medium ${activeTab === key ? 'text-green-600' : 'text-gray-500'}`}>{label}</span>
+                            className={`relative flex flex-col items-center justify-center py-1 px-3 rounded-lg transition-all ${activeTab === key ? 'text-[var(--brand-primary)]' : 'text-[var(--text-muted)]'}`}>
+                            <div className="relative"><Icon a={activeTab === key} />{badge ? <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-3.5 bg-[var(--brand-primary)] rounded-full flex items-center justify-center text-white text-[8px] font-bold px-0.5">{badge > 99 ? '99+' : badge}</span> : null}</div>
+                            <span className={`text-[9px] mt-0.5 font-medium ${activeTab === key ? 'text-[var(--brand-primary)]' : 'text-[var(--text-muted)]'}`}>{label}</span>
                         </button>
                     ))}
                 </div>
             )}
             {/* Modal ver imagen */}
             {viewingImage && (
-                <div className="fixed inset-0 z-[100] bg-white dark:bg-gray-100 flex items-center justify-center" onClick={() => setViewingImage(null)}>
+                <div className="fixed inset-0 z-[100] bg-[var(--bg-primary)] flex items-center justify-center" onClick={() => setViewingImage(null)}>
                     {/* Botón cerrar arriba derecha */}
-                    <button onClick={() => setViewingImage(null)} className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-200 rounded-full transition-colors z-10">
+                    <button onClick={() => setViewingImage(null)} className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-full transition-colors z-10">
                         <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                     {/* Botón descargar abajo derecha */}
@@ -501,7 +502,7 @@ export function MisContactosPageContent() {
                             document.body.removeChild(a);
                             URL.revokeObjectURL(url);
                         } catch {}
-                    }} className="absolute bottom-6 right-6 z-10 bg-green-600 hover:bg-green-700 text-white rounded-full w-12 h-12 flex items-center justify-center transition-colors shadow-lg" title="Descargar">
+                    }} className="absolute bottom-6 right-6 z-10 bg-[var(--brand-primary)] hover:opacity-90 text-white rounded-full w-12 h-12 flex items-center justify-center transition-colors shadow-lg" title="Descargar">
                         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     </button>
                     <img src={viewingImage} alt="" className="max-w-[92vw] max-h-[90vh] object-contain select-none shadow-2xl rounded-lg" onClick={(e) => e.stopPropagation()} />

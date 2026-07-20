@@ -90,10 +90,10 @@ export default function EstadosPanel({ user, onNewStatus, onStatusSelect, select
     };
 
     return (
-        <div className="flex flex-col h-full bg-white dark:bg-gray-800">
+        <div className="flex flex-col h-full bg-[var(--bg-primary)]">
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                <h2 className="font-semibold text-gray-800">Estados · 48h</h2>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-light)]">
+                <h2 className="font-semibold text-[var(--text-primary)]">Estados · 48h</h2>
                 <button onClick={onNewStatus}
                     className="text-xs bg-brand text-white px-4 py-1.5 rounded-full font-medium hover:opacity-90 transition-opacity shadow-sm">
                     + Publicar
@@ -101,24 +101,24 @@ export default function EstadosPanel({ user, onNewStatus, onStatusSelect, select
             </div>
 
             {/* Filtro ubicación */}
-            <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
-                <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-full px-3 py-1.5">
+            <div className="px-4 py-2 border-b border-[var(--border-light)]">
+                <div className="flex items-center gap-2 bg-[var(--bg-tertiary)] rounded-full px-3 py-1.5">
                     <IC.Search />
                     <input
                         value={locationFilter}
                         onChange={e => setLocationFilter(e.target.value)}
                         placeholder="Filtrar por zona o distrito..."
-                        className="bg-transparent text-xs text-gray-700 placeholder-gray-400 flex-1 focus:outline-none"
+                        className="bg-transparent text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] flex-1 focus:outline-none"
                     />
                 </div>
             </div>
 
             {/* Mi estado */}
             <div onClick={onNewStatus}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 transition-colors">
+                className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--bg-tertiary)] cursor-pointer border-b border-[var(--border-light)] transition-colors">
                 <div className="relative">
                     <div className="w-12 h-12 rounded-full p-0.5 bg-brand">
-                        <div className="w-full h-full rounded-full bg-white dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                        <div className="w-full h-full rounded-full bg-[var(--bg-primary)] flex items-center justify-center overflow-hidden">
                             <Avatar name={user?.firstName ?? 'U'} role={user?.role} size="md" />
                         </div>
                     </div>
@@ -127,15 +127,15 @@ export default function EstadosPanel({ user, onNewStatus, onStatusSelect, select
                     </div>
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-gray-900">Mi estado</p>
-                    <p className="text-xs text-gray-400">Toca para publicar · dura 48 horas</p>
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">Mi estado</p>
+                    <p className="text-xs text-[var(--text-muted)]">Toca para publicar · dura 48 horas</p>
                 </div>
             </div>
 
             {/* Sección recientes */}
             {!isLoading && allPosts.length > 0 && (
                 <div className="px-4 py-2">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                    <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">
                         Recientes
                     </p>
                 </div>
@@ -149,8 +149,8 @@ export default function EstadosPanel({ user, onNewStatus, onStatusSelect, select
                     </div>
                 ) : allPosts.length === 0 ? (
                     <div className="text-center py-16 px-6">
-                        <p className="text-gray-500 text-sm font-medium">No hay estados activos</p>
-                        <p className="text-gray-400 text-xs mt-1">Sé el primero en publicar una búsqueda</p>
+                        <p className="text-[var(--text-muted)] text-sm font-medium">No hay estados activos</p>
+                        <p className="text-[var(--text-muted)] text-xs mt-1">Sé el primero en publicar una búsqueda</p>
                     </div>
                 ) : (
                     <>
@@ -161,7 +161,7 @@ export default function EstadosPanel({ user, onNewStatus, onStatusSelect, select
                             const roleLabel = ROLE_LABEL[post.userRole] ?? 'Usuario';
                             return (
                                 <div key={post.id}
-                                    className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 transition-colors cursor-pointer ${selectedStatusId === post.id ? 'bg-brand/10 dark:bg-gray-600' : ''}`}
+                                    className={`flex items-start gap-3 px-4 py-3 hover:bg-[var(--bg-tertiary)] border-b border-[var(--border-light)] transition-colors cursor-pointer ${selectedStatusId === post.id ? 'bg-brand/10' : ''}`}
                                     onClick={() => handleStatusClick(post.id)}>
                                     <div className="relative flex-shrink-0">
                                         <div className={`w-12 h-12 rounded-full ring-2 ring-offset-1 ${isUrgent ? 'ring-red-400' : 'ring-green-400'} overflow-hidden`}>
@@ -172,16 +172,16 @@ export default function EstadosPanel({ user, onNewStatus, onStatusSelect, select
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between mb-0.5">
                                             <div className="flex items-center gap-1.5 flex-wrap">
-                                                <span className="text-sm font-semibold text-gray-900">{post.userName}</span>
+                                                <span className="text-sm font-semibold text-[var(--text-primary)]">{post.userName}</span>
                                                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${badge}`}>{roleLabel}</span>
                                             </div>
                                             <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
-                                                <span className={`text-[10px] font-medium ${isUrgent ? 'text-red-400' : 'text-gray-400'}`}>
+                                                <span className={`text-[10px] font-medium ${isUrgent ? 'text-red-400' : 'text-[var(--text-muted)]'}`}>
                                                     {isUrgent ? '️ ' : ''}{timeLeft(new Date(post.expiresAt))}
                                                 </span>
                                             </div>
                                         </div>
-                                        <p className="text-xs text-gray-600 leading-relaxed line-clamp-2">{post.content}</p>
+                                        <p className="text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-2">{post.content}</p>
                                         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                                             {post.location && (
                                                 <span className="inline-flex items-center gap-1 text-[10px] bg-brand/10 text-brand px-2 py-0.5 rounded-full font-medium">
@@ -193,7 +193,7 @@ export default function EstadosPanel({ user, onNewStatus, onStatusSelect, select
                                                     {post.propertyType}
                                                 </span>
                                             )}
-                                            <span className="text-[10px] text-gray-400 ml-auto">{post.viewCount} vistas</span>
+                                            <span className="text-[10px] text-[var(--text-muted)] ml-auto">{post.viewCount} vistas</span>
                                         </div>
                                     </div>
                                 </div>
@@ -204,7 +204,7 @@ export default function EstadosPanel({ user, onNewStatus, onStatusSelect, select
                                 {isFetchingNextPage ? (
                                     <div className="w-6 h-6 rounded-full border-2 border-brand border-t-transparent animate-spin" />
                                 ) : (
-                                    <span className="text-xs text-gray-400">Desplaza para más estados...</span>
+                                    <span className="text-xs text-[var(--text-muted)]">Desplaza para más estados...</span>
                                 )}
                             </div>
                         )}

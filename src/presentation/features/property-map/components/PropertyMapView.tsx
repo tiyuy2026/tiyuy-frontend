@@ -314,10 +314,10 @@ export function PropertyMapView({
     <div className="relative w-full h-full">
       {/* Loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 z-[1000] bg-white/60 backdrop-blur-sm flex items-center justify-center">
+        <div className="absolute inset-0 z-[1000] bg-[var(--bg-primary)]/60 backdrop-blur-sm flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm text-gray-500 font-medium">Cargando mapa...</p>
+            <p className="text-sm text-[var(--text-muted)] font-medium">Cargando mapa...</p>
           </div>
         </div>
       )}
@@ -327,22 +327,22 @@ export function PropertyMapView({
 
       {/* Leyenda de cobertura */}
       {searchResult && searchResult.items.length > 0 && (
-        <div className="absolute bottom-6 left-6 z-[1000] bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200 p-3">
+        <div className="absolute bottom-6 left-6 z-[1000] bg-[var(--bg-card)]/90 backdrop-blur-sm rounded-xl shadow-lg border border-[var(--border-color)] p-3">
           <div className="flex flex-col gap-1.5">
-            <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+            <span className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
               Cobertura
             </span>
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-emerald-500" />
-              <span className="text-xs text-gray-600">Distrito exacto</span>
+              <span className="text-xs text-[var(--text-secondary)]">Distrito exacto</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-amber-500" />
-              <span className="text-xs text-gray-600">Distritos cercanos</span>
+              <span className="text-xs text-[var(--text-secondary)]">Distritos cercanos</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-violet-500" />
-              <span className="text-xs text-gray-600">Área metropolitana</span>
+              <span className="text-xs text-[var(--text-secondary)]">Área metropolitana</span>
             </div>
           </div>
         </div>

@@ -16,7 +16,7 @@ export function GrupoDetailPanel({ group, user, onBack }: { group: any; user: an
     };
 
     return (
-        <div className="flex flex-col h-full bg-white dark:bg-gray-900">
+        <div className="flex flex-col h-full bg-[var(--bg-primary)]">
             {/* Header del grupo - barra verde delgada solo con nombre */}
             <div className="bg-green-600 px-4 py-3 flex-shrink-0">
                 <div className="flex items-center justify-between">
@@ -41,12 +41,12 @@ export function GrupoDetailPanel({ group, user, onBack }: { group: any; user: an
             </div>
 
             {/* Stats en fondo blanco (no verde) */}
-            <div className="flex items-center gap-4 px-4 py-2 border-b border-gray-100 dark:border-gray-700">
-                <div className="flex items-center gap-2 text-xs text-gray-500">
+            <div className="flex items-center gap-4 px-4 py-2 border-b border-[var(--border-light)]">
+                <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
                     <Users className="w-3.5 h-3.5" />
                     <span>{group.memberCount || 0} miembros</span>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-gray-500">
+                <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>{group.postCount || 0} publicaciones</span>
                 </div>

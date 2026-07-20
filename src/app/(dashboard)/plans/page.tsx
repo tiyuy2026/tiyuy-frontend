@@ -459,16 +459,16 @@ function PlansPageContent() {
   return (
     <ProtectedRoute>
       <AdminRestrictionGuard feature="plans">
-      <div className="min-h-screen bg-gray-50">
-        <div className="relative bg-white overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand-primary-light)] via-white to-white opacity-50"></div>
+      <div className="min-h-screen bg-[var(--bg-secondary)]">
+        <div className="relative bg-[var(--bg-primary)] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand-primary-light)] via-[var(--bg-primary)] to-[var(--bg-primary)] opacity-50"></div>
           <HeroSection />
         </div>
 
         <div className="max-w-[1920px] mx-auto px-8 xl:px-16 pb-16 pt-12">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Elige tu Plan Ideal</h2>
-            <p className="text-lg text-gray-600">Precios transparentes, sin sorpresas. Escalable según tu crecimiento.</p>
+            <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-4">Elige tu Plan Ideal</h2>
+            <p className="text-lg text-[var(--text-secondary)]">Precios transparentes, sin sorpresas. Escalable según tu crecimiento.</p>
           </div>
 
           {/* Mensaje si ya tiene un plan activo pagado */}
@@ -548,7 +548,7 @@ function PlansPageContent() {
                     {diasRestantes}
                     <span className="text-sm font-normal ml-1">días</span>
                   </div>
-                  <div className="h-8 w-px bg-gray-300"></div>
+                  <div className="h-8 w-px bg-[var(--border-color)]"></div>
                   <p className={`text-xs ${textColor}`}>
                     Vence el {expiresAt.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </p>
@@ -569,7 +569,7 @@ function PlansPageContent() {
             {isLoading ? (
               <div className="text-center py-16">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)]"></div>
-                <p className="mt-4 text-gray-600">Cargando planes...</p>
+                <p className="mt-4 text-[var(--text-secondary)]">Cargando planes...</p>
               </div>
             ) : plans && plans.length > 0 ? (
               <div className="relative px-1 pb-4">
@@ -580,9 +580,9 @@ function PlansPageContent() {
                       scrollContainerRef.current.scrollBy({ left: -cardWidth, behavior: 'smooth' });
                     }
                   }}
-                  className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all cursor-pointer border border-gray-200"
+                  className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-[var(--bg-card)] rounded-full shadow-lg flex items-center justify-center hover:bg-[var(--bg-tertiary)] transition-all cursor-pointer border border-[var(--border-color)]"
                 >
-                  <Icon icon="material-symbols:chevron-left-rounded" className="w-6 h-6 text-gray-700" />
+                  <Icon icon="material-symbols:chevron-left-rounded" className="w-6 h-6 text-[var(--text-secondary)]" />
                 </button>
                 <button
                   onClick={() => {
@@ -591,9 +591,9 @@ function PlansPageContent() {
                       scrollContainerRef.current.scrollBy({ left: cardWidth, behavior: 'smooth' });
                     }
                   }}
-                  className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all cursor-pointer border border-gray-200"
+                  className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-[var(--bg-card)] rounded-full shadow-lg flex items-center justify-center hover:bg-[var(--bg-tertiary)] transition-all cursor-pointer border border-[var(--border-color)]"
                 >
-                  <Icon icon="material-symbols:chevron-right-rounded" className="w-6 h-6 text-gray-700" />
+                  <Icon icon="material-symbols:chevron-right-rounded" className="w-6 h-6 text-[var(--text-secondary)]" />
                 </button>
 
                 <div className="overflow-visible pt-8 pb-8 px-2">
@@ -700,7 +700,7 @@ function PlansPageContent() {
                              Descuento inteligente aplicado
                            </h3>
                          </div>
-                         <div className="text-sm text-gray-700">
+                         <div className="text-sm text-[var(--text-secondary)]">
                            Se ha aplicado automáticamente un {intelligentDiscount.percentage}% de descuento según el precio del plan.
                          </div>
                        </div>

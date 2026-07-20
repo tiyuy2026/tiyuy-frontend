@@ -88,7 +88,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
   };
 
   return (
-    <div className="flex flex-col bg-white dark:bg-gray-900 h-full">
+    <div className="flex flex-col bg-[var(--bg-primary)] h-full">
       <div className="bg-green-600 px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div>
@@ -122,7 +122,7 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
           <form onSubmit={handleSubmit} className="space-y-6">
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               Nombre del canal *
             </label>
             <input
@@ -131,17 +131,17 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
               onChange={(e) => setName(e.target.value)}
               placeholder="Ej: Lima Inmobiliaria Oficial"
               maxLength={50}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[var(--bg-card)] text-[var(--text-primary)]"
               required
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-[var(--text-muted)] mt-1">
               {name.length}/50 caracteres
             </p>
           </div>
 
           {/* City */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               Ciudad/Region *
             </label>
             <input
@@ -150,17 +150,17 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
               onChange={(e) => setCity(e.target.value)}
               placeholder="Ej: Lima"
               maxLength={100}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[var(--bg-card)] text-[var(--text-primary)]"
               required
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-[var(--text-muted)] mt-1">
               {city.length}/100 caracteres
             </p>
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               Descripcion *
             </label>
             <textarea
@@ -169,26 +169,26 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
               placeholder="Describe tu canal y el tipo de contenido que compartiras..."
               maxLength={1000}
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-4 py-2 border border-[var(--border-color)] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-[var(--bg-card)] text-[var(--text-primary)]"
               required
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-[var(--text-muted)] mt-1">
               {description.length}/1000 caracteres
             </p>
           </div>
 
           {/* Avatar Upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               Avatar (Opcional)
             </label>
             <div className="flex items-center gap-4">
               {/* Preview */}
-              <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden border-2 border-gray-200 dark:border-gray-600">
+              <div className="w-20 h-20 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center overflow-hidden border-2 border-[var(--border-color)]">
                 {avatarPreview ? (
                   <img src={avatarPreview} alt="Avatar preview" className="w-full h-full object-cover" />
                 ) : (
-                  <User className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                  <User className="w-8 h-8 text-[var(--text-muted)]" />
                 )}
               </div>
               
@@ -204,11 +204,11 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium text-sm"
+                  className="px-4 py-2 bg-[var(--bg-tertiary)] text-[var(--text-primary)] rounded-lg hover:bg-[var(--border-color)] transition-colors font-medium text-sm"
                 >
                   {avatarFile ? 'Cambiar imagen' : 'Seleccionar imagen'}
                 </button>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <p className="text-xs text-[var(--text-muted)] mt-1">
                   JPG, PNG o GIF. Max 5MB
                 </p>
                 {avatarFile && (
@@ -222,11 +222,11 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
 
           {/* Channel Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               Tipo de Canal *
             </label>
             <div className="space-y-2">
-              <label className="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors bg-white dark:bg-gray-800">
+              <label className="flex items-center p-3 border border-[var(--border-color)] rounded-lg cursor-pointer hover:bg-[var(--bg-tertiary)] transition-colors bg-[var(--bg-card)]">
                 <input
                   type="radio"
                   name="channelType"
@@ -235,13 +235,13 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
                   className="mr-3"
                 />
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900 dark:text-gray-100">Público</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Cualquier usuario puede encontrar y suscribirse</div>
+                  <div className="font-medium text-[var(--text-primary)]">Público</div>
+                  <div className="text-sm text-[var(--text-muted)]">Cualquier usuario puede encontrar y suscribirse</div>
                 </div>
                 <Users className="w-5 h-5 text-green-500" />
               </label>
               
-              <label className="flex items-center p-3 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors bg-white dark:bg-gray-800">
+              <label className="flex items-center p-3 border border-[var(--border-color)] rounded-lg cursor-pointer hover:bg-[var(--bg-tertiary)] transition-colors bg-[var(--bg-card)]">
                 <input
                   type="radio"
                   name="channelType"
@@ -250,8 +250,8 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
                   className="mr-3"
                 />
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900 dark:text-gray-100">Privado</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">Solo usuarios invitados pueden suscribirse</div>
+                  <div className="font-medium text-[var(--text-primary)]">Privado</div>
+                  <div className="text-sm text-[var(--text-muted)]">Solo usuarios invitados pueden suscribirse</div>
                 </div>
                 <ShieldAlert className="w-5 h-5 text-orange-500" />
               </label>
@@ -260,14 +260,14 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
 
           {/* Subscribers Can Post Toggle */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
               Publicación de Suscriptores
             </label>
-            <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div className="bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg p-4">
               <label className="flex items-center justify-between cursor-pointer">
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900 dark:text-gray-100">Permitir que suscriptores publiquen</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <div className="font-medium text-[var(--text-primary)]">Permitir que suscriptores publiquen</div>
+                  <div className="text-sm text-[var(--text-muted)] mt-1">
                     {subscribersCanPost 
                       ? 'Los suscriptores podrán crear posts en el canal'
                       : 'Solo tú y los colaboradores con permiso podrán publicar'}
@@ -315,14 +315,14 @@ export default function CreateChannelView({ user, onBack }: { user: any; onBack:
             <button
               type="button"
               onClick={onBack}
-              className="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-medium"
+              className="flex-1 px-6 py-3 border border-[var(--border-color)] text-[var(--text-primary)] rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors font-medium"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isCreating || !name.trim() || !city.trim() || !description.trim()}
-              className="flex-1 px-6 py-3 bg-brand text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
+              className="flex-1 px-6 py-3 bg-brand text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
             >
               {isCreating ? (
                 <>

@@ -48,7 +48,7 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
 
     if (hasGroup) {
         return (
-            <div className="h-full bg-white dark:bg-gray-900 flex flex-col">
+            <div className="h-full bg-[var(--bg-primary)] flex flex-col">
                 {/* Header */}
                 <div className="flex-none flex items-center gap-3 px-4 py-3 bg-green-600">
                     <button onClick={onBack} className="text-white/70 hover:text-white transition-colors">
@@ -64,12 +64,12 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
                         <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
                             <AlertCircle className="w-10 h-10 text-red-500" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">No puedes crear más grupos</h3>
+                        <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3">No puedes crear más grupos</h3>
                         <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
                             <p className="text-red-800 dark:text-red-300 text-sm font-medium">Ya alcanzaste el límite de 1 grupo activo</p>
                         </div>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
-                            Tu grupo actual: <strong className="text-gray-900 dark:text-white">"{userGroups[0]?.name}"</strong>
+                        <p className="text-[var(--text-secondary)] text-sm mb-6">
+                            Tu grupo actual: <strong className="text-[var(--text-primary)]">"{userGroups[0]?.name}"</strong>
                         </p>
                         <button onClick={onBack} className="w-full py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-colors">
                             Entendido
@@ -83,7 +83,7 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
     return (
         <>
             <InfoDialog isOpen={infoDialog.isOpen} onClose={() => setInfoDialog(prev => ({ ...prev, isOpen: false }))} title={infoDialog.title} message={infoDialog.message} variant={infoDialog.variant} />
-            <div className="h-full bg-white dark:bg-gray-900 flex flex-col">
+            <div className="h-full bg-[var(--bg-primary)] flex flex-col">
                 {/* Header */}
                 <div className="flex-none flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600">
                     <button onClick={onBack} className="text-white/70 hover:text-white transition-colors">
@@ -99,7 +99,7 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
                     <div className="max-w-2xl mx-auto space-y-6">
                         {/* Nombre */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                                 Nombre del grupo *
                             </label>
                             <input
@@ -108,14 +108,14 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
                                 onChange={e => { if (e.target.value.length <= 100) setName(e.target.value); }}
                                 maxLength={100}
                                 placeholder="Ej: Alquiler Miraflores, Venta Casas Lima Norte..."
-                                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm"
+                                className="w-full px-4 py-2.5 border border-[var(--border-color)] rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-[var(--bg-card)] text-[var(--text-primary)] text-sm"
                             />
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{name.length}/100</p>
+                            <p className="text-xs text-[var(--text-muted)] mt-1">{name.length}/100</p>
                         </div>
 
                         {/* Descripción */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                                 Descripción
                             </label>
                             <textarea
@@ -124,14 +124,14 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
                                 maxLength={500}
                                 rows={3}
                                 placeholder="¿De qué trata este grupo? ¿Qué tipo de miembros buscas?"
-                                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm resize-none"
+                                className="w-full px-4 py-2.5 border border-[var(--border-color)] rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-[var(--bg-card)] text-[var(--text-primary)] text-sm resize-none"
                             />
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{description.length}/500</p>
+                            <p className="text-xs text-[var(--text-muted)] mt-1">{description.length}/500</p>
                         </div>
 
                         {/* Tipo de grupo */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-3">
                                 Tipo de grupo *
                             </label>
                             <div className="grid grid-cols-2 gap-3">
@@ -140,14 +140,14 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
                                     className={`p-4 rounded-xl border-2 text-left transition-all ${
                                         groupType === 'PUBLIC'
                                             ? 'border-green-500 bg-green-50 dark:bg-green-900/20 ring-1 ring-green-500/20'
-                                            : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 bg-white dark:bg-gray-800'
+                                            : 'border-[var(--border-color)] hover:border-[var(--text-muted)] bg-[var(--bg-card)]'
                                     }`}
                                 >
                                     <div className="flex items-center gap-2 mb-2">
-                                        <Globe className={`w-5 h-5 ${groupType === 'PUBLIC' ? 'text-green-600' : 'text-gray-400'}`} />
-                                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">Público</p>
+                                        <Globe className={`w-5 h-5 ${groupType === 'PUBLIC' ? 'text-green-600' : 'text-[var(--text-muted)]'}`} />
+                                        <p className="text-sm font-semibold text-[var(--text-primary)]">Público</p>
                                     </div>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                                    <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                                         Visible en "Descubrir". Cualquiera puede unirse.
                                     </p>
                                 </button>
@@ -156,14 +156,14 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
                                     className={`p-4 rounded-xl border-2 text-left transition-all ${
                                         groupType === 'PRIVATE'
                                             ? 'border-green-500 bg-green-50 dark:bg-green-900/20 ring-1 ring-green-500/20'
-                                            : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 bg-white dark:bg-gray-800'
+                                            : 'border-[var(--border-color)] hover:border-[var(--text-muted)] bg-[var(--bg-card)]'
                                     }`}
                                 >
                                     <div className="flex items-center gap-2 mb-2">
-                                        <Lock className={`w-5 h-5 ${groupType === 'PRIVATE' ? 'text-green-600' : 'text-gray-400'}`} />
-                                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">Privado</p>
+                                        <Lock className={`w-5 h-5 ${groupType === 'PRIVATE' ? 'text-green-600' : 'text-[var(--text-muted)]'}`} />
+                                        <p className="text-sm font-semibold text-[var(--text-primary)]">Privado</p>
                                     </div>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                                    <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                                         No aparece en búsqueda. Solo por invitación.
                                     </p>
                                 </button>
@@ -171,13 +171,13 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
                         </div>
 
                         {/* Restricción por correo */}
-                        <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+                        <div className="bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl p-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-start gap-3">
-                                    <Mail className="w-5 h-5 text-gray-400 mt-0.5" />
+                                    <Mail className="w-5 h-5 text-[var(--text-muted)] mt-0.5" />
                                     <div>
-                                        <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Restringir por correo</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Solo emails aprobados pueden unirse</p>
+                                        <p className="text-sm font-medium text-[var(--text-secondary)]">Restringir por correo</p>
+                                        <p className="text-xs text-[var(--text-muted)] mt-0.5">Solo emails aprobados pueden unirse</p>
                                     </div>
                                 </div>
                                 <button
@@ -204,7 +204,7 @@ export default function CreateGroupView({ user, onBack }: { user: any; onBack: (
                         <div className="flex gap-3 pt-2">
                             <button
                                 onClick={onBack}
-                                className="flex-1 py-3 text-sm border border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-medium"
+                                className="flex-1 py-3 text-sm border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-colors font-medium"
                             >
                                 Cancelar
                             </button>
