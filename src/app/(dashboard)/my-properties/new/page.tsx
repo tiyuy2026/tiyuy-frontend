@@ -66,7 +66,7 @@ export default function NuevaPropiedadPage() {
 
       {/* ── TOP NAV ── */}
       <header className="bg-white dark:bg-[#1a2332] border-b border-gray-200 dark:border-gray-700/50 sticky top-0 z-20">
-        <div className="max-w-9xl mx-auto px-8 xl:px-16 h-14 flex items-center justify-between">
+        <div className="max-w-9xl mx-auto px-4 sm:px-8 xl:px-16 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/dashboard')}
@@ -108,7 +108,7 @@ export default function NuevaPropiedadPage() {
 
       {/* ── MOBILE STEPPER ── */}
       <div className="lg:hidden bg-white dark:bg-[#1a2332] border-b border-gray-200 dark:border-gray-700/50">
-        <div className="max-w-9xl mx-auto px-8 xl:px-16 py-3">
+        <div className="max-w-9xl mx-auto px-4 sm:px-8 xl:px-16 py-3">
           <div className="flex items-center justify-between">
             {STEPS.map((step, index) => {
               const isDone = currentStep > step.number;
@@ -148,7 +148,7 @@ export default function NuevaPropiedadPage() {
       </div>
 
       {/* ── BODY ── */}
-      <div className="max-w-9xl mx-auto px-8 xl:px-16 py-6 sm:py-8 flex gap-8 items-start">
+      <div className="max-w-9xl mx-auto px-4 sm:px-8 xl:px-16 py-6 sm:py-8 flex gap-8 items-start">
 
         {/* ── SIDEBAR: STEPPER ── */}
         <aside className="w-64 flex-shrink-0 hidden lg:block">
@@ -237,7 +237,7 @@ export default function NuevaPropiedadPage() {
 
       {/* ── FOOTER ── */}
       <footer className="bg-white dark:bg-[#1a2332] border-t border-gray-200 dark:border-gray-700/50 mt-6">
-        <div className="max-w-9xl mx-auto px-8 xl:px-16 py-6 sm:py-8 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+        <div className="max-w-9xl mx-auto px-4 sm:px-8 xl:px-16 py-6 sm:py-8 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           <div>
             <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">¿Por qué publicar con nosotros?</h4>
             <ul className="space-y-2">

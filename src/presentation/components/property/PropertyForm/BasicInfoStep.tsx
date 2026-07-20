@@ -109,21 +109,28 @@ export function BasicInfoStep({ formData, onChange, validationErrors }: BasicInf
         }
 
         .type-btn {
-          padding: 16px 12px;
+          padding: 12px 6px;
           border-radius: 12px;
           border: 1.5px solid #e2e8f0;
           background: #fff;
           font-weight: 600;
-          font-size: 13px;
+          font-size: 11px;
           color: #64748b;
           cursor: pointer;
           transition: all 0.2s ease;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 8px;
+          gap: 4px;
           font-family: 'Plus Jakarta Sans', sans-serif;
           width: 100%;
+        }
+        @media (min-width: 640px) {
+          .type-btn {
+            padding: 16px 12px;
+            font-size: 13px;
+            gap: 8px;
+          }
         }
         .type-btn:hover {
           border-color: #00a63e;
@@ -229,7 +236,7 @@ export function BasicInfoStep({ formData, onChange, validationErrors }: BasicInf
         <div>
           <div className="section-divider" />
           <label className="field-label">Tipo de propiedad</label>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
             {PROPERTY_TYPES.map((type) => (
               <button
                 key={type.value}
